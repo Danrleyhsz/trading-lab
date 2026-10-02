@@ -1,0 +1,5 @@
+import Fastify from "fastify";import websocket from "@fastify/websocket";import{BinancePublicMarketData}from "./infrastructure/binance-market-data.js";import{EventBus}from "./application/event-bus.js";import{event}from "./domain/events.js";
+const app=Fastify({logger:true});await app.register(websocket);const bus=new EventBus();let latest:any=null;
+app.get("/health",async()=>({ok:true,mode:"PAPER_TRADING"}));app.get("/market/latest",async()=>latest??{status:"waiting"});app.get("/events",{websocket:true},socket=>{const unsub=bus.subscribe(e=>socket.send(JSON.stringify(e)));socket.on("close",unsub)});
+const market=new BinancePublicMarketData(process.env.MARKET_SYMBOL?.toLowerCase()||"btcusdt");await market.connect(t=>{latest=t;bus.publish(event("MARKET_TICK",t))});
+const port=Number(process.env.PORT||3000);await app.listen({port,host:"0.0.0.0"});
