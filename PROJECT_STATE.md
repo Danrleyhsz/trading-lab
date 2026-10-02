@@ -46,3 +46,12 @@ Architecture skeleton + market-data ingestion + paper broker contract + event sc
 - UI profile uses the read-only endpoint and does not let stale snapshots override newer room or market events.
 - Validation: typecheck, 23 tests, and JavaScript syntax passed. Browser visual validation is still pending.
 - This remains cloud-first; a single runtime writer and a durable cloud volume are required for the current JSON adapter until the PostgreSQL milestone. This increment does not provision or deploy cloud infrastructure.
+
+## Independent paper accounts (approved capital model, implementation pending review)
+- Evaluation wallets receive explicitly configured virtual capital independently of the fund. They are never added to or subtracted from fund equity.
+- PAPER_EVALUATION_ENABLED defaults to false; EVALUATION_PAPER_CAPITAL must be configured and positive to create evaluation wallets. Existing wallets are preserved rather than reseeded when configuration changes. Disabled evaluation execution is rejected even for restored accounts.
+- /paper/orders remains fund-only. /paper/accounts/:id/orders explicitly selects the account. Caller-supplied routing, agent, approval and reference price fields are rejected. Market price must be current.
+- The book assigns account, owner, proposal and optional strategy IDs and retains original proposal/risk/order/fill events. Snapshots persist initial endowments and ledgers; replay restores positions, fees and realized results. Legacy snapshots get no invented old fills.
+- The Risk Engine rejects invalid numeric orders and evaluates cumulative projected positions. Requests are serialized per account to prevent concurrent approvals from ignoring prior fills.
+- Office and profiles separate evaluation wallets from the fund. Net P&L includes execution fees. Win rate and maximum drawdown remain unavailable without complete outcome/time-series data.
+- The infrastructure is still cloud-first. The JSON adapter still requires one runtime writer and a durable cloud volume; PostgreSQL migration remains on the roadmap. No production deployment or real-money adapter was added.

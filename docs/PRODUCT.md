@@ -26,3 +26,6 @@ A user on a phone can open the office, see a live BTC market feed, observe an ag
 
 ## Current career evidence
 The agent profile exposes actual memories, sent/received messages and state-transition events. State-transition experience is retained for compatibility and is labeled as such. It is not a measure of profitability or a completed research count. Detailed activity history begins when this journal is enabled; missing historical details remain visible as a coverage gap. Financial performance per agent is unavailable until paper fills have explicit account/agent attribution. Negative memories remain visible.
+
+## Evaluation wallets and fund
+Agent evaluation wallets have independent virtual starting capital. Their equity is shown alongside, never summed into, fund equity. Agent financial P&L is derived only from attributed evaluation fills and current marks; net P&L includes fees. The official fund remains a separate paper portfolio. Creating wallets does not mean an agent has performed research or traded.

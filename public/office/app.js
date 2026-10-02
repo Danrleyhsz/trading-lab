@@ -60,7 +60,7 @@ async function details() {
     const result = await get('/agents/' + encodeURIComponent(id) + '/profile');
     if (version !== profileVersion || id !== selected) return;
     const evidence = result.evidence, coverage = result.coverage;
-    q('#career').textContent = `${evidence.observations} observations · ${evidence.decisions} decisions · ${evidence.failures} failures · ${evidence.lessons} lessons · ${evidence.sentMessages} sent messages. Strategies studied: ${evidence.strategyIds.length}. Individual P&L, win rate and drawdown unavailable: no attributed trade ledger.`;
+    q('#career').textContent = `${evidence.observations} observations · ${evidence.decisions} decisions · ${evidence.failures} failures · ${evidence.lessons} lessons · ${evidence.sentMessages} sent messages. Strategies studied: ${evidence.strategyIds.length}. ${result.evaluationAccounts?.length ? 'Evaluation net P&L: ' + money(result.performance.netPnl) + '. Fees: ' + money(result.performance.feesPaid) + '. Fund excluded. Win rate and drawdown unavailable.' : 'Individual P&L, win rate and drawdown unavailable: no attributed evaluation account.'}`;
     q('#coverage').textContent = `${evidence.recordedTransitions} transitions in preserved history. ${coverage.legacyTransitionsWithoutHistory} older transitions have no detailed history. History starts: ${coverage.activitySince ? date(coverage.activitySince) : 'no recorded transitions yet'}.`;
     records('#memories', result.memories, memory => {
       const row = node('li', '');
@@ -89,24 +89,34 @@ async function details() {
 }
 q('#closeProfile').onclick = () => q('#profile').close();
 q('#profile').addEventListener('close', () => { selected = undefined; profileVersion++; });
+function renderAccounts(items) {
+  const host = q('#accounts');
+  host.replaceChildren();
+  for (const account of items) {
+    const row = node('li', '');
+    row.append(node('b', account.kind === 'FUND' ? 'Fund · separate official paper portfolio' : 'Evaluation · ' + account.ownerAgentId), node('p', 'Equity: ' + money(account.portfolio.equity)), node('p', 'Net P&L: ' + money(account.portfolio.equity - account.initialCash)), node('small', `${account.fills} recorded fills · Initial virtual capital: ${money(account.initialCash)}`));
+    host.append(row);
+  }
+  q('#accountScope').textContent = items.some(account => account.kind === 'EVALUATION') ? 'Evaluation capital is independent. These balances are never added to fund equity.' : 'Evaluation accounts are not configured. Fund remains separate.';
+}
 async function refresh() {
   if (busy) return;
   busy = true;
   const initialStateVersion = stateVersion, initialMarketVersion = marketVersion;
   try {
-    const [states, portfolio, market] = await Promise.all([get('/agents'), get('/portfolio'), get('/market/latest')]);
+    const [states, portfolio, market, accounts] = await Promise.all([get('/agents'), get('/portfolio'), get('/market/latest'), get('/paper/accounts')]);
     // A snapshot requested before a stream event must not move an agent back.
     if (initialStateVersion === stateVersion) {
       agents.clear();
       states.forEach(agent => agents.set(agent.id, agent));
       render();
     }
-    q('#equity').textContent = money(portfolio.equity);
-    q('#pnl').textContent = money(portfolio.realizedPnl + portfolio.unrealizedPnl);
+    renderAccounts(accounts);q('#equity').textContent = money(portfolio.equity);
+    q('#pnl').textContent = money(portfolio.equity - portfolio.initialCash);
     if (initialMarketVersion === marketVersion) q('#market').textContent = market.price ? market.symbol + ' ' + money(market.price) : 'Waiting for market data';
     q('#sync').textContent = 'Snapshot received ' + new Date().toLocaleTimeString();
   } catch {
-    q('#sync').textContent = 'Backend unavailable · displayed data may be stale';
+    q('#sync').textContent = 'Backend unavailable · displayed data may be stale';q('#accountScope').textContent = 'Account data unavailable or stale';
   } finally { busy = false; }
 }
 function connect() {
@@ -142,3 +152,4 @@ function connect() {
 refresh();
 setInterval(() => { refresh(); if (selected) details(); }, 5000);
 connect();
+
