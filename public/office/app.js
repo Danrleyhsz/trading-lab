@@ -152,4 +152,3 @@ function connect() {
 refresh();
 setInterval(() => { refresh(); if (selected) details(); }, 5000);
 connect();
-
