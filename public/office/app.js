@@ -1,12 +1,144 @@
-const q=s=>document.querySelector(s),agents=new Map(),events=[];let selected,version=0,busy=false;
-const money=n=>Number.isFinite(n)?n.toFixed(2)+' USDT':'—';
-function node(tag,text){const n=document.createElement(tag);n.textContent=text;return n}
-async function get(url){const r=await fetch(url,{cache:'no-store'});if(!r.ok)throw Error(url);return r.json()}
-function render(){document.querySelectorAll('.occupants').forEach(n=>n.replaceChildren());q('#agentList').replaceChildren();for(const a of agents.values()){const b=node('button','');b.className='agent';b.append(node('span','▣'),node('b',a.name),node('small',a.status));b.onclick=()=>profile(a.id);b.setAttribute('aria-label',`${a.name}, ${a.room}, ${a.status}`);const room=[...document.querySelectorAll('[data-room]')].find(n=>n.dataset.room===a.room);(room?.querySelector('.occupants')||q('#unmapped')).append(b);const row=node('button',`${a.name} · ${a.room} · ${a.status}`);row.onclick=()=>profile(a.id);q('#agentList').append(row)}if(selected)state()}
-function state(){const a=agents.get(selected);if(!a)return;q('#profileTitle').textContent=a.name;q('#profileState').textContent=`${a.role} · ${a.room} · ${a.status}`;q('#experience').textContent=`Experience: ${a.experience} recorded transitions`;q('#reason').textContent=a.lastReason||'No activity reason recorded';q('#updated').textContent='Backend state updated: '+new Date(a.updatedAt).toLocaleString()}
-async function profile(id){selected=id;q('#profile').showModal();state();await details()}
-async function details(){const id=selected,v=++version;const hosts=['#memories','#activity'];hosts.forEach(s=>q(s).textContent='Loading…');const results=await Promise.allSettled([get('/memories?agentId='+encodeURIComponent(id)),get('/agent-messages?agentId='+encodeURIComponent(id))]);if(v!==version||id!==selected)return;results.forEach((r,i)=>{const host=q(hosts[i]);host.replaceChildren();if(r.status==='rejected'){host.textContent='Data unavailable. Reopen to retry.';return}if(!r.value.length)host.textContent='No records available.';[...r.value].reverse().forEach(x=>{const row=node('li','');row.append(node('b',x.kind||x.type||'Record'),node('p',x.summary||''),node('small',new Date(x.createdAt||x.occurredAt).toLocaleString()));if(x.tags?.length)row.append(node('p',x.tags.join(' · ')));host.append(row)})})}
-q('#closeProfile').onclick=()=>q('#profile').close();q('#profile').addEventListener('close',()=>{selected=undefined;version++});
-async function refresh(){if(busy)return;busy=true;try{const [a,p,m]=await Promise.all([get('/agents'),get('/portfolio'),get('/market/latest')]);agents.clear();a.forEach(x=>agents.set(x.id,x));render();q('#equity').textContent=money(p.equity);q('#pnl').textContent=money(p.realizedPnl+p.unrealizedPnl);q('#market').textContent=m.price?m.symbol+' '+money(m.price):'Waiting for market data';q('#sync').textContent='Snapshot received '+new Date().toLocaleTimeString()}catch{q('#sync').textContent='Backend unavailable · displayed data may be stale'}finally{busy=false}}
-function connect(){const ws=new WebSocket(`${location.protocol==='https:'?'wss':'ws'}://${location.host}/events`);ws.onopen=()=>{q('#connection').textContent='Event stream connected';refresh()};ws.onmessage=m=>{let e;try{e=JSON.parse(m.data)}catch{return}if(!e.id||!e.type)return;if(e.type==='MARKET_TICK'){q('#market').textContent=e.payload.symbol+' '+money(e.payload.price);return}if(events.some(x=>x.id===e.id))return;events.unshift(e);events.splice(50);q('#events').replaceChildren(...events.map(x=>node('li',new Date(x.occurredAt).toLocaleString()+' · '+x.type)));if(e.type==='AGENT_STATE_CHANGED'){agents.set(e.payload.id,e.payload);render()}refresh();if(selected)details()};ws.onerror=()=>ws.close();ws.onclose=()=>{q('#connection').textContent='Event stream disconnected · retrying';setTimeout(connect,3000)}}
-refresh();setInterval(refresh,5000);connect();
+const q = selector => document.querySelector(selector);
+const agents = new Map(), events = [];
+let selected, profileVersion = 0, busy = false, stateVersion = 0, marketVersion = 0;
+const money = value => Number.isFinite(value) ? value.toFixed(2) + ' USDT' : '—';
+const date = value => new Date(value).toLocaleString();
+function node(tag, text) {
+  const element = document.createElement(tag);
+  element.textContent = text;
+  return element;
+}
+async function get(url) {
+  const response = await fetch(url, {cache: 'no-store'});
+  if (!response.ok) throw Error(url);
+  return response.json();
+}
+function render() {
+  document.querySelectorAll('.occupants').forEach(element => element.replaceChildren());
+  q('#agentList').replaceChildren();
+  for (const agent of agents.values()) {
+    const button = node('button', '');
+    button.className = 'agent';
+    button.append(node('span', '▣'), node('b', agent.name), node('small', agent.status));
+    button.onclick = () => profile(agent.id);
+    button.setAttribute('aria-label', `${agent.name}, ${agent.room}, ${agent.status}`);
+    const room = [...document.querySelectorAll('[data-room]')].find(element => element.dataset.room === agent.room);
+    (room?.querySelector('.occupants') || q('#unmapped')).append(button);
+    const row = node('button', `${agent.name} · ${agent.room} · ${agent.status}`);
+    row.onclick = () => profile(agent.id);
+    q('#agentList').append(row);
+  }
+  if (selected) renderState();
+}
+function renderState() {
+  const agent = agents.get(selected);
+  if (!agent) return;
+  q('#profileTitle').textContent = agent.name;
+  q('#profileState').textContent = `${agent.role} · ${agent.room} · ${agent.status}`;
+  q('#experience').textContent = `Experience: ${agent.experience} recorded transitions`;
+  q('#reason').textContent = agent.lastReason || 'No activity reason recorded';
+  q('#updated').textContent = 'Backend state updated: ' + date(agent.updatedAt);
+}
+async function profile(id) {
+  selected = id;
+  q('#profile').showModal();
+  renderState();
+  await details();
+}
+function records(selector, items, renderRecord) {
+  const host = q(selector);
+  host.replaceChildren();
+  if (!items.length) host.textContent = 'No records available.';
+  for (const item of [...items].reverse()) host.append(renderRecord(item));
+}
+async function details() {
+  const id = selected, version = ++profileVersion;
+  if (!id) return;
+  const selectors = ['#memories', '#activity', '#career', '#history'];
+  selectors.forEach(selector => q(selector).textContent = 'Loading…');
+  try {
+    const result = await get('/agents/' + encodeURIComponent(id) + '/profile');
+    if (version !== profileVersion || id !== selected) return;
+    const evidence = result.evidence, coverage = result.coverage;
+    q('#career').textContent = `${evidence.observations} observations · ${evidence.decisions} decisions · ${evidence.failures} failures · ${evidence.lessons} lessons · ${evidence.sentMessages} sent messages. Strategies studied: ${evidence.strategyIds.length}. Individual P&L, win rate and drawdown unavailable: no attributed trade ledger.`;
+    q('#coverage').textContent = `${evidence.recordedTransitions} transitions in preserved history. ${coverage.legacyTransitionsWithoutHistory} older transitions have no detailed history. History starts: ${coverage.activitySince ? date(coverage.activitySince) : 'no recorded transitions yet'}.`;
+    records('#memories', result.memories, memory => {
+      const row = node('li', '');
+      row.append(node('b', memory.kind), node('p', memory.summary), node('small', date(memory.createdAt)));
+      const strategyId = memory.strategyId || memory.metadata?.strategyId;
+      if (strategyId) row.append(node('p', 'Strategy: ' + strategyId));
+      if (memory.tags?.length) row.append(node('p', memory.tags.join(' · ')));
+      if (memory.confidence !== undefined) row.append(node('p', 'Recorded confidence: ' + memory.confidence));
+      return row;
+    });
+    records('#activity', result.messages, message => {
+      const row = node('li', '');
+      row.append(node('b', message.kind), node('p', message.summary), node('p', `${message.from} → ${message.to.join(', ')}`), node('small', date(message.createdAt)));
+      return row;
+    });
+    records('#history', result.activity, activity => {
+      const row = node('li', '');
+      row.append(node('b', `${activity.state.room} · ${activity.state.status}`), node('p', activity.state.lastReason || ''), node('small', date(activity.occurredAt)), node('p', 'Source event: ' + activity.eventId));
+      return row;
+    });
+  } catch {
+    if (version !== profileVersion || id !== selected) return;
+    selectors.forEach(selector => q(selector).textContent = 'Data unavailable. Reopen to retry.');
+    q('#coverage').textContent = '';
+  }
+}
+q('#closeProfile').onclick = () => q('#profile').close();
+q('#profile').addEventListener('close', () => { selected = undefined; profileVersion++; });
+async function refresh() {
+  if (busy) return;
+  busy = true;
+  const initialStateVersion = stateVersion, initialMarketVersion = marketVersion;
+  try {
+    const [states, portfolio, market] = await Promise.all([get('/agents'), get('/portfolio'), get('/market/latest')]);
+    // A snapshot requested before a stream event must not move an agent back.
+    if (initialStateVersion === stateVersion) {
+      agents.clear();
+      states.forEach(agent => agents.set(agent.id, agent));
+      render();
+    }
+    q('#equity').textContent = money(portfolio.equity);
+    q('#pnl').textContent = money(portfolio.realizedPnl + portfolio.unrealizedPnl);
+    if (initialMarketVersion === marketVersion) q('#market').textContent = market.price ? market.symbol + ' ' + money(market.price) : 'Waiting for market data';
+    q('#sync').textContent = 'Snapshot received ' + new Date().toLocaleTimeString();
+  } catch {
+    q('#sync').textContent = 'Backend unavailable · displayed data may be stale';
+  } finally { busy = false; }
+}
+function connect() {
+  const ws = new WebSocket(`${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/events`);
+  ws.onopen = () => { q('#connection').textContent = 'Event stream connected'; refresh(); if (selected) details(); };
+  ws.onmessage = message => {
+    let event;
+    try { event = JSON.parse(message.data); } catch { return; }
+    if (!event.id || !event.type) return;
+    if (event.type === 'MARKET_TICK') {
+      marketVersion++;
+      q('#market').textContent = event.payload.symbol + ' ' + money(event.payload.price);
+      return;
+    }
+    if (events.some(item => item.id === event.id)) return;
+    events.unshift(event);
+    events.splice(50);
+    q('#events').replaceChildren(...events.map(item => node('li', date(item.occurredAt) + ' · ' + item.type)));
+    if (event.type === 'AGENT_STATE_CHANGED') {
+      stateVersion++;
+      agents.set(event.payload.id, event.payload);
+      render();
+    }
+    refresh();
+    if (selected) details();
+  };
+  ws.onerror = () => ws.close();
+  ws.onclose = () => {
+    q('#connection').textContent = 'Event stream disconnected · retrying';
+    setTimeout(connect, 3000);
+  };
+}
+refresh();
+setInterval(() => { refresh(); if (selected) details(); }, 5000);
+connect();

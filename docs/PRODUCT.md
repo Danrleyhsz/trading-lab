@@ -23,3 +23,6 @@ Walking, desk activity, meetings and speech/status bubbles are projections of ba
 
 ## Success criteria for MVP
 A user on a phone can open the office, see a live BTC market feed, observe an agent workflow, inspect a simulated trade from proposal through risk review to fill/close, and audit the resulting P&L and memory.
+
+## Current career evidence
+The agent profile exposes actual memories, sent/received messages and state-transition events. State-transition experience is retained for compatibility and is labeled as such. It is not a measure of profitability or a completed research count. Detailed activity history begins when this journal is enabled; missing historical details remain visible as a coverage gap. Financial performance per agent is unavailable until paper fills have explicit account/agent attribution. Negative memories remain visible.

@@ -36,3 +36,13 @@ Architecture skeleton + market-data ingestion + paper broker contract + event sc
 - Baseline at 90ebf75: typecheck and 17 tests passed. Office increment: typecheck and 19 tests passed.
 - Experience currently counts state transitions. It does not yet measure a career, accuracy or individual P&L.
 - Browser visual validation remains pending in this environment (in-app localhost access blocked; Chrome unavailable).
+
+## Agent profiles and career evidence increment (pending review)
+- GET /agents/:id/profile combines existing state, per-agent memories and structured messages with event-linked activity history.
+- Future AGENT_STATE_CHANGED events are preserved with their original IDs and timestamps. Older transitions are explicitly marked as lacking detailed history; no history is synthesized.
+- Agent messages and activity survive restart in the current JSON state format; older snapshots remain readable. Writes are serialized to avoid temporary-file collisions.
+- Experience remains the legacy transition count. Evidence counts are descriptive, not win-rate, performance ratings or completed-work claims. Backtest P&L is never promoted to individual trading P&L.
+- Agent-specific financial metrics remain unavailable until an attributed paper-trade ledger exists.
+- UI profile uses the read-only endpoint and does not let stale snapshots override newer room or market events.
+- Validation: typecheck, 23 tests, and JavaScript syntax passed. Browser visual validation is still pending.
+- This remains cloud-first; a single runtime writer and a durable cloud volume are required for the current JSON adapter until the PostgreSQL milestone. This increment does not provision or deploy cloud infrastructure.

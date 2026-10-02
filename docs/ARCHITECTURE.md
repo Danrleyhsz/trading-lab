@@ -27,3 +27,6 @@ There is no LiveBroker implementation in the MVP. A future live adapter must rem
 
 ## Event examples
 MARKET_TICK, SIGNAL_CREATED, RESEARCH_STARTED, BACKTEST_STARTED, BACKTEST_COMPLETED, TRADE_PROPOSED, RISK_APPROVED, RISK_REJECTED, PAPER_ORDER_SUBMITTED, PAPER_FILL, POSITION_CLOSED, MEMORY_CREATED, AGENT_STATE_CHANGED.
+
+## Agent profile projection and current durability
+Agent profiles are read-only projections over registry state, memory, structured messages and the agent activity journal. The journal stores original AGENT_STATE_CHANGED event IDs and payload snapshots; it never reconstructs past events from a counter. The JSON state adapter accepts optional agentMessages and agentActivity collections for backward compatibility and serializes writes within one process. Domain events schedule a snapshot after the synchronous collaboration action completes. Errors are logged; this is not a transactional event store. Production requires a durable cloud volume and a single runtime writer until PostgreSQL replaces this adapter. No cloud deployment is introduced by this increment.
