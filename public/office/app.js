@@ -36,7 +36,7 @@ function renderState() {
   q('#profileTitle').textContent = agent.name;
   q('#profileState').textContent = `${agent.role} · ${agent.room} · ${agent.status}`;
   q('#experience').textContent = `Experience: ${agent.experience} recorded transitions`;
-  q('#reason').textContent = agent.lastReason || 'No activity reason recorded';
+  q('#reason').textContent = (agent.specialization ? agent.specialization + ' · ' : '') + (agent.lastReason || 'No activity reason recorded');
   q('#updated').textContent = 'Backend state updated: ' + date(agent.updatedAt);
 }
 async function profile(id) {

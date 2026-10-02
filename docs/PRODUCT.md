@@ -29,3 +29,6 @@ The agent profile exposes actual memories, sent/received messages and state-tran
 
 ## Evaluation wallets and fund
 Agent evaluation wallets have independent virtual starting capital. Their equity is shown alongside, never summed into, fund equity. Agent financial P&L is derived only from attributed evaluation fills and current marks; net P&L includes fees. The official fund remains a separate paper portfolio. Creating wallets does not mean an agent has performed research or traded.
+
+## Expanded research roles
+Satoshi studies Bitcoin price history, Flux observes market microstructure/derivatives context, Vega measures realized volatility and Oracle classifies market regimes. All begin idle. A specialization label does not imply executed research, accumulated experience or financial performance. Actual work must retain its input evidence and results.

@@ -55,3 +55,9 @@ Architecture skeleton + market-data ingestion + paper broker contract + event sc
 - The Risk Engine rejects invalid numeric orders and evaluates cumulative projected positions. Requests are serialized per account to prevent concurrent approvals from ignoring prior fills.
 - Office and profiles separate evaluation wallets from the fund. Net P&L includes execution fees. Win rate and maximum drawdown remain unavailable without complete outcome/time-series data.
 - The infrastructure is still cloud-first. The JSON adapter still requires one runtime writer and a durable cloud volume; PostgreSQL migration remains on the roadmap. No production deployment or real-money adapter was added.
+
+## Expanded roster (definitions, pending review)
+- Satoshi: Bitcoin price research; Flux: market microstructure; Vega: realized volatility; Oracle: market regimes.
+- They start IDLE with zero transitions and no invented messages, memories, fills or historical activity. Existing agent counters and reasons survive hydration.
+- Configured independent evaluation accounts can cover the expanded roster without changing fund capital.
+- Specialization is a role definition, not a claim that a task ran. Real specialist work is the next Research Engine increment.
