@@ -1,0 +1,4 @@
+import test from "node:test";import assert from "node:assert/strict";import{HistoricalBacktester,type Candle}from "../src/domain/backtest.js";
+const prices=[10,10,10,9,8,9,11,13,14,13,11,9,8,9,11,13];const candles:Candle[]=prices.map((p,i)=>({timestamp:i,open:p,high:p,low:p,close:p,volume:1}));
+test("backtester is deterministic and reports risk/performance metrics",()=>{const b=new HistoricalBacktester(),cfg={initialCapital:10000,feeRate:.0005,slippageBps:1,fastPeriod:2,slowPeriod:3};const a=b.run(candles,cfg),c=b.run(candles,cfg);assert.deepEqual(a,c);assert.ok(a.trades>=1);assert.ok(Number.isFinite(a.maxDrawdown));assert.ok(Number.isFinite(a.netPnl));assert.ok(a.winRate>=0&&a.winRate<=1)});
+test("backtester rejects insufficient history",()=>assert.throws(()=>new HistoricalBacktester().run(candles.slice(0,3),{initialCapital:10000,feeRate:0,slippageBps:0,fastPeriod:2,slowPeriod:3})));
