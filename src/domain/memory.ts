@@ -1,3 +1,2 @@
 export interface MemoryRecord{id:string;agentId:string;kind:"DECISION"|"FAILURE"|"OBSERVATION"|"LESSON";summary:string;createdAt:string;metadata?:Record<string,unknown>}
 export class MemoryStore{private records:MemoryRecord[]=[];add(input:Omit<MemoryRecord,"id"|"createdAt">){const r={...input,id:crypto.randomUUID(),createdAt:new Date().toISOString()};this.records.push(r);return r}list(agentId?:string){return this.records.filter(r=>!agentId||r.agentId===agentId).map(r=>({...r}))}}
-}
