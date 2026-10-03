@@ -744,7 +744,7 @@ dialog .close{
   width:100%;
   padding:4px 5px;
   display:grid;
-  grid-template-columns:repeat(6,1fr);
+  grid-template-columns:repeat(7,1fr);
   gap:3px;
   background:#090f20f5;
   border-bottom:1px solid var(--line)
@@ -871,3 +871,13 @@ dialog .close{
 .trade-outcome p {font-size:11px;margin:5px 0}
 .equity-trace {display:block;width:100%;height:80px;margin:8px 0}
 #closedTrades section {border-bottom:1px solid var(--line);padding:12px 0}
+
+select{font:inherit;color:var(--text);background:#101c33;border:1px solid var(--line);border-radius:5px;padding:10px;max-width:100%}
+.event-button{width:100%;min-height:44px;text-align:left;background:transparent;border:0;padding:8px 2px;overflow-wrap:anywhere}
+.source-link{display:block;max-width:100%;min-height:44px;margin:7px 0;text-align:left;overflow-wrap:anywhere;font-size:11px}
+.audit-toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+#historyList{list-style:none;padding:0}#auditContent{overflow-wrap:anywhere}#auditContent pre{white-space:pre-wrap;overflow-wrap:anywhere;max-height:260px;overflow:auto;background:#050d1b;padding:12px;border:1px solid var(--line);font-size:11px}#auditContent summary{cursor:pointer;min-height:44px;padding:12px 0}
+#eventType:focus-visible{outline:3px solid var(--cyan);outline-offset:3px}
+#olderEvents,#auditOlder,#auditBack{min-height:44px;margin:10px 0}
+[hidden]{display:none!important}
+@media(max-width:600px){#auditDialog{width:calc(100% - 24px);padding:18px}.audit-toolbar{align-items:stretch}.audit-toolbar>*{width:100%}}

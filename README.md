@@ -33,3 +33,6 @@ Minimal /health/live and /health/ready endpoints now distinguish process respons
 
 ## Bounded historical calculations
 Historical studies now retain source data/hash durably before calculating in a bounded internal worker. The unchanged deterministic simulator preserves all funding/risk/OOS audit output; timeout/crash produces a retained failure rather than a partial result. Runtime/data adapters stay in the cloud container; no broker/AI/account capabilities are passed to the worker. No automatic retry, activation, service provisioning or deployment is added. See docs/HISTORICAL_LAB.md for resource bounds and remaining operational limits.
+
+## Pixel Office recorded audit navigation
+The office now opens original recorded events, filters/pages confirmed history and browses closed operations per account. Session-received events remain separate from the last saved history. Missing evidence and empty accounts remain explicit. Original fill/funding/source IDs are preserved; queries cannot change agents, approve risk or execute paper orders. See docs/OFFICE_AUDIT.md.

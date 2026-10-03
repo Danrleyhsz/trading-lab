@@ -47,3 +47,6 @@ The access panel now shows actual service phase, confirmed writes, market availa
 
 ## Historical study failure visibility
 A historical study uses recorded source data saved before calculation. A calculation timeout, worker failure or unavailable source stays visible as a failed study with no claimed partial profit or paper operation. Restarted unfinished studies retain saved evidence and report interruption. This improves panel/market responsiveness during calculation; it does not change financial model assumptions or activate autonomous execution. The approved pixel scene continues to reflect actual backend task state only.
+
+## Recorded history and source navigation
+History filters and earlier pages open preserved backend events. Clicking a session activity, agent source or operation fill/funding opens the original ID and payload with explicit confirmed/unconfirmed/missing coverage. Account pages keep fund/evaluations separate and exclude open positions from win rate. Empty history remains empty. Queries do not change rooms, experience, memory, risk or execution. Mobile and keyboard navigation preserve the approved scene; source payloads render as text. See OFFICE_AUDIT.md.
