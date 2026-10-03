@@ -31,3 +31,13 @@
 
 ## Restore integrity increment
 PR #22 will be the next reviewable increment: evaluation owner/account matching, unique actual fill IDs, supported perpetual symbol and unavailable outcome metrics after non-monotonic execution timestamps. No historical auto-repair, reseeding or invented fill is allowed. Validate current branch/PR/CI state before continuing.
+
+## 2026-10-03 analytical AI increment
+- PR #22 integrity checks were verified green before beginning; branch feat/ai-analysis-cost-controls stacks on fix/paper-ledger-attribution. Main remains unchanged.
+- Baseline locally: typecheck passed; 78 tests passed, PostgreSQL integration skipped locally and passed in prior CI.
+- Prepared disabled advisory AI boundary with durable reservations, independent global/per-agent caps, pinned price/input evidence, immutable history, read-only diagnostics and no paid retry.
+- No provider adapter, external account, real price configuration, credential access, paid call or deployment was introduced.
+- Next concrete increment: cloud readiness diagnostics (storage/source freshness/default-disabled autonomous gates), then bounded historical work and Pixel Office V3 audit/accessibility indicators. Connect actual paid AI only after specific provider/budget approval and adapter review.
+- Do not infer that held reservations mean provider charges occurred; they explicitly represent unresolved maximum cost. Do not release them without verifiable evidence and a reviewed append-only reconciliation design.
+
+Validation before opening the analytical increment: typecheck/build passed; full local suite passed 90 tests with the PostgreSQL test skipped locally. The focused analytical/storage checks also passed. The forthcoming draft PR CI must run all 91 tests with PostgreSQL plus the container build; do not claim CI completion until its result is checked.

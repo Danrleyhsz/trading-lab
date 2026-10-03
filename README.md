@@ -24,3 +24,6 @@ Secrets never belong in Git. The initial product has no live-money broker. Devel
 
 ## Online Paper V2
 See [implemented package and limits](docs/ONLINE_PAPER_V2.md) and [cloud deployment handoff](docs/CLOUD_DEPLOYMENT.md). Feature code is pending review; no cloud deployment is implied. Production runs from the compiled cloud container with PostgreSQL and protected HTTPS access, not from a developer computer.
+
+## Analytical AI preparation (disabled)
+A provider-neutral advisory boundary now reserves an explicit independent USD budget durably before a potential call. Global/per-agent cost and request caps, pinned pricing versions, input/output caps, timeout and idempotency are mandatory for an enabled adapter. Unknown charges remain held across restart and UTC-day boundaries; failed persistence fails closed. Actual provider-reported usage can produce a usage-priced ceiling, never a claimed invoice. The online runtime exposes read-only AI status/audit and supplies no provider; default budgets are zero. No LLM work, paid call, agent experience, approval or trading history is fabricated. See docs/AI_COST_CONTROLS.md.

@@ -109,3 +109,6 @@ CI checkpoint: PR #21 completed with 76 tests passing, zero skipped, including P
 - Perpetual restore accepts only the supported BTCUSDT instrument; legacy fills cannot masquerade as perpetual records.
 - The read-only performance projection reports duplicate fill IDs and non-monotonic execution timestamps as unavailable. It never invents a second execution or reorders a clock rollback into a profitable trade.
 - Valid recorded snapshots replay unchanged. This fix rejects inconsistent evidence and does not repair, delete or rewrite historical data.
+
+## Analytical cost-control checkpoint
+Prepared a provider-neutral, analysis-only boundary with immutable source/input hashes, durable cost reservations, explicit global/per-agent budgets and actual-usage settlement validation. Provider failures/timeouts and interrupted attempts retain reservations; no paid retries or zero-charge assumptions. Runtime remains disabled with no adapter and zero budget. Read-only status/audit routes require the existing production access control. No paid call, provider account, cloud deployment or paper activation occurred. This increment changes no fund/evaluation balance, risk rule, agent state or historical outcome. See AI_COST_CONTROLS.md for billing-contract limits and unimplemented activation dependencies.

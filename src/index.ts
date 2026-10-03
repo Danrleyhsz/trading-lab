@@ -1,3 +1,5 @@
+import {AiAnalysis,registerAiStatus} from './application/ai-analysis.js';
+import type {AiRecord} from './domain/ai-analysis.js';
 import Fastify from 'fastify';
 import websocket from '@fastify/websocket';
 import {registerOfficeAssets} from './application/office-assets.js';
@@ -47,8 +49,9 @@ const accounts=new PaperAccounts(bus,Number(process.env.INITIAL_PAPER_CAPITAL||1
 const book=new PerpetualPaperBook(bus,restored?.perpetualBook),perpetualHistory=new BinancePerpetualHistory(),perpetualMarket=new BinancePerpetualMarket(),studies=new PerpetualStudies(perpetualHistory,restored?.perpetualStudies??[]);
 const evaluationEnabled=process.env.PAPER_EVALUATION_ENABLED==='true',perpetualEnabled=process.env.PERPETUAL_PAPER_ENABLED==='true';
 if(evaluationEnabled||perpetualEnabled){const capital=Number(process.env.EVALUATION_PAPER_CAPITAL);if(!Number.isFinite(capital)||capital<=0)throw Error('positive EVALUATION_PAPER_CAPITAL required');for(const agent of agents.list()){if(evaluationEnabled)accounts.ensureEvaluation(agent.id,capital);if(perpetualEnabled)book.ensureEvaluation(agent.id,capital);}}
+let durableAi:AiRecord[]=structuredClone(restored?.aiLedger??[]);
 let durableBook=book.exportState(),writes:Promise<unknown>=Promise.resolve(),persistenceError:string|null=null;
-const persist=(override?:PerpetualBookState)=>{const run=async()=>{try{await store.save({domainEvents:structuredClone(domainEvents),agents:agents.list(),memories:memories.list(),agentMessages:messages.list(),agentActivity:activity.list(),paperAccounts:accounts.exportState(),researchRuns:researchRuns.list(),strategies:strategies.list(),perpetualStudies:studies.list(),perpetualBook:override??durableBook});if(override)durableBook=structuredClone(override);persistenceError=null;}catch(error){persistenceError='state persistence unavailable';throw error;}};const result=writes.then(run);writes=result.catch(()=>{});return result;};
+const persist=(override?:PerpetualBookState,aiOverride?:AiRecord[])=>{const run=async()=>{try{await store.save({aiLedger:aiOverride??durableAi,domainEvents:structuredClone(domainEvents),agents:agents.list(),memories:memories.list(),agentMessages:messages.list(),agentActivity:activity.list(),paperAccounts:accounts.exportState(),researchRuns:researchRuns.list(),strategies:strategies.list(),perpetualStudies:studies.list(),perpetualBook:override??durableBook});if(override)durableBook=structuredClone(override);if(aiOverride)durableAi=structuredClone(aiOverride);persistenceError=null;}catch(error){persistenceError='state persistence unavailable';throw error;}};const result=writes.then(run);writes=result.catch(()=>{});return result;};
 bus.subscribe(e=>{if(['MARKET_TICK','PERPETUAL_MARKET_UPDATED','MARKET_DATA_FAILED'].includes(e.type))return;domainEvents.push(structuredClone(e));activity.record(e);queueMicrotask(()=>void persist().catch(error=>app.log.error({error},'state persistence failed')));});
 // Actual committed outcomes create agent memories; historical simulations never enter this path.
 bus.subscribe(e=>{const payload=e.payload as any;if(!payload?.accountId?.endsWith(':usdm')&&!payload?.fill?.accountId?.endsWith(':usdm'))return;
@@ -63,6 +66,8 @@ const research=new ResearchEngine({snapshot:symbol=>derivatives.snapshot(symbol)
 registerResearchRoutes(app,research,()=>persist());registerPerpetualStudies(app,studies,()=>persist(),coordinator,bus);
 let latest:MarketTick|null=null;registerPaperAccountRoutes(app,accounts,{market:()=>latest,memories,strategies,coordinator,persist:()=>persist(),evaluationEnabled,bus,executionEnabled:process.env.LEGACY_PAPER_EXECUTION_ENABLED==='true'});
 registerPerpetualPaperRoutes(app,book,persist,perpetualEnabled,cycle,()=>perpetualMarket.snapshot().status==='HEALTHY'&&!persistenceError&&(!(store instanceof PostgresStateStore)||store.available()));
+const aiAnalysis=new AiAnalysis(ledger=>persist(undefined,ledger),durableAi);
+registerAiStatus(app,aiAnalysis);
 registerOfficeAssets(app);
 app.get('/health',async(_req,reply)=>reply.code(persistenceError||(store instanceof PostgresStateStore&&!store.available())?503:200).send({ok:!persistenceError&&(!(store instanceof PostgresStateStore)||store.available()),mode:'PAPER_TRADING',storage:store instanceof PostgresStateStore?'POSTGRESQL':'JSON_DEVELOPMENT',marketStatus:perpetualMarket.snapshot().status}));
 app.get('/agents',async()=>agents.list());app.get('/agent-messages',async(req)=>messages.list((req.query as any).agentId));app.get('/strategies',async()=>strategies.list());

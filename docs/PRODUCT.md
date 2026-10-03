@@ -38,3 +38,6 @@ Run research requests actual public market evidence, records measurements and pe
 
 ## Online Paper V2 controls
 The office adds a sourced USD-M market panel, recorded historical study list/detail and independent account financial cards. Users can pause new perpetual paper exposure; risk still evaluates reducing exits. Automatic evaluation is configured in the cloud and defaults off. Legacy fund equity, independent evaluation equity and historical-study P&L remain separate. Login uses a configured access code without storing it in the browser. Unavailable sources and stale valuations remain visible.
+
+## Analytical AI readiness
+AI status and retained audit records distinguish disabled configuration, actual reported usage and unknown-cost reservations. No production adapter or automatic paid research is enabled. Future responses are advisory data and cannot approve execution, validate strategies or manufacture agent achievements. AI budgets are explicit USD spending limits, independent of paper endowments. A real provider, budget and reviewed billing contract remain required before activation.
