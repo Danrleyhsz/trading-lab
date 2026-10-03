@@ -14,9 +14,12 @@ import type {EventBus} from './event-bus.js';
 
 export interface ResearchSources {snapshot(symbol:string):Promise<MarketSnapshot>;candles(symbol:string,interval:string,limit:number):Promise<Candle[]>}
 export class ResearchEngine {
- private busy=false;
+ private busy=false;private accepting=true;
  constructor(private source:ResearchSources,private coordinator:AgentCoordinator,private collaboration:AgentCollaboration,private messages:AgentMessageBus,private memories:MemoryStore,private strategies:StrategyRegistry,private lab:StrategyLab,private backtester:HistoricalBacktester,readonly runs:ResearchRunStore,private bus:EventBus){}
+ status(){return {busy:this.busy,accepting:this.accepting};}
+ stopAccepting(){this.accepting=false;}
  async run(limit=500){
+  if(!this.accepting)throw Error('research runtime draining');
   if(this.busy||this.coordinator.registry.get('euler')?.status==='BACKTESTING')throw Error('research already running');
   if(!Number.isInteger(limit)||limit<100||limit>1000)throw Error('invalid research limit');
   this.busy=true;

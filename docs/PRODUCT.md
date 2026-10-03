@@ -41,3 +41,6 @@ The office adds a sourced USD-M market panel, recorded historical study list/det
 
 ## Analytical AI readiness
 AI status and retained audit records distinguish disabled configuration, actual reported usage and unknown-cost reservations. No production adapter or automatic paid research is enabled. Future responses are advisory data and cannot approve execution, validate strategies or manufacture agent achievements. AI budgets are explicit USD spending limits, independent of paper endowments. A real provider, budget and reviewed billing contract remain required before activation.
+
+## Operational diagnosis
+The access panel now shows actual service phase, confirmed writes, market availability, paper block reasons, active research/study state and AI configuration. Missing, partial or expired diagnoses become unavailable instead of implying a running task or healthy deployment. An available panel does not approve an order; deterministic risk still reviews each paper submission. New-exposure halts preserve risk-checked reducing orders. Online hosting and backups remain externally unverified until a real provider account and deployment exist.

@@ -14,3 +14,8 @@ The template deploy/cloud-service.example.json is provider-neutral preparation, 
 
 ## Single-writer deployment updates
 Disable automatic deployments until architectural review. Updates must stop/drain the old runtime before starting the new one; the writer lock intentionally rejects overlapping replicas. Rolling deployments that keep the old writer running until the new replica is healthy will fail with this architecture. Use a recreate deployment with planned downtime, or a provider-supported persistent-volume strategy that prevents overlap. This is an operational boundary, not multi-replica availability.
+
+## Health and graceful termination
+Keep /health for existing compatibility. Configure process liveness with /health/live and control-plane readiness with /health/ready where the provider supports separate checks. Both are minimal public responses. Authenticate /runtime/readiness for actual source/funding/paper/job diagnostics and configure separate source-outage alerts. Healthy readiness does not imply exchange availability, order approval, backup verification or a provisioned cloud account.
+
+Allow graceful SIGTERM termination: the runtime stops new admission, joins admitted historical work and queued writes, then closes PostgreSQL. Its signal grace deadline is 30 seconds; an unfinished durable study remains eligible for the existing INTERRUPTED restoration, never invented completion. The provider may force termination earlier; synchronous CPU work is not preempted by the JavaScript timer. Retain single-writer stop/drain/recreate updates and validate a restore drill before claiming uninterrupted operation. See RUNTIME_READINESS.md.

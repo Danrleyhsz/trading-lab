@@ -96,7 +96,7 @@ function node(tag, text) {
   return element;
 }
 async function get(url) {
-  const response = await fetch(url, {cache: 'no-store'});
+  const response = await fetch(url, {cache: 'no-store', signal: typeof AbortSignal!=='undefined' && AbortSignal.timeout ? AbortSignal.timeout(10000) : undefined});
   if (!response.ok) throw Error(url);
   return response.json();
 }
@@ -264,7 +264,7 @@ function connect() {
     try { event = JSON.parse(message.data); } catch { return; }
     if (!event.id || !event.type) return;
     if (event.type === 'PERPETUAL_MARKET_UPDATED') { onlineVersion++; showPerpetualMarket({quote: event.payload, status: 'HEALTHY'}); refreshOnline(); return; }
-    if (event.type === 'MARKET_DATA_FAILED') { onlineVersion++; marketUnavailable('USD-M indisponível · ordens paper bloqueadas'); }
+    if (event.type === 'MARKET_DATA_FAILED') { onlineVersion++; marketUnavailable('USD-M indisponível · ordens paper bloqueadas'); runtimeUnavailable(); }
     if (event.type === 'MARKET_TICK') {
       marketVersion++;
       q('#market').textContent = event.payload.symbol + ' ' + money(event.payload.price);observeTrace('spot',event.payload.price,event.payload.timestamp);
@@ -291,7 +291,7 @@ refresh();
 setInterval(() => { refresh(); if (selected) details(); }, 5000);
 connect();
 
-let onlineBusy = false, onlineVersion = 0, halted = null;
+let onlineBusy = false, onlineVersion = 0, halted = null, runtimeObservedAt = 0;
 function showPerpetualMarket(market) {
   const quote = market.quote;
   if (market.status !== 'HEALTHY' || !quote || !Number.isFinite(quote.markTime) || Date.now()-quote.markTime > 15000) {
@@ -320,10 +320,33 @@ async function studyDetails(id) {
   } catch { q('#studyDetails').textContent = 'Estudo indisponível. Entre se o acesso for exigido.'; }
 }
 q('#closeStudy').onclick = () => q('#studyDialog').close();
+function runtimeUnavailable() {
+  runtimeObservedAt = 0;
+  q('#runtimeStatus').textContent = 'Diagnóstico indisponível ou desatualizado · entre se o acesso for exigido';
+  q('#runtimeDetails').replaceChildren();
+}
+function renderRuntime(data) {
+  const observed = Date.parse(data?.observedAt), phases = {STARTING:'Inicializando',SERVING:'Em serviço',DRAINING:'Encerrando',STOPPED:'Encerrado'};
+  if (data?.mode!=='PAPER_TRADING' || !Number.isFinite(observed) || Date.now()-observed>15000 || observed>Date.now()+5000 || typeof data.controlPlaneReady!=='boolean' || !Object.hasOwn(phases,data.phase) || !['PRODUCTION','DEVELOPMENT'].includes(data.environment) || !data.storage || !['HEALTHY','UNAVAILABLE'].includes(data.market?.perpetual?.status) || typeof data.paper?.newExposure?.ready!=='boolean' || !Array.isArray(data.paper.newExposure.reasons) || typeof data.paper.autonomous?.ready!=='boolean' || typeof data.jobs?.research?.busy!=='boolean' || typeof data.jobs?.historical?.busy!=='boolean' || typeof data.ai?.enabled!=='boolean') {runtimeUnavailable();return;}
+  runtimeObservedAt = observed;
+  const reasons = {RUNTIME_STARTING:'Serviço inicializando',RUNTIME_DRAINING:'Serviço encerrando',RUNTIME_STOPPED:'Serviço encerrado',CLOCK_ROLLBACK:'Relógio do serviço recuou',STORAGE_UNAVAILABLE:'Banco indisponível',PERSISTENCE_FAILED:'Última gravação falhou',INITIAL_PERSISTENCE_PENDING:'Aguardando a primeira gravação',PRODUCTION_POSTGRESQL_REQUIRED:'Banco de produção pendente',PRODUCTION_ACCESS_REQUIRED:'Proteção de acesso pendente',PRODUCTION_HTTPS_REQUIRED:'Acesso seguro pendente',PERPETUAL_EXECUTION_DISABLED:'Execução paper desligada',PERPETUAL_SOURCE_UNAVAILABLE:'Dados perpétuos indisponíveis',BOOK_QUOTE_NOT_READY:'Cotação do livro indisponível',BOOK_PERSISTENCE_FAILED:'Gravação do livro falhou',FUNDING_RECONCILIATION_PENDING:'Funding aguardando conciliação',NEW_EXPOSURE_HALTED:'Novas exposições pausadas',NO_INDEPENDENT_ACCOUNTS:'Contas independentes não configuradas'};
+  q('#runtimeStatus').textContent = phases[data.phase] + ' · ' + (data.controlPlaneReady?'Painel disponível':'Painel com impedimento') + ' · ' + (data.environment==='PRODUCTION'?'Ambiente de produção':'Ambiente de desenvolvimento');
+  const host=q('#runtimeDetails');host.replaceChildren();
+  const add=text=>host.append(node('li',text));
+  add('Última gravação confirmada: ' + (data.storage.lastPersistedAt?date(data.storage.lastPersistedAt):'nenhuma neste processo'));
+  if (Number.isSafeInteger(data.storage.pendingWrites)) add('Gravações aguardando: ' + data.storage.pendingWrites);
+  add('Dados perpétuos: ' + (data.market.perpetual?.status==='HEALTHY'?'atuais':'indisponíveis'));
+  add('Novas exposições paper: ' + (data.paper.newExposure.ready?'condições operacionais atendidas; aprovação do risco continua obrigatória':(data.paper.newExposure.reasons||[]).map(reason=>reasons[reason]||'Bloqueio adicional registrado').join(' · ')));
+  add('Autonomia: ' + (data.paper.autonomous?.ready?'condições operacionais atendidas':'aguardando condições ou desligada'));
+  add('Pesquisa: ' + (data.jobs.research?.busy?'em andamento':'sem tarefa em andamento') + ' · estudo histórico: ' + (data.jobs.historical?.busy?'em andamento':'sem tarefa em andamento'));
+  add(data.ai.enabled?'IA habilitada para análise':'IA desligada · chamadas pagas desativadas');
+  if (data.ai.heldMicrousd>0) add('Há reserva de orçamento de IA com custo ainda não esclarecido.');
+  add('Hospedagem e backups exigem verificação externa. Execução exclusivamente paper; avaliações separadas do fundo.');
+}
 async function refreshOnline() {
   if (onlineBusy) return;onlineBusy = true;const version = onlineVersion;
   try {
-    const results = await Promise.allSettled([get('/market/v3'), get('/finance'), get('/backtests/v2/studies'), get('/paper/perpetual/status')]);
+    const results = await Promise.allSettled([get('/market/v3'), get('/finance'), get('/backtests/v2/studies'), get('/paper/perpetual/status'), get('/runtime/readiness')]);
     if (results[0].status === 'fulfilled' && version === onlineVersion) showPerpetualMarket(results[0].value);
     else if (results[0].status === 'rejected') marketUnavailable('Dados USD-M indisponíveis · preços podem estar desatualizados');
     if (results[1].status === 'fulfilled') {
@@ -340,6 +363,7 @@ async function refreshOnline() {
       const status = results[3].value;q('#riskSummary').textContent = 'Execução ' + (status.executionEnabled ? 'habilitada' : 'desligada') + ' · Autonomia ' + (status.autonomous?.enabled ? 'habilitada' : 'desligada') + (status.halted ? ' · Novas exposições pausadas' : '');halted = status.halted;q('#haltPaper').disabled = typeof halted !== 'boolean';q('#haltPaper').textContent = halted ? 'Retomar exposições paper permitidas' : 'Pausar novas exposições paper';
       q('#onlineStatus').textContent = `Execução perpétua ${status.executionEnabled ? 'habilitada' : 'desligada'} · nova exposição ${halted ? 'pausada' : 'sujeita ao risco'} · autonomia ${status.autonomous?.enabled ? 'habilitada' : 'desligada'} · ${status.autonomous?.reason || 'estado indisponível'}. Somente avaliação independente.`;
     } else { halted = null;q('#riskSummary').textContent = 'Estado de risco indisponível';q('#haltPaper').disabled = true;q('#onlineStatus').textContent = 'Controles indisponíveis · entre se o acesso for exigido'; }
+    if (results[4].status==='fulfilled' && version===onlineVersion) renderRuntime(results[4].value); else runtimeUnavailable();
   } finally { onlineBusy = false; }
 }
 q('#runStudy').onclick = async () => {
@@ -356,7 +380,7 @@ q('#loginPanel').onclick = async () => {
   try { const response = await fetch('/auth/login', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({accessToken:q('#accessToken').value})});q('#accessToken').value = '';q('#loginStatus').textContent = response.ok ? 'Acesso autorizado' : 'Acesso recusado';if (response.ok) { await refresh();await refreshOnline(); } }
   catch { q('#loginStatus').textContent = 'Não foi possível acessar o laboratório'; }
 };
-refreshOnline();setInterval(refreshOnline, 5000);
+refreshOnline();setInterval(() => {refreshOnline();if (!runtimeObservedAt || Date.now()-runtimeObservedAt>15000 || runtimeObservedAt>Date.now()+5000) runtimeUnavailable();}, 5000);
 
 q('#navOffice').onclick = () => q('#workspaceDialog').close();
 q('#navAgents').onclick = () => openPanel('agentsPanel','Equipe do laboratório','navAgents');

@@ -24,3 +24,17 @@ test('study API rejects claimed results, retains source failures and emits no pa
  }finally{await app.close();}
 });
 test('pending studies restore as interrupted rather than completed',()=>{const studies=new PerpetualStudies({load:async()=>data(300)},[{id:'pending',status:'RUNNING',createdAt:'2026-01-01',request:{bars:300,trainBars:100,testBars:50}}]);assert.equal(studies.get('pending')!.status,'INTERRUPTED');assert.equal(studies.get('pending')!.result,undefined);});
+
+test('historical drain rejects new work and waits for the active source and final durable outcome',async()=>{
+ let release!:(data:PerpetualDataset)=>void;const pending=new Promise<PerpetualDataset>(resolve=>{release=resolve;});const bus=new EventBus(),coordinator=new AgentCoordinator(new AgentRegistry(),bus),studies=new PerpetualStudies({load:async()=>pending});let retained:ReturnType<PerpetualStudies['list']>=[];
+ const save=async()=>{retained=studies.list();};const study=await studies.start({bars:300,trainBars:100,testBars:50},save,coordinator,bus);let finished=false;const draining=studies.drain().then(()=>{finished=true;});
+ assert.equal(studies.status().accepting,false);assert.equal(studies.status().activeTasks,1);await assert.rejects(studies.start({bars:300,trainBars:100,testBars:50},save,coordinator,bus),/runtime draining/);assert.equal(finished,false);release(data(300));await draining;assert.equal(studies.status().activeTasks,0);assert.equal(studies.status().busy,false);assert.equal(retained.find(r=>r.id===study.id)?.status,'COMPLETED');assert.equal(studies.status().persistenceFailed,false);
+});
+test('draining joins an initial persistence failure without inventing an accepted study',async()=>{
+ let rejectSave!:(error:Error)=>void;const pending=new Promise<void>((_resolve,reject)=>{rejectSave=reject;});const bus=new EventBus(),coordinator=new AgentCoordinator(new AgentRegistry(),bus);let sourceCalls=0;const studies=new PerpetualStudies({load:async()=>{sourceCalls++;return data(300);}});
+ const starting=studies.start({bars:300,trainBars:100,testBars:50},()=>pending,coordinator,bus);const failed=assert.rejects(starting,/storage offline/);const draining=studies.drain();rejectSave(Error('storage offline'));await failed;await draining;assert.equal(sourceCalls,0);assert.equal(studies.list().length,0);assert.equal(studies.status().activeTasks,0);
+});
+test('a failed final historical write drains safely and remains visible in runtime diagnostics',async()=>{
+ const bus=new EventBus(),coordinator=new AgentCoordinator(new AgentRegistry(),bus),studies=new PerpetualStudies({load:async()=>{throw Error('source unavailable');}});let saves=0;
+ await studies.start({bars:300,trainBars:100,testBars:50},async()=>{if(++saves===3)throw Error('test-only database credential must stay private');},coordinator,bus);await studies.drain();assert.equal(studies.status().persistenceFailed,true);assert.equal(studies.status().busy,false);assert.equal(studies.status().activeTasks,0);assert.equal(JSON.stringify(studies.status()).includes('credential'),false);
+});

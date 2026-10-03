@@ -17,7 +17,8 @@ export class PerpetualPaperBook {
  exportState(){return structuredClone(this.state);}
  cursor(){return this.state.fundingCursor;}
  market(){return this.quote?structuredClone(this.quote):null;}
- status(){return {halted:this.state.halted,persistenceFailed:this.persistenceFailed,marketReady:!!this.quote&&freshPerpetualQuote(this.quote,this.now()),autonomousCursor:this.state.autonomousCursor??null};}
+ private fundingReady(){return !this.state.expectedFundingTime||this.now()<this.state.expectedFundingTime||this.state.fundingCursor>=this.state.expectedFundingTime-1000;}
+ status(){return {accountCount:this.state.accounts.length,autonomousAccountExists:this.state.accounts.some(a=>a.id==='evaluation:nova:usdm'),fundingCursor:this.state.fundingCursor,expectedFundingTime:this.state.expectedFundingTime??null,fundingReady:this.fundingReady(),halted:this.state.halted,persistenceFailed:this.persistenceFailed,marketReady:!!this.quote&&freshPerpetualQuote(this.quote,this.now()),autonomousCursor:this.state.autonomousCursor??null};}
  performance(id:string,limit?:number){
   const account=this.state.accounts.find(a=>a.id===id);if(!account)return undefined;
   const cached=this.performanceCache.get(id),lastId=account.ledger.at(-1)?.id;
@@ -40,7 +41,7 @@ export class PerpetualPaperBook {
   for(const account of next.accounts){this.measure(account,quote);const p=portfolio(account).snapshot();const position=p.positions[0];if(position&&p.equity<=Math.abs(position.quantity)*quote.markPrice*0.015)await this.order(next,account,position.quantity>0?'SELL':'BUY',Math.abs(position.quantity),quote,events,true);}
   await this.commit(next,save,events);this.quote=structuredClone(quote);
  });}
- propose(id:string,side:'BUY'|'SELL',quantity:number,save:(state:PerpetualBookState)=>Promise<void>,studyId?:string){return this.serial(async()=>{if(!this.quote||!freshPerpetualQuote(this.quote,this.now()))throw Error('market unavailable');if(this.persistenceFailed)throw Error('persistence unavailable');if(this.state.expectedFundingTime&&this.now()>=this.state.expectedFundingTime&&this.state.fundingCursor<this.state.expectedFundingTime-1000)throw Error('funding reconciliation pending');const next=structuredClone(this.state),account=next.accounts.find(a=>a.id===id);if(!account)throw Error('unknown perpetual account');const events:DomainEvent[]=[];const result=await this.order(next,account,side,quantity,this.quote,events,false,studyId);await this.commit(next,save,events);return result;});}
+ propose(id:string,side:'BUY'|'SELL',quantity:number,save:(state:PerpetualBookState)=>Promise<void>,studyId?:string){return this.serial(async()=>{if(!this.quote||!freshPerpetualQuote(this.quote,this.now()))throw Error('market unavailable');if(this.persistenceFailed)throw Error('persistence unavailable');if(!this.fundingReady())throw Error('funding reconciliation pending');const next=structuredClone(this.state),account=next.accounts.find(a=>a.id===id);if(!account)throw Error('unknown perpetual account');const events:DomainEvent[]=[];const result=await this.order(next,account,side,quantity,this.quote,events,false,studyId);await this.commit(next,save,events);return result;});}
  halt(value:boolean,save:(state:PerpetualBookState)=>Promise<void>){return this.serial(async()=>{const next=structuredClone(this.state);next.halted=value;await this.commit(next,save,[event('PAPER_CONTROL_CHANGED',{halted:value,instrument:PERPETUAL_INSTRUMENT})]);return this.status();});}
  checkpoint(timestamp:number,save:(state:PerpetualBookState)=>Promise<void>){return this.serial(async()=>{const next=structuredClone(this.state);next.autonomousCursor=timestamp;await this.commit(next,save);});}
 }
