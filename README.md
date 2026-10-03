@@ -58,4 +58,6 @@ Seated workstations and truthful live monitors: [OFFICE_WORKSTATIONS.md](docs/OF
 
 ## Functional priority and historical accounting
 
+Latest display request: [whole-screen overview and resolution/scale choices](docs/OFFICE_DISPLAY.md), with explicit reference composition. Original background fidelity still needs further art work; current runtime data remains authoritative.
+
 The user's current priority is end-to-end functionality; further graphic polish is deferred. New spot SMA screens execute completed signals at the next observed open, reserve entry fees within cash and classify outcomes after both fees. Recorded version/configuration/costs distinguish new calculations from unchanged older history. See [model assumptions and limits](docs/SPOT_BACKTEST_ACCOUNTING.md). Research results remain historical simulations, separate from paper account performance. Cloud deployment and paid AI are still unconfigured.

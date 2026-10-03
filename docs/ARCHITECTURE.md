@@ -92,4 +92,6 @@ Browser workstations.js adds a pure room/owner catalog and state projection over
 
 ## Versioned spot historical calculation
 
+Office display controls remain browser-only in display.js, served by the explicit asset allowlist. CSS size-container fit preserves authored geometry; validated local storage holds presentation preferences only, without tokens. Current scene directors reproject on the existing resize event. No new backend schema/route, renderer, provider or task capability. See OFFICE_DISPLAY.md.
+
 The existing pure HistoricalBacktester now uses completed crossover signals and next-open execution with fully cash-reserved entry fees and net closed-trade accounting. Optional result model/configuration/fees metadata travels through existing research events/storage; old records remain unversioned and unchanged. The USD-M simulator, account ledger, order admission and deterministic execution risk are untouched. See SPOT_BACKTEST_ACCOUNTING.md.

@@ -256,3 +256,10 @@ test('research outcomes distinguish recorded next-open costs from unversioned hi
  assert.match(text,/abertura seguinte/);assert.match(text,/20.00 USDT/);assert.match(text,/modelo e custos não versionados/);assert.match(text,/123.45 USDT/);
  assert.equal(rows[1]!.backtest.model,undefined);assert.ok(!h.requests.includes('/research/run'));
 });
+
+test('overview counts actual nonflat positions without mixing equity and expires its count on financial read failure',async()=>{
+ const responses:Record<string,unknown>={'/finance':{legacyAccounts:[{id:'fund',kind:'FUND',initialCash:1000,portfolio:{equity:1000,positions:[{symbol:'BTCUSDT',quantity:1,averageEntry:100},{symbol:'ETHUSDT',quantity:0,averageEntry:0}]}}],perpetualAccounts:[{id:'evaluation:nova:usdm',kind:'EVALUATION',ownerAgentId:'nova',instrument:'BINANCE_USDM:BTCUSDT',initialCash:500,portfolio:{equity:500,positions:[{symbol:'BTCUSDT',quantity:-2,averageEntry:100}]}}]}};
+ const h=harness(responses);await settle();assert.equal(h.ids.get('#openPositionCount')!.textContent,'2');
+ responses['/finance']={httpError:503};await vm.runInContext('refreshOnline()',h.context);
+ assert.equal(h.ids.get('#openPositionCount')!.textContent,'—');assert.ok(!h.requests.some(url=>url.includes('/orders')));
+});

@@ -2,6 +2,8 @@
 
 ## Current human priority — functionality, 2026-10-03
 
+Later explicit human request overrides graphics deferral for reference fidelity, complete one-screen view and scale/resolution choices. See OFFICE_DISPLAY.md for delivered framing scope and remaining scene-art mismatch. Finish this concrete visual request before returning to the functional sequence below; full original-art alignment must revalidate seats/floor/doors, not paste illustrative work/numbers into production.
+
 This section supersedes older visual-priority checkpoints below. The human approved the seated office and deferred additional graphics. Branch fix/spot-backtest-accounting stacks on workstation draft #33; new spot SMA calculations use next-open execution, complete fees and versioned evidence without changing old results. See SPOT_BACKTEST_ACCOUNTING.md. Check the workspace continuation artifact for exact commit/PR/CI validation.
 
 Next increments: expose full original research/study evidence through existing read APIs; strengthen bounded, retained research job admission/restart/drain; verify the real-data → research → historical validation → deterministic risk → independent paper → portfolio/audit workflow with isolated meaningful tests. Automatic research/paper and AI remain disabled unless separately configured and authorized. Do not create real trades or synthetic runtime history to demonstrate activity.

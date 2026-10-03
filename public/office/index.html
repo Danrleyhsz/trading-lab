@@ -5,12 +5,13 @@
 <meta name="theme-color" content="#090f20"><title>Trading Lab · Escritório</title>
 <link rel="stylesheet" href="/office/style.css">
 </head>
-<body>
+<body data-view="fit">
 <header class="topbar">
-  <a class="brand" href="/office"><span class="brand-mark" aria-hidden="true">▥</span><span>AI TRADING LAB<small>VIRTUAL HEDGE FUND</small></span></a>
+  <a class="brand" href="/office"><svg class="brand-mark" aria-hidden="true" viewBox="0 0 44 44"><path fill="currentColor" d="M3 32h6v9H3zm10-7h6v16h-6zm10-7h6v23h-6zm10-8h6v31h-6z"/><path fill="none" stroke="currentColor" stroke-width="4" d="m3 26 12-12 8 4L39 3M29 3h10v10"/></svg><span>AI TRADING LAB<small>VIRTUAL HEDGE FUND</small></span></a>
   <div class="metric"><small>Patrimônio do fundo</small><strong id="equity">—</strong></div>
   <div class="metric"><small>P&amp;L líquido do fundo</small><strong id="pnl">—</strong></div>
   <div class="metric compact"><small>Agentes em atividade</small><strong id="activeAgents">—</strong></div>
+  <div class="metric compact"><small>Posições abertas</small><strong id="openPositionCount">—</strong></div>
   <div class="mode"><span class="status-dot"></span> PAPER TRADING</div>
 </header>
 <nav class="rail" aria-label="Navegação do laboratório">
@@ -31,7 +32,7 @@
   </section>
   <div class="connection-bar"><span id="connection" role="status">Conectando…</span><span id="sync">Aguardando estado do sistema</span></div>
   <section class="office-shell" aria-label="Centro de controle em pixel art">
-    <div class="scene-caption"><span>ESCRITÓRIO / VISÃO GERAL</span><div class="scene-tools"><button id="togglePresence" aria-pressed="true">Pausar animações</button><button id="openCollaboration">Colaboração</button></div></div>
+    <div class="scene-caption"><span>ESCRITÓRIO / VISÃO GERAL</span><div class="scene-tools"><button id="openDisplay">Tela e escala</button><button id="togglePresence" aria-pressed="true">Pausar animações</button><button id="openCollaboration">Colaboração</button><button id="toggleTeamFeed" aria-expanded="false" aria-controls="teamFeed">Feed</button></div></div>
     <div class="scene-scroll" tabindex="0" aria-label="Mapa das salas; em telas pequenas, deslize para explorar">
       <section id="office" aria-label="Salas do escritório"><div class="research-stations-art" aria-hidden="true"></div>
         <section class="room" data-room="Research Lab"><h2><button class="room-hotspot" data-space="Research Lab" aria-label="Explorar Research Lab">RESEARCH LAB ↗</button></h2><div class="occupants"></div></section>
@@ -43,7 +44,7 @@
       </section>
     </div>
     <div id="unmapped" aria-label="Agentes em salas não reconhecidas"></div>
-    <section class="handoff-board" aria-labelledby="handoffTitle"><h2 id="handoffTitle">Comunicação da equipe</h2><p id="handoffStatus" role="status">Aguardando mensagens registradas.</p><div class="handoff-layout"><ol id="handoffList"></ol><div id="handoffDetail"></div></div><button id="clearHandoff" hidden>Limpar destaque</button></section>
+    <section id="teamFeed" class="handoff-board" aria-labelledby="handoffTitle"><h2 id="handoffTitle">Comunicação da equipe</h2><p id="handoffStatus" role="status">Aguardando mensagens registradas.</p><div class="handoff-layout"><ol id="handoffList"></ol><div id="handoffDetail"></div></div><button id="clearHandoff" hidden>Limpar destaque</button></section>
     <p class="scene-note">Clique nas salas, personagens e objetos para explorar. Sentado não significa trabalhando: os monitores mostram o estado recebido. Clique em um monitor para consultar motivo, fontes e histórico.</p>
   </section>
   <section class="bottom-panels">
@@ -53,6 +54,15 @@
   </section>
   <footer>Dados reais de mercado · Execução exclusivamente simulada · Nenhum dinheiro real conectado</footer>
 </main>
+<dialog id="displayDialog" aria-labelledby="displayTitle">
+  <button id="closeDisplay" class="close" aria-label="Fechar opções de tela">×</button><h2 id="displayTitle">Tela e escala</h2>
+  <p>Enquadre todas as salas ou amplie para explorar os detalhes. A arte mantém suas proporções.</p>
+  <label for="viewScale">Visualização</label><select id="viewScale"><option value="fit">Ajustar tudo à tela</option><option value="width">Preencher largura · rolagem vertical</option><option value="50">50% da cena</option><option value="75">75% da cena</option><option value="100">100% da cena</option><option value="125">125% da cena</option></select>
+  <label for="viewLayout">Composição dos painéis</label><select id="viewLayout"><option value="auto">Automática · aproveita a altura disponível</option><option value="reference">Referência · mercado acima, atividade abaixo</option></select>
+  <label for="viewResolution">Resolução da cena</label><select id="viewResolution"><option value="960">960 × 640 · compacto</option><option value="1280">1280 × 853</option><option value="1536" selected>1536 × 1024 · original</option><option value="1920">1920 × 1280</option><option value="2560">2560 × 1707</option></select>
+  <small>O tamanho da cena afeta as opções percentuais. Ajustar à tela usa o espaço disponível; estas opções não alteram a resolução do seu monitor.</small>
+  <p id="displayStatus" role="status"></p><button id="resetDisplay">Restaurar ajuste automático</button>
+</dialog>
 <dialog id="workspaceDialog" aria-labelledby="workspaceTitle">
   <button id="closeWorkspace" class="close" aria-label="Fechar painel">×</button><h2 id="workspaceTitle">Laboratório</h2>
   <section id="agentsPanel" class="workspace-panel" hidden><p>Funções definidas; atividade e experiência vêm do backend.</p><div id="agentList"></div></section>
@@ -74,5 +84,5 @@
 <dialog id="auditDialog" aria-labelledby="auditTitle"><button id="closeAudit" class="close" aria-label="Fechar auditoria">×</button><h2 id="auditTitle">Auditoria</h2><p id="auditStatus" role="status"></p><button id="auditBack" hidden>Voltar às operações da conta</button><div id="auditContent"></div><button id="auditOlder" hidden>Ver operações anteriores</button></dialog>
 <dialog id="roomDialog" aria-labelledby="roomTitle"><button id="closeRoom" class="close" aria-label="Fechar sala">×</button><h2 id="roomTitle"></h2><p id="roomDescription"></p><div id="roomPeople" class="room-people"></div><div id="roomActions" class="room-actions"></div><h3>Objetos e funções da sala</h3><div id="roomObjects" class="room-objects"></div><h3>Comunicação entre agentes</h3><p id="roomMessageStatus" role="status"></p><ol id="roomMessages"></ol></dialog>
 <script src="/office/collaboration.js"></script><script src="/office/navigation.js"></script><script src="/office/workstations.js"></script><script src="/office/presence.js"></script><script src="/office/transitions.js"></script><script src="/office/character-frames.js"></script><script src="/office/sprites.js"></script>
-<script src="/office/app.js"></script>
+<script src="/office/app.js"></script><script src="/office/display.js"></script>
 </body></html>
