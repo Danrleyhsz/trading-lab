@@ -16,7 +16,7 @@ export function checkCloudConfiguration(env: NodeJS.ProcessEnv): LaunchCheck[] {
     let databaseValid = false, tlsValid = false, directHost = false;
     try {
         const db = new URL(env.DATABASE_URL ?? '');
-        databaseValid = ['postgres:', 'postgresql:'].includes(db.protocol) && !!db.hostname && !!db.username && !!db.password && db.pathname.length > 1 && !db.hash;
+        databaseValid = ['postgres:', 'postgresql:'].includes(db.protocol) && !!db.hostname && !!db.username && !!db.password && db.pathname.length > 1 && !db.hash && [...db.searchParams.keys()].every(key => key === 'sslmode');
         tlsValid = !db.searchParams.has('sslmode') || db.searchParams.get('sslmode') === 'verify-full';
         // Render's internal self-signed endpoint cannot meet production verify-full.
         directHost = !/^dpg-[^.]+$/.test(db.hostname) && !db.hostname.endsWith('.internal');

@@ -7,6 +7,7 @@ import {RuntimeReadiness, type RuntimeInputs} from '../src/application/runtime-r
 import {PerpetualPaperBook} from '../src/application/perpetual-paper-book.js';
 import {EventBus} from '../src/application/event-bus.js';
 import {AiAnalysis} from '../src/application/ai-analysis.js';
+import {PostgresStateStore} from '../src/infrastructure/postgres-state-store.js';
 
 // TEST_ONLY: isolated fixture data; no provider, database, network or product writes.
 const token = 'TEST_ONLY-random-fixture-code-at-least-32-characters';
@@ -27,6 +28,7 @@ test('first-publication config rejects accidental capabilities and TLS weakening
         {DATABASE_URL:'https://fixture:SECRET_TEST_ONLY@db.example.test/tradinglab'},
         {DATABASE_URL:'postgres://fixture:SECRET_TEST_ONLY@dpg-internal/tradinglab'},
         {DATABASE_URL:'postgres://fixture:SECRET_TEST_ONLY@db.example.test/tradinglab?sslmode=require'},
+        {DATABASE_URL:'postgres://fixture:SECRET_TEST_ONLY@db.example.test/tradinglab?host=dpg-internal'},
         {DATABASE_URL:''}, {NODE_TLS_REJECT_UNAUTHORIZED:'0'},
         {PAPER_EVALUATION_ENABLED:'true'}, {PERPETUAL_PAPER_ENABLED:'true'},
         {AUTONOMOUS_PERPETUAL_ENABLED:'true'}, {LEGACY_PAPER_EXECUTION_ENABLED:'true'},
@@ -38,6 +40,13 @@ test('first-publication config rejects accidental capabilities and TLS weakening
         assert.ok(report.some(c=>!c.ok),JSON.stringify(Object.keys(changed)));
         assert.ok(!JSON.stringify(report).includes('SECRET_TEST_ONLY'));
     }
+});
+test('malformed production database URL errors cannot expose the raw credential input',()=>{
+    assert.throws(()=>new PostgresStateStore('INVALID_SECRET_TEST_ONLY',true),(error:unknown)=>{
+        const message=error as Error;assert.equal(message.message,'invalid PostgreSQL connection configuration');
+        assert.ok(!JSON.stringify(message).includes('INVALID_SECRET_TEST_ONLY'));
+        assert.ok(!message.stack?.includes('INVALID_SECRET_TEST_ONLY'));return true;
+    });
 });
 test('production rejects malformed, credential-bearing and path-bearing HTTPS origins before opening storage',async()=>{
     for(const invalid of ['https://','https://user:SECRET_TEST_ONLY@example.test','https://example.test/office/index.html','https://example.test/','https://example.test?secret=value','https://example.test#fragment','http://example.test',' https://example.test']) {
