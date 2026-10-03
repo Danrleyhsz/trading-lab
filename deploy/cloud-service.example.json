@@ -1,0 +1,11 @@
+{
+  "runtime": "cloud-container",
+  "dockerfile": "Dockerfile",
+  "replicas": 1,
+  "portEnvironment": "PORT",
+  "healthPath": "/health",
+  "requiredSecrets": ["DATABASE_URL", "APP_ACCESS_TOKEN"],
+  "requiredConfiguration": {"NODE_ENV": "production", "PAPER_TRADING_ONLY": "true", "PUBLIC_ORIGIN": "https://YOUR-CLOUD-DOMAIN", "PERPETUAL_PAPER_ENABLED": "false", "AUTONOMOUS_PERPETUAL_ENABLED": "false"},
+  "database": {"engine": "PostgreSQL", "managed": true, "verifiedTLS": true, "dailyBackupsRequired": true, "pointInTimeRecoveryRecommended": true},
+  "notProvisioned": true
+}

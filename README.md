@@ -21,3 +21,6 @@ The project is designed to run in cloud infrastructure and be manageable from a 
 
 ## Repository policy
 Secrets never belong in Git. The initial product has no live-money broker. Development uses feature branches and pull requests rather than unreviewed architectural changes directly on main.
+
+## Online Paper V2
+See [implemented package and limits](docs/ONLINE_PAPER_V2.md) and [cloud deployment handoff](docs/CLOUD_DEPLOYMENT.md). Feature code is pending review; no cloud deployment is implied. Production runs from the compiled cloud container with PostgreSQL and protected HTTPS access, not from a developer computer.

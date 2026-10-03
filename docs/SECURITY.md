@@ -12,3 +12,6 @@
 
 ## Independent-account execution controls
 Evaluation account creation/execution is opt-in. No transfer from the fund exists. Public order payloads cannot select an owner, forge a risk approval or provide a market reference price. Routing must use the account endpoint. Orders are checked against fresh public-market data, strict payload validation and account-specific deterministic risk. The legacy order endpoint targets only the paper fund. No live-money adapter or private exchange credentials are introduced.
+
+## Protected online runtime
+Production refuses to start without PostgreSQL and an access code of at least 32 characters. APIs and the event stream require a bearer code or an eight-hour HMAC-protected HttpOnly/Secure/SameSite session. Browser mutations and event-stream origins are checked against PUBLIC_ORIGIN. Real codes/DB URLs belong only in the cloud secret manager; the office never stores them in localStorage or source. Alleged client agent-work and strategy-result endpoints are disabled. Perpetual execution and autonomous evaluation default off; deterministic risk is mandatory even for liquidation/reducing exits. The fund is not an autonomous perpetual target.

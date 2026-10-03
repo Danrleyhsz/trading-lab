@@ -35,3 +35,6 @@ Satoshi studies Bitcoin price history, Flux observes market microstructure/deriv
 
 ## Research controls
 Run research requests actual public market evidence, records measurements and performs a historical SMA screen. The office reports the recorded outcome. It does not add paper fills, change fund capital or fabricate activity. Source errors and negative results are retained. Current regime labels are descriptive heuristics, not predictive certainty. In-sample results are explicitly historical simulations.
+
+## Online Paper V2 controls
+The office adds a sourced USD-M market panel, recorded historical study list/detail and independent account financial cards. Users can pause new perpetual paper exposure; risk still evaluates reducing exits. Automatic evaluation is configured in the cloud and defaults off. Legacy fund equity, independent evaluation equity and historical-study P&L remain separate. Login uses a configured access code without storing it in the browser. Unavailable sources and stale valuations remain visible.

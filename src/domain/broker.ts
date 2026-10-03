@@ -1,7 +1,7 @@
 export type Side = 'BUY' | 'SELL';
 export interface PaperOrder {
  symbol:string; side:Side; quantity:number; referencePrice:number;
- accountId?:string; agentId?:string; strategyId?:string; proposalId?:string;
+ instrument?:'BINANCE_USDM:BTCUSDT'; accountId?:string; agentId?:string; strategyId?:string; proposalId?:string;
 }
 export interface PaperFill extends PaperOrder {id:string;fillPrice:number;fee:number;filledAt:string}
 export interface Broker {submit(order:PaperOrder):Promise<PaperFill>}

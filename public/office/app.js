@@ -60,6 +60,7 @@ async function details() {
     const result = await get('/agents/' + encodeURIComponent(id) + '/profile');
     if (version !== profileVersion || id !== selected) return;
     const evidence = result.evidence, coverage = result.coverage;
+    q('#perpetualProfile').textContent = (result.perpetualEvaluationAccounts || []).map(a => 'Perpetual evaluation: ' + money(a.portfolio.equity - a.initialCash) + ' net P&L · funding ' + money(a.fundingCashDelta) + ' · fees ' + money(a.feesPaid) + ' · max observed drawdown ' + (a.maxDrawdown === null ? 'unavailable' : (a.maxDrawdown * 100).toFixed(2) + '%') + (a.valuationFresh ? '' : ' · valuation stale')).join(' | ');
     q('#career').textContent = `${evidence.observations} observations · ${evidence.decisions} decisions · ${evidence.failures} failures · ${evidence.lessons} lessons · ${evidence.sentMessages} sent messages. Strategies studied: ${evidence.strategyIds.length}. ${result.evaluationAccounts?.length ? 'Evaluation net P&L: ' + money(result.performance.netPnl) + '. Fees: ' + money(result.performance.feesPaid) + '. Fund excluded. Win rate and drawdown unavailable.' : 'Individual P&L, win rate and drawdown unavailable: no attributed evaluation account.'}`;
     q('#coverage').textContent = `${evidence.recordedTransitions} transitions in preserved history. ${coverage.legacyTransitionsWithoutHistory} older transitions have no detailed history. History starts: ${coverage.activitySince ? date(coverage.activitySince) : 'no recorded transitions yet'}.`;
     records('#memories', result.memories, memory => {
@@ -149,6 +150,8 @@ function connect() {
     let event;
     try { event = JSON.parse(message.data); } catch { return; }
     if (!event.id || !event.type) return;
+    if (event.type === 'PERPETUAL_MARKET_UPDATED') { onlineVersion++; showPerpetualMarket({quote: event.payload, status: 'HEALTHY'}); refreshOnline(); return; }
+    if (event.type === 'MARKET_DATA_FAILED') { q('#marketV3').textContent = 'USD-M market unavailable · paper orders blocked'; }
     if (event.type === 'MARKET_TICK') {
       marketVersion++;
       q('#market').textContent = event.payload.symbol + ' ' + money(event.payload.price);
@@ -175,3 +178,60 @@ function connect() {
 refresh();
 setInterval(() => { refresh(); if (selected) details(); }, 5000);
 connect();
+
+let onlineBusy = false, onlineVersion = 0, halted = null;
+function showPerpetualMarket(market) {
+  const quote = market.quote;
+  q('#marketV3').textContent = quote ? `BTCUSDT perpetual · bid ${money(quote.bid)} · ask ${money(quote.ask)} · mark ${money(quote.markPrice)} · quoted funding ${(quote.fundingRate * 100).toFixed(4)}% · ${market.status}. Updated ${date(quote.markTime)}` : 'USD-M market unavailable · paper orders blocked';
+}
+async function studyDetails(id) {
+  q('#studyDialog').showModal();q('#studyDetails').textContent = 'Loading…';
+  try {
+    const study = await get('/backtests/v2/studies/' + encodeURIComponent(id));
+    const host = q('#studyDetails');host.replaceChildren();host.append(node('p', 'Recorded status: ' + study.status));
+    if (study.error) host.append(node('p', study.error));
+    if (study.result) {
+      host.append(node('p', 'Out-of-sample simulated P&L: ' + money(study.result.netPnl)), node('p', 'Evidence: ' + study.result.datasetHash), node('p', 'Historical results do not approve fund trading. Each fold starts and ends flat. Unused tail bars: ' + study.result.excludedTailBars));
+      for (const fold of study.result.folds) host.append(node('p', `${date(fold.testStart)} → ${date(fold.testEnd)} · ${fold.configuration?.strategy || 'SMA'} · ${fold.result.trades ?? 'unavailable'} historical trades · P&L ${money(fold.result.netPnl)} · fees ${money(fold.result.feesPaid)} · funding ${money(fold.result.fundingCashDelta)} · drawdown ${(fold.result.maxDrawdown * 100).toFixed(2)}% · ${fold.result.liquidations} modeled liquidations`));
+      host.append(node('p', 'Liquidation uses configured conservative assumptions, not the complete rules of the exchange.'));
+    }
+  } catch { q('#studyDetails').textContent = 'Study unavailable. Sign in if access is required.'; }
+}
+q('#closeStudy').onclick = () => q('#studyDialog').close();
+async function refreshOnline() {
+  if (onlineBusy) return;onlineBusy = true;const version = onlineVersion;
+  try {
+    const results = await Promise.allSettled([get('/market/v3'), get('/finance'), get('/backtests/v2/studies'), get('/paper/perpetual/status')]);
+    if (results[0].status === 'fulfilled' && version === onlineVersion) showPerpetualMarket(results[0].value);
+    else if (results[0].status === 'rejected') q('#marketV3').textContent = 'USD-M data unavailable · displayed prices may be stale';
+    if (results[1].status === 'fulfilled') {
+      const data = results[1].value, host = q('#finance');host.replaceChildren();
+      for (const account of [...(data.legacyAccounts || []), ...(data.perpetualAccounts || [])]) {
+        const card = node('article', '');const net = account.portfolio.equity - account.initialCash;
+        card.append(node('h3', account.kind === 'FUND' ? 'Fund · separate paper portfolio' : 'Evaluation · ' + account.ownerAgentId), node('p', account.instrument), node('p', 'Equity: ' + money(account.portfolio.equity)), node('p', 'Net P&L: ' + money(net)), node('p', 'Fees: ' + money(account.feesPaid)), node('p', 'Funding: ' + money(account.fundingCashDelta)), node('p', 'Max observed drawdown: ' + (Number.isFinite(account.maxDrawdown) ? (account.maxDrawdown * 100).toFixed(2) + '%' : 'unavailable')));
+        if (account.instrument === 'BINANCE_USDM:BTCUSDT') card.append(node('p', 'Margin: ' + money(account.initialMargin)), node('small', account.valuationFresh ? 'Current sampled valuation' : 'Valuation unavailable or stale'));
+        host.append(card);
+      }
+    } else q('#finance').textContent = 'Financial data unavailable · sign in if access is required';
+    if (results[2].status === 'fulfilled' && Array.isArray(results[2].value)) records('#studyList', [...results[2].value].reverse(), study => { const li = node('li', '');const button = node('button', `${study.status} · ${date(study.createdAt)}${Number.isFinite(study.netPnl) ? ' · historical P&L ' + money(study.netPnl) : ''}`);button.onclick = () => studyDetails(study.id);li.append(button);return li; });
+    if (results[3].status === 'fulfilled') {
+      const status = results[3].value;halted = status.halted;q('#haltPaper').disabled = typeof halted !== 'boolean';q('#haltPaper').textContent = halted ? 'Resume permitted paper exposure' : 'Pause new paper exposure';
+      q('#onlineStatus').textContent = `Perpetual execution ${status.executionEnabled ? 'enabled' : 'disabled'} · new exposure ${halted ? 'paused' : 'subject to risk'} · autonomous ${status.autonomous?.enabled ? 'enabled' : 'disabled'} · ${status.autonomous?.reason || 'status unavailable'}. Independent evaluation only.`;
+    } else { halted = null;q('#haltPaper').disabled = true;q('#onlineStatus').textContent = 'Controls unavailable · sign in if access is required'; }
+  } finally { onlineBusy = false; }
+}
+q('#runStudy').onclick = async () => {
+  const button = q('#runStudy');button.disabled = true;
+  try { const response = await fetch('/backtests/v2/studies', {method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});const result = await response.json();q('#studyActionStatus').textContent = response.ok ? 'Historical study recorded: ' + result.id : result.error || 'Study unavailable';await refreshOnline(); }
+  catch { q('#studyActionStatus').textContent = 'Could not contact the laboratory'; } finally { button.disabled = false; }
+};
+q('#haltPaper').onclick = async () => {
+  if (typeof halted !== 'boolean') return;q('#haltPaper').disabled = true;
+  try { const response = await fetch('/paper/perpetual/halt', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({halted:!halted})});if (!response.ok) throw Error();await refreshOnline(); }
+  catch { q('#onlineStatus').textContent = 'Control change failed. Recheck backend status.'; }
+};
+q('#loginPanel').onclick = async () => {
+  try { const response = await fetch('/auth/login', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({accessToken:q('#accessToken').value})});q('#accessToken').value = '';q('#loginStatus').textContent = response.ok ? 'Signed in' : 'Access rejected';if (response.ok) { await refresh();await refreshOnline(); } }
+  catch { q('#loginStatus').textContent = 'Could not contact the laboratory'; }
+};
+refreshOnline();setInterval(refreshOnline, 5000);

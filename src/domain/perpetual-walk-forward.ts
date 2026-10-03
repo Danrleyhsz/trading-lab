@@ -10,7 +10,7 @@ export function walkForwardPerpetual(data:PerpetualDataset,candidates:PerpetualC
   // Warmup is from prior observations; the simulator opens only after slowPeriod bars.
   const testing=slice(start-selected.config.slowPeriod,start+testBars);
   const result=backtestPerpetual(testing,{...selected.config,initialCapital:equity});
-  folds.push({trainStart:training.trade[0].timestamp,trainEnd:training.trade.at(-1)!.timestamp,testStart:data.trade[start].timestamp,testEnd:data.trade[start+testBars-1].timestamp,selectedCandidate:selected.index,trainingNetPnl:selected.result.netPnl,result});equity=result.finalEquity;
+  folds.push({trainStart:training.trade[0].timestamp,trainEnd:training.trade.at(-1)!.timestamp,testStart:data.trade[start].timestamp,testEnd:data.trade[start+testBars-1].timestamp,selectedCandidate:selected.index,configuration:structuredClone(selected.config),trainingNetPnl:selected.result.netPnl,result});equity=result.finalEquity;
  }
  return {datasetHash,model:'LINEAR_PERPETUAL_WALK_FORWARD_V2' as const,execution:'HISTORICAL_SIMULATION' as const,folds,finalEquity:equity,netPnl:equity-candidates[0].initialCapital,excludedTailBars:(data.trade.length-trainBars)%testBars,foldPolicy:'flat at every fold boundary; candidate chosen by training net P&L only',automaticPaperApproval:false};
 }

@@ -56,3 +56,8 @@ Cross-margin stress uses the adverse hourly mark extreme, 1% maintenance margin 
 Data endpoints and field definitions: [official Binance USD-M market data documentation](https://developers.binance.com/en/docs/catalog/core-trading-derivatives-trading-usd-s-m-futures/api/rest-api/market-data). Only public klines, markPriceKlines and fundingRate are queried. No API keys or private brackets.
 
 Production remains cloud-only. Local tests are development validation. Deployment, PostgreSQL and uninterrupted cloud jobs are not supplied by this increment.
+
+## Online Paper V2 runtime and durability
+See [Online Paper V2](ONLINE_PAPER_V2.md). The USD-M market adapter, historical simulator, deterministic risk, Paper account book, persistence and browser UI remain separate modules. Book mutations stage a cloned state, persist it and only then publish committed paper outcomes. PostgreSQL snapshots/event rows commit in one transaction; per-book actions and global snapshot writes are serialized. The advisory lock enforces a single cloud writer. Root domain events preserve actual source IDs and autonomous signal datasets. Final research/study evidence and ledger prefixes cannot be rewritten through the PostgreSQL adapter.
+
+The new perpetual runtime is isolated from the original fund/legacy book; an automatic fund migration is deliberately absent. A future multi-replica design requires a new transactional execution architecture and review.

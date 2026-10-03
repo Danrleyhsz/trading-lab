@@ -49,7 +49,7 @@ export class PaperAccounts {
  }
  private record(event:DomainEvent){
   const id=this.accountId(event);
-  if(!id)return;
+  if(!id||id.endsWith(':usdm'))return;
   const account=this.accounts.get(id);
   if(!account)throw Error('unknown event account');
   if(!account.ledger.some(item=>item.id===event.id))account.ledger.push(structuredClone(event));
@@ -82,4 +82,3 @@ export class PaperAccounts {
   return result;
  }
 }
-

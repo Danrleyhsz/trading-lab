@@ -79,3 +79,9 @@ Architecture skeleton + market-data ingestion + paper broker contract + event sc
 - Legacy realtime Paper execution remains unchanged pending Market Data V3 / Autonomous Paper V2; old studies remain legacy.
 - Full exchange tier parity, extra strategy families and browser study controls are not yet implemented.
 - Public-data smoke: 300 aligned bars, 37 funding records, four out-of-sample folds; no broker events or persistent product account changes.
+
+## Online Paper V2 package (pending architectural review)
+- Market Data V3, three historical strategy families, gated autonomous perpetual evaluation, Risk V2, PostgreSQL adapter, financial/study UI and cloud container preparation are integrated on a feature branch.
+- Production requires PostgreSQL, verified TLS and protected HTTPS access. Runtime remains single-writer; actual provider provisioning, backups and deployment are pending external account choice.
+- Perpetual evaluation accounts use new explicit identities; legacy accounts/fund and old history are not converted. New automatic execution targets only the independent Nova evaluation account and defaults off.
+- See docs/ONLINE_PAPER_V2.md for implementation boundaries and docs/CLOUD_DEPLOYMENT.md for the cloud handoff. Browser visual review remains pending.

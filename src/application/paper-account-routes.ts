@@ -15,7 +15,7 @@ export interface PaperAccountRouteDependencies {
  strategies:StrategyRegistry;
  coordinator:AgentCoordinator;
  persist:()=>Promise<void>;
- evaluationEnabled:boolean;bus:EventBus;
+ executionEnabled?:boolean;evaluationEnabled:boolean;bus:EventBus;
 }
 export function registerPaperAccountRoutes(app:FastifyInstance,accounts:PaperAccounts,deps:PaperAccountRouteDependencies){
  const unsubscribe=deps.bus.subscribe(event=>{
@@ -30,6 +30,7 @@ export function registerPaperAccountRoutes(app:FastifyInstance,accounts:PaperAcc
  app.get<{Params:{id:string}}>('/paper/accounts/:id',async(req,reply)=>accounts.snapshot(req.params.id)??reply.code(404).send({error:'unknown account'}));
  app.get<{Params:{id:string}}>('/paper/accounts/:id/events',async(req,reply)=>accounts.has(req.params.id)?accounts.ledger(req.params.id):reply.code(404).send({error:'unknown account'}));
  const execute=async(id:string,body:unknown,reply:FastifyReply)=>{
+  if(deps.executionEnabled===false)return reply.code(403).send({error:'legacy execution disabled; use independent perpetual evaluation'});
   const account=accounts.snapshot(id);
   if(!account)return reply.code(404).send({error:'unknown account'});
   if(account.kind==='EVALUATION'&&!deps.evaluationEnabled)return reply.code(403).send({error:'evaluation execution disabled'});

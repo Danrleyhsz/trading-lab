@@ -8,6 +8,7 @@ export class Portfolio{
  if(old===0||Math.sign(old)===Math.sign(signed)){const q=old+signed;p.averageEntry=(Math.abs(old)*p.averageEntry+Math.abs(signed)*fill.fillPrice)/Math.abs(q);p.quantity=q}
  else{const closing=Math.min(Math.abs(old),Math.abs(signed));const pnl=closing*(fill.fillPrice-p.averageEntry)*Math.sign(old);p.realizedPnl+=pnl;this.cash+=pnl;const q=old+signed;if(q===0){p.quantity=0;p.averageEntry=0}else if(Math.sign(q)!==Math.sign(old)){p.quantity=q;p.averageEntry=fill.fillPrice}else p.quantity=q}
  this.cash-=fill.fee;this.positions.set(fill.symbol,p);this.marks.set(fill.symbol,fill.fillPrice)}
- mark(symbol:string,price:number){if(price>0)this.marks.set(symbol,price)}
+ adjustCash(delta:number){if(!Number.isFinite(delta)||!Number.isFinite(this.cash+delta))throw Error('invalid cash adjustment');this.cash+=delta}
+ mark(symbol:string,price:number){if(Number.isFinite(price)&&price>0)this.marks.set(symbol,price)}
  snapshot():PortfolioSnapshot{const ps=[...this.positions.values()].filter(p=>p.quantity!==0);const unrealized=ps.reduce((s,p)=>s+p.quantity*((this.marks.get(p.symbol)??p.averageEntry)-p.averageEntry),0);const realized=[...this.positions.values()].reduce((s,p)=>s+p.realizedPnl,0);return{initialCash:this.initialCash,cash:this.cash,equity:this.cash+unrealized,realizedPnl:realized,unrealizedPnl:unrealized,positions:ps.map(p=>({...p}))}}
 }
