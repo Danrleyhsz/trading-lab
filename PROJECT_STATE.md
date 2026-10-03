@@ -61,3 +61,13 @@ Architecture skeleton + market-data ingestion + paper broker contract + event sc
 - They start IDLE with zero transitions and no invented messages, memories, fills or historical activity. Existing agent counters and reasons survive hydration.
 - Configured independent evaluation accounts can cover the expanded roster without changing fund capital.
 - Specialization is a role definition, not a claim that a task ran. Real specialist work is the next Research Engine increment.
+
+## Evidence Research Engine (pending review)
+- On-demand /research/run retrieves actual BTC spot hourly history and a separately labeled public USD-M context snapshot. The unfinished candle is excluded; invalid, stale, non-contiguous or non-finite data is rejected without fallback fabrication.
+- Satoshi measures observed spot momentum, Flux spread/funding/open interest, Vega realized hourly log-return volatility, and Oracle a documented descriptive regime heuristic. These are deterministic backend analyses, not LLM conversations or confidence claims.
+- Atlas sends a sourced SMA hypothesis to Euler. Euler uses the existing historical backtester. Positive screens, rejected hypotheses and source failures are preserved with source data, SHA-256 evidence hash and original research/backtest events.
+- Research and strategies survive restart. List responses expose compact recent summaries; details retain full evidence. Research submits no paper orders and never moves capital automatically to the fund.
+- The office can request a real research run and inspect its recorded result. Specialist movement is driven by actual task phases; no decorative chatter or artificial work delays were added.
+- Paper execution status now starts at the actual approved order submission and returns to IDLE after its fill; the risk reviewer also returns to idle. Failed office stream delivery cannot abort domain execution.
+- Validation: typecheck, 38 tests and JavaScript syntax passed. A development smoke test against public Binance endpoints obtained 99 closed candles, four specialist findings and a REJECTED screen with zero execution events. This is development verification, not a production-cloud deployment. Browser visual review is still pending.
+- Backtest screening still uses V1 and does not imply out-of-sample validation. Backtesting V2 is the next milestone.

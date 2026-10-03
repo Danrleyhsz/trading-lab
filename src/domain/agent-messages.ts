@@ -1,5 +1,5 @@
 import type {AgentId} from './agents.js';
-export type AgentMessageKind='HYPOTHESIS'|'BACKTEST_RESULT'|'RISK_REVIEW'|'EXECUTION_PLAN'|'PORTFOLIO_DECISION';
+export type AgentMessageKind='HYPOTHESIS'|'BACKTEST_RESULT'|'RISK_REVIEW'|'EXECUTION_PLAN'|'PORTFOLIO_DECISION'|'RESEARCH_FINDING';
 export interface AgentMessage{id:string;from:AgentId;to:AgentId[];kind:AgentMessageKind;summary:string;createdAt:string;context:Record<string,unknown>}
 export class AgentMessageBus {
  private messages: AgentMessage[]=[];

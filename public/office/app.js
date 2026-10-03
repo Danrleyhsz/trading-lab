@@ -89,6 +89,29 @@ async function details() {
 }
 q('#closeProfile').onclick = () => q('#profile').close();
 q('#profile').addEventListener('close', () => { selected = undefined; profileVersion++; });
+q('#runResearch').onclick = async () => {
+  const button = q('#runResearch');
+  button.disabled = true;
+  q('#researchActionStatus').textContent = 'Research requested…';
+  try {
+    const response = await fetch('/research/run', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({symbol: 'BTCUSDT'})});
+    const run = await response.json();
+    q('#researchActionStatus').textContent = run.status ? 'Recorded result: ' + run.status : 'Request could not complete. See recorded activity.';
+    refresh();
+    if (selected) details();
+  } catch {
+    q('#researchActionStatus').textContent = 'Could not contact the laboratory.';
+  } finally { button.disabled = false; }
+};
+function renderResearch(runs) {
+  records('#researchRuns', [...runs].reverse(), run => {
+    const row = node('li', '');
+    row.append(node('b', run.status === 'SCREEN_PASSED' ? 'Historical screen passed' : run.status === 'REJECTED' ? 'Hypothesis rejected' : 'Research failed'), node('p', date(run.completedAt)));
+    if (run.datasetHash) row.append(node('small', 'Evidence: ' + run.datasetHash));
+    if (run.backtest) row.append(node('p', `${run.backtest.trades} historical trades · Simulated backtest P&L ${money(run.backtest.netPnl)}`));
+    return row;
+  });
+}
 function renderAccounts(items) {
   const host = q('#accounts');
   host.replaceChildren();
@@ -104,14 +127,14 @@ async function refresh() {
   busy = true;
   const initialStateVersion = stateVersion, initialMarketVersion = marketVersion;
   try {
-    const [states, portfolio, market, accounts] = await Promise.all([get('/agents'), get('/portfolio'), get('/market/latest'), get('/paper/accounts')]);
+    const [states, portfolio, market, accounts, runs] = await Promise.all([get('/agents'), get('/portfolio'), get('/market/latest'), get('/paper/accounts'), get('/research/runs')]);
     // A snapshot requested before a stream event must not move an agent back.
     if (initialStateVersion === stateVersion) {
       agents.clear();
       states.forEach(agent => agents.set(agent.id, agent));
       render();
     }
-    renderAccounts(accounts);q('#equity').textContent = money(portfolio.equity);
+    renderResearch(runs);renderAccounts(accounts);q('#equity').textContent = money(portfolio.equity);
     q('#pnl').textContent = money(portfolio.equity - portfolio.initialCash);
     if (initialMarketVersion === marketVersion) q('#market').textContent = market.price ? market.symbol + ' ' + money(market.price) : 'Waiting for market data';
     q('#sync').textContent = 'Snapshot received ' + new Date().toLocaleTimeString();

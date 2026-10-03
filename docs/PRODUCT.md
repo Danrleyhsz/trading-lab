@@ -32,3 +32,6 @@ Agent evaluation wallets have independent virtual starting capital. Their equity
 
 ## Expanded research roles
 Satoshi studies Bitcoin price history, Flux observes market microstructure/derivatives context, Vega measures realized volatility and Oracle classifies market regimes. All begin idle. A specialization label does not imply executed research, accumulated experience or financial performance. Actual work must retain its input evidence and results.
+
+## Research controls
+Run research requests actual public market evidence, records measurements and performs a historical SMA screen. The office reports the recorded outcome. It does not add paper fills, change fund capital or fabricate activity. Source errors and negative results are retained. Current regime labels are descriptive heuristics, not predictive certainty. In-sample results are explicitly historical simulations.

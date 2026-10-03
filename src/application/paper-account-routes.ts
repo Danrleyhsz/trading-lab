@@ -1,3 +1,4 @@
+import type {EventBus} from "./event-bus.js";
 import type {PaperOrder,PaperFill} from "../domain/broker.js";
 import type {FastifyInstance,FastifyReply} from 'fastify';
 import {z} from 'zod';
@@ -14,9 +15,17 @@ export interface PaperAccountRouteDependencies {
  strategies:StrategyRegistry;
  coordinator:AgentCoordinator;
  persist:()=>Promise<void>;
- evaluationEnabled:boolean;
+ evaluationEnabled:boolean;bus:EventBus;
 }
 export function registerPaperAccountRoutes(app:FastifyInstance,accounts:PaperAccounts,deps:PaperAccountRouteDependencies){
+ const unsubscribe=deps.bus.subscribe(event=>{
+  if(event.type!=='PAPER_ORDER_SUBMITTED')return;
+  const order=event.payload as PaperOrder;
+  const account=order.accountId?accounts.snapshot(order.accountId):undefined;
+  if(!account||!order.agentId)return;
+  deps.coordinator.move(account.ownerAgentId??'nova','TRADING','Trading Floor','submit approved paper order for '+account.id);
+ });
+ app.addHook('onClose',async()=>{unsubscribe()});
  app.get('/paper/accounts',async()=>accounts.list());
  app.get<{Params:{id:string}}>('/paper/accounts/:id',async(req,reply)=>accounts.snapshot(req.params.id)??reply.code(404).send({error:'unknown account'}));
  app.get<{Params:{id:string}}>('/paper/accounts/:id/events',async(req,reply)=>accounts.has(req.params.id)?accounts.ledger(req.params.id):reply.code(404).send({error:'unknown account'}));
@@ -44,7 +53,7 @@ export function registerPaperAccountRoutes(app:FastifyInstance,accounts:PaperAcc
    deps.memories.add({agentId:'sentinel',kind:'FAILURE',summary:'paper order rejected by risk engine',sourceEventId:source?.id,metadata:{accountId:id,proposalId:result.proposalId,ownerAgentId:result.agentId,reasons:result.decision.reasons}});
    deps.coordinator.move('sentinel','IDLE','Risk Desk','review complete for '+id);
   }else{
-   deps.coordinator.move(result.agentId,'TRADING','Trading Floor','approved paper fill for '+id);
+   deps.coordinator.move('sentinel','IDLE','Risk Desk','risk review complete for '+id);deps.coordinator.move(result.agentId,'IDLE','Trading Floor','paper fill recorded for '+id);
    deps.memories.add({agentId:result.agentId,kind:'DECISION',summary:'approved paper order filled',strategyId:parsed.data.strategyId,sourceEventId:source?.id,metadata:{accountId:id,proposalId:result.proposalId,fillId:result.fill.id,symbol:result.fill.symbol}});
   }
   await deps.persist();
@@ -54,4 +63,3 @@ export function registerPaperAccountRoutes(app:FastifyInstance,accounts:PaperAcc
  // Existing API remains explicitly fund-only. Account routing cannot be inferred from body fields.
  app.post('/paper/orders',async(req,reply)=>execute('fund',req.body,reply));
 }
-

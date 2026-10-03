@@ -53,7 +53,7 @@ function api(evaluationEnabled=true, marketAge=0){
  const app=Fastify(),bus=new EventBus(),agents=new AgentRegistry(),memories=new MemoryStore(),strategies=new StrategyRegistry(),accounts=new PaperAccounts(bus,10000);
  accounts.ensureEvaluation('nova',1000);accounts.ensureEvaluation('atlas',2000);
  let persistenceCount=0;
- registerPaperAccountRoutes(app,accounts,{market:()=>({symbol:'BTCUSDT',price:1000,exchange:'test',timestamp:Date.now()-marketAge}),memories,strategies,coordinator:new AgentCoordinator(agents,bus),persist:async()=>{persistenceCount++},evaluationEnabled});
+ registerPaperAccountRoutes(app,accounts,{market:()=>({symbol:'BTCUSDT',price:1000,exchange:'test',timestamp:Date.now()-marketAge}),memories,strategies,coordinator:new AgentCoordinator(agents,bus),persist:async()=>{persistenceCount++},evaluationEnabled,bus});
  registerAgentProfiles(app,agents,memories,new AgentMessageBus(),new AgentActivityJournal(),accounts);
  return {app,accounts,memories,strategies,get persistenceCount(){return persistenceCount}};
 }
