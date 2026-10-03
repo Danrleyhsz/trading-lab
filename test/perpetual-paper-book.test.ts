@@ -40,3 +40,16 @@ test('real account outcomes reconcile costs, refresh the projection and survive 
  assert.deepEqual(new PerpetualPaperBook(new EventBus(),book.exportState(),()=>now).performance(id),book.performance(id));
  assert.equal(book.list()[0].performance.summary.closedTrades,1);
 });
+test('perpetual restore refuses a duplicated fill or misleading inner attribution/instrument',async()=>{
+ const book=new PerpetualPaperBook(new EventBus(),undefined,()=>start),id=book.ensureEvaluation('nova',1000);
+ await book.synchronize(quote(start),[],noop);await book.propose(id,'BUY',1,noop);const valid=book.exportState();
+ for(const tamper of [
+  (state:PerpetualBookState)=>{(state.accounts[0].ledger.find(e=>e.type==='PAPER_FILL')!.payload as any).fill.accountId='fund';},
+  (state:PerpetualBookState)=>{(state.accounts[0].ledger.find(e=>e.type==='PAPER_FILL')!.payload as any).fill.agentId='atlas';},
+  (state:PerpetualBookState)=>{(state.accounts[0].ledger.find(e=>e.type==='PAPER_FILL')!.payload as any).fill.symbol='ETHUSDT';},
+  (state:PerpetualBookState)=>{const original=state.accounts[0].ledger.find(e=>e.type==='PAPER_FILL')!;state.accounts[0].ledger.push({...structuredClone(original),id:'another-event-same-fill'});},
+ ]){
+  const corrupted=structuredClone(valid);tamper(corrupted);assert.throws(()=>new PerpetualPaperBook(new EventBus(),corrupted,()=>start),/perpetual (fill|ledger)/);
+ }
+ assert.deepEqual(new PerpetualPaperBook(new EventBus(),valid,()=>start).list(),book.list());
+});

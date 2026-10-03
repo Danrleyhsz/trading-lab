@@ -28,3 +28,8 @@ Profiles show account-level completed operations, opening/closing times, gross/n
 These features do not authorize autonomous fund trading, establish exchange liquidation parity, provision cloud services or call an AI provider.
 
 CI verification: PR #21 passed all 76 tests (zero skipped), typecheck, build and Docker image. The isolated preview kept evaluation/execution disabled and exposed null win rate with no closed account operations.
+
+## Restore identity checks
+Both account books reject duplicate actual fill IDs, including different wrapper event IDs, and mismatched inner wallet/agent attribution when replaying stored fills. Evaluation IDs must match a known roster owner. Perpetual fills must use the supported BTCUSDT instrument; legacy fills cannot carry perpetual instrumentation.
+
+The projection also refuses execution timestamps that run backwards in original ledger order. Actual account replay remains based on recorded execution sequence; outcome metrics are unavailable instead of inferring a chronology. No stored event is rewritten or discarded by this validation.

@@ -104,3 +104,16 @@ test('closing evaluation positions records actual realized P&L and fees without 
  assert.ok(Math.abs(snapshot.portfolio.equity-snapshot.initialCash-(snapshot.portfolio.realizedPnl-snapshot.feesPaid))<1e-8);
  assert.equal(accounts.snapshot('fund')!.portfolio.realizedPnl,0);assert.equal(accounts.snapshot('fund')!.portfolio.equity,10000);
 });
+test('restore rejects duplicated actual fill IDs and wallet/agent identity mismatches',async()=>{
+ const accounts=new PaperAccounts(new EventBus(),10000);accounts.ensureEvaluation('nova',1000);await accounts.propose('evaluation:nova',order);
+ const valid=accounts.exportState();
+ for(const tamper of [
+  (state:any[])=>{state.find(a=>a.id==='evaluation:nova').ledger.find((e:any)=>e.type==='PAPER_FILL').payload.fill.accountId='fund';},
+  (state:any[])=>{state.find(a=>a.id==='evaluation:nova').ledger.find((e:any)=>e.type==='PAPER_FILL').payload.fill.agentId='atlas';},
+  (state:any[])=>{const account=state.find(a=>a.id==='evaluation:nova'),original=account.ledger.find((e:any)=>e.type==='PAPER_FILL');account.ledger.push({...structuredClone(original),id:'new-event-same-fill'});},
+  (state:any[])=>{state.find(a=>a.id==='evaluation:nova').ownerAgentId='atlas';},
+ ]){
+  const corrupted=structuredClone(valid);tamper(corrupted);assert.throws(()=>new PaperAccounts(new EventBus(),10000,corrupted),/attribution/);
+ }
+ assert.doesNotThrow(()=>new PaperAccounts(new EventBus(),10000,valid));
+});

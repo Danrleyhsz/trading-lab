@@ -28,3 +28,6 @@
 - No cloud infrastructure has been provisioned. Budget/provider proposal and deployment handoff exist separately.
 - No private exchange key, live broker or real-money connection exists.
 - Review relevant repo docs and current Git/CI state before each increment. Avoid overwriting user work. Keep substantive increments on feature branches with draft PRs, tests and validated CI.
+
+## Restore integrity increment
+PR #22 will be the next reviewable increment: evaluation owner/account matching, unique actual fill IDs, supported perpetual symbol and unavailable outcome metrics after non-monotonic execution timestamps. No historical auto-repair, reseeding or invented fill is allowed. Validate current branch/PR/CI state before continuing.

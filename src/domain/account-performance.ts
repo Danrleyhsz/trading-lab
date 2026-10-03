@@ -27,13 +27,15 @@ const blank = ():AccountPerformance => ({
  */
 export function projectAccountPerformance(ledger:DomainEvent[],accountId:string,instrument:string):AccountPerformance {
   try {
-    const result=blank(), open=new Map<string,OpenTrade>(), ids=new Set<string>();
+    const result=blank(), open=new Map<string,OpenTrade>(), ids=new Set<string>(),fillIds=new Set<string>();let previousFillTime=-Infinity;
     const items=ledger.map((e,index)=>{
       if (!e.id || ids.has(e.id)) throw Error('duplicate or missing source event');
       ids.add(e.id);
       const payload=e.payload as {fill?:PaperFill;accountId?:string;timestamp?:number};
+      if(e.type==='PAPER_FILL'){if(!payload.fill?.id||fillIds.has(payload.fill.id))throw Error('duplicate or missing fill ID');fillIds.add(payload.fill.id);}
       const time=e.type==='PAPER_FILL'?Date.parse(payload.fill?.filledAt??''):e.type==='FUNDING_SETTLED'?payload.timestamp:undefined;
       if ((e.type==='PAPER_FILL'||e.type==='FUNDING_SETTLED') && !Number.isFinite(time)) throw Error('missing economic timestamp');
+      if(e.type==='PAPER_FILL'){if(time! < previousFillTime)throw Error('non-monotonic execution timestamps');previousFillTime=time!;}
       return {e,index,time:time??0};
     }).filter(item=>item.e.type==='PAPER_FILL'||item.e.type==='FUNDING_SETTLED')
       .sort((a,b)=>a.time-b.time || (a.e.type===b.e.type?a.index-b.index:a.e.type==='FUNDING_SETTLED'?-1:1));

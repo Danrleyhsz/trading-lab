@@ -51,3 +51,9 @@ test('performance audit pages use original closing event cursors and reject unsu
   assert.equal((await app.inject('/accounts/fund/performance')).statusCode,404);
  }finally{await app.close();}
 });
+test('performance does not invent a second fill from a duplicate ID or reorder execution after a clock rollback',()=>{
+ const a=fill('a',1,'BUY',1,100,1),duplicate={...structuredClone(a),id:'another-event'};
+ assert.equal(projectAccountPerformance([a,duplicate],id,PERPETUAL_INSTRUMENT).available,false);
+ const result=projectAccountPerformance([a,fill('earlier-clock',0,'SELL',1,110,1)],id,PERPETUAL_INSTRUMENT);
+ assert.equal(result.available,false);assert.match(result.reason!,/non-monotonic/);assert.equal(result.summary.winRate,null);
+});

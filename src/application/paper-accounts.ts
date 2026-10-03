@@ -1,5 +1,5 @@
 import {projectAccountPerformance,type AccountPerformance} from '../domain/account-performance.js';
-import type {AgentId} from '../domain/agents.js';
+import {AGENT_IDS,type AgentId} from '../domain/agents.js';
 import {PaperBroker, type PaperOrder, type PaperFill} from '../domain/broker.js';
 import type {DomainEvent} from '../domain/events.js';
 import {Portfolio} from '../domain/portfolio.js';
@@ -26,19 +26,22 @@ export class PaperAccounts {
  private add(definition:PaperAccountDefinition){
   if(this.accounts.has(definition.id))throw Error('duplicate account');
   if((definition.kind==='FUND')!==(definition.id==='fund')||((definition.kind==='FUND')!==(definition.ownerAgentId===null)))throw Error('invalid account definition');
+  if(definition.kind==='EVALUATION'&&(definition.id!=='evaluation:'+definition.ownerAgentId||!AGENT_IDS.includes(definition.ownerAgentId!)))throw Error('invalid evaluation attribution');
   const portfolio=new Portfolio(definition.initialCash);
   this.accounts.set(definition.id,{definition:{id:definition.id,kind:definition.kind,ownerAgentId:definition.ownerAgentId,initialCash:definition.initialCash,createdAt:definition.createdAt},portfolio,trading:new TradingService(new PaperBroker(),portfolio,new RiskEngine(),this.bus),ledger:[],pending:Promise.resolve()});
  }
  private restore(stored:StoredPaperAccount){
   this.add(stored);
   const account=this.accounts.get(stored.id)!;
-  const ids=new Set<string>();
+  const ids=new Set<string>(),fillIds=new Set<string>();
   for(const event of stored.ledger){
    if(ids.has(event.id))throw Error('duplicate ledger event');
    ids.add(event.id);
    if(this.accountId(event)!==stored.id)throw Error('account ledger attribution mismatch');
    if(event.type==='PAPER_FILL'){
     const fill=(event.payload as {fill:PaperFill}).fill;
+    if(!fill?.id||fillIds.has(fill.id)||fill.accountId!==stored.id||(stored.kind==='EVALUATION'&&fill.agentId!==stored.ownerAgentId)||!!fill.instrument)throw Error('invalid stored fill attribution');
+    fillIds.add(fill.id);
     if(!Number.isFinite(fill.quantity)||fill.quantity<=0||!Number.isFinite(fill.fillPrice)||fill.fillPrice<=0||!Number.isFinite(fill.fee)||fill.fee<0||!['BUY','SELL'].includes(fill.side))throw Error('invalid stored fill');
     account.portfolio.applyFill(fill);
    }

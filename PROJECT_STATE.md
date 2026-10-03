@@ -103,3 +103,9 @@ Architecture skeleton + market-data ingestion + paper broker contract + event sc
 - Validation: typecheck and 76-test suite passed locally with the PostgreSQL integration deferred to the CI service; no execution was enabled for development preview.
 
 CI checkpoint: PR #21 completed with 76 tests passing, zero skipped, including PostgreSQL integration, typecheck, build and cloud-container build. PR #20 also passed its complete CI. Desktop profile verification confirmed no invented account, closed operations, memories or win rate in the unconfigured development preview. See docs/DEVELOPMENT_QUEUE.md for the next steps and actual remaining boundaries.
+
+## Ledger restoration integrity (pending review)
+- Evaluation wallet identities must match a known roster owner. The runtime rejects stored fills attributed to another wallet/agent and rejects duplicate actual fill IDs even if wrapper event IDs differ.
+- Perpetual restore accepts only the supported BTCUSDT instrument; legacy fills cannot masquerade as perpetual records.
+- The read-only performance projection reports duplicate fill IDs and non-monotonic execution timestamps as unavailable. It never invents a second execution or reorders a clock rollback into a profitable trade.
+- Valid recorded snapshots replay unchanged. This fix rejects inconsistent evidence and does not repair, delete or rewrite historical data.

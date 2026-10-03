@@ -11,6 +11,7 @@ const seed:Record<AgentId,Omit<AgentState,'updatedAt'>>={
  vega:{id:'vega',name:'Vega',role:'Volatility Researcher',room:'Quant Lab',status:'IDLE',experience:0,specialization:'Realized volatility from historical price returns'},
  oracle:{id:'oracle',name:'Oracle',role:'Market Regime Researcher',room:'Research Lab',status:'IDLE',experience:0,specialization:'Evidence-based market-regime classification'},
 };
+export const AGENT_IDS=Object.freeze(Object.keys(seed) as AgentId[]);
 export class AgentRegistry {
  private states=new Map<AgentId,AgentState>(Object.entries(seed).map(([id,state])=>[id as AgentId,{...state,updatedAt:new Date().toISOString()}]));
  hydrate(states:AgentState[]){for(const state of states)this.states.set(state.id,{...state,specialization:state.specialization??seed[state.id]?.specialization})}
