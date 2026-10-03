@@ -93,3 +93,11 @@ Architecture skeleton + market-data ingestion + paper broker contract + event sc
 - Profiles, research/study/risk controls and protected access remain functional through the existing APIs. Mobile uses a scrollable map and an accessible roster/profile panel.
 - Source failures hide current USD-M prices; in-flight older snapshots cannot override a newer stream failure. Assets are served as binary PNGs from an explicit allowlist.
 - Browser review completed at desktop and 390px mobile width, including agent profile and roster navigation. No production cloud deployment is implied.
+
+## Account outcome performance (pending review)
+- Portfolio V2 increment: read-only position lifecycles derived from actual account fills and funding. Complete flat-to-flat operations have net outcomes after all attributed fees/funding; open lifecycles are excluded from win rate.
+- Partial exits, scaling, shorts, reversals and liquidation fees preserve source event IDs. Funding is matched by original settlement time, including later publication; same-timestamp funding uses the book's strict-before-fill rule.
+- Missing/invalid provenance produces unavailable metrics. Empty histories have no win rate, performance grade or invented closed trades.
+- Fund, legacy evaluations and USD-M evaluations remain separate. Existing snapshots/events are unchanged; projections are cached by append-only ledger version.
+- Bounded read-only audit pages and the most recent 20 outcomes per account are available through profiles. The office shows source IDs, fees/funding and genuine equity samples.
+- Validation: typecheck and 76-test suite passed locally with the PostgreSQL integration deferred to the CI service; no execution was enabled for development preview.

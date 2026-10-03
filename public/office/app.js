@@ -16,6 +16,42 @@ function observeTrace(source, price, timestamp) {
 function marketUnavailable(reason) {
   q('#marketV3').textContent = reason;q('#markPrice').textContent = 'Indisponível';q('#fundingRate').textContent = '—';q('#spreadQuote').textContent = '—';q('#quoteTime').textContent = reason;
 }
+function outcomeLabel(performance) {
+  if (!performance?.available) return 'Métricas de operações indisponíveis';
+  const s=performance.summary;
+  return s.closedTrades + ' operações encerradas · acerto ' + (s.winRate===null?'indisponível':(s.winRate*100).toFixed(1)+'%');
+}
+function renderClosedTrades(accounts) {
+  const host=q('#closedTrades');host.replaceChildren();
+  if(!accounts.length){host.textContent='Nenhuma conta de avaliação atribuída.';return;}
+  for(const account of accounts){
+    const performance=account.performance,group=node('section','');
+    group.append(node('b',account.accountId),node('p',outcomeLabel(performance)));
+    if(performance?.available){
+      for(const trade of [...performance.closedTrades].reverse()){
+        const row=node('article','');row.className='trade-outcome';
+        row.append(node('b',trade.symbol+' '+trade.direction+' · '+money(trade.netPnl)),node('p',date(trade.openedAt)+' → '+date(trade.closedAt)),node('small','P&L bruto '+money(trade.grossPnl)+' · taxas '+money(trade.feesPaid)+' · funding '+money(trade.fundingCashDelta)),node('p','Eventos de fills: '+trade.fillEventIds.join(', ')));
+        if(trade.fundingEventIds.length)row.append(node('small','Funding: '+trade.fundingEventIds.join(', ')));
+        group.append(row);
+      }
+      if(!performance.closedTrades.length)group.append(node('p','Nenhuma operação completa registrada. Posições abertas não entram na taxa de acerto.'));
+    } else group.append(node('p',performance?.reason || 'Evidências indisponíveis'));
+    const link=node('a','Ver auditoria de operações (JSON)');
+    link.setAttribute('href',(account.instrument==='BINANCE_USDM:BTCUSDT'?'/paper/perpetual/accounts/':'/paper/accounts/')+encodeURIComponent(account.accountId)+'/performance');
+    group.append(link);host.append(group);
+  }
+}
+function renderEquitySamples(card,account) {
+  if(!account.samples?.length)return;
+  const samples=account.samples.filter(sample=>Number.isFinite(sample.equity)&&Number.isFinite(sample.timestamp));
+  card.append(node('small','Equity observada · amostras por minuto (até 24h)'));
+  if(samples.length<2){card.append(node('small','Aguardando mais amostras'));return;}
+  if(!document.createElementNS)return;
+  const low=Math.min(...samples.map(s=>s.equity)),high=Math.max(...samples.map(s=>s.equity));
+  const start=samples[0].timestamp,end=samples[samples.length-1].timestamp;
+  const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.setAttribute('viewBox','0 0 300 80');svg.setAttribute('role','img');svg.setAttribute('aria-label','Equity observada de '+account.id+' de '+date(start)+' até '+date(end));svg.setAttribute('class','equity-trace');
+  const line=document.createElementNS('http://www.w3.org/2000/svg','polyline');line.setAttribute('points',samples.map(s=>((s.timestamp-start)/(end-start||1)*300).toFixed(1)+','+(74-(s.equity-low)/(high-low||1)*66).toFixed(1)).join(' '));line.setAttribute('stroke','#35c9ff');line.setAttribute('stroke-width','2');line.setAttribute('fill','none');svg.append(line);card.append(svg);
+}
 function renderFinancialOverview(data) {
   const all = [...(data.legacyAccounts || []), ...(data.perpetualAccounts || [])];
   const positions = q('#positions'), performance = q('#performance');positions.replaceChildren();performance.replaceChildren();
@@ -33,7 +69,7 @@ function renderFinancialOverview(data) {
     if (account.kind !== 'FUND') {
       const row = node('div','');row.className = 'data-row';
       const label = node('span',name + ' · ' + instrument);label.append(node('small','Patrimônio ' + money(account.portfolio.equity) + (account.valuationFresh === false ? ' · desatualizado' : '')));
-      const pnl = node('b',money(account.portfolio.equity-account.initialCash));pnl.className = account.portfolio.equity >= account.initialCash ? 'positive' : 'negative';
+      label.append(node('small',outcomeLabel(account.performance)));const pnl = node('b',money(account.portfolio.equity-account.initialCash));pnl.className = account.portfolio.equity >= account.initialCash ? 'positive' : 'negative';
       row.append(label,pnl);performance.append(row);
     }
   }
@@ -131,14 +167,14 @@ function records(selector, items, renderRecord) {
 async function details() {
   const id = selected, version = ++profileVersion;
   if (!id) return;
-  const selectors = ['#memories', '#activity', '#career', '#history'];
+  const selectors = ['#memories', '#activity', '#career', '#history', '#closedTrades'];
   selectors.forEach(selector => q(selector).textContent = 'Carregando…');
   try {
     const result = await get('/agents/' + encodeURIComponent(id) + '/profile');
     if (version !== profileVersion || id !== selected) return;
-    const evidence = result.evidence, coverage = result.coverage;
+    const evidence = result.evidence, coverage = result.coverage;renderClosedTrades(result.recentTrades || []);
     q('#perpetualProfile').textContent = (result.perpetualEvaluationAccounts || []).map(a => 'Avaliação perpétua: ' + money(a.portfolio.equity - a.initialCash) + ' P&L líquido · funding ' + money(a.fundingCashDelta) + ' · taxas ' + money(a.feesPaid) + ' · drawdown máximo observado ' + (a.maxDrawdown === null ? 'indisponível' : (a.maxDrawdown * 100).toFixed(2) + '%') + (a.valuationFresh ? '' : ' · avaliação desatualizada')).join(' | ');
-    q('#career').textContent = `${evidence.observations} observações · ${evidence.decisions} decisões · ${evidence.failures} falhas · ${evidence.lessons} lições · ${evidence.sentMessages} mensagens enviadas. Estratégias estudadas: ${evidence.strategyIds.length}. ${result.evaluationAccounts?.length ? 'P&L líquido da avaliação: ' + money(result.performance.netPnl) + '. Taxas: ' + money(result.performance.feesPaid) + '. Fundo separado. Taxa de acerto e drawdown indisponíveis.' : 'P&L individual, taxa de acerto e drawdown indisponíveis: sem conta de avaliação atribuída.'}`;
+    q('#career').textContent = `${evidence.observations} observações · ${evidence.decisions} decisões · ${evidence.failures} falhas · ${evidence.lessons} lições · ${evidence.sentMessages} mensagens enviadas. Estratégias estudadas: ${evidence.strategyIds.length}. ${result.evaluationAccounts?.length ? 'P&L líquido da avaliação: ' + money(result.performance.netPnl) + '. Taxas: ' + money(result.performance.feesPaid) + '. Fundo separado. Consulte as métricas de cada conta em operações encerradas.' : 'P&L individual, taxa de acerto e drawdown indisponíveis: sem conta de avaliação atribuída.'}`;
     q('#coverage').textContent = `${evidence.recordedTransitions} transições no histórico preservado. ${coverage.legacyTransitionsWithoutHistory} transições antigas não têm histórico detalhado. Histórico desde: ${coverage.activitySince ? date(coverage.activitySince) : 'nenhuma transição registrada'}.`;
     records('#memories', result.memories, memory => {
       const row = node('li', '');
@@ -296,7 +332,7 @@ async function refreshOnline() {
         const card = node('article', '');const net = account.portfolio.equity - account.initialCash;
         card.append(node('h3', account.kind === 'FUND' ? 'Fundo · portfólio paper separado' : 'Avaliação · ' + account.ownerAgentId), node('p', account.instrument), node('p', 'Patrimônio: ' + money(account.portfolio.equity)), node('p', 'P&L líquido: ' + money(net)), node('p', 'Taxas: ' + money(account.feesPaid)), node('p', 'Funding: ' + money(account.fundingCashDelta)), node('p', 'Drawdown máximo observado: ' + (Number.isFinite(account.maxDrawdown) ? (account.maxDrawdown * 100).toFixed(2) + '%' : 'indisponível')));
         if (account.instrument === 'BINANCE_USDM:BTCUSDT') card.append(node('p', 'Margem: ' + money(account.initialMargin)), node('small', account.valuationFresh ? 'Avaliação atual por amostragem' : 'Avaliação indisponível ou desatualizada'));
-        host.append(card);
+        card.append(node('p',outcomeLabel(account.performance)));renderEquitySamples(card,account);host.append(card);
       }
     } else { q('#finance').textContent = 'Dados financeiros indisponíveis · entre se o acesso for exigido';q('#positions').textContent = 'Posições indisponíveis ou desatualizadas';q('#performance').textContent = 'Contas indisponíveis ou desatualizadas'; }
     if (results[2].status === 'fulfilled' && Array.isArray(results[2].value)) records('#studyList', [...results[2].value].reverse(), study => { const li = node('li', '');const button = node('button', `${study.status} · ${date(study.createdAt)}${Number.isFinite(study.netPnl) ? ' · P&L histórico ' + money(study.netPnl) : ''}`);button.onclick = () => studyDetails(study.id);li.append(button);return li; });

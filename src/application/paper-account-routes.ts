@@ -1,3 +1,4 @@
+import {registerPerformanceRoute} from './performance-routes.js';
 import type {EventBus} from "./event-bus.js";
 import type {PaperOrder,PaperFill} from "../domain/broker.js";
 import type {FastifyInstance,FastifyReply} from 'fastify';
@@ -26,6 +27,7 @@ export function registerPaperAccountRoutes(app:FastifyInstance,accounts:PaperAcc
   deps.coordinator.move(account.ownerAgentId??'nova','TRADING','Trading Floor','submit approved paper order for '+account.id);
  });
  app.addHook('onClose',async()=>{unsubscribe()});
+ registerPerformanceRoute(app,'/paper/accounts/:id/performance',id=>accounts.performance(id));
  app.get('/paper/accounts',async()=>accounts.list());
  app.get<{Params:{id:string}}>('/paper/accounts/:id',async(req,reply)=>accounts.snapshot(req.params.id)??reply.code(404).send({error:'unknown account'}));
  app.get<{Params:{id:string}}>('/paper/accounts/:id/events',async(req,reply)=>accounts.has(req.params.id)?accounts.ledger(req.params.id):reply.code(404).send({error:'unknown account'}));

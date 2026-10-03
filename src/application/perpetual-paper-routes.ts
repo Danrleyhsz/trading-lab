@@ -1,8 +1,10 @@
+import {registerPerformanceRoute} from './performance-routes.js';
 import type {FastifyInstance} from 'fastify';
 import {z} from 'zod';
 import type {PerpetualPaperBook,PerpetualBookState} from './perpetual-paper-book.js';
 import type {AutonomousPerpetualCycle} from './autonomous-perpetual-cycle.js';
 export function registerPerpetualPaperRoutes(app:FastifyInstance,book:PerpetualPaperBook,save:(state:PerpetualBookState)=>Promise<void>,enabled:boolean,cycle:AutonomousPerpetualCycle,healthy:()=>boolean){
+ registerPerformanceRoute(app,'/paper/perpetual/accounts/:id/performance',id=>book.performance(id));
  app.get('/paper/perpetual/accounts',async()=>book.list());app.get('/paper/perpetual/status',async()=>({...book.status(),executionEnabled:enabled,autonomous:cycle.status(),marginModel:'configured 1% maintenance and 0.5% liquidation fee; sampled quotes, not exchange parity'}));
  app.get<{Params:{id:string}}>('/paper/perpetual/accounts/:id/events',async(req,reply)=>book.ledger(req.params.id)??reply.code(404).send({error:'unknown account'}));
  const order=z.object({side:z.enum(['BUY','SELL']),quantity:z.number().finite().positive()}).strict();

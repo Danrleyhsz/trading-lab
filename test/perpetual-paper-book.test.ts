@@ -26,3 +26,17 @@ test('pending funding publication and stale prices block reconciliation without 
 test('risk rejects stale quotes and drawdown without being fooled by an otherwise affordable order',()=>{
  const risk=new PerpetualRiskEngine(),order={symbol:'BTCUSDT',side:'BUY' as const,quantity:1,referencePrice:100},portfolio={initialCash:1000,cash:950,equity:950,realizedPnl:0,unrealizedPnl:0,positions:[]};assert.ok(risk.evaluate(order,portfolio,quote(start),{halted:false,peakEquity:1200,dailyStartEquity:1000},start).reasons.includes('DRAWDOWN_LIMIT'));assert.ok(risk.evaluate(order,portfolio,quote(start),{halted:false,peakEquity:1000,dailyStartEquity:1000},start+20000).reasons.includes('STALE_MARKET'));
 });
+test('real account outcomes reconcile costs, refresh the projection and survive restart',async()=>{
+ let now=start;const book=new PerpetualPaperBook(new EventBus(),undefined,()=>now),id=book.ensureEvaluation('nova',1000);
+ assert.equal(book.performance(id)!.summary.winRate,null);
+ await book.synchronize(quote(now),[],noop);await book.propose(id,'BUY',1,noop);
+ assert.equal(book.performance(id)!.summary.closedTrades,0);
+ now+=2000;await book.synchronize(quote(now,110),[{instrument:PERPETUAL_INSTRUMENT,timestamp:now-1,rate:0.01,markPrice:110}],noop);await book.propose(id,'SELL',1,noop);
+ const performance=book.performance(id)!;
+ assert.equal(performance.summary.closedTrades,1);assert.equal(performance.summary.winRate,1);
+ assert.ok(Math.abs(performance.summary.realizedNetPnl-(book.list()[0].portfolio.cash-1000))<1e-9);
+ performance.closedTrades[0].netPnl=-999;
+ assert.ok(book.performance(id)!.closedTrades[0].netPnl>0);
+ assert.deepEqual(new PerpetualPaperBook(new EventBus(),book.exportState(),()=>now).performance(id),book.performance(id));
+ assert.equal(book.list()[0].performance.summary.closedTrades,1);
+});

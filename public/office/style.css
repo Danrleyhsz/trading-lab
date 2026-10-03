@@ -866,3 +866,8 @@ dialog .close{
 }
 
 }
+
+.trade-outcome {border:1px solid var(--line);border-radius:5px;padding:10px;margin:10px 0;overflow-wrap:anywhere}
+.trade-outcome p {font-size:11px;margin:5px 0}
+.equity-trace {display:block;width:100%;height:80px;margin:8px 0}
+#closedTrades section {border-bottom:1px solid var(--line);padding:12px 0}

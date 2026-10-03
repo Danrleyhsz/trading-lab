@@ -1,3 +1,4 @@
+import {projectAccountPerformance,type AccountPerformance} from '../domain/account-performance.js';
 import type {AgentId} from '../domain/agents.js';
 import {PaperBroker, type PaperOrder, type PaperFill} from '../domain/broker.js';
 import type {DomainEvent} from '../domain/events.js';
@@ -15,6 +16,7 @@ interface RuntimeAccount {
  pending:Promise<unknown>;
 }
 export class PaperAccounts {
+ private performanceCache=new Map<string,{events:number;lastId?:string;value:AccountPerformance}>();
  private accounts=new Map<string,RuntimeAccount>();
  constructor(private bus:EventBus, initialFundCash:number, restored:StoredPaperAccount[]=[]){
   for(const stored of restored)this.restore(stored);
@@ -59,10 +61,17 @@ export class PaperAccounts {
   if(!this.accounts.has(id))this.add({id,kind:'EVALUATION',ownerAgentId,initialCash,createdAt:new Date().toISOString()});
  }
  has(id:string){return this.accounts.has(id)}
+ performance(id:string,limit?:number){
+  const account=this.accounts.get(id);if(!account)return undefined;
+  const cached=this.performanceCache.get(id),lastId=account.ledger.at(-1)?.id;
+  if(cached&&cached.events===account.ledger.length&&cached.lastId===lastId)return structuredClone({...cached.value,closedTrades:limit===0?[]:limit?cached.value.closedTrades.slice(-limit):cached.value.closedTrades,openTrades:limit===0?[]:cached.value.openTrades});
+  const value=projectAccountPerformance(account.ledger,id,'LEGACY_PAPER_V1');
+  this.performanceCache.set(id,{events:account.ledger.length,lastId,value});return structuredClone({...value,closedTrades:limit===0?[]:limit?value.closedTrades.slice(-limit):value.closedTrades,openTrades:limit===0?[]:value.openTrades});
+ }
  list(ownerAgentId?:AgentId){
   return [...this.accounts.values()].filter(account=>ownerAgentId===undefined||account.definition.ownerAgentId===ownerAgentId).map(account=>{
    const fills=account.ledger.filter(event=>event.type==='PAPER_FILL').map(event=>(event.payload as {fill:PaperFill}).fill);
-   return {...structuredClone(account.definition),portfolio:account.portfolio.snapshot(),feesPaid:fills.reduce((sum,fill)=>sum+fill.fee,0),fills:fills.length,ledgerEvents:account.ledger.length};
+   return {...structuredClone(account.definition),portfolio:account.portfolio.snapshot(),performance:(()=>{const {closedTrades,openTrades,...summary}=this.performance(account.definition.id,0)!;return summary;})(),feesPaid:fills.reduce((sum,fill)=>sum+fill.fee,0),fills:fills.length,ledgerEvents:account.ledger.length};
   });
  }
  snapshot(id:string){return this.list().find(account=>account.id===id)}
