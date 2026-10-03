@@ -41,3 +41,6 @@ PR #22 will be the next reviewable increment: evaluation owner/account matching,
 - Do not infer that held reservations mean provider charges occurred; they explicitly represent unresolved maximum cost. Do not release them without verifiable evidence and a reviewed append-only reconciliation design.
 
 Validation before opening the analytical increment: typecheck/build passed; full local suite passed 90 tests with the PostgreSQL test skipped locally. The focused analytical/storage checks also passed. The forthcoming draft PR CI must run all 91 tests with PostgreSQL plus the container build; do not claim CI completion until its result is checked.
+
+### Verified analytical checkpoint
+PR #23: https://github.com/Danrleyhsz/trading-lab/pull/23 (draft, stacked on #22). Code commit acdabe7 passed CI run 37093860927: 91 tests, zero failures/skips, typecheck, build and container build. An isolated loopback development smoke check confirmed healthy PAPER_TRADING mode, AI disabled, providerConfigured false, zero budget, zero AI records and executionAuthority false. No call was made. Main is still 90ebf7553492a031e2203a5fdeac17c97cde914f. Next: authenticated cloud readiness diagnostics; no external account or deployment prerequisite is available yet.
