@@ -50,3 +50,6 @@ A historical study uses recorded source data saved before calculation. A calcula
 
 ## Recorded history and source navigation
 History filters and earlier pages open preserved backend events. Clicking a session activity, agent source or operation fill/funding opens the original ID and payload with explicit confirmed/unconfirmed/missing coverage. Account pages keep fund/evaluations separate and exclude open positions from win rate. Empty history remains empty. Queries do not change rooms, experience, memory, risk or execution. Mobile and keyboard navigation preserve the approved scene; source payloads render as text. See OFFICE_AUDIT.md.
+
+## Paper continuation evidence
+Restart retains original processed-candle/funding progress and separate account history. Missing expected funding and stale/paused/unavailable service state stop the pending signal before checkpoint. A saved cursor means an attempt was consumed, not that an agent finished work or an operation filled. Source failures and interrupted attempts never populate the office with assumed decisions, memory or profit. Automatic paper execution continues to default off. See PAPER_CONTINUATION.md.

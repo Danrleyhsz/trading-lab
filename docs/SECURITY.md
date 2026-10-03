@@ -27,3 +27,6 @@ The bounded historical worker receives trusted cloned source/configuration data 
 
 ## Read-only audit access
 The new audit list/detail routes remain behind existing production API authentication; only minimal health routes are public. Strict bounded queries reject arbitrary claimed records/filters. Only confirmed snapshots supply recorded history; conflicts/malformed evidence fail closed with fixed errors. Source text/JSON is inserted with textContent, never interpreted as HTML or instructions. Received-only fallback is limited to an actual session record after a 404; access failures cannot display it. No audit mutation, risk bypass, paid AI call or private exchange capability exists. See OFFICE_AUDIT.md.
+
+## Continuation and recovery controls
+Both stores reject rollback/removal of saved perpetual progress and rewrite/deletion of perpetual account identity/endowment/ledger prefixes. Restore fails on malformed/future cursors rather than resetting them. A known due funding record cannot be replaced with a later timestamp to bypass reconciliation. Runtime admission and book gates are rechecked after signal retrieval; no recovery cursor authorizes risk or proves an execution. No activation, repair endpoint, private exchange credential or paid capability is added. See PAPER_CONTINUATION.md.

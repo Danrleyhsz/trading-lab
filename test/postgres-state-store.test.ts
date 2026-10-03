@@ -1,3 +1,5 @@
+import {PerpetualPaperBook} from '../src/application/perpetual-paper-book.js';
+import {EventBus} from '../src/application/event-bus.js';
 import {validatePerpetualDataset} from '../src/domain/perpetual-backtest.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -20,6 +22,19 @@ test('PostgreSQL roundtrip, single writer exclusion and transactional rejection'
   retained={...retained,perpetualStudies:[{id:'pg-study-fixture',status:'RUNNING',createdAt:'2026-01-01T00:00:00Z',request:{bars:300,trainBars:100,testBars:50},dataset:{instrument:'BINANCE_USDM:BTCUSDT',trade,mark:structuredClone(trade),funding:[]},datasetHash:validatePerpetualDataset({instrument:'BINANCE_USDM:BTCUSDT',trade,mark:structuredClone(trade),funding:[]})}]};await first.save(retained);
   const evidenceRewrite=structuredClone(retained);evidenceRewrite.perpetualStudies![0].dataset!.trade[0].close=200;await assert.rejects(first.save(evidenceRewrite),/study/);assert.deepEqual(await first.load(),retained);
   retained=structuredClone(retained);Object.assign(retained.perpetualStudies![0],{status:'INTERRUPTED',error:'server restarted before completion'});await first.save(retained);assert.deepEqual(await first.load(),retained);
+  // Test-only paper continuation: actual DB rejects progress rollback without changing cash/events.
+  const time=1700000000000,closed=Math.floor(time/3600000)*3600000-3600000;
+  const book=new PerpetualPaperBook(new EventBus(),undefined,()=>time),id=book.ensureEvaluation('nova',1000);
+  const saveBook=async(perpetualBook:ReturnType<PerpetualPaperBook['exportState']>)=>{const staged={...retained,perpetualBook};await first.save(staged);retained=staged;};
+  await book.synchronize({instrument:'BINANCE_USDM:BTCUSDT',symbol:'BTCUSDT',bid:100,ask:100,markPrice:100,indexPrice:100,fundingRate:0.01,nextFundingTime:time+28800000,bookTime:time,markTime:time,receivedAt:time},[],saveBook);
+  await book.propose(id,'BUY',1,saveBook);await book.checkpoint(closed,saveBook);
+  for(const corrupt of [
+   (s:StoredState)=>{s.perpetualBook!.fundingCursor--;},
+   (s:StoredState)=>{s.perpetualBook!.autonomousCursor!-=3600000;},
+   (s:StoredState)=>{delete s.perpetualBook!.autonomousCursor;},
+   (s:StoredState)=>{s.perpetualBook!.accounts[0].ownerAgentId='atlas';},
+  ]){const changed=structuredClone(retained);corrupt(changed);await assert.rejects(first.save(changed),/rollback|rewrite/);assert.deepEqual(await first.load(),retained);}
+  await book.halt(true,saveBook);assert.deepEqual(await first.load(),retained);
  }finally{await first.close();}
- const restarted=new PostgresStateStore(process.env.TEST_DATABASE_URL!);await restarted.open();try{assert.deepEqual(await restarted.load(),retained);}finally{await restarted.close();}
+ const restarted=new PostgresStateStore(process.env.TEST_DATABASE_URL!);await restarted.open();try{const loaded=await restarted.load();assert.deepEqual(loaded,retained);const book=new PerpetualPaperBook(new EventBus(),loaded!.perpetualBook,()=>1700000000000);assert.equal(book.status().autonomousCursor,retained.perpetualBook!.autonomousCursor);assert.equal(book.status().marketReady,false);assert.equal(book.list()[0].fills,1);assert.equal(book.status().halted,true);}finally{await restarted.close();}
 });

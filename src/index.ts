@@ -65,7 +65,7 @@ bus.subscribe(e=>{const payload=e.payload as any;if(!payload?.accountId?.endsWit
  if(e.type==='PAPER_FILL'){memories.add({agentId:payload.fill.agentId,kind:'DECISION',summary:'perpetual paper fill recorded',sourceEventId:e.id,strategyId:payload.fill.strategyId,metadata:{accountId:payload.fill.accountId,fillId:payload.fill.id}});coordinator.move(payload.fill.agentId,'IDLE','Trading Floor','perpetual paper fill recorded '+e.id);}
 });
 const autonomousEnabled=process.env.AUTONOMOUS_PERPETUAL_ENABLED==='true';if(autonomousEnabled&&(!perpetualEnabled||!process.env.AUTONOMOUS_STUDY_ID))throw Error('autonomous perpetual evaluation requires enabled accounts and explicit study ID');
-const cycle=new AutonomousPerpetualCycle(autonomousEnabled,process.env.AUTONOMOUS_STUDY_ID??'',studies,book,perpetualHistory,persist,memories,bus,()=>persist());
+const cycle=new AutonomousPerpetualCycle(autonomousEnabled,process.env.AUTONOMOUS_STUDY_ID??'',studies,book,perpetualHistory,persist,memories,bus,()=>persist(),Date.now,()=>runtime.control().ready);
 registerAgentProfiles(app,agents,memories,messages,activity,accounts,book);
 registerEventAudit(app,new EventAudit(()=>durableSnapshot));
 const research=new ResearchEngine({snapshot:symbol=>derivatives.snapshot(symbol),candles:(symbol,interval,limit)=>history.candles(symbol,interval,limit)},coordinator,collaboration,messages,memories,strategies,strategyLab,backtester,researchRuns,bus);

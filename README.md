@@ -36,3 +36,6 @@ Historical studies now retain source data/hash durably before calculating in a b
 
 ## Pixel Office recorded audit navigation
 The office now opens original recorded events, filters/pages confirmed history and browses closed operations per account. Session-received events remain separate from the last saved history. Missing evidence and empty accounts remain explicit. Original fill/funding/source IDs are preserved; queries cannot change agents, approve risk or execute paper orders. See docs/OFFICE_AUDIT.md.
+
+## Continuous paper recovery preparation
+Shared durable continuation guards now reject cursor rollback and perpetual ledger/account rewrites; known funding boundaries require their actual settlement before advancing. Autonomous signals recheck book/runtime gates after source retrieval. Saved interrupted attempts retain the existing at-most-once policy, without claiming a completed decision or fill. Execution remains disabled by default. See docs/PAPER_CONTINUATION.md.
