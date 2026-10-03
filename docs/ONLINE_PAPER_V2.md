@@ -24,3 +24,5 @@ The perpetual model uses configured 1% maintenance and 0.5% liquidation fee; the
 Unit/API tests cover isolation, durable-write failure, funding/restart/deduplication, reducing exits, liquidation, source validation, authentication, strategy outcomes, autonomous gating/cursor and financial display. The real PostgreSQL integration and cloud image are tested in GitHub CI. Public-source smoke verified coherent USD-M book/mark timestamps and actual funding rows without submitting orders.
 
 No cloud resources, real secrets, production balances or external accounts were provisioned. Browser visual review remains pending in this environment. Provider selection, managed DB/backup configuration, actual deployment and monitoring alerts still require external account access and review.
+
+On runtime restart, restored non-idle agent states transition to IDLE with an explicit recovery reason and actual transition event. Pending studies are INTERRUPTED; no prior task result is inferred. High-volume studies/years of market samples will require a normalized paged reporting/event projection beyond this single-runtime snapshot adapter.
