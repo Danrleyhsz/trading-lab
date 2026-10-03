@@ -114,7 +114,7 @@ const presence=new OfficePresence.Director(()=>presenceEnabled&&!reducedMotion?.
 function stopPresence(){for(const view of agentViews.values())presence.stop(view);}
 function render(movingId){
  const focusedAgent=document.activeElement?.dataset?.agentId,slots=new Map();q('#agentList').replaceChildren();
- for(const [id,view] of agentViews)if(!agents.has(id)){presence.stop(view);view.button.remove();agentViews.delete(id);}
+ for(const [id,view] of agentViews)if(!agents.has(id)){presence.forget(view);view.button.remove();agentViews.delete(id);}
  for(const agent of agents.values()){
   let view=agentViews.get(agent.id);
   if(!view){
@@ -460,6 +460,7 @@ function renderRoom(){
  for(const agent of occupants){const button=node('button',''),portrait=node('span','');portrait.className='sprite';portrait.setAttribute('aria-hidden','true');sprite(portrait,agent.id);button.append(portrait,node('b',agent.name),node('small',statusLabels[agent.status]||agent.status));button.dataset.roomControl='person:'+agent.id;button.onclick=()=>{q('#roomDialog').close();profile(agent.id);};people.append(button);controls.push(button);}
  if(!occupants.length)people.textContent='Nenhum agente nesta sala no estado recebido.';
  const actions=q('#roomActions');actions.replaceChildren();const action=node('button',info.action);action.onclick=()=>{q('#roomDialog').close();openPanel(info.panel,info.action,info.nav);};action.dataset.roomControl='action';actions.append(action);controls.push(action);
+ const objectHost=q('#roomObjects');objectHost.replaceChildren();for(const feature of OfficeNavigation.features.filter(f=>f.room===room)){const button=node('button',feature.label+' ↗');button.dataset.roomControl='object:'+feature.id;button.onclick=()=>openFurniture(feature.id);objectHost.append(button);controls.push(button);}
  const messages=room==='Meeting Room'?communications:communications.filter(m=>occupants.some(a=>a.id===m.from||m.to.includes(a.id)));
  const list=q('#roomMessages'),rows=messages.slice().reverse().map(message=>messageCard(message,controls));list.replaceChildren(...rows);if(focused&&q('#roomDialog').open)(controls.find(button=>button.dataset.roomControl===focused)||q('#closeRoom')).focus?.({preventScroll:true});
  q('#roomMessageStatus').textContent=communicationReady?(messages.length?'Comunicações registradas · horário e participantes originais.':'Nenhuma comunicação registrada para esta sala.'):'Comunicações indisponíveis ou ainda não recebidas.';
@@ -487,3 +488,22 @@ for(const button of document.querySelectorAll('button[data-space]'))button.oncli
 for(const id of ['#roomDialog','#profile','#workspaceDialog','#auditDialog','#studyDialog'])q(id).addEventListener('close',()=>render());
 document.addEventListener?.('visibilitychange',()=>{stopPresence();render();});reducedMotion?.addEventListener?.('change',()=>{stopPresence();render();});
 refreshCommunications();setInterval(refreshCommunications,5000);
+
+const furnitureActions={
+ library:{panel:'researchPanel',title:'Biblioteca · pesquisas registradas',nav:'navResearch'},
+ terminal:{panel:'marketPanel',title:'Terminal · mercado observado',nav:'navMarket'},
+ 'risk-board':{panel:'researchPanel',title:'Quadro · controles de risco',nav:'navResearch'},
+ 'quant-servers':{panel:'researchPanel',title:'Bancada · estudos históricos',nav:'navResearch'}
+};
+let furnitureReturn=null;
+function openFurniture(id){
+ const feature=OfficeNavigation.features.find(f=>f.id===id);if(!feature)return;
+ if(q('#roomDialog').open)q('#roomDialog').close();
+ const action=furnitureActions[id];if(action){furnitureReturn=id;openPanel(action.panel,action.title,action.nav);}else{furnitureReturn=null;openRoom(feature.room);}
+}
+for(const feature of OfficeNavigation.features){
+ const room=[...document.querySelectorAll('.room[data-room]')].find(element=>element.dataset.room===feature.room);if(!room)continue;
+ const button=node('button',''),icon=node('span',feature.icon),label=node('span',feature.label);button.className='furniture-hit';button.dataset.furniture=feature.id;button.setAttribute('aria-label',feature.label);button.setAttribute('style','left:'+feature.x+'%;top:'+feature.y+'%');icon.setAttribute('aria-hidden','true');label.className='furniture-label';button.append(icon,label);button.onclick=()=>openFurniture(feature.id);room.append(button);
+}
+q('#workspaceDialog').addEventListener('close',()=>{if(furnitureReturn){document.querySelector('button[data-furniture="'+furnitureReturn+'"]')?.focus?.({preventScroll:true});furnitureReturn=null;}});
+globalThis.addEventListener?.('resize',()=>{stopPresence();render();});

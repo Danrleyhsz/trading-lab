@@ -13,7 +13,7 @@ test('office serves binary artwork with correct type and never exposes arbitrary
   }
   assert.equal((await app.inject('/office/private.env')).statusCode,404);
   assert.equal((await app.inject('/office/subdir/index.html')).statusCode,404);
-  const presentation=await app.inject('/office/presence.js');assert.equal(presentation.statusCode,200);assert.match(presentation.headers['content-type']!,/javascript/);
+  for(const name of ['presence.js','navigation.js']){const presentation=await app.inject('/office/'+name);assert.equal(presentation.statusCode,200);assert.match(presentation.headers['content-type']!,/javascript/);}
   const page=await app.inject('/office/index.html');
   assert.match(page.body,/lang="pt-BR"/);
   assert.equal((await app.inject('/office')).statusCode,302);

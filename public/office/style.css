@@ -900,3 +900,10 @@ select{font:inherit;color:var(--text);background:#101c33;border:1px solid var(--
 #roomMessages{max-height:340px;overflow:auto;padding-left:22px}#roomMessages li{padding:12px;border:1px solid var(--line);border-radius:8px;overflow-wrap:anywhere}#roomMessages small{display:block}#roomDialog{max-width:660px}
 @media(prefers-reduced-motion:reduce){.agent .sprite{animation:none!important}.agent{transition:none!important}}
 @media(max-width:700px){.scene-caption{align-items:flex-start;gap:10px;flex-wrap:wrap}.scene-tools{width:100%}.scene-tools button{flex:1}.room-people button{min-width:90px}.room-actions button{width:100%}#roomDialog{width:calc(100% - 24px);padding:18px}}
+/* Furniture is an accessible read-only entry into existing laboratory views. */
+.furniture-hit{position:absolute;z-index:4;transform:translate(-50%,-50%);display:grid;place-items:center;min-width:44px;min-height:44px;width:44px;height:44px;padding:0;background:#09142799;border:1px solid #35c9ff88;border-radius:50%;color:var(--cyan);box-shadow:0 0 8px #35c9ff33}
+.furniture-hit:hover,.furniture-hit:focus-visible{background:#152d48;border-color:var(--cyan)}
+.furniture-label{position:absolute;bottom:calc(100% + 6px);width:max-content;max-width:170px;padding:5px 8px;border:1px solid var(--cyan);border-radius:5px;background:#0c172df0;color:var(--text);font-size:11px;pointer-events:none;visibility:hidden}
+.furniture-hit:hover .furniture-label,.furniture-hit:focus-visible .furniture-label{visibility:visible}
+.room-objects{display:flex;gap:8px;flex-wrap:wrap}.room-objects button{min-height:44px}
+.agent[data-facing="up"],.agent[data-facing="down"]{--facing:1}
