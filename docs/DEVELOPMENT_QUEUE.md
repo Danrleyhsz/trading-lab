@@ -1,5 +1,9 @@
 # Development continuation queue
 
+## Latest human priority — first online publication preparation
+
+The user requested all prerequisite verification before starting publication. Complete CLOUD_LAUNCH_READINESS.md acceptance with the approved provider only after account/access/budget exist. Preserve the source branch/reviewed release and draft stack; do not deploy old main. Proposed Render template and compiled configuration/read-only service checks require no provisioning to test. Import original history before normal startup, verified TLS, one writer/stop-before-start, disabled first-publication execution/AI, source availability, restart/restore, daily backups and alerts remain explicit gates. Do not repeatedly re-run unchanged tests while waiting for approval; compatible functional preparation may continue without resources or activation.
+
 ## Current human priority — functionality, 2026-10-03
 
 Later explicit human request overrides graphics deferral for reference fidelity, complete one-screen view and scale/resolution choices. OFFICE_REFERENCE_SCENE.md records the delivered original panoramic scene, eight realigned seats/monitors, nine visual zones, fit/zoom and remaining fidelity/physics limits. Preserve the new source and metadata; do not regenerate all characters or restore old room geometry. Return to the functional sequence below after CI/browser verification. Detailed wall-screen projection and sprite delivery optimization remain follow-ups.

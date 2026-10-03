@@ -1,5 +1,7 @@
 # Cloud deployment handoff
 
+First-publication preparation and exact ordered acceptance: [CLOUD_LAUNCH_READINESS.md](CLOUD_LAUNCH_READINESS.md), with proposed Render example and compiled checks. Import original history into an empty database **before** the first normal runtime starts; the order below is a topic list, not permission to seed a database before importing.
+
 1. Review the stacked feature PRs; no architectural merge is automatic.
 2. Choose a cloud container service and managed PostgreSQL. Use exactly one runtime replica; the database advisory lock rejects a second writer.
 3. Configure verified database TLS. Set DATABASE_URL and a random APP_ACCESS_TOKEN (>=32 characters) through the cloud secret manager. Set PUBLIC_ORIGIN to the final HTTPS origin; never store real secrets in this repo.

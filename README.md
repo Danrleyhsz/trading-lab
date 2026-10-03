@@ -23,6 +23,8 @@ The project is designed to run in cloud infrastructure and be manageable from a 
 Secrets never belong in Git. The initial product has no live-money broker. Development uses feature branches and pull requests rather than unreviewed architectural changes directly on main.
 
 ## Online Paper V2
+
+First online launch preparation: [configuration, verification tools and remaining provider acceptance](docs/CLOUD_LAUNCH_READINESS.md). A proposed Render template is supplied without provisioning. All execution and AI remain off for first publication; hosting still requires approved account/access/budget and release review.
 See [implemented package and limits](docs/ONLINE_PAPER_V2.md) and [cloud deployment handoff](docs/CLOUD_DEPLOYMENT.md). Feature code is pending review; no cloud deployment is implied. Production runs from the compiled cloud container with PostgreSQL and protected HTTPS access, not from a developer computer.
 
 ## Analytical AI preparation (disabled)

@@ -31,6 +31,14 @@ jobs:
         env:
           TEST_DATABASE_URL: postgres://tradinglab_test:ci-test-only@localhost:5432/tradinglab_test
       - run: npm run build
+      - run: node --test dist/test/cloud-launch.test.js dist/test/access-control.test.js
       - run: node --test dist/test/office*.test.js
       - run: node --test dist/test/historical-study-runner.test.js dist/test/perpetual-studies.test.js dist/test/historical-study-audit.test.js
       - run: docker build -t trading-lab:ci .
+      - name: Compiled production image refuses missing launch prerequisites
+        run: |
+          if docker run --rm -e NODE_ENV=production -e PAPER_TRADING_ONLY=true trading-lab:ci; then
+            echo "Production image started without required protection"
+            exit 1
+          fi
+          docker run --rm --entrypoint node trading-lab:ci -e "for (const path of ['./dist/src/check-cloud-config.js','./dist/src/check-cloud-service.js','./dist/src/import-state.js','./public/office/office-reference-v2.png']) require('fs').accessSync(path)"

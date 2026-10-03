@@ -10,7 +10,9 @@
     "test": "node --import tsx --test test/**/*.test.ts",
     "build": "tsc",
     "start:cloud": "node dist/src/index.js",
-    "import-state": "tsx src/import-state.ts"
+    "import-state": "tsx src/import-state.ts",
+    "check:cloud-config": "node dist/src/check-cloud-config.js",
+    "check:cloud-service": "node dist/src/check-cloud-service.js"
   },
   "dependencies": {
     "@fastify/websocket": "^11.2.0",
