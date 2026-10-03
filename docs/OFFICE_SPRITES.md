@@ -33,3 +33,8 @@ These first sheets still need temporal art review, finer walking polish and purp
 Used the built-in **imagegen** tool, with transparent-background requests, original local identity art and a new Atlas sheet as layout references. No external image API, account, key, paid provider adapter or runtime AI activation was introduced. Originals remain in the tool's generated-images folder. Selected final sheets live in `public/office/characters`; original source filenames are recorded in `SPRITE_GENERATION.json`.
 
 The complete prompt set and reference roles are in `SPRITE_GENERATION.json`: Atlas's initial prompt, targeted gait correction, and the common per-character prompt with seven identity substitutions. Atlas's initial variant was discarded. Human review should assess natural movement and style before merging; automatic bounds/hash checks do not prove artistic quality.
+
+
+## Workstations — 2026-10-03
+
+Update: OFFICE_WORKSTATIONS.md now mounts the sixth (seated) source frame with actual room/seat assignment and chair foreground. All 24 frames are mounted; walk animation explicitly excludes seated frames. IDLE remains no task. Source PNGs/provenance are unchanged.

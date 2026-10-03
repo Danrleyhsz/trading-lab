@@ -28,7 +28,7 @@
     element.setAttribute('style',Object.entries(variables).map(([key,value])=>key+':'+value).join(';'));
     if(same)return true;
     element.replaceChildren();
-    if(sheet)for(const [row,direction] of directions.entries())for(let column=0;column<5;column++){
+    if(sheet)for(const [row,direction] of directions.entries())for(let column=0;column<6;column++){
       const bounds=sheet.frames[row*6+column],part=document.createElement('span');
       part.className='sprite-frame';part.dataset.direction=direction;part.dataset.frame=String(column);
       part.setAttribute('aria-hidden','true');

@@ -39,12 +39,20 @@
     }
     return result;
   }
-  function plan(fromRoom,fromSlot,toRoom,toSlot,occupied=[],startPoint) {
+  function stationLeg(station,room) {
+    if(!station || !globalThis.OfficeWorkstations?.catalog.includes(station) || station.room!==room) return null;
+    const p=local(room,station.point),floor={x:Math.round(p.x/2)*2,y:88};
+    if(!OfficeNavigation.walkable(room,floor))return null;
+    return {floor,points:[station.point,world(room,{x:p.x,y:88}),world(room,floor)]};
+  }
+  function plan(fromRoom,fromSlot,toRoom,toSlot,occupied=[],startPoint,fromStation,toStation) {
     const door=doors.find(d=>d.rooms.includes(fromRoom)&&d.rooms.includes(toRoom));
-    const start=OfficeNavigation.anchor(fromRoom,fromSlot),goal=OfficeNavigation.anchor(toRoom,toSlot);
+    const origin=stationLeg(fromStation,fromRoom),target=stationLeg(toStation,toRoom);
+    const start=origin?.floor||OfficeNavigation.anchor(fromRoom,fromSlot),goal=target?.floor||OfficeNavigation.anchor(toRoom,toSlot);
     if(fromRoom===toRoom || !door || !start || !goal || !Array.isArray(occupied) || occupied.length>4096 || !occupied.every(finite)) return [];
-    let source=start,bridge=[];
-    if(startPoint!==undefined) {
+    let source=start,bridge=origin?origin.points:[];
+    if(origin && startPoint!==undefined && (!finite(startPoint)||distance(startPoint,origin.points[0])>.25))return [];
+    if(!origin && startPoint!==undefined) {
       if(!finite(startPoint)) return [];
       const bounds=layout[fromRoom],local={x:(startPoint.x-bounds.x)*100/bounds.w,y:(startPoint.y-bounds.y)*100/bounds.h};
       source={x:Math.round(local.x/2)*2,y:Math.round(local.y/2)*2};
@@ -56,7 +64,7 @@
     const arrival=OfficeNavigation.plan(toRoom,door.approaches[toRoom],goal);
     if(!departure.length || !arrival.length) return [];
     const via=fromRoom===door.rooms[0]?door.via:door.via.slice().reverse();
-    const points=compress([...bridge,...departure.map(p=>world(fromRoom,p)),...via,...arrival.map(p=>world(toRoom,p))]);
+    const points=compress([...bridge,...departure.map(p=>world(fromRoom,p)),...via,...arrival.map(p=>world(toRoom,p)),...(target?target.points.slice().reverse():[])]);
     // Reserve the complete corridor; never queue old work while waiting for an actor.
     for(let i=1;i<points.length;i++) if(!samples(points[i-1],points[i],p=>!occupied.some(other=>distance(p,other)<3.6))) return [];
     return points;
@@ -73,7 +81,7 @@
       entry.transitionGeneration=(entry.transitionGeneration||0)+1;
       entry.transitionAnimation?.cancel();entry.transitionAnimation=undefined;entry.transitionRoute=undefined;
       delete entry.button.dataset.travel;
-      entry.button.dataset.pose=entry.agent?.status==='IDLE'?'rest':'task';
+      entry.button.dataset.pose=entry.station?'seated':entry.agent?.status==='IDLE'?'rest':'task';if(entry.station)entry.button.dataset.facing='up';
     }
     update(entry,agent,slot,{from,event,bounds,occupied=[],startPoint}={}) {
       const key=agent.room+'|'+agent.status+'|'+slot;
@@ -85,7 +93,7 @@
       }
       if(!event || !from || from.room===agent.room || !freshEvent(event,agent)) return;
       if(!bounds || !Number.isFinite(bounds.width) || !Number.isFinite(bounds.height) || bounds.width<=0 || bounds.height<=0 || !entry.button.animate) return;
-      const route=plan(from.room,from.slot,agent.room,slot,occupied,startPoint),destination=anchor(agent.room,slot);
+      const route=plan(from.room,from.slot,agent.room,slot,occupied,startPoint,from.station,entry.station),destination=entry.station?.point||anchor(agent.room,slot);
       if(route.length<2) return;
       const offsets=route.map(p=>({x:(p.x-destination.x)*bounds.width/100,y:(p.y-destination.y)*bounds.height/100}));
       const length=offsets.slice(1).reduce((sum,p,i)=>sum+Math.hypot(p.x-offsets[i].x,p.y-offsets[i].y),0);

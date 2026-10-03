@@ -23,8 +23,8 @@ test('frame metadata belongs to the actual unchanged irregular atlas and stays w
 test('repainting a stable actor preserves independent direction frames and retains original profile art',()=>{
  const api=environment(),portrait=new Portrait();assert.equal(api.paint(portrait,'atlas',true),true);const parts=portrait.children.slice();
  api.paint(portrait,'atlas',true);assert.deepEqual(portrait.children,parts);assert.equal(portrait.hidden,false);assert.equal(portrait.dataset.sprite,'atlas');assert.equal(portrait.dataset.rig,'directional');
- assert.equal(parts.length,20);for(const direction of api.directions){assert.equal(parts.filter(part=>part.dataset.direction===direction).length,5);}
- assert.ok(!parts.some(part=>part.dataset.frame==='5')); // Seated art is not evidence of an occupied desk.
+ assert.equal(parts.length,24);for(const direction of api.directions){assert.equal(parts.filter(part=>part.dataset.direction===direction).length,6);}
+ assert.equal(parts.filter(part=>part.dataset.frame==='5').length,4); // Visibility requires a seat; posture is not task evidence.
  assert.ok(parts.every(part=>part.attributes['aria-hidden']==='true'));
  api.paint(portrait,'euler',false);assert.equal(portrait.dataset.sprite,'euler');assert.equal(portrait.dataset.rig,'portrait');assert.equal(portrait.children.length,0);assert.doesNotMatch(portrait.attributes.style,/NaN|Infinity/);
 });

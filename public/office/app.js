@@ -105,6 +105,29 @@ const statusLabels = {IDLE:'Disponível', RESEARCHING:'Pesquisando', BACKTESTING
 const roleLabels = {atlas:'Coordenação de pesquisa', euler:'Pesquisa quantitativa', nova:'Trader paper', sentinel:'Gestão de risco', satoshi:'Pesquisa de Bitcoin', flux:'Microestrutura de mercado', vega:'Pesquisa de volatilidade', oracle:'Regimes de mercado'};
 function sprite(element,id,directional=false){OfficeSprites.paint(element,id,directional);}
 const agentViews=new Map();let presenceEnabled=true;
+const stationViews=new Map(),agentObservedAt=new Map();let stationConnected=false;
+function stationProjection(agent){return OfficeWorkstations.project(agent,{observedAt:agentObservedAt.get(agent?.id)||0,connected:stationConnected,events});}
+function renderStations(){
+ for(const station of OfficeWorkstations.catalog){
+  let view=stationViews.get(station.id);
+  if(!view){
+   const monitor=node('button',''),name=node('b',''),state=node('small',''),chair=node('span','');
+   monitor.className='station-monitor';monitor.dataset.station=station.id;monitor.append(name,state);
+   monitor.setAttribute('style','left:'+station.mx/1536*100+'%;top:'+station.my/1024*100+'%');
+   monitor.onclick=()=>profile(station.id);
+   chair.className='station-chair'+(station.room==='Research Lab'?' research-chair':'');chair.setAttribute('aria-hidden','true');
+   chair.setAttribute('style','left:'+station.cx/1536*100+'%;top:'+station.cy/1024*100+'%;width:'+station.cw/1536*100+'%;height:'+station.ch/1024*100+'%;background-position:-'+station.cx/1536*100+'cqw -'+station.cy/1536*100+'cqw');
+   q('#office').append(monitor,chair);view={monitor,name,state,chair};stationViews.set(station.id,view);
+  }
+  const agent=agents.get(station.id),occupant=OfficeWorkstations.seat(agent),p=stationProjection(agent);
+  view.name.textContent=agent?.name||station.id;view.state.textContent=!agent?'Sem dados':!occupant?'Em outra sala':p.label;
+  view.monitor.dataset.active=String(!!occupant&&p.active);view.monitor.disabled=!agent;
+  view.monitor.setAttribute('aria-label','Monitor de '+(agent?.name||station.id)+': '+view.state.textContent+'. Abrir estado e evidências');
+  view.monitor.setAttribute('title',p.mode+' · '+(p.updatedAt?date(p.updatedAt):'Sem data')+' · '+p.reasonLabel+': '+p.reason);
+  view.chair.hidden=!occupant;
+ }
+}
+
 const reducedMotion=globalThis.matchMedia?.('(prefers-reduced-motion: reduce)');
 const motionAllowed=()=>presenceEnabled&&!selectedHandoff&&!reducedMotion?.matches&&!document.hidden&&!['#profile','#workspaceDialog','#roomDialog','#auditDialog','#studyDialog'].some(id=>q(id).open);
 const presence=new OfficePresence.Director(motionAllowed);
@@ -121,17 +144,19 @@ function render(movingEvent){
    button.className='agent';avatar.className='sprite';shadow.className='foot-shadow';avatar.setAttribute('aria-hidden','true');shadow.setAttribute('aria-hidden','true');sprite(avatar,agent.id,true);button.append(avatar,label,status,shadow);button.onclick=()=>profile(agent.id);
    view={button,avatar,label,status};agentViews.set(agent.id,view);
   }
-  const from=view.agent?{room:view.agent.room,slot:view.slot}:null,wasTraveling=!!view.transitionRoute;
+  const from=view.agent?{room:view.agent.room,slot:view.slot,station:view.station}:null,wasTraveling=!!view.transitionRoute;
   const bounds=q('#office').getBoundingClientRect?.(),previous=view.button.getBoundingClientRect?.();
   const startPoint=from&&previous&&bounds?.width>0&&bounds?.height>0?{x:(previous.left+previous.width/2-bounds.left)/bounds.width*100,y:(previous.top+previous.height-bounds.top)/bounds.height*100}:undefined;
   const button=view.button;button.dataset.agentId=agent.id;button.dataset.status=agent.status;button.dataset.room=agent.room;view.label.textContent=agent.name;view.status.textContent=statusLabels[agent.status]||agent.status;
   button.setAttribute('aria-label',agent.name+', '+agent.room+', '+(statusLabels[agent.status]||agent.status));button.setAttribute('title',agent.lastReason||'Disponível; sem atividade registrada');
   const room=[...document.querySelectorAll('.room[data-room]')].find(element=>element.dataset.room===agent.room),host=room?.querySelector('.occupants')||q('#unmapped');
-  const slot=placements.get(agent.id);const point=OfficePresence.floorPoint(agent.room,slot)||{x:50,y:88};
+  const slot=placements.get(agent.id);view.station=OfficeWorkstations.seat(agent);
+  const point=(view.station?OfficeTransitions.local(agent.room,view.station.point):OfficePresence.floorPoint(agent.room,slot))||{x:50,y:88};
+  button.dataset.seated=String(!!view.station);button.dataset.stationScale=String(!!view.station||!!from?.station||wasTraveling);
   if(button.parentElement!==host)host.append(button);button.setAttribute('style','left:'+point.x+'%;top:'+point.y+'%');
   presence.update(view,agent,slot,host);
   const occupied=[];
-  for(const other of agents.values())if(other.id!==agent.id){const anchor=OfficeTransitions.anchor(other.room,placements.get(other.id));if(anchor)occupied.push(anchor);}
+  for(const other of agents.values())if(other.id!==agent.id){const anchor=OfficeWorkstations.seat(other)?.point||OfficeTransitions.anchor(other.room,placements.get(other.id));if(anchor)occupied.push(anchor);}
   for(const other of agentViews.values())if(other!==view){
    if(other.transitionRoute)occupied.push(...other.transitionRoute);
    else if(other.route)occupied.push(...other.route.map(p=>OfficeTransitions.world(other.agent.room,p)).filter(Boolean));
@@ -143,11 +168,12 @@ function render(movingEvent){
  q('#office').dataset.presence=motionAllowed()?'on':'off';
  q('#togglePresence').textContent=reducedMotion?.matches?'Movimento reduzido':selectedHandoff?'Presença pausada':presenceEnabled?'Pausar animações':'Animar escritório';q('#togglePresence').disabled=!!reducedMotion?.matches||!!selectedHandoff;q('#togglePresence').setAttribute('aria-pressed',String(presenceEnabled&&!selectedHandoff&&!reducedMotion?.matches));
  q('#activeAgents').textContent=[...agents.values()].filter(agent=>agent.status!=='IDLE').length+' / '+agents.size;
- if(selected)renderState();if(inspectedRoom&&q('#roomDialog').open)renderRoom();renderHandoffs();
+ renderStations();if(selected)renderState();if(inspectedRoom&&q('#roomDialog').open)renderRoom();renderHandoffs();
 }
 function renderState() {
   const agent = agents.get(selected);
   if (!agent) return;
+  const station=stationProjection(agent);q('#stationState').textContent=station.label+' · '+station.mode+(station.updatedAt?' · '+date(station.updatedAt):'');q('#stationReason').textContent=station.reasonLabel+': '+station.reason;q('#stationSource').replaceChildren();if(station.eventId)q('#stationSource').append(sourceButton(station.eventId));else q('#stationSource').textContent='ID do evento deste estado não recebido nesta sessão. Consulte o histórico preservado abaixo.';
   q('#profileTitle').textContent = agent.name;sprite(q('#profilePortrait'),agent.id);
   q('#profileState').textContent = (roleLabels[agent.id] || agent.role) + ' · ' + agent.room + ' · ' + (statusLabels[agent.status] || agent.status);
   q('#experience').textContent = `Experiência: ${agent.experience} transições registradas`;
@@ -247,7 +273,7 @@ async function refresh() {
     // A snapshot requested before a stream event must not move an agent back.
     if (initialStateVersion === stateVersion) {
       agents.clear();
-      states.forEach(agent => agents.set(agent.id, agent));
+      agentObservedAt.clear();states.forEach(agent => {agents.set(agent.id, agent);agentObservedAt.set(agent.id,Date.now());});
       render();
     }
     renderResearch(runs);renderAccounts(accounts);q('#equity').textContent = money(portfolio.equity);
@@ -255,12 +281,13 @@ async function refresh() {
     if (initialMarketVersion === marketVersion) { q('#market').textContent = market.price ? market.symbol + ' ' + money(market.price) : 'Aguardando dados de mercado'; observeTrace('spot',market.price,market.timestamp); }
     q('#sync').textContent = 'Estado recebido às ' + new Date().toLocaleTimeString();
   } catch {
+    agentObservedAt.clear();renderStations();if(selected)renderState();
     q('#sync').textContent = 'Sistema indisponível · dados exibidos podem estar desatualizados';q('#accountScope').textContent = 'Contas indisponíveis ou desatualizadas';
   } finally { busy = false; }
 }
 function connect() {
   const ws = new WebSocket(`${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/events`);
-  ws.onopen = () => { q('#connection').textContent = '● Eventos conectados'; refresh(); if (selected) details(); };
+  ws.onopen = () => { stationConnected=true;renderStations();q('#connection').textContent = '● Eventos conectados'; refresh(); if (selected) details(); };
   ws.onmessage = message => {
     let event;
     try { event = JSON.parse(message.data); } catch { return; }
@@ -278,20 +305,20 @@ function connect() {
     renderSessionEvents();
     if (event.type === 'AGENT_STATE_CHANGED') {
       stateVersion++;
-      agents.set(event.payload.id, event.payload); render(event);
+      agents.set(event.payload.id, event.payload);agentObservedAt.set(event.payload.id,Date.now());render(event);
     }
     refresh();
     if (selected) details();
   };
   ws.onerror = () => ws.close();
   ws.onclose = () => {
-    stopPresence();
+    stationConnected=false;renderStations();if(selected)renderState();stopPresence();
     q('#connection').textContent = 'Eventos desconectados · reconectando';
     setTimeout(connect, 3000);
   };
 }
 refresh();
-setInterval(() => { refresh(); if (selected) details(); }, 5000);
+setInterval(() => { renderStations();if(selected)renderState();refresh(); if (selected) details(); }, 5000);
 connect();
 
 let onlineBusy = false, onlineVersion = 0, halted = null, runtimeObservedAt = 0;

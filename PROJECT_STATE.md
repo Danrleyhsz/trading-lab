@@ -139,3 +139,8 @@ Baseline #31 was clean and CI green (178/178 including PostgreSQL,57 compiled of
 Next concrete increment: temporal gait polish and source transfer-size optimization, then inspected desk/seat approach and occlusion with presentation occupancy, tied to actual room/status. No claimed seated work or perfect animation, general collision world, paid runtime AI or public hosting. Continue original/licensed reuse rules; never import commercial Stardew assets. Typecheck/build and local/compiled suites must pass; CI must validate PostgreSQL before delivery is reported green.
 
 Local verification before PR: typecheck/build passed;185 tests total,184 passed and the PostgreSQL integration skipped locally (CI supplies PostgreSQL).64/64 compiled office checks passed. Actual browser review: all eight soles coincide with 84px actor footprints, real empty profiles/status preserved,390×844 viewport with375px body/client and341px profile, corrected parent-panel focus recovery confirmed. System reduced motion remained enabled; manually inspected static art frames in a separate TEST_ONLY gallery. Original source PNG hash unchanged. No perfect temporal animation or hosted deployment claim.
+
+
+## Workstations — 2026-10-03
+
+Workstation increment on feat/office-workstations (stacked on draft #32): eight assigned seated poses, a clipped original three-desk Research variant, chair foreground, seat-access legs and real-state monitor projection. Typecheck/build;191 local tests:190 pass/1 PostgreSQL skip;70 compiled office checks. Actual desktop/mobile reviewed. See docs/OFFICE_WORKSTATIONS.md. No runtime activation, merge or deployment. Temporal gait/mobile asset transfer and richer job evidence remain.

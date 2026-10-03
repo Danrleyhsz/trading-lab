@@ -62,3 +62,8 @@ The communication board makes original structured messages explorable without op
 
 ## Directional office presentation — 2026-10-03
 Sprites own presentation only. Actual labels/events stay authoritative while original front/back/profile walking frames follow the current route direction. Prepared seated artwork does not imply a real meeting or desk job; seat/task placement requires a reviewed scene anchor and actual backend room/status. Opening a profile or room still schedules no work. Motion honors pause, hidden state, reduced motion, dialogs and focused characters. See OFFICE_SPRITES.md.
+
+
+## Workstations — 2026-10-03
+
+Agents now sit at their assigned computers when their actual room matches. An idle occupant is labeled available/no task; seated posture does not imply work. Physical monitor buttons expose current state/reason/time and matching original event evidence in the profile. Past reasons and historical results are distinguished from current tasks; stale/disconnected coverage remains explicit. See OFFICE_WORKSTATIONS.md.

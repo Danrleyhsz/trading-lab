@@ -85,3 +85,7 @@ collaboration.js is original browser-only validation and finite visible-position
 
 ## Recorded presentation travel
 public/office/transitions.js adds original browser-only scene connectors and a separate owned motion generation. Existing agent events admit fresh optional travel while the actual room/status stays immediate. Local presence and global travel share sampled peer reservations; snapshots never replay. No domain capability, schema or renderer migration. See OFFICE_TRANSITIONS.md.
+
+## Workstations — 2026-10-03
+
+Browser workstations.js adds a pure room/owner catalog and state projection over existing bounded snapshots/events. app.js owns stable monitor nodes and receipt timestamps; existing profile/audit readers provide details. Catalog seat legs extend only existing door routes; original scene masks provide chair foreground. No data schema, service endpoint, provider or renderer migration. See OFFICE_WORKSTATIONS.md.

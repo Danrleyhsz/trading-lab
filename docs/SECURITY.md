@@ -39,3 +39,7 @@ Collaboration reads the existing authenticated message endpoint only. Last-windo
 
 ## Browser room transitions
 The explicit static allowlist serves transitions.js. Its geometry/animation director has no network, broker, risk, AI or store capability. Matching fresh events may project movement only; invalid/unknown/blocked inputs and stale callbacks fail closed. Presentation reservations do not approve work or trades. QA route overlays remain separate loopback fixtures with no product mutation/provider access; production protections/default-disabled execution are unchanged.
+
+## Workstations — 2026-10-03
+
+Workstation geometry/art/monitors remain read-only browser presentation. Source text uses textContent, unknown rooms do not get seats, and original event links require matching state identity/time/room/status/reason. Monitors cannot schedule research, approve risk, submit orders, mutate memory or call AI. The new script and PNG are explicit static allowlist entries. See OFFICE_WORKSTATIONS.md.

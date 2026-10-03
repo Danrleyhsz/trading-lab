@@ -21,7 +21,7 @@ function harness(overrides:Record<string,unknown>={},reduceMotion=false,geometry
   if(geometry)(document as any).createElementNS=()=>{const e=new Element(),set=e.setAttribute.bind(e);e.setAttribute=(name:string,value:string)=>{set(name,value);if(name==='id')ids.set('#'+value,e)};return e};
   const requests:string[]=[];const intervals:Array<()=>void>=[];
   const context=vm.createContext({matchMedia:()=>({matches:reduceMotion,addEventListener(){}}),document,location:{protocol:'https:',host:'example.test'},WebSocket:class{constructor(){socket=this}},fetch:async(url:string)=>{requests.push(url);return {ok:!(overrides[url] as any)?.httpError,status:(overrides[url] as any)?.httpError||200,json:async()=>Object.hasOwn(overrides,url)? await overrides[url] :url==='/finance'?{legacyAccounts:[{id:'fund',kind:'FUND',instrument:'LEGACY_PAPER_V1',initialCash:10000,portfolio:{equity:10000},feesPaid:0}],perpetualAccounts:[{id:'evaluation:nova:usdm',kind:'EVALUATION',instrument:'BINANCE_USDM:BTCUSDT',ownerAgentId:'nova',initialCash:5000,portfolio:{equity:4900},feesPaid:10,fundingCashDelta:-20,maxDrawdown:0.03,initialMargin:500,valuationFresh:false}]}:url==='/market/v3'?{status:'UNAVAILABLE',quote:null}:url==='/paper/perpetual/status'?{halted:false,executionEnabled:false,autonomous:{enabled:false,reason:'completed V2 study required'}}:url==='/backtests/v2/studies'?[]:url==='/agents'?[{id:'atlas',name:'Atlas',role:'Research',room:'Research Lab',status:'IDLE',experience:0,updatedAt:'2026-01-01'}]:url==='/agent-messages'?[]:url==='/research/runs'?[]:url==='/paper/accounts'?[{kind:'FUND',ownerAgentId:null,initialCash:10000,portfolio:{equity:10000},fills:0}]:url==='/portfolio'?{initialCash:10000,equity:10000,realizedPnl:0,unrealizedPnl:0}:url==='/market/latest'?{status:'waiting'}:{evidence:{observations:0,decisions:0,failures:0,lessons:0,sentMessages:0,strategyIds:[],recordedTransitions:0},coverage:{legacyTransitionsWithoutHistory:0,activitySince:null},memories:[],messages:[],activity:[]}}},setInterval:(callback:()=>void)=>{intervals.push(callback);return 0},setTimeout:()=>0,clearTimeout:()=>{},console});
-  for(const name of ['collaboration','navigation','presence','transitions','character-frames','sprites'])vm.runInContext(readFileSync('public/office/'+name+'.js','utf8'),context);
+  for(const name of ['collaboration','navigation','workstations','presence','transitions','character-frames','sprites'])vm.runInContext(readFileSync('public/office/'+name+'.js','utf8'),context);
   vm.runInContext(readFileSync('public/office/app.js','utf8'),context);
   return {ids,rooms,requests,intervals,context,get socket(){return socket}};
 }
@@ -53,7 +53,7 @@ test('office moves agents only on real state events and reports a disconnected s
 
 test('a received room transition animates a stable view while all labels immediately show the backend state',async()=>{
  const h=harness();await settle();const agent=h.rooms[0].children[0].children[0],animations:any[]=[];
- h.ids.get('#office')!.rect={left:0,top:0,width:1536,height:1024};agent.rect={left:1536*.086-36,top:1024*.4072-110,width:72,height:110};
+ h.ids.get('#office')!.rect={left:0,top:0,width:1536,height:1024};agent.rect={left:149-36,top:390-98,width:72,height:98};
  (agent as any).animate=(frames:any,options:any)=>{const effect={frames,options,cancels:0,onfinish:undefined,cancel(){this.cancels++;}};animations.push(effect);return effect;};
  const actual={id:'atlas',name:'Atlas',room:'Quant Lab',status:'BACKTESTING',experience:3};
  h.socket.onmessage({data:JSON.stringify({id:'TEST_ONLY_RECEIVED_STATE',type:'AGENT_STATE_CHANGED',occurredAt:new Date().toISOString(),payload:actual})});
@@ -67,7 +67,7 @@ test('a received room transition animates a stable view while all labels immedia
 test('stream disconnect and reduced motion stop travel without replay on a snapshot',async()=>{
  for(const reduce of [false,true]){
   const actual={id:'atlas',name:'Atlas',room:'Quant Lab',status:'IDLE',experience:0},overrides:any={};const h=harness(overrides,reduce);await settle();
-  const agent=h.rooms[0].children[0].children[0];h.ids.get('#office')!.rect={left:0,top:0,width:1536,height:1024};agent.rect={left:1536*.086-36,top:1024*.4072-110,width:72,height:110};let plays=0,cancels=0;let animation:any;
+  const agent=h.rooms[0].children[0].children[0];h.ids.get('#office')!.rect={left:0,top:0,width:1536,height:1024};agent.rect={left:149-36,top:390-98,width:72,height:98};let plays=0,cancels=0;let animation:any;
   (agent as any).animate=()=>{plays++;animation={cancel(){cancels++;},onfinish:undefined};return animation;};
   overrides['/agents']=[actual];h.socket.onmessage({data:JSON.stringify({id:'TEST_ONLY_STATE',type:'AGENT_STATE_CHANGED',occurredAt:new Date().toISOString(),payload:actual})});
   assert.equal(plays,reduce?0:1);h.socket.onclose();animation?.onfinish();assert.equal(agent.dataset.travel,undefined);assert.equal(cancels,reduce?0:1);
@@ -240,4 +240,12 @@ test('new original communication identifies sender and recipient but failure cle
 test('handoff list stays bounded and preserves keyboard selection across live refresh',async()=>{
  const data=Array.from({length:8},(_,i)=>({id:'fixture-'+i,from:'atlas',to:['euler'],kind:'HYPOTHESIS',summary:'Original fixture '+i,createdAt:'2026-01-01T00:00:00Z'})),h=harness({'/agent-messages':data});await settle();assert.equal(h.ids.get('#handoffList')!.children.length,6);const button=buttons(h.ids.get('#handoffList')!)[0];(h.context.document as any).activeElement=button;button.onclick!();h.intervals.forEach(fn=>fn());await settle();const current=buttons(h.ids.get('#handoffList')!).find(b=>b.dataset.handoffControl==='fixture-7')!;assert.ok(current.focusCalls>0);assert.match(flatten(h.ids.get('#handoffDetail')!),/fixture-7/);
  data.splice(0,data.length);h.intervals.forEach(fn=>fn());await settle();assert.match(h.ids.get('#handoffStatus')!.textContent,/Nenhuma comunicação/);assert.equal(h.ids.get('#handoffDetail')!.children.length,0);assert.equal(h.ids.get('#activeAgents')!.textContent,'0 / 1');
+});
+
+
+test('station monitors follow streamed state, label past reasons and open existing real profiles without scheduling work',async()=>{
+ const overrides:any={},h=harness(overrides);await settle();const actor=h.rooms[0].children[0].children[0],monitor=h.ids.get('#office')!.children.find(e=>e.dataset.station==='atlas')!;
+ assert.equal(actor.dataset.pose,'seated');assert.match(flatten(monitor),/Sem tarefa/);const actual={id:'atlas',name:'Atlas',room:'Research Lab',status:'RESEARCHING',updatedAt:new Date().toISOString(),lastReason:'TEST_ONLY public dataset request',experience:1};
+ overrides['/agents']=[actual];h.socket.onmessage({data:JSON.stringify({id:'TEST_ONLY_STATION_STATE',type:'AGENT_STATE_CHANGED',occurredAt:actual.updatedAt,payload:actual})});assert.match(flatten(monitor),/Pesquisando/);assert.equal(actor.dataset.pose,'seated');monitor.onclick!();await settle();assert.match(h.ids.get('#stationState')!.textContent,/Pesquisando/);assert.match(h.ids.get('#stationReason')!.textContent,/public dataset/);assert.equal(h.ids.get('#stationSource')!.children.length,1);assert.ok(h.requests.includes('/agents/atlas/profile'));assert.ok(!h.requests.includes('/research/run'));h.socket.onclose();assert.match(h.ids.get('#stationState')!.textContent,/desconectados/);
+ vm.runInContext('Date.now = () => '+(Date.now()+20000),h.context);h.intervals[0]();assert.match(flatten(monitor),/Desatualizado/);
 });

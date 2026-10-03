@@ -33,7 +33,7 @@
   <section class="office-shell" aria-label="Centro de controle em pixel art">
     <div class="scene-caption"><span>ESCRITÓRIO / VISÃO GERAL</span><div class="scene-tools"><button id="togglePresence" aria-pressed="true">Pausar animações</button><button id="openCollaboration">Colaboração</button></div></div>
     <div class="scene-scroll" tabindex="0" aria-label="Mapa das salas; em telas pequenas, deslize para explorar">
-      <section id="office" aria-label="Salas do escritório">
+      <section id="office" aria-label="Salas do escritório"><div class="research-stations-art" aria-hidden="true"></div>
         <section class="room" data-room="Research Lab"><h2><button class="room-hotspot" data-space="Research Lab" aria-label="Explorar Research Lab">RESEARCH LAB ↗</button></h2><div class="occupants"></div></section>
         <section class="room" data-room="Trading Floor"><h2><button class="room-hotspot" data-space="Trading Floor" aria-label="Explorar Trading Floor">TRADING FLOOR ↗</button></h2><div class="occupants"></div></section>
         <section class="room" data-room="Risk Desk"><h2><button class="room-hotspot" data-space="Risk Desk" aria-label="Explorar Risk Desk">RISK DESK ↗</button></h2><div class="occupants"></div></section>
@@ -44,7 +44,7 @@
     </div>
     <div id="unmapped" aria-label="Agentes em salas não reconhecidas"></div>
     <section class="handoff-board" aria-labelledby="handoffTitle"><h2 id="handoffTitle">Comunicação da equipe</h2><p id="handoffStatus" role="status">Aguardando mensagens registradas.</p><div class="handoff-layout"><ol id="handoffList"></ol><div id="handoffDetail"></div></div><button id="clearHandoff" hidden>Limpar destaque</button></section>
-    <p class="scene-note">Clique nas salas, personagens e objetos para explorar. Presença animada; trabalho e mensagens vêm do sistema.</p>
+    <p class="scene-note">Clique nas salas, personagens e objetos para explorar. Sentado não significa trabalhando: os monitores mostram o estado recebido. Clique em um monitor para consultar motivo, fontes e histórico.</p>
   </section>
   <section class="bottom-panels">
     <article class="panel"><h2><span class="status-dot"></span> Atividades recebidas</h2><small>Eventos reais desta sessão</small><ol id="events"><li>Nenhum evento de atividade recebido nesta sessão.</li></ol></article>
@@ -65,7 +65,7 @@
 <dialog id="profile" aria-labelledby="profileTitle">
   <button id="closeProfile" class="close" aria-label="Fechar perfil">×</button>
   <div class="profile-heading"><span id="profilePortrait" class="sprite portrait" aria-hidden="true"></span><div><h2 id="profileTitle"></h2><p id="profileState"></p></div></div>
-  <p id="experience"></p><p id="reason"></p><small id="updated"></small>
+  <section class="terminal-detail" aria-label="Monitor da estação"><h3>Monitor · estado recebido</h3><p id="stationState"></p><p id="stationReason"></p><div id="stationSource"></div><small>Memórias, mensagens e resultados abaixo são históricos registrados. Não indicam uma tarefa atual.</small></section><p id="experience"></p><p id="reason"></p><small id="updated"></small>
   <nav class="profile-tabs" aria-label="Seções do perfil"><a href="#career">Status</a><a href="#history">Atividade</a><a href="#memories">Memória</a><a href="#activity">Mensagens</a></nav>
   <h3>Evidências da carreira</h3><p id="career"></p><p id="coverage"></p><p id="perpetualProfile"></p>
   <h3>Operações encerradas</h3><div id="closedTrades"></div><h3>Histórico preservado</h3><ul id="history"></ul><h3>Memórias reais</h3><ul id="memories"></ul><h3>Comunicação estruturada</h3><ul id="activity"></ul>
@@ -73,6 +73,6 @@
 <dialog id="studyDialog" aria-labelledby="studyTitle"><button id="closeStudy" class="close" aria-label="Fechar estudo">×</button><h2 id="studyTitle">Estudo histórico</h2><div id="studyDetails"></div></dialog>
 <dialog id="auditDialog" aria-labelledby="auditTitle"><button id="closeAudit" class="close" aria-label="Fechar auditoria">×</button><h2 id="auditTitle">Auditoria</h2><p id="auditStatus" role="status"></p><button id="auditBack" hidden>Voltar às operações da conta</button><div id="auditContent"></div><button id="auditOlder" hidden>Ver operações anteriores</button></dialog>
 <dialog id="roomDialog" aria-labelledby="roomTitle"><button id="closeRoom" class="close" aria-label="Fechar sala">×</button><h2 id="roomTitle"></h2><p id="roomDescription"></p><div id="roomPeople" class="room-people"></div><div id="roomActions" class="room-actions"></div><h3>Objetos e funções da sala</h3><div id="roomObjects" class="room-objects"></div><h3>Comunicação entre agentes</h3><p id="roomMessageStatus" role="status"></p><ol id="roomMessages"></ol></dialog>
-<script src="/office/collaboration.js"></script><script src="/office/navigation.js"></script><script src="/office/presence.js"></script><script src="/office/transitions.js"></script><script src="/office/character-frames.js"></script><script src="/office/sprites.js"></script>
+<script src="/office/collaboration.js"></script><script src="/office/navigation.js"></script><script src="/office/workstations.js"></script><script src="/office/presence.js"></script><script src="/office/transitions.js"></script><script src="/office/character-frames.js"></script><script src="/office/sprites.js"></script>
 <script src="/office/app.js"></script>
 </body></html>

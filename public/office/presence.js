@@ -8,12 +8,13 @@
  }
  class Director {
   constructor(allowed){this.allowed=allowed;this.entries=new Map();}
-  stop(entry){entry.generation=(entry.generation||0)+1;if(entry.timer!==undefined)clearTimeout(entry.timer);entry.timer=undefined;entry.animation?.cancel();entry.animation=undefined;entry.route=undefined;entry.button.dataset.pose='rest';entry.button.dataset.navigation='rest';}
+  stop(entry){entry.generation=(entry.generation||0)+1;if(entry.timer!==undefined)clearTimeout(entry.timer);entry.timer=undefined;entry.animation?.cancel();entry.animation=undefined;entry.route=undefined;entry.button.dataset.pose=entry.station?'seated':'rest';entry.button.dataset.navigation='rest';if(entry.station)entry.button.dataset.facing='up';}
   forget(entry){this.stop(entry);this.entries.delete(entry.agent?.id);}
   update(entry,agent,slot,host){
    const key=agent.room+'|'+agent.status+'|'+slot;
    if(entry.key!==key){this.stop(entry);entry.key=key;}
    entry.agent=agent;entry.slot=slot;entry.host=host;this.entries.set(agent.id,entry);
+   if(entry.station&&!entry.transitionRoute){this.stop(entry);return;}
    if(!this.allowed()){this.stop(entry);return;}
    if(entry.transitionRoute)return;
    if(agent.status!=='IDLE'||!floorPoint(agent.room,slot)){entry.button.dataset.pose=agent.status==='IDLE'?'rest':'task';return;}
@@ -26,7 +27,7 @@
     const start=floorPoint(entry.agent.room,entry.slot),occupied=[];
     for(const other of this.entries.values())if(other!==entry){
      if(other.transitionRoute)occupied.push(...other.transitionRoute.map(p=>OfficeTransitions.local(entry.agent.room,p)).filter(p=>OfficeNavigation.floorContains(entry.agent.room,p)));
-     else if(other.agent.room===entry.agent.room){const anchor=floorPoint(other.agent.room,other.slot);if(other.route)occupied.push(...other.route);else if(anchor)occupied.push(anchor);}
+     else if(other.agent.room===entry.agent.room){const anchor=other.station?OfficeTransitions.local(other.agent.room,other.station.point):floorPoint(other.agent.room,other.slot);if(other.route)occupied.push(...other.route);else if(anchor)occupied.push(anchor);}
     }
     const route=OfficeNavigation.idleRoute(entry.agent.room,start,entry.agent.id,entry.cycle||0,occupied);entry.cycle=(entry.cycle||0)+1;
     if(route.length<2){entry.button.dataset.navigation='waiting';return;}
@@ -35,7 +36,7 @@
     const play=index=>{
      if(generation!==entry.generation)return;
      if(!this.allowed()||entry.agent.status!=='IDLE'||entry.button===document.activeElement){this.stop(entry);return;}
-     if(index>=offsets.length){entry.animation=undefined;entry.route=undefined;entry.button.dataset.pose='rest';entry.button.dataset.navigation='rest';this.update(entry,entry.agent,entry.slot,entry.host);return;}
+     if(index>=offsets.length){entry.animation=undefined;entry.route=undefined;entry.button.dataset.pose=entry.station?'seated':'rest';entry.button.dataset.navigation='rest';if(entry.station)entry.button.dataset.facing='up';this.update(entry,entry.agent,entry.slot,entry.host);return;}
      const from=offsets[index-1],to=offsets[index],dx=to.x-from.x,dy=to.y-from.y;
      entry.button.dataset.facing=Math.abs(dx)>=Math.abs(dy)?(dx<0?'left':'right'):(dy<0?'up':'down');
      const animation=entry.button.animate([{translate:from.x+'px '+from.y+'px'},{translate:to.x+'px '+to.y+'px'}],{duration:Math.max(100,Math.hypot(dx,dy)/30*1000),easing:'linear'});entry.animation=animation;
