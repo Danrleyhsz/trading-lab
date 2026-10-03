@@ -85,3 +85,11 @@ Architecture skeleton + market-data ingestion + paper broker contract + event sc
 - Production requires PostgreSQL, verified TLS and protected HTTPS access. Runtime remains single-writer; actual provider provisioning, backups and deployment are pending external account choice.
 - Perpetual evaluation accounts use new explicit identities; legacy accounts/fund and old history are not converted. New automatic execution targets only the independent Nova evaluation account and defaults off.
 - See docs/ONLINE_PAPER_V2.md for implementation boundaries and docs/CLOUD_DEPLOYMENT.md for the cloud handoff. Browser visual review remains pending.
+
+## Pixel Office art direction (pending review)
+- The primary screen now uses a detailed six-room pixel-art scene and eight neutral character sprites based on the approved visual reference. Asset art contains no people working, financial figures, trade charts or UI labels; all operational text/data is rendered from backend projections.
+- Room placement and travel come only from actual registry/state events. Available agents are explicitly idle; no decorative work or chatter is introduced.
+- Read-only market session traces use observed quotes only. Spot, USD-M quotes, fund capital, independent evaluation balances and historical studies remain distinct.
+- Profiles, research/study/risk controls and protected access remain functional through the existing APIs. Mobile uses a scrollable map and an accessible roster/profile panel.
+- Source failures hide current USD-M prices; in-flight older snapshots cannot override a newer stream failure. Assets are served as binary PNGs from an explicit allowlist.
+- Browser review completed at desktop and 390px mobile width, including agent profile and roster navigation. No production cloud deployment is implied.

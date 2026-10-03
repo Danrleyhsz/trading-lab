@@ -1,6 +1,6 @@
 import Fastify from 'fastify';
 import websocket from '@fastify/websocket';
-import {readFile} from 'node:fs/promises';
+import {registerOfficeAssets} from './application/office-assets.js';
 import {extname,join} from 'node:path';
 import {EventBus} from './application/event-bus.js';
 import {event} from './domain/events.js';
@@ -63,8 +63,7 @@ const research=new ResearchEngine({snapshot:symbol=>derivatives.snapshot(symbol)
 registerResearchRoutes(app,research,()=>persist());registerPerpetualStudies(app,studies,()=>persist(),coordinator,bus);
 let latest:MarketTick|null=null;registerPaperAccountRoutes(app,accounts,{market:()=>latest,memories,strategies,coordinator,persist:()=>persist(),evaluationEnabled,bus,executionEnabled:process.env.LEGACY_PAPER_EXECUTION_ENABLED==='true'});
 registerPerpetualPaperRoutes(app,book,persist,perpetualEnabled,cycle,()=>perpetualMarket.snapshot().status==='HEALTHY'&&!persistenceError&&(!(store instanceof PostgresStateStore)||store.available()));
-app.get('/office/*',async(req,reply)=>{const rel=(req.params as {'*':string})['*']||'index.html';const safe=['index.html','style.css','app.js'].includes(rel)?rel:'index.html';const types:Record<string,string>={'.html':'text/html','.css':'text/css','.js':'application/javascript'};reply.type(types[extname(safe)]);return readFile(join(process.cwd(),'public','office',safe),'utf8');});
-app.get('/office',async(_req,reply)=>reply.redirect('/office/index.html'));
+registerOfficeAssets(app);
 app.get('/health',async(_req,reply)=>reply.code(persistenceError||(store instanceof PostgresStateStore&&!store.available())?503:200).send({ok:!persistenceError&&(!(store instanceof PostgresStateStore)||store.available()),mode:'PAPER_TRADING',storage:store instanceof PostgresStateStore?'POSTGRESQL':'JSON_DEVELOPMENT',marketStatus:perpetualMarket.snapshot().status}));
 app.get('/agents',async()=>agents.list());app.get('/agent-messages',async(req)=>messages.list((req.query as any).agentId));app.get('/strategies',async()=>strategies.list());
 // Client-supplied alleged work/results cannot change agent history or validate a strategy.
