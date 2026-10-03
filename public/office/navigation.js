@@ -12,12 +12,13 @@
  // Percent coordinates match the approved scene's existing room overlays. Footprint masks,
  // not sprite rectangles: desks/chairs/sofas/cabinets stay outside the allowed floor.
  const maps=Object.fromEntries(roomNames.map(room=>[room,{areas:[{x:8,y:88,w:84,h:6}],obstacles:[]}]));
- maps['Quant Lab']={areas:[{x:8,y:88,w:84,h:6},{x:86,y:44,w:6,h:50}],obstacles:[]};
+ maps['Quant Lab']={areas:[{x:8,y:88,w:86,h:6},{x:86,y:44,w:8,h:50}],obstacles:[]};
  maps['Meeting Room']={areas:[{x:8,y:88,w:84,h:6},{x:86,y:40,w:6,h:54}],obstacles:[]};
  maps.Lounge={areas:[{x:34,y:30,w:60,h:64}],obstacles:[{x:0,y:20,w:48,h:48},{x:54,y:38,w:46,h:46},{x:0,y:74,w:32,h:26}]};
  const inside=(p,r)=>p.x>=r.x&&p.x<=r.x+r.w&&p.y>=r.y&&p.y<=r.y+r.h;
  const onGrid=p=>p&&Number.isFinite(p.x)&&Number.isFinite(p.y)&&p.x>=4&&p.x<=96&&p.y>=4&&p.y<=96&&p.x%2===0&&p.y%2===0;
- function walkable(room,p,occupied=[]){const map=maps[room];return !!map&&onGrid(p)&&map.areas.some(r=>inside(p,r))&&!map.obstacles.some(r=>inside(p,r))&&!occupied.some(o=>Math.hypot(p.x-o.x,p.y-o.y)<12);}
+ function floorContains(room,p){const map=Object.hasOwn(maps,room)?maps[room]:null;return !!map&&!!p&&Number.isFinite(p.x)&&Number.isFinite(p.y)&&map.areas.some(r=>inside(p,r))&&!map.obstacles.some(r=>inside(p,r));}
+ function walkable(room,p,occupied=[]){return onGrid(p)&&floorContains(room,p)&&!occupied.some(o=>Math.hypot(p.x-o.x,p.y-o.y)<12);}
  function anchor(room,slot){if(!maps[room]||!Number.isInteger(slot)||slot<0||slot>7)return null;const xs=room==='Lounge'?[52,82,64,42,74,58,90,46]:[22,52,82,14,42,70,32,62],point={x:xs[slot],y:slot>2?92:88};return walkable(room,point)?point:null;}
  function plan(room,start,goal,occupied=[]){
   if(!walkable(room,start,occupied)||!walkable(room,goal,occupied))return [];
@@ -33,5 +34,5 @@
   const feature=features.find(f=>f.room===room),goals=[{x:start.x+sign*12,y:cycle%2?92:88},{x:start.x-sign*12,y:92},{x:start.x+sign*8,y:90},feature?.approach].filter(Boolean);if(cycle%3===2&&feature)goals.unshift(feature.approach);
   for(const goal of goals){const path=plan(room,start,goal,occupied);if(path.length>1)return [...path,...path.slice(0,-1).reverse()];}return [];
  }
- globalThis.OfficeNavigation={features,roomNames,walkable,anchor,plan,idleRoute};
+ globalThis.OfficeNavigation={features,roomNames,floorContains,walkable,anchor,plan,idleRoute};
 })();

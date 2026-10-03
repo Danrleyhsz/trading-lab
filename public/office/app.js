@@ -110,11 +110,14 @@ function sprite(element, id) {
 }
 const agentViews=new Map();let presenceEnabled=true;
 const reducedMotion=globalThis.matchMedia?.('(prefers-reduced-motion: reduce)');
-const presence=new OfficePresence.Director(()=>presenceEnabled&&!selectedHandoff&&!reducedMotion?.matches&&!document.hidden&&!['#profile','#workspaceDialog','#roomDialog','#auditDialog','#studyDialog'].some(id=>q(id).open));
-function stopPresence(){for(const view of agentViews.values())presence.stop(view);}
-function render(movingId){
- const focusedAgent=document.activeElement?.dataset?.agentId,slots=new Map();q('#agentList').replaceChildren();
- for(const [id,view] of agentViews)if(!agents.has(id)){presence.forget(view);clearViewSpeech(view);view.button.remove();agentViews.delete(id);}
+const motionAllowed=()=>presenceEnabled&&!selectedHandoff&&!reducedMotion?.matches&&!document.hidden&&!['#profile','#workspaceDialog','#roomDialog','#auditDialog','#studyDialog'].some(id=>q(id).open);
+const presence=new OfficePresence.Director(motionAllowed);
+const transitions=new OfficeTransitions.Director(motionAllowed,view=>presence.stop(view),view=>presence.update(view,view.agent,view.slot,view.host));
+function stopPresence(){for(const view of agentViews.values()){transitions.stop(view);presence.stop(view);}}
+function render(movingEvent){
+ const focusedAgent=document.activeElement?.dataset?.agentId,slots=new Map(),placements=new Map();q('#agentList').replaceChildren();
+ for(const agent of agents.values()){const slot=slots.get(agent.room)||0;slots.set(agent.room,slot+1);placements.set(agent.id,slot);}
+ for(const [id,view] of agentViews)if(!agents.has(id)){transitions.stop(view);presence.forget(view);clearViewSpeech(view);view.button.remove();agentViews.delete(id);}
  for(const agent of agents.values()){
   let view=agentViews.get(agent.id);
   if(!view){
@@ -122,15 +125,22 @@ function render(movingId){
    button.className='agent';avatar.className='sprite';shadow.className='foot-shadow';avatar.setAttribute('aria-hidden','true');shadow.setAttribute('aria-hidden','true');sprite(avatar,agent.id);button.append(avatar,label,status,shadow);button.onclick=()=>profile(agent.id);
    view={button,avatar,label,status};agentViews.set(agent.id,view);
   }
-  const oldRoom=view.button.dataset.room;
+  const from=view.agent?{room:view.agent.room,slot:view.slot}:null,wasTraveling=!!view.transitionRoute;
+  const bounds=q('#office').getBoundingClientRect?.(),previous=view.button.getBoundingClientRect?.();
+  const startPoint=from&&previous&&bounds?.width>0&&bounds?.height>0?{x:(previous.left+previous.width/2-bounds.left)/bounds.width*100,y:(previous.top+previous.height-bounds.top)/bounds.height*100}:undefined;
   const button=view.button;button.dataset.agentId=agent.id;button.dataset.status=agent.status;button.dataset.room=agent.room;view.label.textContent=agent.name;view.status.textContent=statusLabels[agent.status]||agent.status;
   button.setAttribute('aria-label',agent.name+', '+agent.room+', '+(statusLabels[agent.status]||agent.status));button.setAttribute('title',agent.lastReason||'Disponível; sem atividade registrada');
   const room=[...document.querySelectorAll('.room[data-room]')].find(element=>element.dataset.room===agent.room),host=room?.querySelector('.occupants')||q('#unmapped');
-  const slot=slots.get(agent.room)||0;slots.set(agent.room,slot+1);const point=OfficePresence.floorPoint(agent.room,slot)||{x:50,y:88};
+  const slot=placements.get(agent.id);const point=OfficePresence.floorPoint(agent.room,slot)||{x:50,y:88};
   if(button.parentElement!==host)host.append(button);button.setAttribute('style','left:'+point.x+'%;top:'+point.y+'%');
   presence.update(view,agent,slot,host);
-  // Room changes use a brief arrival effect; the painted walls are not a collision map.
-  if(oldRoom&&oldRoom!==agent.room&&button.animate&&presenceEnabled&&!reducedMotion?.matches){button.animate([{opacity:.25},{opacity:1}],{duration:350});}
+  const occupied=[];
+  for(const other of agents.values())if(other.id!==agent.id){const anchor=OfficeTransitions.anchor(other.room,placements.get(other.id));if(anchor)occupied.push(anchor);}
+  for(const other of agentViews.values())if(other!==view){
+   if(other.transitionRoute)occupied.push(...other.transitionRoute);
+   else if(other.route)occupied.push(...other.route.map(p=>OfficeTransitions.world(other.agent.room,p)).filter(Boolean));
+  }
+  transitions.update(view,agent,slot,{from:wasTraveling?null:from,event:movingEvent?.payload?.id===agent.id?movingEvent:undefined,bounds,occupied,startPoint});
   if(agent.id===focusedAgent)button.focus?.({preventScroll:true});
   const row=node('button',agent.name+' · '+agent.room+' · '+(statusLabels[agent.status]||agent.status));row.onclick=()=>profile(agent.id);q('#agentList').append(row);
  }
@@ -272,13 +282,14 @@ function connect() {
     renderSessionEvents();
     if (event.type === 'AGENT_STATE_CHANGED') {
       stateVersion++;
-      agents.set(event.payload.id, event.payload); render(event.payload.id);
+      agents.set(event.payload.id, event.payload); render(event);
     }
     refresh();
     if (selected) details();
   };
   ws.onerror = () => ws.close();
   ws.onclose = () => {
+    stopPresence();
     q('#connection').textContent = 'Eventos desconectados · reconectando';
     setTimeout(connect, 3000);
   };

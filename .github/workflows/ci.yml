@@ -31,5 +31,6 @@ jobs:
         env:
           TEST_DATABASE_URL: postgres://tradinglab_test:ci-test-only@localhost:5432/tradinglab_test
       - run: npm run build
+      - run: node --test dist/test/office*.test.js
       - run: node --test dist/test/historical-study-runner.test.js dist/test/perpetual-studies.test.js dist/test/historical-study-audit.test.js
       - run: docker build -t trading-lab:ci .

@@ -28,3 +28,6 @@ The navigation module receives only room geometry, IDs, coordinates and occupied
 ## Verification
 
 Tests check the Lounge detour around furniture, cardinal steps, blocked narrow aisles, malformed/off-grid geometry, all six accessible approaches, round-trip return, facing reversal, concurrent reservations and stale callbacks/removal. Existing office tests keep actual empty memory/work/accounts and communication safeguards. Browser review covers pointer/keyboard object navigation, room-list alternatives, native Escape and focus return, actual idle roster/empty collaboration, desktop and mobile sizing. Reduced-motion preference remains respected; motion behavior is verified independently through the controller tests. CI must exercise PostgreSQL and the existing compiled historical/container checks before final approval.
+
+## Follow-on: recorded room transitions
+OFFICE_TRANSITIONS.md supersedes the brief-arrival effect for two inspected reversible passages (Research/Quant and Trading/Lounge). General door graph, seating and directional art remain pending. The existing room-local controller also respects sampled traveling footprints in their departing room. Quant's validated front/right foot strip extends two percentage points to reach its shelf detour connector. This remains a foot-center mask, not full-width sprite physics.

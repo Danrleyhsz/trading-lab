@@ -15,6 +15,7 @@
    if(entry.key!==key){this.stop(entry);entry.key=key;}
    entry.agent=agent;entry.slot=slot;entry.host=host;this.entries.set(agent.id,entry);
    if(!this.allowed()){this.stop(entry);return;}
+   if(entry.transitionRoute)return;
    if(agent.status!=='IDLE'||!floorPoint(agent.room,slot)){entry.button.dataset.pose=agent.status==='IDLE'?'rest':'task';return;}
    if(entry.timer!==undefined||entry.animation)return;
    const generation=entry.generation||0;
@@ -23,7 +24,10 @@
     if(!this.allowed()||entry.agent.status!=='IDLE'||entry.button===document.activeElement)return;
     const bounds=entry.host.getBoundingClientRect?.();if(!bounds||!entry.button.animate||bounds.width<=0||bounds.height<=0)return;
     const start=floorPoint(entry.agent.room,entry.slot),occupied=[];
-    for(const other of this.entries.values())if(other!==entry&&other.agent.room===entry.agent.room){const anchor=floorPoint(other.agent.room,other.slot);if(other.route)occupied.push(...other.route);else if(anchor)occupied.push(anchor);}
+    for(const other of this.entries.values())if(other!==entry){
+     if(other.transitionRoute)occupied.push(...other.transitionRoute.map(p=>OfficeTransitions.local(entry.agent.room,p)).filter(p=>OfficeNavigation.floorContains(entry.agent.room,p)));
+     else if(other.agent.room===entry.agent.room){const anchor=floorPoint(other.agent.room,other.slot);if(other.route)occupied.push(...other.route);else if(anchor)occupied.push(anchor);}
+    }
     const route=OfficeNavigation.idleRoute(entry.agent.room,start,entry.agent.id,entry.cycle||0,occupied);entry.cycle=(entry.cycle||0)+1;
     if(route.length<2){entry.button.dataset.navigation='waiting';return;}
     entry.route=route;entry.button.dataset.pose='walk';entry.button.dataset.navigation='walking';

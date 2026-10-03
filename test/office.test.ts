@@ -21,7 +21,7 @@ function harness(overrides:Record<string,unknown>={},reduceMotion=false,geometry
   if(geometry)(document as any).createElementNS=()=>{const e=new Element(),set=e.setAttribute.bind(e);e.setAttribute=(name:string,value:string)=>{set(name,value);if(name==='id')ids.set('#'+value,e)};return e};
   const requests:string[]=[];const intervals:Array<()=>void>=[];
   const context=vm.createContext({matchMedia:()=>({matches:reduceMotion,addEventListener(){}}),document,location:{protocol:'https:',host:'example.test'},WebSocket:class{constructor(){socket=this}},fetch:async(url:string)=>{requests.push(url);return {ok:!(overrides[url] as any)?.httpError,status:(overrides[url] as any)?.httpError||200,json:async()=>Object.hasOwn(overrides,url)? await overrides[url] :url==='/finance'?{legacyAccounts:[{id:'fund',kind:'FUND',instrument:'LEGACY_PAPER_V1',initialCash:10000,portfolio:{equity:10000},feesPaid:0}],perpetualAccounts:[{id:'evaluation:nova:usdm',kind:'EVALUATION',instrument:'BINANCE_USDM:BTCUSDT',ownerAgentId:'nova',initialCash:5000,portfolio:{equity:4900},feesPaid:10,fundingCashDelta:-20,maxDrawdown:0.03,initialMargin:500,valuationFresh:false}]}:url==='/market/v3'?{status:'UNAVAILABLE',quote:null}:url==='/paper/perpetual/status'?{halted:false,executionEnabled:false,autonomous:{enabled:false,reason:'completed V2 study required'}}:url==='/backtests/v2/studies'?[]:url==='/agents'?[{id:'atlas',name:'Atlas',role:'Research',room:'Research Lab',status:'IDLE',experience:0,updatedAt:'2026-01-01'}]:url==='/agent-messages'?[]:url==='/research/runs'?[]:url==='/paper/accounts'?[{kind:'FUND',ownerAgentId:null,initialCash:10000,portfolio:{equity:10000},fills:0}]:url==='/portfolio'?{initialCash:10000,equity:10000,realizedPnl:0,unrealizedPnl:0}:url==='/market/latest'?{status:'waiting'}:{evidence:{observations:0,decisions:0,failures:0,lessons:0,sentMessages:0,strategyIds:[],recordedTransitions:0},coverage:{legacyTransitionsWithoutHistory:0,activitySince:null},memories:[],messages:[],activity:[]}}},setInterval:(callback:()=>void)=>{intervals.push(callback);return 0},setTimeout:()=>0,clearTimeout:()=>{},console});
-  vm.runInContext(readFileSync('public/office/collaboration.js','utf8'),context);vm.runInContext(readFileSync('public/office/navigation.js','utf8'),context);vm.runInContext(readFileSync('public/office/presence.js','utf8'),context);
+  vm.runInContext(readFileSync('public/office/collaboration.js','utf8'),context);vm.runInContext(readFileSync('public/office/navigation.js','utf8'),context);vm.runInContext(readFileSync('public/office/presence.js','utf8'),context);vm.runInContext(readFileSync('public/office/transitions.js','utf8'),context);
   vm.runInContext(readFileSync('public/office/app.js','utf8'),context);
   return {ids,rooms,requests,intervals,context,get socket(){return socket}};
 }
@@ -45,6 +45,30 @@ test('office moves agents only on real state events and reports a disconnected s
   assert.equal(h.ids.get('#events')!.children.length,1);
   h.socket.onclose();
   assert.match(h.ids.get('#connection')!.textContent,/desconectados/);
+});
+
+test('a received room transition animates a stable view while all labels immediately show the backend state',async()=>{
+ const h=harness();await settle();const agent=h.rooms[0].children[0].children[0],animations:any[]=[];
+ h.ids.get('#office')!.rect={left:0,top:0,width:1536,height:1024};agent.rect={left:1536*.086-36,top:1024*.4072-110,width:72,height:110};
+ (agent as any).animate=(frames:any,options:any)=>{const effect={frames,options,cancels:0,onfinish:undefined,cancel(){this.cancels++;}};animations.push(effect);return effect;};
+ const actual={id:'atlas',name:'Atlas',room:'Quant Lab',status:'BACKTESTING',experience:3};
+ h.socket.onmessage({data:JSON.stringify({id:'TEST_ONLY_RECEIVED_STATE',type:'AGENT_STATE_CHANGED',occurredAt:new Date().toISOString(),payload:actual})});
+ assert.equal(h.rooms[1].children[0].children[0],agent);assert.equal(agent.dataset.room,'Quant Lab');assert.equal(agent.dataset.status,'BACKTESTING');assert.equal(agent.dataset.travel,'recorded');assert.equal(animations.length,1);
+ assert.match(h.ids.get('#agentList')!.children[0].textContent,/Quant Lab/);assert.equal(h.ids.get('#activeAgents')!.textContent,'1 / 1');
+ h.socket.onmessage({data:JSON.stringify({id:'TEST_ONLY_NEW_STATUS',type:'AGENT_STATE_CHANGED',occurredAt:new Date().toISOString(),payload:{...actual,status:'IDLE'}})});
+ animations[0].onfinish();assert.equal(agent.dataset.travel,undefined);assert.equal(animations[0].cancels,1);assert.equal(animations.length,1);assert.equal(h.ids.get('#activeAgents')!.textContent,'0 / 1');
+ assert.ok(!h.requests.some(url=>url.includes('/orders')||url.includes('/ai/')));
+});
+
+test('stream disconnect and reduced motion stop travel without replay on a snapshot',async()=>{
+ for(const reduce of [false,true]){
+  const actual={id:'atlas',name:'Atlas',room:'Quant Lab',status:'IDLE',experience:0},overrides:any={};const h=harness(overrides,reduce);await settle();
+  const agent=h.rooms[0].children[0].children[0];h.ids.get('#office')!.rect={left:0,top:0,width:1536,height:1024};agent.rect={left:1536*.086-36,top:1024*.4072-110,width:72,height:110};let plays=0,cancels=0;let animation:any;
+  (agent as any).animate=()=>{plays++;animation={cancel(){cancels++;},onfinish:undefined};return animation;};
+  overrides['/agents']=[actual];h.socket.onmessage({data:JSON.stringify({id:'TEST_ONLY_STATE',type:'AGENT_STATE_CHANGED',occurredAt:new Date().toISOString(),payload:actual})});
+  assert.equal(plays,reduce?0:1);h.socket.onclose();animation?.onfinish();assert.equal(agent.dataset.travel,undefined);assert.equal(cancels,reduce?0:1);
+  h.intervals[0]();await settle();assert.equal(plays,reduce?0:1);assert.equal(agent.dataset.room,'Quant Lab');assert.equal(agent.dataset.status,'IDLE');
+ }
 });
 
 test('an older initial snapshot cannot overwrite a newer streamed room or market tick',async()=>{
