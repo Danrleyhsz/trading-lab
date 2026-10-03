@@ -24,7 +24,7 @@ Secrets never belong in Git. The initial product has no live-money broker. Devel
 
 ## Online Paper V2
 
-First online launch preparation: [configuration, verification tools and remaining provider acceptance](docs/CLOUD_LAUNCH_READINESS.md). A proposed Render template is supplied without provisioning. All execution and AI remain off for first publication; hosting still requires approved account/access/budget and release review.
+First online launch preparation: [configuration, verification tools and remaining provider acceptance](docs/CLOUD_LAUNCH_READINESS.md). The human created Render web/database resources; startup remains blocked and operational acceptance is pending. Docker and `npm run start:cloud` use the direct compiled `launch-cloud.js` configuration gate before loading the runtime, avoiding quoted platform shell commands. All execution and AI remain off for first publication; original-history migration and release review remain required.
 See [implemented package and limits](docs/ONLINE_PAPER_V2.md) and [cloud deployment handoff](docs/CLOUD_DEPLOYMENT.md). Feature code is pending review; no cloud deployment is implied. Production runs from the compiled cloud container with PostgreSQL and protected HTTPS access, not from a developer computer.
 
 ## Analytical AI preparation (disabled)

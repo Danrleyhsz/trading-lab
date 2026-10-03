@@ -2,6 +2,8 @@
 
 ## Latest human priority — first online publication preparation
 
+Current checkpoint 2026-10-03: human-created Render DB/web resources exist; first web build succeeded at db8ae61 but both quoted shell variants failed before configuration checks (exit 127). Use the direct compiled `node dist/src/launch-cloud.js` entrypoint on the new fix branch after its CI, preserving missing PUBLIC_ORIGIN/DATABASE_URL until history/TLS/access are resolved. This is not a healthy hosted deployment. Do not duplicate resources, auto-merge architecture or restart the user's preview. Read workspace continuation for exact new commit/PR/CI and guide human Settings changes; no secret values belong in chat.
+
 The user requested all prerequisite verification before starting publication. Complete CLOUD_LAUNCH_READINESS.md acceptance with the approved provider only after account/access/budget exist. Preserve the source branch/reviewed release and draft stack; do not deploy old main. Proposed Render template and compiled configuration/read-only service checks require no provisioning to test. Import original history before normal startup, verified TLS, one writer/stop-before-start, disabled first-publication execution/AI, source availability, restart/restore, daily backups and alerts remain explicit gates. Do not repeatedly re-run unchanged tests while waiting for approval; compatible functional preparation may continue without resources or activation.
 
 ## Current human priority — functionality, 2026-10-03

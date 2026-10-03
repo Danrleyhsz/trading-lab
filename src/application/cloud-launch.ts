@@ -35,6 +35,21 @@ export function checkCloudConfiguration(env: NodeJS.ProcessEnv): LaunchCheck[] {
     return checks;
 }
 
+export function cloudConfigurationReport(env: NodeJS.ProcessEnv) {
+    const checks = checkCloudConfiguration(env);
+    return {scope:'FIRST_PUBLICATION_CONFIG_ONLY',ready:checks.every(c=>c.ok),checks,
+        unverified:['DATABASE_CONNECTION','CLOUD_HOST','HISTORY_IMPORT','BACKUPS_AND_RESTORE','RELEASE_REVIEW']};
+}
+
+// The runtime module must remain unloaded until every first-publication gate passes.
+export async function launchConfiguredCloud(env: NodeJS.ProcessEnv, start: () => Promise<unknown>, report: (value: ReturnType<typeof cloudConfigurationReport>) => void) {
+    const result = cloudConfigurationReport(env);
+    report(result);
+    if (!result.ready) return 1;
+    await start();
+    return 0;
+}
+
 const object = (value: unknown): Record<string, any> => value !== null && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, any> : {};
 export function checkCloudRuntime(value: unknown, now = Date.now()): LaunchCheck[] {
     const d = object(value), storage = object(d.storage), access = object(d.access), paper = object(d.paper), market = object(d.market), ai = object(d.ai);

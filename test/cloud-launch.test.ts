@@ -1,7 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import Fastify from 'fastify';
-import {checkCloudConfiguration, checkCloudRuntime, verifyCloudService} from '../src/application/cloud-launch.js';
+import {checkCloudConfiguration, checkCloudRuntime, verifyCloudService, launchConfiguredCloud} from '../src/application/cloud-launch.js';
+import {spawnSync} from 'node:child_process';
+import {fileURLToPath} from 'node:url';
 import {registerAccessControl} from '../src/application/access-control.js';
 import {RuntimeReadiness, type RuntimeInputs} from '../src/application/runtime-readiness.js';
 import {PerpetualPaperBook} from '../src/application/perpetual-paper-book.js';
@@ -21,6 +23,47 @@ function diagnosis() {
     const input: RuntimeInputs = {spot:{symbol:'BTCUSDT',price:100,timestamp:time,exchange:'TEST_ONLY'},perpetual:{status:'HEALTHY',quote:{instrument:'BINANCE_USDM:BTCUSDT',symbol:'BTCUSDT',bid:100,ask:101,markPrice:100,indexPrice:100,fundingRate:0,nextFundingTime:time+28800000,bookTime:time,markTime:time,receivedAt:time},consecutiveFailures:0},book:book.status(),autonomous:{enabled:false,studyId:null,busy:false,error:null,eligible:false,reason:'completed V2 study required',accountId:'evaluation:nova:usdm',lastProcessedCandle:null},research:{busy:false,accepting:true},historical:{busy:false,accepting:true,persistenceFailed:false,activeTasks:0,interruptedStudies:0},ai:new AiAnalysis(async()=>{},[],undefined,undefined,()=>time).status(),legacyExecutionEnabled:false,evaluationEnabled:false,perpetualEnabled:false};
     return runtime.snapshot(input);
 }
+
+test('direct cloud launcher never starts runtime with missing prerequisites or enabled execution',async()=>{
+    let starts=0;
+    for(const changed of [{PUBLIC_ORIGIN:undefined},{DATABASE_URL:undefined},{APP_ACCESS_TOKEN:'short'},
+        {PAPER_EVALUATION_ENABLED:'true'},{PERPETUAL_PAPER_ENABLED:'true'},
+        {AUTONOMOUS_PERPETUAL_ENABLED:'true'},{LEGACY_PAPER_EXECUTION_ENABLED:'true'},
+        {AI_PROVIDER_API_KEY:'SECRET_TEST_ONLY'}]) {
+        const reports:unknown[]=[];
+        assert.equal(await launchConfiguredCloud({...configuration(),...changed},async()=>{starts++;},r=>reports.push(r)),1);
+        assert.equal(starts,0);assert.equal(reports.length,1);
+        assert.equal((reports[0] as {ready:boolean}).ready,false);
+        assert.ok(!JSON.stringify(reports).includes('SECRET_TEST_ONLY'));
+    }
+});
+test('direct cloud launcher reports before starting exactly once with valid disabled configuration',async()=>{
+    const calls:string[]=[];
+    assert.equal(await launchConfiguredCloud(configuration(),async()=>{calls.push('start');},r=>{
+        assert.equal(r.ready,true);assert.ok(r.unverified.includes('HISTORY_IMPORT'));calls.push('report');
+    }),0);
+    assert.deepEqual(calls,['report','start']);
+});
+test('direct cloud launcher propagates a runtime startup failure without retry',async()=>{
+    let starts=0;
+    await assert.rejects(launchConfiguredCloud(configuration(),async()=>{starts++;throw Error('TEST_ONLY startup failure');},()=>{}),/TEST_ONLY startup failure/);
+    assert.equal(starts,1);
+});
+test('actual cloud entry process returns a sanitized missing-config report without importing runtime',()=>{
+    const compiled=import.meta.url.endsWith('.js');
+    const path=fileURLToPath(new URL('../src/launch-cloud.'+(compiled?'js':'ts'),import.meta.url));
+    const result=spawnSync(process.execPath,[...(compiled?[]:['--import','tsx']),path],{
+        env:{PATH:process.env.PATH,SystemRoot:process.env.SystemRoot,NODE_ENV:'production',
+            PAPER_TRADING_ONLY:'true',APP_ACCESS_TOKEN:token,DATABASE_URL:'INVALID_SECRET_TEST_ONLY'},
+        encoding:'utf8',timeout:10000,
+    });
+    assert.ifError(result.error);assert.equal(result.status,1);assert.equal(result.stderr,'');
+    const report=JSON.parse(result.stdout);assert.equal(report.ready,false);
+    assert.equal(report.scope,'FIRST_PUBLICATION_CONFIG_ONLY');
+    assert.ok(report.checks.some((c:{id:string;ok:boolean})=>c.id==='HTTPS_ORIGIN_REQUIRED'&&!c.ok));
+    assert.ok(report.checks.some((c:{id:string;ok:boolean})=>c.id==='DIRECT_POSTGRESQL_REQUIRED'&&!c.ok));
+    assert.ok(!result.stdout.includes('INVALID_SECRET_TEST_ONLY'));assert.ok(!result.stdout.includes(token));
+});
 test('first-publication config rejects accidental capabilities and TLS weakening without revealing secrets',()=>{
     assert.ok(checkCloudConfiguration(configuration()).every(c=>c.ok));
     for(const changed of [
