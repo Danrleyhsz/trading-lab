@@ -17,7 +17,7 @@ export class ResearchEngine {
  private busy=false;
  constructor(private source:ResearchSources,private coordinator:AgentCoordinator,private collaboration:AgentCollaboration,private messages:AgentMessageBus,private memories:MemoryStore,private strategies:StrategyRegistry,private lab:StrategyLab,private backtester:HistoricalBacktester,readonly runs:ResearchRunStore,private bus:EventBus){}
  async run(limit=500){
-  if(this.busy)throw Error('research already running');
+  if(this.busy||this.coordinator.registry.get('euler')?.status==='BACKTESTING')throw Error('research already running');
   if(!Number.isInteger(limit)||limit<100||limit>1000)throw Error('invalid research limit');
   this.busy=true;
   const id=crypto.randomUUID(),startedAt=new Date().toISOString();

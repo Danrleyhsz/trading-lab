@@ -40,3 +40,19 @@ The fund-only /paper/orders API is preserved. Evaluation orders require an expli
 Research consumes public BTC spot hourly candles and a distinct USD-M derivatives snapshot. The sources are not treated as interchangeable instruments. It retains the dataset, its hash and original domain events for audit. Satoshi measures observed momentum, Flux derivatives context, Vega realized volatility and Oracle a documented regime heuristic; these are descriptive deterministic analyses, not LLM-generated chatter or forecasts.
 
 Atlas submits a sourced SMA hypothesis to Euler's historical backtester. Failed queries and rejected hypotheses remain visible. A passed in-sample screen does not imply out-of-sample evidence, trading success or automatic fund eligibility. No paper order is submitted by a research task. The run endpoint accepts only supported symbol/limit fields; clients cannot upload alleged candles, profits or backtest results into this path. Runs are bounded and do not overlap within a runtime. Dataset and strategy state join the existing single-writer snapshot until PostgreSQL.
+
+## Linear perpetual historical studies V2
+
+`POST /backtests/v2/studies` accepts only `{bars, trainBars, testBars}` (defaults 1000/400/100), returns 202, and starts one bounded public-data study. Read its ID with `GET /backtests/v2/studies/:id`; summaries use `GET /backtests/v2/studies`. Jobs retain original USD-M trade/mark candles, actual funding timestamps and settlement marks, dataset SHA-256, configuration and every simulation proposal/decision/fill/funding entry. Pending jobs restore as INTERRUPTED. Source failures remain FAILED without fabricated results.
+
+Instrument: BINANCE_USDM:BTCUSDT, linear USDT perpetual, offline historical simulation only. This does not relabel the legacy spot SMA studies or switch the existing real-time PaperBroker to derivatives. No study promotes itself into account execution or fund approval.
+
+The first V2 candidates are SMA 10/30, 20/60 and 5/20. Training net P&L selects the candidate before each nonoverlapping test window. Prior candles provide warmup; each fold starts flat, carries out-of-sample equity and closes at its boundary. Unused trailing bars are reported. Further strategy families remain future work.
+
+Signals use prior completed candles and execute at the next open with adverse slippage. Entry and exit fees are charged. Funding applies `-signed quantity × actual settlement mark × rate`. Records within one second of an hour boundary apply to carried positions before the open; original timestamps are preserved. Other settlements apply before the hourly stress test. This ordering is a model assumption, not a claim about intrabar chronology.
+
+Cross-margin stress uses the adverse hourly mark extreme, 1% maintenance margin and 0.5% liquidation fee as explicit study assumptions. Liquidation uses the adverse trade extreme plus configured slippage. These are not Binance tiered margin rules. The model has no leverage above 1×, uses 10% notional per position, retains bankruptcy deficits and includes final closing costs in drawdown. Every entry and exit passes the deterministic RiskEngine. Strict reductions without reversal remain eligible after loss limits; invalid orders remain rejected.
+
+Data endpoints and field definitions: [official Binance USD-M market data documentation](https://developers.binance.com/en/docs/catalog/core-trading-derivatives-trading-usd-s-m-futures/api/rest-api/market-data). Only public klines, markPriceKlines and fundingRate are queried. No API keys or private brackets.
+
+Production remains cloud-only. Local tests are development validation. Deployment, PostgreSQL and uninterrupted cloud jobs are not supplied by this increment.

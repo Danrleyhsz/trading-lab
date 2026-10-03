@@ -71,3 +71,11 @@ Architecture skeleton + market-data ingestion + paper broker contract + event sc
 - Paper execution status now starts at the actual approved order submission and returns to IDLE after its fill; the risk reviewer also returns to idle. Failed office stream delivery cannot abort domain execution.
 - Validation: typecheck, 38 tests and JavaScript syntax passed. A development smoke test against public Binance endpoints obtained 99 closed candles, four specialist findings and a REJECTED screen with zero execution events. This is development verification, not a production-cloud deployment. Browser visual review is still pending.
 - Backtest screening still uses V1 and does not imply out-of-sample validation. Backtesting V2 is the next milestone.
+
+### Backtesting V2 — linear perpetual increment
+- Added server-owned asynchronous USD-M studies with real trade/mark/funding inputs and retained evidence.
+- Added signed historical simulation, fees, funding, conservative margin stress/liquidation and walk-forward SMA parameter selection.
+- No automatic strategy validation or account order execution from these studies.
+- Legacy realtime Paper execution remains unchanged pending Market Data V3 / Autonomous Paper V2; old studies remain legacy.
+- Full exchange tier parity, extra strategy families and browser study controls are not yet implemented.
+- Public-data smoke: 300 aligned bars, 37 funding records, four out-of-sample folds; no broker events or persistent product account changes.
