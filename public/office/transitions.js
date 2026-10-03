@@ -1,20 +1,13 @@
 // Original browser presentation. A received state is authoritative before any journey starts.
 (() => {
-  const layout = {
-    'Research Lab': {x:2, y:2, w:30, h:44},
-    'Trading Floor': {x:34, y:2, w:33, h:44},
-    'Risk Desk': {x:69, y:2, w:29, h:44},
-    'Quant Lab': {x:2, y:49, w:30, h:44},
-    Lounge: {x:34, y:49, w:33, h:44},
-    'Meeting Room': {x:69, y:49, w:29, h:44}
-  };
-  // Foot-center passages inspected against office-scene.png. Unverified doors fail closed.
+  const layout = OfficeNavigation.layout;
+  // Foot-center passages inspected against office-reference-v2.png; other doors fail closed.
   const doors = [
-    {rooms:['Research Lab','Quant Lab'], approaches:{'Research Lab':{x:92,y:88},'Quant Lab':{x:94,y:88}}, via:[{x:29.6,y:52},{x:30.2,y:52}]},
-    {rooms:['Trading Floor','Lounge'], approaches:{'Trading Floor':{x:50,y:88},Lounge:{x:50,y:88}}, via:[]}
+    {rooms:['Research Lab','Quant Lab'], approaches:{'Research Lab':{x:94,y:94},'Quant Lab':{x:94,y:98}}, via:[{x:33.4,y:36.32},{x:33.4,y:66.42}]},
+    {rooms:['Trading Floor','Lounge'], approaches:{'Trading Floor':{x:94,y:94},Lounge:{x:94,y:98}}, via:[{x:66.9,y:36.32},{x:66.9,y:66.42}]}
   ];
   const finite = p => !!p && Number.isFinite(p.x) && Number.isFinite(p.y);
-  const distance = (a,b) => Math.hypot(a.x-b.x,(a.y-b.y)*2/3);
+  const distance = (a,b) => Math.hypot(a.x-b.x,(a.y-b.y)*OfficeNavigation.scene.height/OfficeNavigation.scene.width);
   function world(room,point) {
     const bounds=Object.hasOwn(layout,room)?layout[room]:null;
     return bounds && finite(point) ? {x:bounds.x+point.x*bounds.w/100,y:bounds.y+point.y*bounds.h/100} : null;
@@ -41,9 +34,9 @@
   }
   function stationLeg(station,room) {
     if(!station || !globalThis.OfficeWorkstations?.catalog.includes(station) || station.room!==room) return null;
-    const p=local(room,station.point),floor={x:Math.round(p.x/2)*2,y:88};
+    const p=local(room,station.point),floor={x:Math.round(p.x/2)*2,y:OfficeNavigation.aisle(room)};
     if(!OfficeNavigation.walkable(room,floor))return null;
-    return {floor,points:[station.point,world(room,{x:p.x,y:88}),world(room,floor)]};
+    return {floor,points:[station.point,world(room,{x:p.x,y:floor.y}),world(room,floor)]};
   }
   function plan(fromRoom,fromSlot,toRoom,toSlot,occupied=[],startPoint,fromStation,toStation) {
     const door=doors.find(d=>d.rooms.includes(fromRoom)&&d.rooms.includes(toRoom));

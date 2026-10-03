@@ -3,6 +3,8 @@
 Eight original characters now default to their own computer seat when the backend places them in that workstation's actual room. Atlas, Satoshi and Oracle each have a separate Research desk; Euler/Vega occupy Quant, Nova/Flux Trading and Sentinel Risk. A visiting agent keeps its real room and uses the existing floor placement. No backend room, experience, work record or account is changed for visual convenience.
 
 ## Scene and movement
+Current environment: OFFICE_REFERENCE_SCENE.md and REFERENCE_SCENE_ART.json supersede the following historical six-room artwork geometry. Active art is the original 1852×849 panoramic background; all seat/crop/monitor coordinates use its dimensions. The old Research patch remains archival and is no longer layered into runtime. Eight character PNG sources remain unchanged.
+
 The original background and eight character sources are unchanged. Built-in imagegen produced research-stations.png with three desks. The browser clips that variant to the Research furniture rectangle so all other scene pixels remain original. WORKSTATION_ART.json records the exact prompt, source, hash and size. No third-party art or renderer is added.
 
 Column 6 of the existing character sheets supplies the static seated back view. It is a posture for both available and busy states, not evidence of typing. The character scales with the scene; existing chair-back art is a pointer-transparent foreground mask. Each named seat has one owner and is only assigned when that owner's real room matches. IDLE at a station schedules no cosmetic stroll.

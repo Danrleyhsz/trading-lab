@@ -20,19 +20,19 @@ function motion(){
  return {...h,animations,agent,entry,director,options,setAllowed:(value:boolean)=>{allowed=value;},get stops(){return stops;},get settled(){return settled;}};
 }
 
-test('verified doors join the original floor routes in both directions without diagonal shortcuts',()=>{
+test('verified doors join the panoramic front aisles in both directions without diagonal shortcuts',()=>{
  const {api}=environment();
- for(const [from,to,doorX] of [['Research Lab','Quant Lab',30.2],['Trading Floor','Lounge',50.5]] as const){
+ for(const [from,to,doorX] of [['Research Lab','Quant Lab',33.4],['Trading Floor','Lounge',66.9]] as const){
   const path=api.plan(from,0,to,1),reverse=api.plan(to,1,from,0);
   assert.ok(path.length>=3);assert.deepEqual(copy(path[0]),copy(api.anchor(from,0)));assert.deepEqual(copy(path.at(-1)),copy(api.anchor(to,1)));
   assert.deepEqual(copy(reverse),copy(path).reverse());
   for(let i=1;i<path.length;i++)assert.ok(Math.abs(path[i].x-path[i-1].x)<1e-8||Math.abs(path[i].y-path[i-1].y)<1e-8);
   const bridge=path.findIndex((p:any,i:number)=>i>0&&Math.abs(p.y-path[i-1].y)>30);
   assert.ok(bridge>0);assert.ok(Math.abs(path[bridge].x-doorX)<1e-8);assert.ok(Math.abs(path[bridge-1].x-doorX)<1e-8);
-  // Visual review found the Quant back shelf on the original straight passage.
+  // Visual review found the Quant cabinets inside the new room.
   for(let i=1;i<path.length;i++)for(let step=0;step<=100;step++){
    const x=path[i-1].x+(path[i].x-path[i-1].x)*step/100,y=path[i-1].y+(path[i].y-path[i-1].y)*step/100;
-   assert.ok(!(x>=27.4&&x<=30&&y>=55&&y<=65));
+   assert.ok(!(x>=27.4&&x<=30&&y>=42&&y<=59));
   }
  }
 });
@@ -41,7 +41,7 @@ test('unverified, crowded or malformed passages never fabricate a route',()=>{
  const {api}=environment();
  for(const pair of [['Research Lab','Trading Floor'],['Risk Desk','Meeting Room'],['Lounge','Meeting Room'],['unknown','Quant Lab'],['__proto__','Quant Lab'],['Research Lab','Research Lab']])assert.equal(api.plan(pair[0],0,pair[1],0).length,0);
  assert.equal(api.plan('Research Lab',8,'Quant Lab',0).length,0);
- assert.equal(api.plan('Research Lab',0,'Quant Lab',0,[{x:29.6,y:60}]).length,0);
+ assert.equal(api.plan('Research Lab',0,'Quant Lab',0,[{x:33.4,y:50}]).length,0);
  assert.equal(api.plan('Research Lab',0,'Quant Lab',0,[api.anchor('Research Lab',1)]).length,0);
  assert.equal(api.plan('Research Lab',0,'Quant Lab',0,[{x:NaN,y:60}]).length,0);
  assert.equal(api.plan('Research Lab',0,'Quant Lab',0,[] as any,{x:20,y:20}).length,0);
@@ -49,10 +49,10 @@ test('unverified, crowded or malformed passages never fabricate a route',()=>{
 });
 
 test('an in-progress local stroll can leave its actual foot position, but cannot snap across furniture',()=>{
- const {api}=environment(),start=api.world('Research Lab',{x:23.25,y:90.5});
+ const {api}=environment(),start=api.world('Research Lab',{x:23.25,y:93.5});
  const route=api.plan('Research Lab',0,'Quant Lab',0,[],start);
  assert.ok(route.length>2);assert.deepEqual(copy(route[0]),copy(start));
- assert.equal(api.plan('Research Lab',0,'Quant Lab',0,[],api.world('Research Lab',{x:23.25,y:87.5})).length,0);
+ assert.equal(api.plan('Research Lab',0,'Quant Lab',0,[],api.world('Research Lab',{x:23.25,y:91.5})).length,0);
  assert.equal(api.plan('Research Lab',0,'Quant Lab',0,[],{x:Infinity,y:90}).length,0);
 });
 
@@ -100,7 +100,7 @@ test('completed segment callbacks cannot restart an obsolete effect or accumulat
 test('a peer state arriving inside a reserved corridor cancels travel immediately without waiting or replay',()=>{
  const h=motion();h.director.update(h.entry,h.agent,0,h.options());const previous=h.entry.transitionAnimation;
  assert.ok(h.entry.transitionRoute.length>50);
- h.director.update(h.entry,h.agent,0,{occupied:[{x:29.6,y:49}]});previous.onfinish();
+ h.director.update(h.entry,h.agent,0,{occupied:[{x:33.4,y:49}]});previous.onfinish();
  assert.equal(previous.cancels,1);assert.equal(h.entry.transitionRoute,undefined);assert.equal(h.animations.length,1);assert.equal(h.settled,0);assert.equal(h.agent.room,'Quant Lab');
  h.director.update(h.entry,h.agent,0,{});assert.equal(h.entry.transitionAnimation,undefined);
 });

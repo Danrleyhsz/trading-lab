@@ -5,7 +5,7 @@ import vm from 'node:vm';
 function environment(){const callbacks=new Map<number,()=>void>();let sequence=0;const cancelled:number[]=[];const context=vm.createContext({document:{activeElement:null},setTimeout:(fn:()=>void)=>{callbacks.set(++sequence,fn);return sequence;},clearTimeout:(id:number)=>{cancelled.push(id);callbacks.delete(id);}});vm.runInContext(readFileSync('public/office/navigation.js','utf8'),context);vm.runInContext(readFileSync('public/office/presence.js','utf8'),context);vm.runInContext(readFileSync('public/office/transitions.js','utf8'),context);return {api:context.OfficePresence,transitions:context.OfficeTransitions,callbacks,cancelled,context};}
 test('cosmetic floor lanes are bounded and unknown rooms never get a fabricated location',()=>{
  const {api}=environment();for(const room of ['Research Lab','Quant Lab','Trading Floor','Risk Desk','Meeting Room','Lounge'])for(let slot=0;slot<8;slot++){
-  const point=api.floorPoint(room,slot),path=api.idlePath(room,slot,'atlas',300,280);assert.ok(point.x>=10&&point.x<=90);assert.ok(point.y>=86&&point.y<=94);for(const p of path){assert.ok(Math.abs(p.x)<=60);assert.ok(Math.abs(p.y)<=170);}assert.equal(path.at(-1).x,0);assert.equal(path.at(-1).y,0);
+  const point=api.floorPoint(room,slot),path=api.idlePath(room,slot,'atlas',300,280);assert.ok(point.x>=10&&point.x<=90);assert.ok(point.y>=92&&point.y<=98);for(const p of path){assert.ok(Math.abs(p.x)<=60);assert.ok(Math.abs(p.y)<=170);}assert.equal(path.at(-1).x,0);assert.equal(path.at(-1).y,0);
  }assert.equal(api.floorPoint('unknown',0),null);assert.equal(api.idlePath('unknown',0,'atlas',300,280).length,0);assert.equal(api.idlePath('Research Lab',0,'atlas',0,280).length,0);
 });
 test('idle presentation reuses one timer and actual task/room changes cancel previous motion',()=>{
@@ -35,7 +35,7 @@ test('concurrent cosmetic routes reserve footprints and removed actors release b
 test('idle strolls reserve every sampled segment of a recorded journey, including its departing room',()=>{
  const h=environment(),host={getBoundingClientRect:()=>({width:300,height:280})},director=new h.api.Director(()=>true);
  const idle:any={button:{dataset:{},animate:()=>({cancel(){},onfinish:undefined})}};
- const traveler:any={button:{dataset:{}},transitionRoute:[{x:34,y:88},{x:10,y:88}].map(p=>h.transitions.world('Research Lab',p))};
+ const traveler:any={button:{dataset:{}},transitionRoute:[{x:34,y:94},{x:10,y:94}].map(p=>h.transitions.world('Research Lab',p))};
  director.update(idle,{id:'atlas',room:'Research Lab',status:'IDLE'},0,host);
  director.update(traveler,{id:'euler',room:'Quant Lab',status:'IDLE'},0,host);
  assert.equal(traveler.timer,undefined);h.callbacks.get(idle.timer)!();assert.equal(idle.animation,undefined);assert.equal(idle.button.dataset.navigation,'waiting');

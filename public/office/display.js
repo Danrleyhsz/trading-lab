@@ -1,7 +1,7 @@
 /* Presentation preferences only. No backend, market, task or execution access. */
 (() => {
-  const modes=['fit','width','50','75','100','125'], resolutions=[960,1280,1536,1920,2560];
-  const defaults={mode:'fit',resolution:1536,layout:'auto'}, key='trading-lab.display.v1';
+  const modes=['fit','width','50','75','100','125'], resolutions=[960,1280,1536,1852,1920,2560];
+  const defaults={mode:'fit',resolution:1852,layout:'auto'}, key='trading-lab.display.v1';
   const q=selector=>document.querySelector(selector);
   const valid=value=>value&&modes.includes(value.mode)&&resolutions.includes(value.resolution);
   let preference={...defaults};
@@ -13,7 +13,7 @@
     q('#viewScale').value=preference.mode;q('#viewResolution').value=String(preference.resolution);
     q('#viewLayout').value=preference.layout;
     q('#viewResolution').disabled=['fit','width'].includes(preference.mode);
-    q('#displayStatus').textContent=preference.mode==='fit'?'Ajuste automático ativo: escritório inteiro, sem cortar salas.':preference.mode==='width'?'Largura disponível; role a página para ver os painéis.':`Cena em ${preference.mode}% de ${preference.resolution} × ${Math.round(preference.resolution*2/3)}. Deslize dentro do mapa quando necessário.`;
+    q('#displayStatus').textContent=preference.mode==='fit'?'Ajuste automático ativo: escritório inteiro, sem cortar salas.':preference.mode==='width'?'Largura disponível; role a página para ver os painéis.':`Cena em ${preference.mode}% de ${preference.resolution} × ${Math.round(preference.resolution*OfficeNavigation.scene.height/OfficeNavigation.scene.width)}. Deslize dentro do mapa quando necessário.`;
     if(save)try{localStorage.setItem(key,JSON.stringify(preference));}catch{}
     // Existing scene directors cancel owned paths and reproject actual coordinates.
     window.dispatchEvent(new Event('resize'));

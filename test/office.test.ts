@@ -26,6 +26,13 @@ function harness(overrides:Record<string,unknown>={},reduceMotion=false,geometry
   return {ids,rooms,requests,intervals,context,get socket(){return socket}};
 }
 const settle=()=>new Promise(resolve=>setImmediate(resolve));
+test('reference control areas open existing read panels without inventing agent rooms or scheduling work',async()=>{
+ const h=harness();await settle();const before=[...h.requests];
+ for(const [id,panel] of [['sceneDataCenter','accessPanel'],['sceneWarRoom','financePanel'],['sceneMarketAnalysis','marketPanel']]){
+  h.ids.get('#'+id)!.onclick!();assert.equal(h.ids.get('#workspaceDialog')!.open,true);assert.equal(h.ids.get('#'+panel)!.hidden,false);h.ids.get('#workspaceDialog')!.close();
+ }
+ await settle();assert.deepEqual(h.requests,before);assert.equal(h.rooms.length,6);assert.equal(h.rooms[0].children[0].children[0].dataset.room,'Research Lab');
+});
 test('closing a profile whose roster opener was refreshed keeps keyboard focus inside the parent panel',async()=>{
  const h=harness();await settle();h.ids.get('#navAgents')!.onclick!();const opener=h.ids.get('#agentList')!.children[0];h.context.document.activeElement=opener;opener.onclick!();await settle();opener.isConnected=false;
  h.ids.get('#profile')!.close();assert.equal(h.ids.get('#workspaceDialog')!.open,true);assert.ok(h.ids.get('#closeWorkspace')!.focusCalls>0);
@@ -53,7 +60,7 @@ test('office moves agents only on real state events and reports a disconnected s
 
 test('a received room transition animates a stable view while all labels immediately show the backend state',async()=>{
  const h=harness();await settle();const agent=h.rooms[0].children[0].children[0],animations:any[]=[];
- h.ids.get('#office')!.rect={left:0,top:0,width:1536,height:1024};agent.rect={left:149-36,top:390-98,width:72,height:98};
+ h.ids.get('#office')!.rect={left:0,top:0,width:1852,height:849};agent.rect={left:174-36,top:299-98,width:72,height:98};
  (agent as any).animate=(frames:any,options:any)=>{const effect={frames,options,cancels:0,onfinish:undefined,cancel(){this.cancels++;}};animations.push(effect);return effect;};
  const actual={id:'atlas',name:'Atlas',room:'Quant Lab',status:'BACKTESTING',experience:3};
  h.socket.onmessage({data:JSON.stringify({id:'TEST_ONLY_RECEIVED_STATE',type:'AGENT_STATE_CHANGED',occurredAt:new Date().toISOString(),payload:actual})});
@@ -67,7 +74,7 @@ test('a received room transition animates a stable view while all labels immedia
 test('stream disconnect and reduced motion stop travel without replay on a snapshot',async()=>{
  for(const reduce of [false,true]){
   const actual={id:'atlas',name:'Atlas',room:'Quant Lab',status:'IDLE',experience:0},overrides:any={};const h=harness(overrides,reduce);await settle();
-  const agent=h.rooms[0].children[0].children[0];h.ids.get('#office')!.rect={left:0,top:0,width:1536,height:1024};agent.rect={left:149-36,top:390-98,width:72,height:98};let plays=0,cancels=0;let animation:any;
+  const agent=h.rooms[0].children[0].children[0];h.ids.get('#office')!.rect={left:0,top:0,width:1852,height:849};agent.rect={left:174-36,top:299-98,width:72,height:98};let plays=0,cancels=0;let animation:any;
   (agent as any).animate=()=>{plays++;animation={cancel(){cancels++;},onfinish:undefined};return animation;};
   overrides['/agents']=[actual];h.socket.onmessage({data:JSON.stringify({id:'TEST_ONLY_STATE',type:'AGENT_STATE_CHANGED',occurredAt:new Date().toISOString(),payload:actual})});
   assert.equal(plays,reduce?0:1);h.socket.onclose();animation?.onfinish();assert.equal(agent.dataset.travel,undefined);assert.equal(cancels,reduce?0:1);

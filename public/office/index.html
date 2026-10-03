@@ -34,13 +34,16 @@
   <section class="office-shell" aria-label="Centro de controle em pixel art">
     <div class="scene-caption"><span>ESCRITÓRIO / VISÃO GERAL</span><div class="scene-tools"><button id="openDisplay">Tela e escala</button><button id="togglePresence" aria-pressed="true">Pausar animações</button><button id="openCollaboration">Colaboração</button><button id="toggleTeamFeed" aria-expanded="false" aria-controls="teamFeed">Feed</button></div></div>
     <div class="scene-scroll" tabindex="0" aria-label="Mapa das salas; em telas pequenas, deslize para explorar">
-      <section id="office" aria-label="Salas do escritório"><div class="research-stations-art" aria-hidden="true"></div>
+      <section id="office" aria-label="Salas do escritório">
         <section class="room" data-room="Research Lab"><h2><button class="room-hotspot" data-space="Research Lab" aria-label="Explorar Research Lab">RESEARCH LAB ↗</button></h2><div class="occupants"></div></section>
         <section class="room" data-room="Trading Floor"><h2><button class="room-hotspot" data-space="Trading Floor" aria-label="Explorar Trading Floor">TRADING FLOOR ↗</button></h2><div class="occupants"></div></section>
         <section class="room" data-room="Risk Desk"><h2><button class="room-hotspot" data-space="Risk Desk" aria-label="Explorar Risk Desk">RISK DESK ↗</button></h2><div class="occupants"></div></section>
         <section class="room" data-room="Quant Lab"><h2><button class="room-hotspot" data-space="Quant Lab" aria-label="Explorar Quant Lab">QUANT LAB ↗</button></h2><div class="occupants"></div></section>
         <section class="room" data-room="Lounge"><h2><button class="room-hotspot" data-space="Lounge" aria-label="Explorar Lounge">LOUNGE ↗</button></h2><div class="occupants"></div></section>
         <section class="room" data-room="Meeting Room"><h2><button class="room-hotspot" data-space="Meeting Room" aria-label="Explorar Meeting Room">MEETING ROOM ↗</button></h2><div class="occupants"></div></section>
+        <button id="sceneDataCenter" class="control-zone" aria-label="Data Center: consultar estado do serviço">DATA CENTER ↗</button>
+        <button id="sceneWarRoom" class="control-zone" aria-label="War Room: consultar portfólio e contas">WAR ROOM ↗</button>
+        <button id="sceneMarketAnalysis" class="control-zone" aria-label="Análise de mercado: consultar dados recebidos">ANÁLISE DE MERCADO ↗</button>
       </section>
     </div>
     <div id="unmapped" aria-label="Agentes em salas não reconhecidas"></div>
@@ -59,7 +62,7 @@
   <p>Enquadre todas as salas ou amplie para explorar os detalhes. A arte mantém suas proporções.</p>
   <label for="viewScale">Visualização</label><select id="viewScale"><option value="fit">Ajustar tudo à tela</option><option value="width">Preencher largura · rolagem vertical</option><option value="50">50% da cena</option><option value="75">75% da cena</option><option value="100">100% da cena</option><option value="125">125% da cena</option></select>
   <label for="viewLayout">Composição dos painéis</label><select id="viewLayout"><option value="auto">Automática · aproveita a altura disponível</option><option value="reference">Referência · mercado acima, atividade abaixo</option></select>
-  <label for="viewResolution">Resolução da cena</label><select id="viewResolution"><option value="960">960 × 640 · compacto</option><option value="1280">1280 × 853</option><option value="1536" selected>1536 × 1024 · original</option><option value="1920">1920 × 1280</option><option value="2560">2560 × 1707</option></select>
+  <label for="viewResolution">Resolução da cena</label><select id="viewResolution"><option value="960">960 × 440 · compacto</option><option value="1280">1280 × 587</option><option value="1536">1536 × 704</option><option value="1852" selected>1852 × 849 · original</option><option value="1920">1920 × 880</option><option value="2560">2560 × 1174</option></select>
   <small>O tamanho da cena afeta as opções percentuais. Ajustar à tela usa o espaço disponível; estas opções não alteram a resolução do seu monitor.</small>
   <p id="displayStatus" role="status"></p><button id="resetDisplay">Restaurar ajuste automático</button>
 </dialog>

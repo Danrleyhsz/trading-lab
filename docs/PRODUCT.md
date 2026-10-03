@@ -70,4 +70,6 @@ Agents now sit at their assigned computers when their actual room matches. An id
 
 ## Functional priority — 2026-10-03
 
+Later explicit request delivered original panoramic reference art and complete viewport/scale controls before resuming this functional priority. Nine visual areas include three shortcuts to actual service/portfolio/market panels, without adding backend rooms. Seated owners, monitors and floor approaches retain real room/state evidence. See OFFICE_REFERENCE_SCENE.md for current art and remaining fidelity limits.
+
 The human approved the current office preview and deferred further graphic polish in favor of working functionality. Prioritize complete, auditable research/study/risk/paper/result workflows and safe online operation. New spot research shows its next-open calculation model and recorded simulated fees; old unversioned results keep their original metrics and coverage gap. No historical screen is account P&L or automatic strategy promotion. See SPOT_BACKTEST_ACCOUNTING.md.

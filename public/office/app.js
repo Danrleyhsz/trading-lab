@@ -114,10 +114,11 @@ function renderStations(){
   if(!view){
    const monitor=node('button',''),name=node('b',''),state=node('small',''),chair=node('span','');
    monitor.className='station-monitor';monitor.dataset.station=station.id;monitor.append(name,state);
-   monitor.setAttribute('style','left:'+station.mx/1536*100+'%;top:'+station.my/1024*100+'%');
+   const {width,height}=OfficeNavigation.scene;
+   monitor.setAttribute('style','left:'+station.mx/width*100+'%;top:'+station.my/height*100+'%');
    monitor.onclick=()=>profile(station.id);
    chair.className='station-chair'+(station.room==='Research Lab'?' research-chair':'');chair.setAttribute('aria-hidden','true');
-   chair.setAttribute('style','left:'+station.cx/1536*100+'%;top:'+station.cy/1024*100+'%;width:'+station.cw/1536*100+'%;height:'+station.ch/1024*100+'%;background-position:-'+station.cx/1536*100+'cqw -'+station.cy/1536*100+'cqw');
+   chair.setAttribute('style','left:'+station.cx/width*100+'%;top:'+station.cy/height*100+'%;width:'+station.cw/width*100+'%;height:'+station.ch/height*100+'%;background-position:-'+station.cx/width*100+'cqw -'+station.cy/width*100+'cqw');
    q('#office').append(monitor,chair);view={monitor,name,state,chair};stationViews.set(station.id,view);
   }
   const agent=agents.get(station.id),occupant=OfficeWorkstations.seat(agent),p=stationProjection(agent);
@@ -423,6 +424,9 @@ q('#navFinance').onclick = () => openPanel('financePanel','Portfólio e contas',
 q('#navMarket').onclick = () => openPanel('marketPanel','Mercado observado','navMarket');
 q('#navResearch').onclick = () => openPanel('researchPanel','Pesquisa, estudos e risco','navResearch');
 q('#navAccess').onclick = () => openPanel('accessPanel','Acesso ao painel','navAccess');
+q('#sceneDataCenter').onclick = () => openPanel('accessPanel','Data Center · estado do serviço','navAccess');
+q('#sceneWarRoom').onclick = () => openPanel('financePanel','War Room · portfólio e contas','navFinance');
+q('#sceneMarketAnalysis').onclick = () => openPanel('marketPanel','Análise de mercado','navMarket');
 q('#openControls').onclick = q('#navResearch').onclick;
 q('#closeWorkspace').onclick = () => q('#workspaceDialog').close();
 q('#workspaceDialog').addEventListener('close', () => {

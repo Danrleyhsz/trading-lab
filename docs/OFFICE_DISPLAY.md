@@ -1,5 +1,11 @@
 # Office framing and reference fidelity
 
+## Current panoramic scene
+
+OFFICE_REFERENCE_SCENE.md supersedes the historical six-room/3:2 art description below. Active original artwork is 1852×849 with nine visual areas, six authoritative backend rooms, eight realigned workstations and three read-panel shortcuts. Fit/width/percentage controls preserve this new ratio; native source width 1852 is added to the existing bounded choices. Old assets remain archived. The following section records the earlier framing increment and its then-pending art work.
+
+## Earlier framing increment
+
 The human explicitly requested an entire-office overview, scene resolution choices and the closest possible fidelity to the supplied initial concept. This concrete display request supersedes the preceding graphics-deferred priority; functional development remains next after this increment.
 
 ## Whole-screen overview

@@ -1,15 +1,15 @@
 // Original read-only workstation geometry and state projection; no execution capability.
 (() => {
  const catalog=[
-  {id:'atlas',room:'Research Lab',x:149,y:390,mx:150,my:287,cx:133,cy:342,cw:33,ch:30},
-  {id:'satoshi',room:'Research Lab',x:270,y:390,mx:272,my:287,cx:253,cy:342,cw:34,ch:30},
-  {id:'oracle',room:'Research Lab',x:390,y:390,mx:390,my:287,cx:373,cy:342,cw:34,ch:30},
-  {id:'nova',room:'Trading Floor',x:611,y:392,mx:611,my:299,cx:594,cy:344,cw:35,ch:29},
-  {id:'flux',room:'Trading Floor',x:928,y:392,mx:928,my:299,cx:911,cy:344,cw:35,ch:29},
-  {id:'sentinel',room:'Risk Desk',x:1256,y:394,mx:1264,my:299,cx:1238,cy:346,cw:36,ch:30},
-  {id:'euler',room:'Quant Lab',x:138,y:811,mx:145,my:702,cx:121,cy:763,cw:34,ch:32},
-  {id:'vega',room:'Quant Lab',x:320,y:811,mx:321,my:703,cx:303,cy:763,cw:34,ch:32}
- ].map(s=>Object.freeze({...s,point:Object.freeze({x:s.x/1536*100,y:s.y/1024*100})}));Object.freeze(catalog);
+  {id:'atlas',room:'Research Lab',x:174,y:299,mx:174,my:196,cx:151,cy:237,cw:45,ch:38},
+  {id:'satoshi',room:'Research Lab',x:346,y:299,mx:346,my:196,cx:323,cy:237,cw:45,ch:38},
+  {id:'oracle',room:'Research Lab',x:519,y:299,mx:519,my:196,cx:496,cy:237,cw:45,ch:38},
+  {id:'nova',room:'Trading Floor',x:760,y:300,mx:760,my:198,cx:738,cy:238,cw:48,ch:40},
+  {id:'flux',room:'Trading Floor',x:1125,y:300,mx:1125,my:198,cx:1102,cy:238,cw:48,ch:40},
+  {id:'sentinel',room:'Risk Desk',x:1442,y:300,mx:1442,my:194,cx:1416,cy:238,cw:48,ch:40},
+  {id:'euler',room:'Quant Lab',x:204,y:543,mx:204,my:434,cx:180,cy:477,cw:45,ch:37},
+  {id:'vega',room:'Quant Lab',x:406,y:543,mx:406,my:434,cx:383,cy:477,cw:47,ch:38}
+ ].map(s=>Object.freeze({...s,point:Object.freeze({x:s.x/OfficeNavigation.scene.width*100,y:s.y/OfficeNavigation.scene.height*100})}));Object.freeze(catalog);
  const labels={IDLE:'Sem tarefa',RESEARCHING:'Pesquisando',BACKTESTING:'Backtest',TRADING:'Paper',REVIEWING_RISK:'Risco',MEETING:'Reunião'};
  function seat(agent){return catalog.find(s=>s.id===agent?.id&&s.room===agent.room)||null;}
  function project(agent,{observedAt=0,connected=false,now=Date.now(),events=[]}={}){
