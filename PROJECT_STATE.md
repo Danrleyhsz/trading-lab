@@ -101,3 +101,5 @@ Architecture skeleton + market-data ingestion + paper broker contract + event sc
 - Fund, legacy evaluations and USD-M evaluations remain separate. Existing snapshots/events are unchanged; projections are cached by append-only ledger version.
 - Bounded read-only audit pages and the most recent 20 outcomes per account are available through profiles. The office shows source IDs, fees/funding and genuine equity samples.
 - Validation: typecheck and 76-test suite passed locally with the PostgreSQL integration deferred to the CI service; no execution was enabled for development preview.
+
+CI checkpoint: PR #21 completed with 76 tests passing, zero skipped, including PostgreSQL integration, typecheck, build and cloud-container build. PR #20 also passed its complete CI. Desktop profile verification confirmed no invented account, closed operations, memories or win rate in the unconfigured development preview. See docs/DEVELOPMENT_QUEUE.md for the next steps and actual remaining boundaries.

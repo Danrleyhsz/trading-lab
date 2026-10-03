@@ -26,3 +26,5 @@ Append-only version caching avoids sorting an unchanged ledger on each price upd
 Profiles show account-level completed operations, opening/closing times, gross/net price result, fees, funding and source IDs. The finance panel charts only persisted equity observations, at their actual timestamps. Sample coverage is up to the existing 1440 minute bins; no pre-creation history or smooth synthetic candles are inserted.
 
 These features do not authorize autonomous fund trading, establish exchange liquidation parity, provision cloud services or call an AI provider.
+
+CI verification: PR #21 passed all 76 tests (zero skipped), typecheck, build and Docker image. The isolated preview kept evaluation/execution disabled and exposed null win rate with no closed account operations.
