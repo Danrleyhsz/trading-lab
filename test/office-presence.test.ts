@@ -1,0 +1,21 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import vm from 'node:vm';
+function environment(){const callbacks=new Map<number,()=>void>();let sequence=0;const cancelled:number[]=[];const context=vm.createContext({document:{activeElement:null},setTimeout:(fn:()=>void)=>{callbacks.set(++sequence,fn);return sequence;},clearTimeout:(id:number)=>{cancelled.push(id);callbacks.delete(id);}});vm.runInContext(readFileSync('public/office/presence.js','utf8'),context);return {api:context.OfficePresence,callbacks,cancelled};}
+test('cosmetic floor lanes are bounded and unknown rooms never get a fabricated location',()=>{
+ const {api}=environment();for(const room of ['Research Lab','Quant Lab','Trading Floor','Risk Desk','Meeting Room','Lounge'])for(let slot=0;slot<8;slot++){
+  const point=api.floorPoint(room,slot),path=api.idlePath(room,slot,'atlas',300,280);assert.ok(point.x>=10&&point.x<=90);assert.ok(point.y>=86&&point.y<=94);for(const p of path){assert.ok(Math.abs(p.x)<=12);assert.ok(Math.abs(p.y)<=4);}assert.equal(path.at(-1).x,0);assert.equal(path.at(-1).y,0);
+ }assert.equal(api.floorPoint('unknown',0),null);assert.equal(api.idlePath('unknown',0,'atlas',300,280).length,0);assert.equal(api.idlePath('Research Lab',0,'atlas',0,280).length,0);
+});
+test('idle presentation reuses one timer and actual task/room changes cancel previous motion',()=>{
+ const h=environment(),agent={id:'atlas',room:'Research Lab',status:'IDLE',experience:0},original=structuredClone(agent);let cancels=0;const animations:any[]=[];
+ const entry:any={button:{dataset:{},animate:(frames:unknown)=>{const animation={frames,cancel:()=>{cancels++;},onfinish:undefined};animations.push(animation);return animation;}}},host={getBoundingClientRect:()=>({width:300,height:280})};
+ const director=new h.api.Director(()=>true);director.update(entry,agent,0,host);director.update(entry,agent,0,host);assert.equal(h.callbacks.size,1);h.callbacks.get(entry.timer)!();assert.equal(entry.button.dataset.pose,'walk');assert.equal(animations.length,1);assert.deepEqual(agent,original);
+ director.update(entry,{...agent,status:'RESEARCHING'},0,host);assert.equal(cancels,1);assert.equal(entry.button.dataset.pose,'task');animations[0].onfinish();assert.equal(entry.animation,undefined);assert.equal(entry.button.dataset.pose,'task');
+});
+test('pause/reduced-motion/visibility gate cancels timers and stale callbacks without domain mutations',()=>{
+ const h=environment();let enabled=true,walks=0;const agent={id:'atlas',room:'Research Lab',status:'IDLE',experience:0},entry:any={button:{dataset:{},animate:()=>{walks++;return {cancel(){}}}}},host={getBoundingClientRect:()=>({width:300,height:280})};const director=new h.api.Director(()=>enabled);
+ director.update(entry,agent,0,host);const callback=h.callbacks.get(entry.timer)!;enabled=false;director.update(entry,agent,0,host);callback();assert.equal(walks,0);assert.equal(entry.timer,undefined);assert.equal(agent.status,'IDLE');assert.equal(agent.experience,0);
+ enabled=true;director.update(entry,agent,0,host);const currentTimer=entry.timer;assert.ok(currentTimer!==undefined);callback();assert.equal(entry.timer,currentTimer);assert.equal(walks,0);
+});

@@ -76,7 +76,7 @@ function renderFinancialOverview(data) {
   if (!count) {positions.textContent = 'Nenhuma posição aberta registrada.';positions.className='empty-state';} else positions.className='';
   if (!performance.children.length) {performance.textContent = 'Contas de avaliação ainda não configuradas.';performance.className='empty-state';} else performance.className='';
 }
-function openPanel(panel, title, navId) {
+function openPanel(panel, title, navId) { stopPresence();
   for (const id of ['agentsPanel','financePanel','marketPanel','researchPanel','historyPanel','accessPanel']) q('#'+id).hidden = id !== panel;
   q('#workspaceTitle').textContent = title;
   for (const id of ['navOffice','navAgents','navFinance','navMarket','navResearch','navHistory','navAccess']) {
@@ -108,40 +108,36 @@ function sprite(element, id) {
   if (index < 0) { element.hidden = true; return; }
   element.setAttribute('style', 'background-position:' + ((index % 4) * 100 / 3) + '% ' + (index < 4 ? 0 : 100) + '%');
 }
-function render(movingId) { const focusedAgent = document.activeElement?.dataset?.agentId;
-  const positions = new Map();
-  document.querySelectorAll('.agent').forEach(button => {
-    if (button.getBoundingClientRect) positions.set(button.dataset.agentId, {rect:button.getBoundingClientRect(), room:button.dataset.room});
-  });
-  document.querySelectorAll('.occupants').forEach(element => element.replaceChildren());
-  q('#unmapped').replaceChildren();
-  q('#agentList').replaceChildren();
-  const slots = new Map();
-  for (const agent of agents.values()) {
-    const button = node('button', '');
-    button.className = 'agent';button.dataset.agentId = agent.id;button.dataset.status = agent.status;button.dataset.room = agent.room;
-    const avatar = node('span', '');avatar.className = 'sprite';avatar.setAttribute('aria-hidden','true');sprite(avatar, agent.id);
-    button.append(avatar, node('b', agent.name), node('small', statusLabels[agent.status] || agent.status));
-    button.onclick = () => profile(agent.id);
-    button.setAttribute('aria-label', agent.name + ', ' + agent.room + ', ' + (statusLabels[agent.status] || agent.status));
-    button.setAttribute('title', agent.lastReason || 'Nenhuma atividade registrada');
-    const room = [...document.querySelectorAll('[data-room]')].find(element => element.dataset.room === agent.room);
-    const slot = slots.get(agent.room) || 0;slots.set(agent.room, slot + 1);
-    const x = [22, 53, 83, 22, 53, 83, 22, 53][slot % 8];
-    const y = [78, 78, 78, 47, 47, 47, 29, 29][slot % 8];
-    button.setAttribute('style', 'left:' + x + '%;top:' + y + '%');
-    (room?.querySelector('.occupants') || q('#unmapped')).append(button);if (agent.id === focusedAgent) button.focus?.({preventScroll:true});
-    const old = positions.get(agent.id);
-    // Only a backend room transition animates travel; idle characters never invent work.
-    if (agent.id === movingId && old && old.room !== agent.room && button.animate && !globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
-      const next = button.getBoundingClientRect();
-      button.animate([{translate:(old.rect.left-next.left)+'px '+(old.rect.top-next.top)+'px'}, {translate:'0px 0px'}], {duration:500,easing:'ease-out'});
-    }
-    const row = node('button', agent.name + ' · ' + agent.room + ' · ' + (statusLabels[agent.status] || agent.status));
-    row.onclick = () => profile(agent.id);q('#agentList').append(row);
+const agentViews=new Map();let presenceEnabled=true;
+const reducedMotion=globalThis.matchMedia?.('(prefers-reduced-motion: reduce)');
+const presence=new OfficePresence.Director(()=>presenceEnabled&&!reducedMotion?.matches&&!document.hidden&&!['#profile','#workspaceDialog','#roomDialog','#auditDialog','#studyDialog'].some(id=>q(id).open));
+function stopPresence(){for(const view of agentViews.values())presence.stop(view);}
+function render(movingId){
+ const focusedAgent=document.activeElement?.dataset?.agentId,slots=new Map();q('#agentList').replaceChildren();
+ for(const [id,view] of agentViews)if(!agents.has(id)){presence.stop(view);view.button.remove();agentViews.delete(id);}
+ for(const agent of agents.values()){
+  let view=agentViews.get(agent.id);
+  if(!view){
+   const button=node('button',''),avatar=node('span',''),label=node('b',''),status=node('small',''),shadow=node('span','');
+   button.className='agent';avatar.className='sprite';shadow.className='foot-shadow';avatar.setAttribute('aria-hidden','true');shadow.setAttribute('aria-hidden','true');sprite(avatar,agent.id);button.append(avatar,label,status,shadow);button.onclick=()=>profile(agent.id);
+   view={button,avatar,label,status};agentViews.set(agent.id,view);
   }
-  q('#activeAgents').textContent = [...agents.values()].filter(agent => agent.status !== 'IDLE').length + ' / ' + agents.size;
-  if (selected) renderState();
+  const oldRoom=view.button.dataset.room;
+  const button=view.button;button.dataset.agentId=agent.id;button.dataset.status=agent.status;button.dataset.room=agent.room;view.label.textContent=agent.name;view.status.textContent=statusLabels[agent.status]||agent.status;
+  button.setAttribute('aria-label',agent.name+', '+agent.room+', '+(statusLabels[agent.status]||agent.status));button.setAttribute('title',agent.lastReason||'Disponível; sem atividade registrada');
+  const room=[...document.querySelectorAll('.room[data-room]')].find(element=>element.dataset.room===agent.room),host=room?.querySelector('.occupants')||q('#unmapped');
+  const slot=slots.get(agent.room)||0;slots.set(agent.room,slot+1);const point=OfficePresence.floorPoint(agent.room,slot)||{x:50,y:88};
+  if(button.parentElement!==host)host.append(button);button.setAttribute('style','left:'+point.x+'%;top:'+point.y+'%');
+  presence.update(view,agent,slot,host);
+  // Room changes use a brief arrival effect; the painted walls are not a collision map.
+  if(oldRoom&&oldRoom!==agent.room&&button.animate&&presenceEnabled&&!reducedMotion?.matches){button.animate([{opacity:.25},{opacity:1}],{duration:350});}
+  if(agent.id===focusedAgent)button.focus?.({preventScroll:true});
+  const row=node('button',agent.name+' · '+agent.room+' · '+(statusLabels[agent.status]||agent.status));row.onclick=()=>profile(agent.id);q('#agentList').append(row);
+ }
+ q('#office').dataset.presence=presenceEnabled&&!reducedMotion?.matches?'on':'off';
+ q('#togglePresence').textContent=reducedMotion?.matches?'Movimento reduzido':presenceEnabled?'Pausar animações':'Animar escritório';q('#togglePresence').disabled=!!reducedMotion?.matches;q('#togglePresence').setAttribute('aria-pressed',String(presenceEnabled&&!reducedMotion?.matches));
+ q('#activeAgents').textContent=[...agents.values()].filter(agent=>agent.status!=='IDLE').length+' / '+agents.size;
+ if(selected)renderState();if(inspectedRoom&&q('#roomDialog').open)renderRoom();
 }
 function renderState() {
   const agent = agents.get(selected);
@@ -153,7 +149,7 @@ function renderState() {
   q('#updated').textContent = 'Estado atualizado pelo backend: ' + date(agent.updatedAt);
 }
 async function profile(id) {
-  selected = id;
+  stopPresence();selected = id;
   q('#profile').showModal();
   renderState();
   await details();
@@ -399,7 +395,7 @@ function eventLabel(record){const p=record.payload||{};return (eventLabels[recor
 function sourceButton(id,received){const button=node('button','Abrir evento de origem · '+id);button.className='source-link';button.dataset.eventId=id;button.onclick=()=>showEvent(id,received);return button;}
 function renderSessionEvents(){const focus=document.activeElement?.dataset?.eventId,buttons=[];q('#events').replaceChildren(...events.map(record=>{const li=node('li',''),button=node('button',date(record.occurredAt)+' · '+eventLabel(record));button.className='event-button';button.dataset.eventId=record.id;button.onclick=()=>showEvent(record.id,record);li.append(button);buttons.push(button);return li;}));buttons.find(button=>button.dataset.eventId===focus)?.focus?.({preventScroll:true});}
 function outcomeCard(trade){const row=node('article','');row.className='trade-outcome';row.append(node('b',trade.symbol+' '+trade.direction+' · '+money(trade.netPnl)),node('p',date(trade.openedAt)+' → '+date(trade.closedAt)),node('small','P&L bruto '+money(trade.grossPnl)+' · taxas '+money(trade.feesPaid)+' · funding '+money(trade.fundingCashDelta)));for(const id of trade.fillEventIds||[])row.append(sourceButton(id));for(const id of trade.fundingEventIds||[]){row.append(node('small','Funding registrado'));row.append(sourceButton(id));}return row;}
-function openAudit(){const dialog=q('#auditDialog');if(!dialog.open){auditOpener=document.activeElement;dialog.showModal();}}
+function openAudit(){stopPresence();const dialog=q('#auditDialog');if(!dialog.open){auditOpener=document.activeElement;dialog.showModal();}}
 function resetAudit(title,status){q('#auditTitle').textContent=title;q('#auditStatus').textContent=status;q('#auditContent').replaceChildren();q('#auditOlder').hidden=true;q('#auditOlder').disabled=true;q('#auditBack').hidden=true;}
 function eventAccount(record){const p=record.payload||{};return p.accountId||p.order?.accountId||p.fill?.accountId;}
 function renderEvent(record,durable){
@@ -440,3 +436,54 @@ q('#reloadEvents').onclick=()=>loadEventHistory();q('#eventType').onchange=()=>l
 q('#auditOlder').onclick=()=>{if(auditCursor&&auditAccount)openAccountAudit(auditAccount,auditCursor);};
 function configureAuditBack(){if(auditReturn){q('#auditBack').hidden=false;q('#auditBack').onclick=()=>{auditVersion++;auditReturn();};}}
 q('#closeAudit').onclick=()=>q('#auditDialog').close();q('#auditDialog').addEventListener('close',()=>{auditVersion++;auditReturn=null;auditAccount=null;auditCursor=null;if(auditOpener?.isConnected)auditOpener.focus?.({preventScroll:true});else if(q('#profile').open)q('#closeProfile').focus?.();else if(q('#workspaceDialog').open)q('#closeWorkspace').focus?.();else (document.querySelector('.nav.active')||q('#navOffice')).focus?.();auditOpener=null;});
+
+let inspectedRoom=null,communicationVersion=0,communicationBusy=false,communicationReady=false;
+let communications=[],seenCommunications=new Set();
+const messageKinds={HYPOTHESIS:'Hipótese',BACKTEST_RESULT:'Resultado de teste',RISK_REVIEW:'Revisão de risco',EXECUTION_PLAN:'Plano de execução',PORTFOLIO_DECISION:'Decisão de portfólio',RESEARCH_FINDING:'Achado de pesquisa'};
+const roomInfo={
+ 'Research Lab':{description:'Biblioteca e coordenação de hipóteses. Consulte evidências e pesquisas registradas.',action:'Abrir pesquisas',panel:'researchPanel',nav:'navResearch'},
+ 'Quant Lab':{description:'Bancada de testes históricos. Resultados positivos, negativos e falhas ficam preservados.',action:'Abrir estudos históricos',panel:'researchPanel',nav:'navResearch'},
+ 'Trading Floor':{description:'Mesas de execução paper. As contas de avaliação e o fundo possuem capital separado.',action:'Ver operações e contas',panel:'financePanel',nav:'navFinance'},
+ 'Risk Desk':{description:'Quadro de risco determinístico. Uma animação ou conversa não aprova uma ordem.',action:'Ver controles de risco',panel:'researchPanel',nav:'navResearch'},
+ 'Meeting Room':{description:'Mesa de colaboração. As mensagens abaixo são comunicações estruturadas realmente registradas.',action:'Ver equipe',panel:'agentsPanel',nav:'navAgents'},
+ 'Lounge':{description:'Área de convivência do cenário. Movimentos de presença são visuais e não alteram o trabalho ou a experiência.',action:'Ver equipe',panel:'agentsPanel',nav:'navAgents'}
+};
+function openRoom(room){if(!roomInfo[room])return;stopPresence();inspectedRoom=room;renderRoom();q('#roomDialog').showModal();refreshCommunications();}
+function messageCard(message,controls=[]){
+ const li=node('li',''),line=node('div','');line.className='message-participants';
+ for(const [index,id] of [message.from,...message.to].entries()){if(index===1)line.append(node('span','→'));else if(index>1)line.append(node('span',','));const button=node('button',agents.get(id)?.name||id);button.dataset.agentId=id;button.dataset.roomControl='message:'+message.id+':'+index;button.onclick=()=>{q('#roomDialog').close();profile(id);};line.append(button);controls.push(button);}
+ li.append(line,node('b',messageKinds[message.kind]),node('p',message.summary),node('small',date(message.createdAt)+' · '+message.id));return li;
+}
+function renderRoom(){
+ const focused=document.activeElement?.dataset?.roomControl,controls=[];const room=inspectedRoom,info=roomInfo[room];if(!info)return;q('#roomTitle').textContent=room;q('#roomDescription').textContent=info.description;
+ const people=q('#roomPeople');people.replaceChildren();const occupants=[...agents.values()].filter(a=>a.room===room);
+ for(const agent of occupants){const button=node('button',''),portrait=node('span','');portrait.className='sprite';portrait.setAttribute('aria-hidden','true');sprite(portrait,agent.id);button.append(portrait,node('b',agent.name),node('small',statusLabels[agent.status]||agent.status));button.dataset.roomControl='person:'+agent.id;button.onclick=()=>{q('#roomDialog').close();profile(agent.id);};people.append(button);controls.push(button);}
+ if(!occupants.length)people.textContent='Nenhum agente nesta sala no estado recebido.';
+ const actions=q('#roomActions');actions.replaceChildren();const action=node('button',info.action);action.onclick=()=>{q('#roomDialog').close();openPanel(info.panel,info.action,info.nav);};action.dataset.roomControl='action';actions.append(action);controls.push(action);
+ const messages=room==='Meeting Room'?communications:communications.filter(m=>occupants.some(a=>a.id===m.from||m.to.includes(a.id)));
+ const list=q('#roomMessages'),rows=messages.slice().reverse().map(message=>messageCard(message,controls));list.replaceChildren(...rows);if(focused&&q('#roomDialog').open)(controls.find(button=>button.dataset.roomControl===focused)||q('#closeRoom')).focus?.({preventScroll:true});
+ q('#roomMessageStatus').textContent=communicationReady?(messages.length?'Comunicações registradas · horário e participantes originais.':'Nenhuma comunicação registrada para esta sala.'):'Comunicações indisponíveis ou ainda não recebidas.';
+}
+function clearSpeech(){for(const view of agentViews.values()){view.speech?.remove();view.speech=null;if(view.speechTimer!==undefined)clearTimeout(view.speechTimer);view.speechTimer=undefined;}}
+function showMessage(message){
+ const view=agentViews.get(message.from);if(!view)return;view.speech?.remove();if(view.speechTimer!==undefined)clearTimeout(view.speechTimer);
+ const speech=node('span',(messageKinds[message.kind]||message.kind)+' → '+message.to.map(id=>agents.get(id)?.name||id).join(', '));speech.className='recorded-speech';speech.setAttribute('title',message.summary+' · '+date(message.createdAt));speech.setAttribute('aria-hidden','true');view.button.append(speech);view.speech=speech;
+ view.speechTimer=setTimeout(()=>{if(view.speech===speech){speech.remove();view.speech=null;view.speechTimer=undefined;}},8000);
+}
+async function refreshCommunications(){
+ if(communicationBusy)return;communicationBusy=true;const version=++communicationVersion;
+ try{
+  const data=await get('/agent-messages');if(version!==communicationVersion)return;if(!Array.isArray(data))throw Error('invalid communications');
+  const recent=data.slice(-20);if(recent.some(m=>typeof m.id!=='string'||!m.id||!spriteIds.includes(m.from)||!Array.isArray(m.to)||!m.to.length||m.to.some(id=>!spriteIds.includes(id))||!messageKinds[m.kind]||typeof m.summary!=='string'||!Number.isFinite(Date.parse(m.createdAt))))throw Error('invalid communication evidence');
+  const initial=!communicationReady;communications=recent;
+  if(!initial)for(const message of recent){const age=Date.now()-Date.parse(message.createdAt);if(!seenCommunications.has(message.id)&&age>=0&&age<=30000)showMessage(message);}
+  seenCommunications=new Set(recent.map(m=>m.id));communicationReady=true;
+ }catch{communications=[];communicationReady=false;clearSpeech();}
+ finally{communicationBusy=false;if(inspectedRoom)renderRoom();}
+}
+q('#togglePresence').onclick=()=>{presenceEnabled=!presenceEnabled;stopPresence();render();};
+q('#openCollaboration').onclick=()=>openRoom('Meeting Room');q('#closeRoom').onclick=()=>q('#roomDialog').close();
+for(const button of document.querySelectorAll('button[data-space]'))button.onclick=()=>openRoom(button.dataset.space);
+for(const id of ['#roomDialog','#profile','#workspaceDialog','#auditDialog','#studyDialog'])q(id).addEventListener('close',()=>render());
+document.addEventListener?.('visibilitychange',()=>{stopPresence();render();});reducedMotion?.addEventListener?.('change',()=>{stopPresence();render();});
+refreshCommunications();setInterval(refreshCommunications,5000);

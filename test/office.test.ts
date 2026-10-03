@@ -5,19 +5,21 @@ import vm from 'node:vm';
 
 class Element {
   hidden=false; textContent=''; children:Element[]=[]; dataset:Record<string,string>={}; onclick?:()=>void;
-  append(...items:Element[]){this.children.push(...items)}
-  replaceChildren(...items:Element[]){this.children=items}
+  parentElement?:Element; remove(){if(this.parentElement)this.parentElement.children=this.parentElement.children.filter(item=>item!==this);this.parentElement=undefined}
+  append(...items:Element[]){for(const item of items){item.remove();item.parentElement=this;this.children.push(item)}}
+  replaceChildren(...items:Element[]){for(const child of this.children)child.parentElement=undefined;this.children=[];this.append(...items)}
   listeners:Record<string,Array<()=>void>>={};open=false;focusCalls=0;isConnected=true;
   setAttribute(){} addEventListener(name:string,fn:()=>void){(this.listeners[name]??=[]).push(fn)} showModal(){this.open=true} close(){this.open=false;for(const fn of this.listeners.close??[])fn()} focus(){this.focusCalls++}
   querySelector(){return this.children[0]}
 }
-function harness(overrides:Record<string,unknown>={}){
+function harness(overrides:Record<string,unknown>={},reduceMotion=false){
   const ids=new Map<string,Element>();
   const rooms=['Research Lab','Quant Lab','Trading Floor','Risk Desk','Meeting Room','Lounge'].map(room=>{const n=new Element();n.dataset.room=room;n.append(new Element());return n});
   let socket:any;
-  const document={createElement:()=>new Element(),querySelector:(s:string)=>{if(!ids.has(s))ids.set(s,new Element());return ids.get(s)},querySelectorAll:(s:string)=>s==='.occupants'?rooms.map(n=>n.children[0]):rooms};
+  const document={createElement:()=>new Element(),querySelector:(s:string)=>{if(!ids.has(s))ids.set(s,new Element());return ids.get(s)},querySelectorAll:(s:string)=>s==='.occupants'?rooms.map(n=>n.children[0]):s==='button[data-space]'?[]:s==='.agent'?rooms.flatMap(n=>n.children[0].children):rooms};
   const requests:string[]=[];const intervals:Array<()=>void>=[];
-  const context=vm.createContext({document,location:{protocol:'https:',host:'example.test'},WebSocket:class{constructor(){socket=this}},fetch:async(url:string)=>{requests.push(url);return {ok:!(overrides[url] as any)?.httpError,status:(overrides[url] as any)?.httpError||200,json:async()=>Object.hasOwn(overrides,url)? await overrides[url] :url==='/finance'?{legacyAccounts:[{id:'fund',kind:'FUND',instrument:'LEGACY_PAPER_V1',initialCash:10000,portfolio:{equity:10000},feesPaid:0}],perpetualAccounts:[{id:'evaluation:nova:usdm',kind:'EVALUATION',instrument:'BINANCE_USDM:BTCUSDT',ownerAgentId:'nova',initialCash:5000,portfolio:{equity:4900},feesPaid:10,fundingCashDelta:-20,maxDrawdown:0.03,initialMargin:500,valuationFresh:false}]}:url==='/market/v3'?{status:'UNAVAILABLE',quote:null}:url==='/paper/perpetual/status'?{halted:false,executionEnabled:false,autonomous:{enabled:false,reason:'completed V2 study required'}}:url==='/backtests/v2/studies'?[]:url==='/agents'?[{id:'atlas',name:'Atlas',role:'Research',room:'Research Lab',status:'IDLE',experience:0,updatedAt:'2026-01-01'}]:url==='/research/runs'?[]:url==='/paper/accounts'?[{kind:'FUND',ownerAgentId:null,initialCash:10000,portfolio:{equity:10000},fills:0}]:url==='/portfolio'?{initialCash:10000,equity:10000,realizedPnl:0,unrealizedPnl:0}:url==='/market/latest'?{status:'waiting'}:{evidence:{observations:0,decisions:0,failures:0,lessons:0,sentMessages:0,strategyIds:[],recordedTransitions:0},coverage:{legacyTransitionsWithoutHistory:0,activitySince:null},memories:[],messages:[],activity:[]}}},setInterval:(callback:()=>void)=>{intervals.push(callback);return 0},setTimeout:()=>0,console});
+  const context=vm.createContext({matchMedia:()=>({matches:reduceMotion,addEventListener(){}}),document,location:{protocol:'https:',host:'example.test'},WebSocket:class{constructor(){socket=this}},fetch:async(url:string)=>{requests.push(url);return {ok:!(overrides[url] as any)?.httpError,status:(overrides[url] as any)?.httpError||200,json:async()=>Object.hasOwn(overrides,url)? await overrides[url] :url==='/finance'?{legacyAccounts:[{id:'fund',kind:'FUND',instrument:'LEGACY_PAPER_V1',initialCash:10000,portfolio:{equity:10000},feesPaid:0}],perpetualAccounts:[{id:'evaluation:nova:usdm',kind:'EVALUATION',instrument:'BINANCE_USDM:BTCUSDT',ownerAgentId:'nova',initialCash:5000,portfolio:{equity:4900},feesPaid:10,fundingCashDelta:-20,maxDrawdown:0.03,initialMargin:500,valuationFresh:false}]}:url==='/market/v3'?{status:'UNAVAILABLE',quote:null}:url==='/paper/perpetual/status'?{halted:false,executionEnabled:false,autonomous:{enabled:false,reason:'completed V2 study required'}}:url==='/backtests/v2/studies'?[]:url==='/agents'?[{id:'atlas',name:'Atlas',role:'Research',room:'Research Lab',status:'IDLE',experience:0,updatedAt:'2026-01-01'}]:url==='/agent-messages'?[]:url==='/research/runs'?[]:url==='/paper/accounts'?[{kind:'FUND',ownerAgentId:null,initialCash:10000,portfolio:{equity:10000},fills:0}]:url==='/portfolio'?{initialCash:10000,equity:10000,realizedPnl:0,unrealizedPnl:0}:url==='/market/latest'?{status:'waiting'}:{evidence:{observations:0,decisions:0,failures:0,lessons:0,sentMessages:0,strategyIds:[],recordedTransitions:0},coverage:{legacyTransitionsWithoutHistory:0,activitySince:null},memories:[],messages:[],activity:[]}}},setInterval:(callback:()=>void)=>{intervals.push(callback);return 0},setTimeout:()=>0,clearTimeout:()=>{},console});
+  vm.runInContext(readFileSync('public/office/presence.js','utf8'),context);
   vm.runInContext(readFileSync('public/office/app.js','utf8'),context);
   return {ids,rooms,requests,intervals,context,get socket(){return socket}};
 }
@@ -102,7 +104,7 @@ test('an older runtime diagnosis cannot undo a newer streamed source failure',as
 test('runtime diagnosis expires even when refreshing the network is still pending',async()=>{
  const report={mode:'PAPER_TRADING',observedAt:new Date().toISOString(),phase:'SERVING',environment:'PRODUCTION',controlPlaneReady:true,storage:{lastPersistedAt:null,pendingWrites:0},market:{perpetual:{status:'HEALTHY'}},paper:{newExposure:{ready:false,reasons:['PERPETUAL_EXECUTION_DISABLED']},autonomous:{ready:false}},jobs:{research:{busy:false},historical:{busy:false}},ai:{enabled:false}};
  const h=harness({'/runtime/readiness':report});await settle();assert.match(h.ids.get('#runtimeStatus')!.textContent,/Painel disponível/);
- vm.runInContext('Date.now = () => '+(Date.now()+20000),h.context);h.intervals.at(-1)!();assert.match(h.ids.get('#runtimeStatus')!.textContent,/indisponível ou desatualizado/);assert.equal(h.ids.get('#runtimeDetails')!.children.length,0);await settle();assert.match(h.ids.get('#runtimeStatus')!.textContent,/desatualizado/);
+ vm.runInContext('Date.now = () => '+(Date.now()+20000),h.context);h.intervals.forEach(callback=>callback());assert.match(h.ids.get('#runtimeStatus')!.textContent,/indisponível ou desatualizado/);assert.equal(h.ids.get('#runtimeDetails')!.children.length,0);await settle();assert.match(h.ids.get('#runtimeStatus')!.textContent,/desatualizado/);
 });
 test('partial diagnostics never invent idle tasks or a deployment environment',async()=>{
  const h=harness({'/runtime/readiness':{observedAt:new Date().toISOString(),phase:'SERVING',controlPlaneReady:true,storage:{},market:{},paper:{newExposure:{ready:true}},jobs:{},ai:{}}});await settle();assert.match(h.ids.get('#runtimeStatus')!.textContent,/indisponível/);assert.equal(h.ids.get('#runtimeDetails')!.children.length,0);
@@ -140,4 +142,39 @@ test('a new session event keeps the focused original event accessible by keyboar
 
 test('closing account audit returns focus inside the still-open parent panel if refresh replaced its opener',async()=>{
  const path='/paper/perpetual/accounts/evaluation%3Anova%3Ausdm/performance?limit=25',h=harness({[path]:{available:true,coverage:'RECORDED_LEDGER_ONLY',summary:{closedTrades:0,winRate:null,closedNetPnl:0},closedTrades:[],nextCursor:null}});await settle();h.ids.get('#navFinance')!.onclick!();const opener=buttons(h.ids.get('#finance')!.children[1]).find(button=>button.textContent==='Navegar operações desta conta')!;(h.context.document as any).activeElement=opener;opener.onclick!();await settle();opener.isConnected=false;h.ids.get('#closeAudit')!.onclick!();assert.equal(h.ids.get('#closeWorkspace')!.focusCalls,1);assert.equal(h.ids.get('#workspaceDialog')!.open,true);assert.equal(h.ids.get('#auditDialog')!.open,false);
+});
+
+test('stable living characters survive snapshot refresh and cosmetic controls never change backend work',async()=>{
+ const h=harness();await settle();const original=h.rooms[0].children[0].children[0];
+ h.intervals[0]();await settle();assert.equal(h.rooms[0].children[0].children[0],original);assert.equal(h.rooms[0].children[0].children.length,1);
+ h.ids.get('#togglePresence')!.onclick!();assert.equal(h.ids.get('#activeAgents')!.textContent,'0 / 1');assert.equal(h.rooms[0].children[0].children[0],original);assert.match(h.ids.get('#togglePresence')!.textContent,/Animar/);assert.equal(original.dataset.status,'IDLE');assert.equal(original.dataset.room,'Research Lab');assert.ok(!h.requests.some(url=>url.includes('/orders')));
+});
+test('interactive meeting room opens original communications and participants without invented chatter',async()=>{
+ const message={id:'stored-message',from:'atlas',to:['euler'],kind:'HYPOTHESIS',summary:'<img onerror=not-executable> Original hypothesis',createdAt:'2026-01-01T00:00:00Z',context:{source:'TEST_ONLY'}};
+ const h=harness({'/agent-messages':[message]});await settle();h.ids.get('#openCollaboration')!.onclick!();await settle();
+ assert.equal(h.ids.get('#roomDialog')!.open,true);assert.match(h.ids.get('#roomMessageStatus')!.textContent,/registradas/);assert.match(flatten(h.ids.get('#roomMessages')!),/stored-message/);assert.match(flatten(h.ids.get('#roomMessages')!),/<img onerror=not-executable>/);assert.equal(h.ids.get('#activeAgents')!.textContent,'0 / 1');assert.equal(h.rooms[0].children[0].children[0].children.some(c=>(c as any).className==='recorded-speech'),false);
+ const participant=buttons(h.ids.get('#roomMessages')!)[0];participant.onclick!();await settle();assert.equal(h.ids.get('#roomDialog')!.open,false);assert.equal(h.ids.get('#profile')!.open,true);assert.ok(h.requests.includes('/agents/atlas/profile'));
+});
+test('empty or failed communication remains explicit and cannot claim a meeting occurred',async()=>{
+ const h=harness();await settle();h.ids.get('#openCollaboration')!.onclick!();await settle();assert.match(h.ids.get('#roomMessageStatus')!.textContent,/Nenhuma comunicação registrada/);assert.equal(h.ids.get('#roomMessages')!.children.length,0);assert.equal(h.ids.get('#activeAgents')!.textContent,'0 / 1');
+ const failed=harness({'/agent-messages':{httpError:401}});await settle();failed.ids.get('#openCollaboration')!.onclick!();await settle();assert.match(failed.ids.get('#roomMessageStatus')!.textContent,/indisponíveis/);assert.equal(failed.ids.get('#roomMessages')!.children.length,0);
+});
+test('invalid communication participants or timestamps do not create visual characters or messages',async()=>{
+ for(const message of [{id:'bad',from:'unknown-agent',to:['atlas'],kind:'HYPOTHESIS',summary:'unverified',createdAt:'2026-01-01'}, {id:'bad',from:'atlas',to:['euler'],kind:'HYPOTHESIS',summary:'unverified',createdAt:'invalid'}]){
+  const h=harness({'/agent-messages':[message]});await settle();h.ids.get('#openCollaboration')!.onclick!();await settle();assert.match(h.ids.get('#roomMessageStatus')!.textContent,/indisponíveis/);assert.equal(h.ids.get('#roomMessages')!.children.length,0);assert.equal(h.ids.get('#activeAgents')!.textContent,'0 / 1');
+ }
+});
+test('only a newly observed recent original message creates a temporary speech indicator',async()=>{
+ const messages:any[]=[],h=harness({'/agent-messages':messages});await settle();const agent=h.rooms[0].children[0].children[0];
+ messages.push({id:'new-original',from:'atlas',to:['euler'],kind:'HYPOTHESIS',summary:'Actual test fixture message',createdAt:new Date().toISOString(),context:{}});
+ h.intervals.forEach(fn=>fn());await settle();assert.equal(agent.children.filter(c=>(c as any).className==='recorded-speech').length,1);assert.match(flatten(agent),/Hipótese → euler/);assert.equal(agent.dataset.status,'IDLE');assert.equal(h.ids.get('#activeAgents')!.textContent,'0 / 1');
+ const original=agent.children.find(c=>(c as any).className==='recorded-speech');h.intervals.forEach(fn=>fn());await settle();assert.equal(agent.children.find(c=>(c as any).className==='recorded-speech'),original);
+});
+test('room communication refresh preserves focused participants and safely closes with the actual state unchanged',async()=>{
+ const message={id:'focus-message',from:'atlas',to:['euler'],kind:'HYPOTHESIS',summary:'Original fixture',createdAt:'2026-01-01T00:00:00Z'},h=harness({'/agent-messages':[message]});await settle();h.ids.get('#openCollaboration')!.onclick!();await settle();
+ const participant=buttons(h.ids.get('#roomMessages')!)[0];(h.context.document as any).activeElement=participant;h.intervals.forEach(fn=>fn());await settle();
+ const updated=buttons(h.ids.get('#roomMessages')!)[0];assert.equal(updated.dataset.roomControl,participant.dataset.roomControl);assert.ok(updated.focusCalls>0);assert.match(flatten(h.ids.get('#roomMessages')!),/→/);h.ids.get('#closeRoom')!.onclick!();assert.equal(h.ids.get('#roomDialog')!.open,false);assert.equal(h.ids.get('#activeAgents')!.textContent,'0 / 1');
+});
+test('reduced-motion preference explicitly disables presentation without changing the backend status',async()=>{
+ const h=harness({},true);await settle();assert.equal(h.ids.get('#office')!.dataset.presence,'off');assert.equal(h.ids.get('#togglePresence')!.textContent,'Movimento reduzido');assert.equal((h.ids.get('#togglePresence') as any).disabled,true);assert.equal(h.ids.get('#activeAgents')!.textContent,'0 / 1');assert.equal(h.rooms[0].children[0].children[0].dataset.status,'IDLE');
 });

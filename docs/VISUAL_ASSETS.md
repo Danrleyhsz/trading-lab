@@ -7,7 +7,7 @@ Mode: built-in ImageGen; no external image API, account or private key. Original
 - public/office/office-scene.png: six-room, top-down pixel-art office background (1536 × 1024), derived from the user-approved visual reference.
 - public/office/agent-sprites.png: transparent 4 × 2 character atlas, ordered Atlas/Euler/Nova/Sentinel, then Satoshi/Flux/Vega/Oracle.
 - Raster art is decoration only. Quotes, charts, status labels, people placement, profiles, positions and financial figures are separate HTML/JS projections of real backend state. No reference-image financial figures or invented activity were imported.
-- Idle sprites are neutral; movement runs only on a received change of backend room. Reduced motion is respected.
+- The atlas contains one neutral pose per agent. The living-office increment permits cosmetic idle breathing and short local floor-lane movement, without asserting work or changing actual room/status. Real room changes use an arrival fade; full directional frames and collision-aware paths remain future work. Pause and reduced motion are respected.
 
 ## Scene art direction
 
@@ -32,3 +32,6 @@ Desktop agent click displayed actual role, room, transition count and empty pres
 The six-room scene follows the reference aesthetic, rather than copying its extra market-analysis rooms or unsupported ETH/order-book panels. There is no claim of live exchange-tier liquidation parity, agent AI integration or production deployment from the artwork.
 
 Validation: typecheck, build and 69-test suite completed; 68 passed locally and the PostgreSQL integration case requires the CI PostgreSQL service. JavaScript syntax and binary asset routes passed. Desktop and mobile browser review completed.
+
+## Living-office visual scope, 2026-10-03
+The approved scene/atlas are retained. Character elements survive refresh; all six room entrances open actual occupants and existing functions. Meeting Room displays original messages/participants. CSS idle/walk/task effects use the existing neutral atlas; they are not a new multi-frame sprite pack. Paths remain authored short front-floor lanes within the received actual room. No collision map, wall-crossing route or fictitious coffee/conversation/work event is claimed. Review OPEN_SOURCE_RESEARCH.md for licensing and LIVING_OFFICE_DESIGN.md for the next movement/interaction increment.

@@ -31,19 +31,19 @@
   </section>
   <div class="connection-bar"><span id="connection" role="status">Conectando…</span><span id="sync">Aguardando estado do sistema</span></div>
   <section class="office-shell" aria-label="Centro de controle em pixel art">
-    <div class="scene-caption"><span>ESCRITÓRIO / VISÃO GERAL</span><small>Clique em um agente para ver seu trabalho registrado</small></div>
+    <div class="scene-caption"><span>ESCRITÓRIO / VISÃO GERAL</span><div class="scene-tools"><button id="togglePresence" aria-pressed="true">Pausar animações</button><button id="openCollaboration">Colaboração</button></div></div>
     <div class="scene-scroll" tabindex="0" aria-label="Mapa das salas; em telas pequenas, deslize para explorar">
       <section id="office" aria-label="Salas do escritório">
-        <section class="room" data-room="Research Lab"><h2>RESEARCH LAB</h2><div class="occupants"></div></section>
-        <section class="room" data-room="Trading Floor"><h2>TRADING FLOOR</h2><div class="occupants"></div></section>
-        <section class="room" data-room="Risk Desk"><h2>RISK DESK</h2><div class="occupants"></div></section>
-        <section class="room" data-room="Quant Lab"><h2>QUANT LAB</h2><div class="occupants"></div></section>
-        <section class="room" data-room="Lounge"><h2>LOUNGE</h2><div class="occupants"></div></section>
-        <section class="room" data-room="Meeting Room"><h2>MEETING ROOM</h2><div class="occupants"></div></section>
+        <section class="room" data-room="Research Lab"><h2><button class="room-hotspot" data-space="Research Lab" aria-label="Explorar Research Lab">RESEARCH LAB ↗</button></h2><div class="occupants"></div></section>
+        <section class="room" data-room="Trading Floor"><h2><button class="room-hotspot" data-space="Trading Floor" aria-label="Explorar Trading Floor">TRADING FLOOR ↗</button></h2><div class="occupants"></div></section>
+        <section class="room" data-room="Risk Desk"><h2><button class="room-hotspot" data-space="Risk Desk" aria-label="Explorar Risk Desk">RISK DESK ↗</button></h2><div class="occupants"></div></section>
+        <section class="room" data-room="Quant Lab"><h2><button class="room-hotspot" data-space="Quant Lab" aria-label="Explorar Quant Lab">QUANT LAB ↗</button></h2><div class="occupants"></div></section>
+        <section class="room" data-room="Lounge"><h2><button class="room-hotspot" data-space="Lounge" aria-label="Explorar Lounge">LOUNGE ↗</button></h2><div class="occupants"></div></section>
+        <section class="room" data-room="Meeting Room"><h2><button class="room-hotspot" data-space="Meeting Room" aria-label="Explorar Meeting Room">MEETING ROOM ↗</button></h2><div class="occupants"></div></section>
       </section>
     </div>
     <div id="unmapped" aria-label="Agentes em salas não reconhecidas"></div>
-    <p class="scene-note">Os personagens refletem o estado do sistema. Salas vazias e agentes ociosos não representam tarefas em andamento.</p>
+    <p class="scene-note">Clique nas salas e personagens para explorar. Presença animada; trabalho e mensagens vêm do sistema.</p>
   </section>
   <section class="bottom-panels">
     <article class="panel"><h2><span class="status-dot"></span> Atividades recebidas</h2><small>Eventos reais desta sessão</small><ol id="events"><li>Nenhum evento de atividade recebido nesta sessão.</li></ol></article>
@@ -71,5 +71,7 @@
 </dialog>
 <dialog id="studyDialog" aria-labelledby="studyTitle"><button id="closeStudy" class="close" aria-label="Fechar estudo">×</button><h2 id="studyTitle">Estudo histórico</h2><div id="studyDetails"></div></dialog>
 <dialog id="auditDialog" aria-labelledby="auditTitle"><button id="closeAudit" class="close" aria-label="Fechar auditoria">×</button><h2 id="auditTitle">Auditoria</h2><p id="auditStatus" role="status"></p><button id="auditBack" hidden>Voltar às operações da conta</button><div id="auditContent"></div><button id="auditOlder" hidden>Ver operações anteriores</button></dialog>
+<dialog id="roomDialog" aria-labelledby="roomTitle"><button id="closeRoom" class="close" aria-label="Fechar sala">×</button><h2 id="roomTitle"></h2><p id="roomDescription"></p><div id="roomPeople" class="room-people"></div><div id="roomActions" class="room-actions"></div><h3>Comunicação entre agentes</h3><p id="roomMessageStatus" role="status"></p><ol id="roomMessages"></ol></dialog>
+<script src="/office/presence.js"></script>
 <script src="/office/app.js"></script>
 </body></html>
