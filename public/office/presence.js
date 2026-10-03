@@ -34,7 +34,7 @@
     const offsets=route.map(p=>({x:(p.x-start.x)*bounds.width/100,y:(p.y-start.y)*bounds.height/100}));
     const play=index=>{
      if(generation!==entry.generation)return;
-     if(!this.allowed()||entry.agent.status!=='IDLE'){this.stop(entry);return;}
+     if(!this.allowed()||entry.agent.status!=='IDLE'||entry.button===document.activeElement){this.stop(entry);return;}
      if(index>=offsets.length){entry.animation=undefined;entry.route=undefined;entry.button.dataset.pose='rest';entry.button.dataset.navigation='rest';this.update(entry,entry.agent,entry.slot,entry.host);return;}
      const from=offsets[index-1],to=offsets[index],dx=to.x-from.x,dy=to.y-from.y;
      entry.button.dataset.facing=Math.abs(dx)>=Math.abs(dy)?(dx<0?'left':'right'):(dy<0?'up':'down');

@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import vm from 'node:vm';
-function environment(){const callbacks=new Map<number,()=>void>();let sequence=0;const cancelled:number[]=[];const context=vm.createContext({document:{activeElement:null},setTimeout:(fn:()=>void)=>{callbacks.set(++sequence,fn);return sequence;},clearTimeout:(id:number)=>{cancelled.push(id);callbacks.delete(id);}});vm.runInContext(readFileSync('public/office/navigation.js','utf8'),context);vm.runInContext(readFileSync('public/office/presence.js','utf8'),context);vm.runInContext(readFileSync('public/office/transitions.js','utf8'),context);return {api:context.OfficePresence,transitions:context.OfficeTransitions,callbacks,cancelled};}
+function environment(){const callbacks=new Map<number,()=>void>();let sequence=0;const cancelled:number[]=[];const context=vm.createContext({document:{activeElement:null},setTimeout:(fn:()=>void)=>{callbacks.set(++sequence,fn);return sequence;},clearTimeout:(id:number)=>{cancelled.push(id);callbacks.delete(id);}});vm.runInContext(readFileSync('public/office/navigation.js','utf8'),context);vm.runInContext(readFileSync('public/office/presence.js','utf8'),context);vm.runInContext(readFileSync('public/office/transitions.js','utf8'),context);return {api:context.OfficePresence,transitions:context.OfficeTransitions,callbacks,cancelled,context};}
 test('cosmetic floor lanes are bounded and unknown rooms never get a fabricated location',()=>{
  const {api}=environment();for(const room of ['Research Lab','Quant Lab','Trading Floor','Risk Desk','Meeting Room','Lounge'])for(let slot=0;slot<8;slot++){
   const point=api.floorPoint(room,slot),path=api.idlePath(room,slot,'atlas',300,280);assert.ok(point.x>=10&&point.x<=90);assert.ok(point.y>=86&&point.y<=94);for(const p of path){assert.ok(Math.abs(p.x)<=60);assert.ok(Math.abs(p.y)<=170);}assert.equal(path.at(-1).x,0);assert.equal(path.at(-1).y,0);
@@ -39,4 +39,10 @@ test('idle strolls reserve every sampled segment of a recorded journey, includin
  director.update(idle,{id:'atlas',room:'Research Lab',status:'IDLE'},0,host);
  director.update(traveler,{id:'euler',room:'Quant Lab',status:'IDLE'},0,host);
  assert.equal(traveler.timer,undefined);h.callbacks.get(idle.timer)!();assert.equal(idle.animation,undefined);assert.equal(idle.button.dataset.navigation,'waiting');
+});
+
+test('keyboard focus stops a local walk and stale completions cannot resume the focused character',()=>{
+ const h=environment(),effects:any[]=[],agent={id:'atlas',room:'Research Lab',status:'IDLE'},entry:any={button:{dataset:{},animate:()=>{const effect={cancelled:false,cancel(){this.cancelled=true;},onfinish:undefined};effects.push(effect);return effect;}}};
+ const director=new h.api.Director(()=>true);director.update(entry,agent,0,{getBoundingClientRect:()=>({width:300,height:280})});h.callbacks.get(entry.timer)!();
+ h.context.document.activeElement=entry.button;effects[0].onfinish();assert.equal(entry.button.dataset.pose,'rest');assert.equal(entry.route,undefined);assert.equal(entry.timer,undefined);effects[0].onfinish();assert.equal(effects.length,1);assert.equal(agent.status,'IDLE');
 });

@@ -886,20 +886,31 @@ select{font:inherit;color:var(--text);background:#101c33;border:1px solid var(--
 .scene-tools{display:flex;gap:8px;flex-wrap:wrap}.scene-tools button{min-height:44px;padding:7px 12px;font-size:12px}
 .room h2{padding:0}.room-hotspot{background:transparent;border:0;border-radius:0;padding:6px 12px;min-height:44px;font-size:inherit;font-weight:800;letter-spacing:inherit}
 .room:has(.room-hotspot:hover){outline:1px solid #35c9ff55;outline-offset:-4px}
-.agent{transform:translate(-50%,-100%);min-height:44px;isolation:isolate}.agent .sprite{transform-origin:center bottom}
+.agent{transform:translate(-50%,-100%);min-height:44px;width:72px;height:84px;padding:0;isolation:isolate}.agent .sprite{transform-origin:center bottom;width:72px;height:84px;flex:none}
+.agent b,.agent small{position:absolute;left:50%;transform:translateX(-50%);width:max-content;max-width:130px;pointer-events:none}.agent b{bottom:calc(100% + 16px)}.agent small{bottom:calc(100% + 2px)}
 .foot-shadow{position:absolute;bottom:2px;width:42px;height:9px;border-radius:50%;background:#090d2370;z-index:-1}
 #office[data-presence="on"] .agent[data-pose="rest"] .sprite{animation:presence-breathe 3.8s ease-in-out infinite}
-#office[data-presence="on"] .agent[data-pose="walk"] .sprite{animation:presence-step .24s ease-in-out infinite alternate}
+#office[data-presence="on"] .agent[data-pose="walk"] .sprite{transform:scaleX(var(--facing,1))}
 #office[data-presence="on"] .agent[data-pose="task"] .sprite{animation:presence-focus 2s ease-in-out infinite}
 .agent[data-facing="left"]{--facing:-1}.agent[data-facing="right"]{--facing:1}
 @keyframes presence-breathe{50%{transform:translateY(-1px) scaleY(1.02)}}
-@keyframes presence-step{from{transform:translateY(0) rotate(-2deg) scaleX(var(--facing,1))}to{transform:translateY(-2px) rotate(2deg) scaleX(var(--facing,1))}}
 @keyframes presence-focus{50%{filter:drop-shadow(0 0 3px #35c9ff99)}}
-.recorded-speech{position:absolute;bottom:115%;max-width:210px;width:max-content;padding:7px 10px;background:#e8efff;color:#17253e;border:2px solid #557092;border-radius:8px;font-size:11px;pointer-events:none;box-shadow:0 3px 6px #0007}.recorded-speech:after{content:'';position:absolute;top:100%;left:45%;border:6px solid transparent;border-top-color:#e8efff}
+.recorded-speech{position:absolute;bottom:calc(100% + 42px);max-width:210px;width:max-content;padding:7px 10px;background:#e8efff;color:#17253e;border:2px solid #557092;border-radius:8px;font-size:11px;pointer-events:none;box-shadow:0 3px 6px #0007}.recorded-speech:after{content:'';position:absolute;top:100%;left:45%;border:6px solid transparent;border-top-color:#e8efff}
 .room-people{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0}.room-people button{display:flex;flex-direction:column;align-items:center;min-width:100px}.room-people .sprite{width:60px;height:70px}.room-actions{display:flex;gap:10px;margin:16px 0}.message-participants{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}.message-participants button{min-height:44px}.message-participants>span{align-self:center;color:var(--cyan)}
 #roomMessages{max-height:340px;overflow:auto;padding-left:22px}#roomMessages li{padding:12px;border:1px solid var(--line);border-radius:8px;overflow-wrap:anywhere}#roomMessages small{display:block}#roomDialog{max-width:660px}
 @media(prefers-reduced-motion:reduce){.agent .sprite{animation:none!important}.agent{transition:none!important}}
 @media(max-width:700px){.scene-caption{align-items:flex-start;gap:10px;flex-wrap:wrap}.scene-tools{width:100%}.scene-tools button{flex:1}.room-people button{min-width:90px}.room-actions button{width:100%}#roomDialog{width:calc(100% - 24px);padding:18px}}
+/* Explicit directional raster frames; never bend/rotate a single portrait into a gait. */
+.sprite[data-sprite]{--sprite-height:84px;position:relative;background-size:calc(var(--sprite-height) * var(--atlas-width)) calc(var(--sprite-height) * var(--atlas-height));background-position:calc(50% + var(--sprite-height) * var(--atlas-x)) calc(var(--sprite-height) * var(--atlas-y))}
+.room-people .sprite[data-sprite]{--sprite-height:70px}
+.sprite[data-rig="directional"]{background-image:none;overflow:hidden;transform:none!important;animation:none!important}
+.sprite-frame{display:none;position:absolute;pointer-events:none;bottom:0;left:calc(50% + var(--sprite-height) * var(--frame-offset));width:calc(var(--sprite-height) * var(--frame-width));height:calc(var(--sprite-height) * var(--frame-height));transform:translateX(-50%);background-size:calc(var(--sprite-height) * var(--sheet-width)) calc(var(--sprite-height) * var(--sheet-height));background-position:calc(var(--sprite-height) * var(--frame-x)) calc(var(--sprite-height) * var(--frame-y));background-repeat:no-repeat;image-rendering:pixelated}
+.agent:not([data-facing]) .sprite-frame[data-direction="down"],.agent[data-facing="down"] .sprite-frame[data-direction="down"],.agent[data-facing="up"] .sprite-frame[data-direction="up"],.agent[data-facing="left"] .sprite-frame[data-direction="left"],.agent[data-facing="right"] .sprite-frame[data-direction="right"]{display:block}
+.sprite-frame:not([data-frame="0"]){opacity:0}
+#office[data-presence="on"] .agent[data-pose="walk"] .sprite-frame[data-frame="0"]{opacity:0}
+#office[data-presence="on"] .agent[data-pose="walk"] .sprite-frame:not([data-frame="0"]){animation:sprite-cycle .56s steps(1,end) infinite;animation-delay:calc(var(--frame-index) * .14s - .56s)}
+@keyframes sprite-cycle{0%{opacity:1}25%,100%{opacity:0}}
+@media(prefers-reduced-motion:reduce){.sprite-frame{animation:none!important}.sprite-frame[data-frame="0"]{opacity:1!important}.sprite-frame:not([data-frame="0"]){opacity:0!important}}
 /* Furniture is an accessible read-only entry into existing laboratory views. */
 .furniture-hit{position:absolute;z-index:4;transform:translate(-50%,-50%);display:grid;place-items:center;min-width:44px;min-height:44px;width:44px;height:44px;padding:0;background:#09142799;border:1px solid #35c9ff88;border-radius:50%;color:var(--cyan);box-shadow:0 0 8px #35c9ff33}
 .furniture-hit:hover,.furniture-hit:focus-visible{background:#152d48;border-color:var(--cyan)}

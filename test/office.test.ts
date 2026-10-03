@@ -21,11 +21,15 @@ function harness(overrides:Record<string,unknown>={},reduceMotion=false,geometry
   if(geometry)(document as any).createElementNS=()=>{const e=new Element(),set=e.setAttribute.bind(e);e.setAttribute=(name:string,value:string)=>{set(name,value);if(name==='id')ids.set('#'+value,e)};return e};
   const requests:string[]=[];const intervals:Array<()=>void>=[];
   const context=vm.createContext({matchMedia:()=>({matches:reduceMotion,addEventListener(){}}),document,location:{protocol:'https:',host:'example.test'},WebSocket:class{constructor(){socket=this}},fetch:async(url:string)=>{requests.push(url);return {ok:!(overrides[url] as any)?.httpError,status:(overrides[url] as any)?.httpError||200,json:async()=>Object.hasOwn(overrides,url)? await overrides[url] :url==='/finance'?{legacyAccounts:[{id:'fund',kind:'FUND',instrument:'LEGACY_PAPER_V1',initialCash:10000,portfolio:{equity:10000},feesPaid:0}],perpetualAccounts:[{id:'evaluation:nova:usdm',kind:'EVALUATION',instrument:'BINANCE_USDM:BTCUSDT',ownerAgentId:'nova',initialCash:5000,portfolio:{equity:4900},feesPaid:10,fundingCashDelta:-20,maxDrawdown:0.03,initialMargin:500,valuationFresh:false}]}:url==='/market/v3'?{status:'UNAVAILABLE',quote:null}:url==='/paper/perpetual/status'?{halted:false,executionEnabled:false,autonomous:{enabled:false,reason:'completed V2 study required'}}:url==='/backtests/v2/studies'?[]:url==='/agents'?[{id:'atlas',name:'Atlas',role:'Research',room:'Research Lab',status:'IDLE',experience:0,updatedAt:'2026-01-01'}]:url==='/agent-messages'?[]:url==='/research/runs'?[]:url==='/paper/accounts'?[{kind:'FUND',ownerAgentId:null,initialCash:10000,portfolio:{equity:10000},fills:0}]:url==='/portfolio'?{initialCash:10000,equity:10000,realizedPnl:0,unrealizedPnl:0}:url==='/market/latest'?{status:'waiting'}:{evidence:{observations:0,decisions:0,failures:0,lessons:0,sentMessages:0,strategyIds:[],recordedTransitions:0},coverage:{legacyTransitionsWithoutHistory:0,activitySince:null},memories:[],messages:[],activity:[]}}},setInterval:(callback:()=>void)=>{intervals.push(callback);return 0},setTimeout:()=>0,clearTimeout:()=>{},console});
-  vm.runInContext(readFileSync('public/office/collaboration.js','utf8'),context);vm.runInContext(readFileSync('public/office/navigation.js','utf8'),context);vm.runInContext(readFileSync('public/office/presence.js','utf8'),context);vm.runInContext(readFileSync('public/office/transitions.js','utf8'),context);
+  for(const name of ['collaboration','navigation','presence','transitions','character-frames','sprites'])vm.runInContext(readFileSync('public/office/'+name+'.js','utf8'),context);
   vm.runInContext(readFileSync('public/office/app.js','utf8'),context);
   return {ids,rooms,requests,intervals,context,get socket(){return socket}};
 }
 const settle=()=>new Promise(resolve=>setImmediate(resolve));
+test('closing a profile whose roster opener was refreshed keeps keyboard focus inside the parent panel',async()=>{
+ const h=harness();await settle();h.ids.get('#navAgents')!.onclick!();const opener=h.ids.get('#agentList')!.children[0];h.context.document.activeElement=opener;opener.onclick!();await settle();opener.isConnected=false;
+ h.ids.get('#profile')!.close();assert.equal(h.ids.get('#workspaceDialog')!.open,true);assert.ok(h.ids.get('#closeWorkspace')!.focusCalls>0);
+});
 test('office projects backend rooms and opens real empty memory/activity without fabricated records',async()=>{
   const h=harness();await settle();
   assert.equal(h.rooms[0]!.children[0]!.children.length,1);
@@ -174,6 +178,14 @@ test('stable living characters survive snapshot refresh and cosmetic controls ne
  const h=harness();await settle();const original=h.rooms[0].children[0].children[0];
  h.intervals[0]();await settle();assert.equal(h.rooms[0].children[0].children[0],original);assert.equal(h.rooms[0].children[0].children.length,1);
  h.ids.get('#togglePresence')!.onclick!();assert.equal(h.ids.get('#activeAgents')!.textContent,'0 / 1');assert.equal(h.rooms[0].children[0].children[0],original);assert.match(h.ids.get('#togglePresence')!.textContent,/Animar/);assert.equal(original.dataset.status,'IDLE');assert.equal(original.dataset.room,'Research Lab');assert.ok(!h.requests.some(url=>url.includes('/orders')));
+});
+
+test('a modal pauses all character presentation through refresh and closing restores the motion preference',async()=>{
+ const h=harness();await settle();const actor=h.rooms[0].children[0].children[0],portrait=actor.children[0],parts=portrait.children.slice();
+ assert.equal(portrait.dataset.sprite,'atlas');assert.equal(portrait.dataset.rig,'directional');assert.equal(h.ids.get('#office')!.dataset.presence,'on');
+ actor.onclick!();await settle();assert.equal(h.ids.get('#office')!.dataset.presence,'off');assert.equal(h.ids.get('#profilePortrait')!.dataset.rig,'portrait');
+ h.intervals[0]();await settle();assert.equal(h.ids.get('#office')!.dataset.presence,'off');assert.equal(actor.children[0],portrait);assert.deepEqual(portrait.children,parts);
+ h.ids.get('#profile')!.close();assert.equal(h.ids.get('#office')!.dataset.presence,'on');assert.equal(actor.dataset.status,'IDLE');assert.equal(h.ids.get('#experience')!.textContent,'Experiência: 0 transições registradas');
 });
 test('interactive meeting room opens original communications and participants without invented chatter',async()=>{
  const message={id:'stored-message',from:'atlas',to:['euler'],kind:'HYPOTHESIS',summary:'<img onerror=not-executable> Original hypothesis',createdAt:'2026-01-01T00:00:00Z',context:{source:'TEST_ONLY'}};

@@ -87,7 +87,7 @@ function openPanel(panel, title, navId) { stopPresence();
 }
 const q = selector => document.querySelector(selector);
 const agents = new Map(), events = [];
-let selected, profileVersion = 0, busy = false, stateVersion = 0, marketVersion = 0;
+let selected, profileOpener, profileVersion = 0, busy = false, stateVersion = 0, marketVersion = 0;
 const money = value => Number.isFinite(value) ? value.toFixed(2) + ' USDT' : '—';
 const date = value => new Date(value).toLocaleString();
 function node(tag, text) {
@@ -103,17 +103,13 @@ async function get(url) {
 const spriteIds = ['atlas', 'euler', 'nova', 'sentinel', 'satoshi', 'flux', 'vega', 'oracle'];
 const statusLabels = {IDLE:'Disponível', RESEARCHING:'Pesquisando', BACKTESTING:'Testando hipóteses', TRADING:'Execução paper', REVIEWING_RISK:'Avaliando risco', MEETING:'Em reunião'};
 const roleLabels = {atlas:'Coordenação de pesquisa', euler:'Pesquisa quantitativa', nova:'Trader paper', sentinel:'Gestão de risco', satoshi:'Pesquisa de Bitcoin', flux:'Microestrutura de mercado', vega:'Pesquisa de volatilidade', oracle:'Regimes de mercado'};
-function sprite(element, id) {
-  const index = spriteIds.indexOf(id);
-  if (index < 0) { element.hidden = true; return; }
-  element.setAttribute('style', 'background-position:' + ((index % 4) * 100 / 3) + '% ' + (index < 4 ? 0 : 100) + '%');
-}
+function sprite(element,id,directional=false){OfficeSprites.paint(element,id,directional);}
 const agentViews=new Map();let presenceEnabled=true;
 const reducedMotion=globalThis.matchMedia?.('(prefers-reduced-motion: reduce)');
 const motionAllowed=()=>presenceEnabled&&!selectedHandoff&&!reducedMotion?.matches&&!document.hidden&&!['#profile','#workspaceDialog','#roomDialog','#auditDialog','#studyDialog'].some(id=>q(id).open);
 const presence=new OfficePresence.Director(motionAllowed);
 const transitions=new OfficeTransitions.Director(motionAllowed,view=>presence.stop(view),view=>presence.update(view,view.agent,view.slot,view.host));
-function stopPresence(){for(const view of agentViews.values()){transitions.stop(view);presence.stop(view);}}
+function stopPresence(){q('#office').dataset.presence='off';for(const view of agentViews.values()){transitions.stop(view);presence.stop(view);}}
 function render(movingEvent){
  const focusedAgent=document.activeElement?.dataset?.agentId,slots=new Map(),placements=new Map();q('#agentList').replaceChildren();
  for(const agent of agents.values()){const slot=slots.get(agent.room)||0;slots.set(agent.room,slot+1);placements.set(agent.id,slot);}
@@ -122,7 +118,7 @@ function render(movingEvent){
   let view=agentViews.get(agent.id);
   if(!view){
    const button=node('button',''),avatar=node('span',''),label=node('b',''),status=node('small',''),shadow=node('span','');
-   button.className='agent';avatar.className='sprite';shadow.className='foot-shadow';avatar.setAttribute('aria-hidden','true');shadow.setAttribute('aria-hidden','true');sprite(avatar,agent.id);button.append(avatar,label,status,shadow);button.onclick=()=>profile(agent.id);
+   button.className='agent';avatar.className='sprite';shadow.className='foot-shadow';avatar.setAttribute('aria-hidden','true');shadow.setAttribute('aria-hidden','true');sprite(avatar,agent.id,true);button.append(avatar,label,status,shadow);button.onclick=()=>profile(agent.id);
    view={button,avatar,label,status};agentViews.set(agent.id,view);
   }
   const from=view.agent?{room:view.agent.room,slot:view.slot}:null,wasTraveling=!!view.transitionRoute;
@@ -144,7 +140,7 @@ function render(movingEvent){
   if(agent.id===focusedAgent)button.focus?.({preventScroll:true});
   const row=node('button',agent.name+' · '+agent.room+' · '+(statusLabels[agent.status]||agent.status));row.onclick=()=>profile(agent.id);q('#agentList').append(row);
  }
- q('#office').dataset.presence=presenceEnabled&&!selectedHandoff&&!reducedMotion?.matches?'on':'off';
+ q('#office').dataset.presence=motionAllowed()?'on':'off';
  q('#togglePresence').textContent=reducedMotion?.matches?'Movimento reduzido':selectedHandoff?'Presença pausada':presenceEnabled?'Pausar animações':'Animar escritório';q('#togglePresence').disabled=!!reducedMotion?.matches||!!selectedHandoff;q('#togglePresence').setAttribute('aria-pressed',String(presenceEnabled&&!selectedHandoff&&!reducedMotion?.matches));
  q('#activeAgents').textContent=[...agents.values()].filter(agent=>agent.status!=='IDLE').length+' / '+agents.size;
  if(selected)renderState();if(inspectedRoom&&q('#roomDialog').open)renderRoom();renderHandoffs();
@@ -159,7 +155,7 @@ function renderState() {
   q('#updated').textContent = 'Estado atualizado pelo backend: ' + date(agent.updatedAt);
 }
 async function profile(id) {
-  stopPresence();selected = id;
+  profileOpener=document.activeElement;stopPresence();selected = id;
   q('#profile').showModal();
   renderState();
   await details();
@@ -523,8 +519,9 @@ async function refreshCommunications(){
 q('#togglePresence').onclick=()=>{presenceEnabled=!presenceEnabled;stopPresence();render();};
 q('#openCollaboration').onclick=()=>openRoom('Meeting Room');q('#closeRoom').onclick=()=>q('#roomDialog').close();
 for(const button of document.querySelectorAll('button[data-space]'))button.onclick=()=>openRoom(button.dataset.space);
-for(const id of ['#roomDialog','#profile','#workspaceDialog','#auditDialog','#studyDialog'])q(id).addEventListener('close',()=>{render();if(id==='#profile')restoreHandoffFocus();});
+for(const id of ['#roomDialog','#profile','#workspaceDialog','#auditDialog','#studyDialog'])q(id).addEventListener('close',()=>{render();if(id==='#profile'){const opener=profileOpener;profileOpener=null;if(handoffProfileFocus)restoreHandoffFocus();else if(opener?.isConnected)opener.focus?.({preventScroll:true});else if(q('#workspaceDialog').open)q('#closeWorkspace').focus?.();else if(q('#roomDialog').open)q('#closeRoom').focus?.();}});
 document.addEventListener?.('visibilitychange',()=>{stopPresence();render();});reducedMotion?.addEventListener?.('change',()=>{stopPresence();render();});
+q('#office').addEventListener('focusin',event=>{const view=agentViews.get(event.target?.closest?.('.agent')?.dataset.agentId);if(view){transitions.stop(view);presence.stop(view);}});
 refreshCommunications();setInterval(refreshCommunications,5000);
 
 const furnitureActions={

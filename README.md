@@ -48,3 +48,5 @@ The scene includes a six-message board over the existing received structured-mes
 
 ## Recorded office room transitions
 Matching new streamed room changes can now animate through two verified reversible passages: Research ↔ Quant (shelf detour) and Trading ↔ Lounge. Actual room/status appears immediately; snapshots/history never replay travel. Owned animations and sampled route reservations cancel on newer state, occupancy, focus/motion gates and disconnect. Other doors and original directional frames remain pending. See [scope, limits and verification](docs/OFFICE_TRANSITIONS.md).
+## Directional character frames — 2026-10-03
+The office now uses original directional idle/walk sheets for all eight agents, keeping the existing scene and profile portraits. See [OFFICE_SPRITES.md](docs/OFFICE_SPRITES.md) for frame bounds, original generation prompts, motion gates and verification limits. Seated art is prepared; desk/seat occupancy and task interactions remain the next increment. Runtime remains cloud-only and exclusively paper.
