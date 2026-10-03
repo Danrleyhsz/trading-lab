@@ -67,3 +67,7 @@ Sprites own presentation only. Actual labels/events stay authoritative while ori
 ## Workstations — 2026-10-03
 
 Agents now sit at their assigned computers when their actual room matches. An idle occupant is labeled available/no task; seated posture does not imply work. Physical monitor buttons expose current state/reason/time and matching original event evidence in the profile. Past reasons and historical results are distinguished from current tasks; stale/disconnected coverage remains explicit. See OFFICE_WORKSTATIONS.md.
+
+## Functional priority — 2026-10-03
+
+The human approved the current office preview and deferred further graphic polish in favor of working functionality. Prioritize complete, auditable research/study/risk/paper/result workflows and safe online operation. New spot research shows its next-open calculation model and recorded simulated fees; old unversioned results keep their original metrics and coverage gap. No historical screen is account P&L or automatic strategy promotion. See SPOT_BACKTEST_ACCOUNTING.md.

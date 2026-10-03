@@ -72,7 +72,20 @@ test('positive historical screens keep their evidence and never promote themselv
  const candles:Candle[]=Array.from({length:1000},(_,i)=>{const close=100+15*Math.sin(i*Math.PI*2/80);return {timestamp:end-(999-i)*3600000,open:close,high:close+1,low:close-1,close,volume:100}});
  const h=setup({...source,candles:async()=>candles}),run=await h.engine.run(1000);
  assert.equal(run.status,'SCREEN_PASSED');assert.ok(run.backtest!.trades>=10);assert.ok(run.backtest!.netPnl>0);
+ assert.equal(run.backtest!.model,'SPOT_SMA_NEXT_OPEN_V2');
+ assert.deepEqual(run.backtest!.configuration,{initialCapital:10000,feeRate:0.00055,slippageBps:1,fastPeriod:10,slowPeriod:30});
+ assert.equal((run.events.find(record=>record.type==='BACKTEST_COMPLETED')!.payload as any).result.model,run.backtest!.model);
  assert.ok(h.memories.list('atlas').some(memory=>memory.kind==='LESSON'&&memory.strategyId===run.strategyId));
  assert.equal(h.events.some(event=>event.type==='PAPER_FILL'||event.type==='PAPER_ORDER_SUBMITTED'),false);
  assert.equal(h.agents.get('nova')!.experience,0);
+});
+
+test('legacy research restoration preserves original unversioned results without inventing new costs or recalculating profit',async()=>{
+ const h=setup(),run=await h.engine.run(100),legacy=structuredClone(run);
+ delete legacy.backtest!.model;delete legacy.backtest!.configuration;delete legacy.backtest!.feesPaid;
+ legacy.backtest!.netPnl=123.45; // TEST_ONLY older retained outcome, not market/paper history.
+ const original=structuredClone(legacy),restored=new ResearchRunStore();restored.hydrate([legacy]);
+ assert.deepEqual(restored.get(legacy.id),original);assert.equal(restored.summaries()[0]!.backtest!.model,undefined);
+ const returned=restored.get(legacy.id)!;returned.backtest!.netPnl=999;
+ assert.deepEqual(restored.get(legacy.id),original);
 });

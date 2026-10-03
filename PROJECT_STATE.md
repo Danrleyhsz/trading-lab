@@ -24,8 +24,8 @@ A persistent AI trading laboratory presented as a top-down pixel-art investment 
 7. Mobile-first monitoring interface.
 8. Cost telemetry per agent/task.
 
-## Next milestone
-Architecture skeleton + market-data ingestion + paper broker contract + event schema.
+## Current priority
+The human approved the seated-office preview and requested focus on functionality; further graphical polish is deferred. Implemented features below remain on stacked drafts awaiting review, not merged production. Current increment corrects newly calculated spot SMA screens (next-open fills, fully reserved entry fees, net outcomes and final closing-cost drawdown), with versioned evidence and unchanged older history. Next: real research/study result access, durable bounded work/recovery and end-to-end paper audit. Cloud/PostgreSQL hosting and paid AI remain unconfigured. See docs/SPOT_BACKTEST_ACCOUNTING.md and docs/DEVELOPMENT_QUEUE.md.
 
 ## Pixel Office V2 increment
 - Six rooms project the actual backend room of each agent.

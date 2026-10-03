@@ -1,5 +1,13 @@
 # Development continuation queue
 
+## Current human priority — functionality, 2026-10-03
+
+This section supersedes older visual-priority checkpoints below. The human approved the seated office and deferred additional graphics. Branch fix/spot-backtest-accounting stacks on workstation draft #33; new spot SMA calculations use next-open execution, complete fees and versioned evidence without changing old results. See SPOT_BACKTEST_ACCOUNTING.md. Check the workspace continuation artifact for exact commit/PR/CI validation.
+
+Next increments: expose full original research/study evidence through existing read APIs; strengthen bounded, retained research job admission/restart/drain; verify the real-data → research → historical validation → deterministic risk → independent paper → portfolio/audit workflow with isolated meaningful tests. Automatic research/paper and AI remain disabled unless separately configured and authorized. Do not create real trades or synthetic runtime history to demonstrate activity.
+
+Cloud preparation can continue without provisioning, but hosted operation requires approved provider/PostgreSQL access and budget. Paid AI activation requires a reviewed adapter and explicit spending approval. Keep existing architecture and original scene, independent evaluation capital and mandatory risk; no architectural auto-merge. Temporal art polish/mobile asset optimization remain later work.
+
 ## Verified checkpoint
 - Current head: 035cad2, feat/paper-performance-audit.
 - PR #20: pixel office art direction, stacked on #19. CI passed (typecheck, full tests with PostgreSQL, build and container).

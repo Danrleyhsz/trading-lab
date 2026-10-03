@@ -249,3 +249,10 @@ test('station monitors follow streamed state, label past reasons and open existi
  overrides['/agents']=[actual];h.socket.onmessage({data:JSON.stringify({id:'TEST_ONLY_STATION_STATE',type:'AGENT_STATE_CHANGED',occurredAt:actual.updatedAt,payload:actual})});assert.match(flatten(monitor),/Pesquisando/);assert.equal(actor.dataset.pose,'seated');monitor.onclick!();await settle();assert.match(h.ids.get('#stationState')!.textContent,/Pesquisando/);assert.match(h.ids.get('#stationReason')!.textContent,/public dataset/);assert.equal(h.ids.get('#stationSource')!.children.length,1);assert.ok(h.requests.includes('/agents/atlas/profile'));assert.ok(!h.requests.includes('/research/run'));h.socket.onclose();assert.match(h.ids.get('#stationState')!.textContent,/desconectados/);
  vm.runInContext('Date.now = () => '+(Date.now()+20000),h.context);h.intervals[0]();assert.match(flatten(monitor),/Desatualizado/);
 });
+
+test('research outcomes distinguish recorded next-open costs from unversioned history without relabeling old evidence',async()=>{
+ const rows=[{id:'TEST_ONLY_NEW',status:'REJECTED',completedAt:'2026-01-01',backtest:{trades:1,netPnl:-5,model:'SPOT_SMA_NEXT_OPEN_V2',feesPaid:20}},{id:'TEST_ONLY_OLD',status:'SCREEN_PASSED',completedAt:'2025-01-01',backtest:{trades:10,netPnl:123.45}}];
+ const h=harness({'/research/runs':rows});await settle();const text=flatten(h.ids.get('#researchRuns')!);
+ assert.match(text,/abertura seguinte/);assert.match(text,/20.00 USDT/);assert.match(text,/modelo e custos não versionados/);assert.match(text,/123.45 USDT/);
+ assert.equal(rows[1]!.backtest.model,undefined);assert.ok(!h.requests.includes('/research/run'));
+});

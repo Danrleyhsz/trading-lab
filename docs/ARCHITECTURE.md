@@ -89,3 +89,7 @@ public/office/transitions.js adds original browser-only scene connectors and a s
 ## Workstations — 2026-10-03
 
 Browser workstations.js adds a pure room/owner catalog and state projection over existing bounded snapshots/events. app.js owns stable monitor nodes and receipt timestamps; existing profile/audit readers provide details. Catalog seat legs extend only existing door routes; original scene masks provide chair foreground. No data schema, service endpoint, provider or renderer migration. See OFFICE_WORKSTATIONS.md.
+
+## Versioned spot historical calculation
+
+The existing pure HistoricalBacktester now uses completed crossover signals and next-open execution with fully cash-reserved entry fees and net closed-trade accounting. Optional result model/configuration/fees metadata travels through existing research events/storage; old records remain unversioned and unchanged. The USD-M simulator, account ledger, order admission and deterministic execution risk are untouched. See SPOT_BACKTEST_ACCOUNTING.md.

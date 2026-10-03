@@ -250,7 +250,11 @@ function renderResearch(runs) {
     const row = node('li', '');
     row.append(node('b', run.status === 'SCREEN_PASSED' ? 'Filtro histórico aprovado' : run.status === 'REJECTED' ? 'Hipótese rejeitada' : 'Pesquisa falhou'), node('p', date(run.completedAt)));
     if (run.datasetHash) row.append(node('small', 'Evidência: ' + run.datasetHash));
-    if (run.backtest) row.append(node('p', `${run.backtest.trades} operações históricas · P&L do backtest simulado ${money(run.backtest.netPnl)}`));
+    if (run.backtest) {
+      row.append(node('p', `${run.backtest.trades} operações históricas · P&L do backtest simulado ${money(run.backtest.netPnl)}`));
+      row.append(node('small',run.backtest.model==='SPOT_SMA_NEXT_OPEN_V2'?'Modelo registrado: sinal fechado → abertura seguinte · taxas de entrada e saída incluídas':'Simulação anterior: modelo e custos não versionados neste registro'));
+      if(Number.isFinite(run.backtest.feesPaid))row.append(node('small','Taxas históricas registradas: '+money(run.backtest.feesPaid)));
+    }
     return row;
   });
 }
