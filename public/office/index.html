@@ -43,6 +43,7 @@
       </section>
     </div>
     <div id="unmapped" aria-label="Agentes em salas não reconhecidas"></div>
+    <section class="handoff-board" aria-labelledby="handoffTitle"><h2 id="handoffTitle">Comunicação da equipe</h2><p id="handoffStatus" role="status">Aguardando mensagens registradas.</p><div class="handoff-layout"><ol id="handoffList"></ol><div id="handoffDetail"></div></div><button id="clearHandoff" hidden>Limpar destaque</button></section>
     <p class="scene-note">Clique nas salas, personagens e objetos para explorar. Presença animada; trabalho e mensagens vêm do sistema.</p>
   </section>
   <section class="bottom-panels">
@@ -72,6 +73,6 @@
 <dialog id="studyDialog" aria-labelledby="studyTitle"><button id="closeStudy" class="close" aria-label="Fechar estudo">×</button><h2 id="studyTitle">Estudo histórico</h2><div id="studyDetails"></div></dialog>
 <dialog id="auditDialog" aria-labelledby="auditTitle"><button id="closeAudit" class="close" aria-label="Fechar auditoria">×</button><h2 id="auditTitle">Auditoria</h2><p id="auditStatus" role="status"></p><button id="auditBack" hidden>Voltar às operações da conta</button><div id="auditContent"></div><button id="auditOlder" hidden>Ver operações anteriores</button></dialog>
 <dialog id="roomDialog" aria-labelledby="roomTitle"><button id="closeRoom" class="close" aria-label="Fechar sala">×</button><h2 id="roomTitle"></h2><p id="roomDescription"></p><div id="roomPeople" class="room-people"></div><div id="roomActions" class="room-actions"></div><h3>Objetos e funções da sala</h3><div id="roomObjects" class="room-objects"></div><h3>Comunicação entre agentes</h3><p id="roomMessageStatus" role="status"></p><ol id="roomMessages"></ol></dialog>
-<script src="/office/navigation.js"></script><script src="/office/presence.js"></script>
+<script src="/office/collaboration.js"></script><script src="/office/navigation.js"></script><script src="/office/presence.js"></script>
 <script src="/office/app.js"></script>
 </body></html>

@@ -110,11 +110,11 @@ function sprite(element, id) {
 }
 const agentViews=new Map();let presenceEnabled=true;
 const reducedMotion=globalThis.matchMedia?.('(prefers-reduced-motion: reduce)');
-const presence=new OfficePresence.Director(()=>presenceEnabled&&!reducedMotion?.matches&&!document.hidden&&!['#profile','#workspaceDialog','#roomDialog','#auditDialog','#studyDialog'].some(id=>q(id).open));
+const presence=new OfficePresence.Director(()=>presenceEnabled&&!selectedHandoff&&!reducedMotion?.matches&&!document.hidden&&!['#profile','#workspaceDialog','#roomDialog','#auditDialog','#studyDialog'].some(id=>q(id).open));
 function stopPresence(){for(const view of agentViews.values())presence.stop(view);}
 function render(movingId){
  const focusedAgent=document.activeElement?.dataset?.agentId,slots=new Map();q('#agentList').replaceChildren();
- for(const [id,view] of agentViews)if(!agents.has(id)){presence.forget(view);view.button.remove();agentViews.delete(id);}
+ for(const [id,view] of agentViews)if(!agents.has(id)){presence.forget(view);clearViewSpeech(view);view.button.remove();agentViews.delete(id);}
  for(const agent of agents.values()){
   let view=agentViews.get(agent.id);
   if(!view){
@@ -134,10 +134,10 @@ function render(movingId){
   if(agent.id===focusedAgent)button.focus?.({preventScroll:true});
   const row=node('button',agent.name+' · '+agent.room+' · '+(statusLabels[agent.status]||agent.status));row.onclick=()=>profile(agent.id);q('#agentList').append(row);
  }
- q('#office').dataset.presence=presenceEnabled&&!reducedMotion?.matches?'on':'off';
- q('#togglePresence').textContent=reducedMotion?.matches?'Movimento reduzido':presenceEnabled?'Pausar animações':'Animar escritório';q('#togglePresence').disabled=!!reducedMotion?.matches;q('#togglePresence').setAttribute('aria-pressed',String(presenceEnabled&&!reducedMotion?.matches));
+ q('#office').dataset.presence=presenceEnabled&&!selectedHandoff&&!reducedMotion?.matches?'on':'off';
+ q('#togglePresence').textContent=reducedMotion?.matches?'Movimento reduzido':selectedHandoff?'Presença pausada':presenceEnabled?'Pausar animações':'Animar escritório';q('#togglePresence').disabled=!!reducedMotion?.matches||!!selectedHandoff;q('#togglePresence').setAttribute('aria-pressed',String(presenceEnabled&&!selectedHandoff&&!reducedMotion?.matches));
  q('#activeAgents').textContent=[...agents.values()].filter(agent=>agent.status!=='IDLE').length+' / '+agents.size;
- if(selected)renderState();if(inspectedRoom&&q('#roomDialog').open)renderRoom();
+ if(selected)renderState();if(inspectedRoom&&q('#roomDialog').open)renderRoom();renderHandoffs();
 }
 function renderState() {
   const agent = agents.get(selected);
@@ -438,7 +438,7 @@ function configureAuditBack(){if(auditReturn){q('#auditBack').hidden=false;q('#a
 q('#closeAudit').onclick=()=>q('#auditDialog').close();q('#auditDialog').addEventListener('close',()=>{auditVersion++;auditReturn=null;auditAccount=null;auditCursor=null;if(auditOpener?.isConnected)auditOpener.focus?.({preventScroll:true});else if(q('#profile').open)q('#closeProfile').focus?.();else if(q('#workspaceDialog').open)q('#closeWorkspace').focus?.();else (document.querySelector('.nav.active')||q('#navOffice')).focus?.();auditOpener=null;});
 
 let inspectedRoom=null,communicationVersion=0,communicationBusy=false,communicationReady=false;
-let communications=[],seenCommunications=new Set();
+let communications=[],seenCommunications=new Set(),selectedHandoff=null,handoffProfileFocus=null;
 const messageKinds={HYPOTHESIS:'Hipótese',BACKTEST_RESULT:'Resultado de teste',RISK_REVIEW:'Revisão de risco',EXECUTION_PLAN:'Plano de execução',PORTFOLIO_DECISION:'Decisão de portfólio',RESEARCH_FINDING:'Achado de pesquisa'};
 const roomInfo={
  'Research Lab':{description:'Biblioteca e coordenação de hipóteses. Consulte evidências e pesquisas registradas.',action:'Abrir pesquisas',panel:'researchPanel',nav:'navResearch'},
@@ -452,7 +452,7 @@ function openRoom(room){if(!roomInfo[room])return;stopPresence();inspectedRoom=r
 function messageCard(message,controls=[]){
  const li=node('li',''),line=node('div','');line.className='message-participants';
  for(const [index,id] of [message.from,...message.to].entries()){if(index===1)line.append(node('span','→'));else if(index>1)line.append(node('span',','));const button=node('button',agents.get(id)?.name||id);button.dataset.agentId=id;button.dataset.roomControl='message:'+message.id+':'+index;button.onclick=()=>{q('#roomDialog').close();profile(id);};line.append(button);controls.push(button);}
- li.append(line,node('b',messageKinds[message.kind]),node('p',message.summary),node('small',date(message.createdAt)+' · '+message.id));return li;
+ li.append(line,node('b',messageKinds[message.kind]),node('p',message.summary),node('small',date(message.createdAt)+' · '+message.id));const highlight=node('button','Destacar participantes no escritório');highlight.dataset.roomControl='highlight:'+message.id;highlight.onclick=()=>{q('#roomDialog').close();selectHandoff(message.id);};li.append(highlight);controls.push(highlight);return li;
 }
 function renderRoom(){
  const focused=document.activeElement?.dataset?.roomControl,controls=[];const room=inspectedRoom,info=roomInfo[room];if(!info)return;q('#roomTitle').textContent=room;q('#roomDescription').textContent=info.description;
@@ -465,27 +465,54 @@ function renderRoom(){
  const list=q('#roomMessages'),rows=messages.slice().reverse().map(message=>messageCard(message,controls));list.replaceChildren(...rows);if(focused&&q('#roomDialog').open)(controls.find(button=>button.dataset.roomControl===focused)||q('#closeRoom')).focus?.({preventScroll:true});
  q('#roomMessageStatus').textContent=communicationReady?(messages.length?'Comunicações registradas · horário e participantes originais.':'Nenhuma comunicação registrada para esta sala.'):'Comunicações indisponíveis ou ainda não recebidas.';
 }
-function clearSpeech(){for(const view of agentViews.values()){view.speech?.remove();view.speech=null;if(view.speechTimer!==undefined)clearTimeout(view.speechTimer);view.speechTimer=undefined;}}
+function clearViewSpeech(view){view.speech?.remove();view.speech=null;if(view.speechTimer!==undefined)clearTimeout(view.speechTimer);view.speechTimer=undefined;delete view.button.dataset.delivery;}
+function clearSpeech(){for(const view of agentViews.values())clearViewSpeech(view);}
 function showMessage(message){
- const view=agentViews.get(message.from);if(!view)return;view.speech?.remove();if(view.speechTimer!==undefined)clearTimeout(view.speechTimer);
- const speech=node('span',(messageKinds[message.kind]||message.kind)+' → '+message.to.map(id=>agents.get(id)?.name||id).join(', '));speech.className='recorded-speech';speech.setAttribute('title',message.summary+' · '+date(message.createdAt));speech.setAttribute('aria-hidden','true');view.button.append(speech);view.speech=speech;
- view.speechTimer=setTimeout(()=>{if(view.speech===speech){speech.remove();view.speech=null;view.speechTimer=undefined;}},8000);
+ for(const id of new Set([message.from,...message.to])){
+  const view=agentViews.get(id);if(!view)continue;clearViewSpeech(view);
+  const sending=id===message.from,speech=node('span',sending?(messageKinds[message.kind]||message.kind)+' → '+message.to.map(id=>agents.get(id)?.name||id).join(', '):'Mensagem de '+(agents.get(message.from)?.name||message.from));
+  speech.className='recorded-speech';speech.setAttribute('title',message.summary+' · '+date(message.createdAt)+' · '+message.id);speech.setAttribute('aria-hidden','true');view.button.dataset.delivery=sending?'sent':'received';view.button.append(speech);view.speech=speech;
+  view.speechTimer=setTimeout(()=>{if(view.speech===speech)clearViewSpeech(view);},8000);
+ }
 }
+function selectHandoff(id){if(!communications.some(m=>m.id===id))return;selectedHandoff=id;stopPresence();render();}
+function handoffProfile(messageId,id){handoffProfileFocus=messageId+':'+id;profile(id);}
+function restoreHandoffFocus(){if(!handoffProfileFocus)return;const target=[...q('#handoffDetail').children].find(b=>b.dataset.handoffControl===handoffProfileFocus);(target||q('#openCollaboration')).focus?.({preventScroll:true});handoffProfileFocus=null;}
+function renderHandoffMap(message){
+ const host=q('#office');q('#handoffMap')?.remove();
+ for(const [id,view] of agentViews){delete view.button.dataset.handoff;if(message){if(id===message.from)view.button.dataset.handoff='sender';else if(message.to.includes(id))view.button.dataset.handoff='recipient';}}
+ if(!message||!document.createElementNS||!host.getBoundingClientRect)return;
+ const bounds=host.getBoundingClientRect();if(bounds.width<=0||bounds.height<=0)return;const positions=new Map();
+ for(const [id,view] of agentViews){if(!roomInfo[view.agent?.room]||!view.button.getBoundingClientRect)continue;const r=view.button.getBoundingClientRect();positions.set(id,{x:(r.left+r.width/2-bounds.left)/bounds.width*100,y:(r.top+r.height/2-bounds.top)/bounds.height*100});}
+ const links=OfficeCollaboration.links(message,positions);if(!links.length)return;
+ const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.setAttribute('id','handoffMap');svg.setAttribute('viewBox','0 0 100 100');svg.setAttribute('preserveAspectRatio','none');svg.setAttribute('aria-hidden','true');svg.setAttribute('class','handoff-map');
+ for(const link of links){const path=document.createElementNS('http://www.w3.org/2000/svg','path');path.setAttribute('d','M '+link.start.x+' '+link.start.y+' L '+link.end.x+' '+link.end.y);path.setAttribute('vector-effect','non-scaling-stroke');const end=document.createElementNS('http://www.w3.org/2000/svg','circle');end.setAttribute('cx',String(link.end.x));end.setAttribute('cy',String(link.end.y));end.setAttribute('r','.7');svg.append(path,end);}host.append(svg);
+}
+function renderHandoffs(){
+ const focused=document.activeElement?.dataset?.handoffControl,controls=[],list=q('#handoffList'),detail=q('#handoffDetail');list.replaceChildren();detail.replaceChildren();
+ const message=communicationReady?communications.find(m=>m.id===selectedHandoff):null;if(!message)selectedHandoff=null;
+ q('#clearHandoff').hidden=!message;
+ q('#handoffStatus').textContent=!communicationReady?'Comunicações indisponíveis ou ainda não recebidas.':!communications.length?'Nenhuma comunicação registrada.':message?'Registro selecionado · linhas ligam posições atuais; presença em pausa.':'Últimas mensagens registradas · selecione para destacar participantes.';
+ for(const item of communications.slice(-6).reverse()){const row=node('li',''),button=node('button','');button.dataset.handoffControl=item.id;button.setAttribute('aria-pressed',String(item.id===selectedHandoff));button.append(node('b',(agents.get(item.from)?.name||item.from)+' → '+item.to.map(id=>agents.get(id)?.name||id).join(', ')),node('span',messageKinds[item.kind]),node('small',date(item.createdAt)));button.onclick=()=>selectHandoff(item.id);row.append(button);list.append(row);controls.push(button);}
+ if(message){detail.append(node('b',messageKinds[message.kind]),node('p',message.summary),node('small','ID original: '+message.id+' · '+date(message.createdAt)),node('p','Salas e estados atuais; não indicam onde esta mensagem foi enviada.'));for(const [index,id] of [message.from,...message.to].entries()){const agent=agents.get(id),button=node('button',(index===0?'Remetente: ':'Destinatário: ')+(agent?.name||id)+(agent?' · '+agent.room+' · '+(statusLabels[agent.status]||agent.status):' · estado indisponível'));button.dataset.handoffControl=message.id+':'+id;button.disabled=!agent;button.onclick=()=>handoffProfile(message.id,id);detail.append(button);controls.push(button);}}
+ renderHandoffMap(message);if(focused)(controls.find(b=>b.dataset.handoffControl===focused&&!b.disabled)||q(message?'#clearHandoff':'#openCollaboration')).focus?.({preventScroll:true});
+}
+q('#clearHandoff').onclick=()=>{const old=selectedHandoff;selectedHandoff=null;render();const button=[...q('#handoffList').children].flatMap(row=>[...row.children]).find(b=>b.dataset.handoffControl===old);(button||q('#openCollaboration')).focus?.({preventScroll:true});};
 async function refreshCommunications(){
  if(communicationBusy)return;communicationBusy=true;const version=++communicationVersion;
  try{
   const data=await get('/agent-messages');if(version!==communicationVersion)return;if(!Array.isArray(data))throw Error('invalid communications');
-  const recent=data.slice(-20);if(recent.some(m=>typeof m.id!=='string'||!m.id||!spriteIds.includes(m.from)||!Array.isArray(m.to)||!m.to.length||m.to.some(id=>!spriteIds.includes(id))||!messageKinds[m.kind]||typeof m.summary!=='string'||!Number.isFinite(Date.parse(m.createdAt))))throw Error('invalid communication evidence');
+  const recent=OfficeCollaboration.read(data,spriteIds,messageKinds,communications);
   const initial=!communicationReady;communications=recent;
   if(!initial)for(const message of recent){const age=Date.now()-Date.parse(message.createdAt);if(!seenCommunications.has(message.id)&&age>=0&&age<=30000)showMessage(message);}
   seenCommunications=new Set(recent.map(m=>m.id));communicationReady=true;
  }catch{communications=[];communicationReady=false;clearSpeech();}
- finally{communicationBusy=false;if(inspectedRoom)renderRoom();}
+ finally{communicationBusy=false;if(inspectedRoom)renderRoom();renderHandoffs();if(!selectedHandoff)render();}
 }
 q('#togglePresence').onclick=()=>{presenceEnabled=!presenceEnabled;stopPresence();render();};
 q('#openCollaboration').onclick=()=>openRoom('Meeting Room');q('#closeRoom').onclick=()=>q('#roomDialog').close();
 for(const button of document.querySelectorAll('button[data-space]'))button.onclick=()=>openRoom(button.dataset.space);
-for(const id of ['#roomDialog','#profile','#workspaceDialog','#auditDialog','#studyDialog'])q(id).addEventListener('close',()=>render());
+for(const id of ['#roomDialog','#profile','#workspaceDialog','#auditDialog','#studyDialog'])q(id).addEventListener('close',()=>{render();if(id==='#profile')restoreHandoffFocus();});
 document.addEventListener?.('visibilitychange',()=>{stopPresence();render();});reducedMotion?.addEventListener?.('change',()=>{stopPresence();render();});
 refreshCommunications();setInterval(refreshCommunications,5000);
 
