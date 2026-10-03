@@ -44,3 +44,6 @@ AI status and retained audit records distinguish disabled configuration, actual 
 
 ## Operational diagnosis
 The access panel now shows actual service phase, confirmed writes, market availability, paper block reasons, active research/study state and AI configuration. Missing, partial or expired diagnoses become unavailable instead of implying a running task or healthy deployment. An available panel does not approve an order; deterministic risk still reviews each paper submission. New-exposure halts preserve risk-checked reducing orders. Online hosting and backups remain externally unverified until a real provider account and deployment exist.
+
+## Historical study failure visibility
+A historical study uses recorded source data saved before calculation. A calculation timeout, worker failure or unavailable source stays visible as a failed study with no claimed partial profit or paper operation. Restarted unfinished studies retain saved evidence and report interruption. This improves panel/market responsiveness during calculation; it does not change financial model assumptions or activate autonomous execution. The approved pixel scene continues to reflect actual backend task state only.

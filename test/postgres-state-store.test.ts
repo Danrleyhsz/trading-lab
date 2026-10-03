@@ -1,3 +1,4 @@
+import {validatePerpetualDataset} from '../src/domain/perpetual-backtest.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {PostgresStateStore,assertAppendOnly} from '../src/infrastructure/postgres-state-store.js';
@@ -14,6 +15,11 @@ test('PostgreSQL roundtrip, single writer exclusion and transactional rejection'
   const ai=new AiAnalysis(async ledger=>{const staged={...retained,aiLedger:ledger};await first.save(staged);retained=staged;},[],{enabled:true,globalDailyMicrousd:1000,agentDailyMicrousd:1000,globalDailyRequests:2,agentDailyRequests:2,maxInputTokens:20,maxOutputTokens:20,timeoutMs:1000},{price:{provider:'TEST_ONLY',model:'fixture',version:'fixture-v1',currency:'USD',inputMicrousdPerMillion:1000000,outputMicrousdPerMillion:1000000},countInput:()=>10,analyze:async()=>{assert.equal((await first.load())?.aiLedger?.[0].kind,'RESERVED');return {providerRequestId:'fixture-request',model:'fixture',text:'Test advisory only',usage:{inputTokens:10,outputTokens:1}};}});
   await ai.analyze({key:'pg-fixture',agentId:'atlas',question:'Test fixture',evidence:{sourceId:'TEST_ONLY',text:'Synthetic integration fixture'}});
   assert.deepEqual(await first.load(),retained);await assert.rejects(first.save({...retained,aiLedger:[]}));assert.deepEqual(await first.load(),retained);
+  // Test-only historical evidence: transactional pinning applies before a final outcome.
+  const trade=Array.from({length:300},(_,i)=>({timestamp:i*3600000,open:100,high:100,low:100,close:100,volume:1}));
+  retained={...retained,perpetualStudies:[{id:'pg-study-fixture',status:'RUNNING',createdAt:'2026-01-01T00:00:00Z',request:{bars:300,trainBars:100,testBars:50},dataset:{instrument:'BINANCE_USDM:BTCUSDT',trade,mark:structuredClone(trade),funding:[]},datasetHash:validatePerpetualDataset({instrument:'BINANCE_USDM:BTCUSDT',trade,mark:structuredClone(trade),funding:[]})}]};await first.save(retained);
+  const evidenceRewrite=structuredClone(retained);evidenceRewrite.perpetualStudies![0].dataset!.trade[0].close=200;await assert.rejects(first.save(evidenceRewrite),/study/);assert.deepEqual(await first.load(),retained);
+  retained=structuredClone(retained);Object.assign(retained.perpetualStudies![0],{status:'INTERRUPTED',error:'server restarted before completion'});await first.save(retained);assert.deepEqual(await first.load(),retained);
  }finally{await first.close();}
  const restarted=new PostgresStateStore(process.env.TEST_DATABASE_URL!);await restarted.open();try{assert.deepEqual(await restarted.load(),retained);}finally{await restarted.close();}
 });

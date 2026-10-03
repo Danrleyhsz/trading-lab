@@ -30,3 +30,6 @@ A provider-neutral advisory boundary now reserves an explicit independent USD bu
 
 ## Runtime readiness and shutdown preparation
 Minimal /health/live and /health/ready endpoints now distinguish process response from control-plane readiness. Authenticated /runtime/readiness reports actual write outcomes, quote/funding gates, independent accounts, admitted jobs and disabled AI/autonomous configuration. The access panel displays recorded block reasons and expires old diagnostics. New mutations stop on storage failure or shutdown; admitted historical tasks drain before the database closes. Signal shutdown has a 30-second grace deadline, retaining existing interrupted-study restore behavior. This is cloud preparation, not a hosted service or backup verification. See docs/RUNTIME_READINESS.md.
+
+## Bounded historical calculations
+Historical studies now retain source data/hash durably before calculating in a bounded internal worker. The unchanged deterministic simulator preserves all funding/risk/OOS audit output; timeout/crash produces a retained failure rather than a partial result. Runtime/data adapters stay in the cloud container; no broker/AI/account capabilities are passed to the worker. No automatic retry, activation, service provisioning or deployment is added. See docs/HISTORICAL_LAB.md for resource bounds and remaining operational limits.

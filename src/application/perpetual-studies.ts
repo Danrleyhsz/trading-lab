@@ -1,15 +1,17 @@
 import type {FastifyInstance} from 'fastify';
 import {z} from 'zod';
-import {walkForwardPerpetual} from '../domain/perpetual-walk-forward.js';
+import type {walkForwardPerpetual} from '../domain/perpetual-walk-forward.js';
+import {HistoricalStudyRunner,type HistoricalStudySimulator} from './historical-study-runner.js';
+import {validatePerpetualDataset} from '../domain/perpetual-backtest.js';
 import type {PerpetualDataset,PerpetualConfig} from '../domain/perpetual-backtest.js';
 import type {AgentCoordinator} from './agent-coordinator.js';
 import type {EventBus} from './event-bus.js';
 import {event} from '../domain/events.js';
 const schema=z.object({bars:z.number().int().min(300).max(5000).default(1000),trainBars:z.number().int().min(100).max(3000).default(400),testBars:z.number().int().min(50).max(1000).default(100)}).strict().refine(v=>v.bars>=v.trainBars+v.testBars,'insufficient study windows');
-export interface PerpetualStudy {id:string;status:'QUEUED'|'RUNNING'|'COMPLETED'|'FAILED'|'INTERRUPTED';createdAt:string;request:z.infer<typeof schema>;dataset?:PerpetualDataset;result?:ReturnType<typeof walkForwardPerpetual>;error?:string;completedAt?:string}
+export interface PerpetualStudy {id:string;status:'QUEUED'|'RUNNING'|'COMPLETED'|'FAILED'|'INTERRUPTED';createdAt:string;request:z.infer<typeof schema>;dataset?:PerpetualDataset;datasetHash?:string;result?:ReturnType<typeof walkForwardPerpetual>;error?:string;completedAt?:string}
 export class PerpetualStudies {
  private records:PerpetualStudy[];private busy=false;private accepting=true;private activeTasks=new Set<Promise<void>>();private persistenceError:string|null=null;
- constructor(private source:{load(count:number):Promise<PerpetualDataset>},restored:PerpetualStudy[]=[]){this.records=structuredClone(restored).map(s=>s.status==='RUNNING'||s.status==='QUEUED'?{...s,status:'INTERRUPTED',error:'server restarted before completion'}:s);}
+ constructor(private source:{load(count:number):Promise<PerpetualDataset>},restored:PerpetualStudy[]=[],private simulator:HistoricalStudySimulator=new HistoricalStudyRunner()){this.records=structuredClone(restored).map(s=>s.status==='RUNNING'||s.status==='QUEUED'?{...s,status:'INTERRUPTED',error:'server restarted before completion'}:s);}
  list(){return structuredClone(this.records);}
  status(){return {busy:this.busy,accepting:this.accepting,persistenceFailed:!!this.persistenceError,activeTasks:this.activeTasks.size,interruptedStudies:this.records.filter(s=>s.status==='INTERRUPTED').length};}
  stopAccepting(){this.accepting=false;}
@@ -19,12 +21,12 @@ export class PerpetualStudies {
  async start(request:z.infer<typeof schema>,persist:()=>Promise<void>,coordinator:AgentCoordinator,bus:EventBus){
   if(!this.accepting)throw new Error('historical runtime draining');
   if(this.busy||coordinator.registry.get('euler')?.status==='BACKTESTING'||coordinator.registry.get('atlas')?.status==='RESEARCHING')throw new Error('quant job already running');
-  this.busy=true;let finish!:()=>void;const completion=new Promise<void>(resolve=>{finish=resolve;});this.activeTasks.add(completion);const finished=()=>{this.activeTasks.delete(completion);finish();};const study:PerpetualStudy={id:crypto.randomUUID(),status:'QUEUED',createdAt:new Date().toISOString(),request};this.records.push(study);
+  request=structuredClone(request);this.busy=true;let finish!:()=>void;const completion=new Promise<void>(resolve=>{finish=resolve;});this.activeTasks.add(completion);const finished=()=>{this.activeTasks.delete(completion);finish();};const study:PerpetualStudy={id:crypto.randomUUID(),status:'QUEUED',createdAt:new Date().toISOString(),request};this.records.push(study);
   try{await persist();}catch(error){this.records.pop();this.busy=false;finished();throw error;}
   const task=async()=>{study.status='RUNNING';coordinator.backtest(`USD-M historical study ${study.id}`);bus.publish(event('BACKTEST_STARTED',{studyId:study.id,model:'LINEAR_PERPETUAL_V2'}));
-   try{await persist();study.dataset=await this.source.load(request.bars);
+   try{await persist();study.dataset=structuredClone(await this.source.load(request.bars));if(study.dataset.trade.length!==request.bars)throw Error('incomplete study dataset');study.datasetHash=validatePerpetualDataset(study.dataset);try{await persist();}catch{throw Error('historical evidence persistence failed');}
     const base:PerpetualConfig={initialCapital:10000,feeRate:0.00055,slippageBps:1,maintenanceRate:0.01,liquidationFeeRate:0.005,positionFraction:0.1,fastPeriod:10,slowPeriod:30};
-    study.result=walkForwardPerpetual(study.dataset,[base,{...base,fastPeriod:20,slowPeriod:60},{...base,fastPeriod:5,slowPeriod:20},{...base,strategy:'BREAKOUT'},{...base,strategy:'MEAN_REVERSION'}],request.trainBars,request.testBars);study.status='COMPLETED';
+    study.result=await this.simulator.run(study.dataset,[base,{...base,fastPeriod:20,slowPeriod:60},{...base,fastPeriod:5,slowPeriod:20},{...base,strategy:'BREAKOUT'},{...base,strategy:'MEAN_REVERSION'}],request.trainBars,request.testBars);study.status='COMPLETED';
    }catch(error){study.status='FAILED';study.error=error instanceof Error?error.message:'historical study failed';}
    finally{study.completedAt=new Date().toISOString();coordinator.move('euler','IDLE','Quant Lab',`Historical study ${study.status.toLowerCase()}: ${study.id}`);bus.publish(event(study.status==='COMPLETED'?'BACKTEST_COMPLETED':'BACKTEST_FAILED',{studyId:study.id,status:study.status,error:study.error}));try{await persist();this.persistenceError=null;}finally{this.busy=false;}}
   };

@@ -1,3 +1,4 @@
+import {assertHistoricalStudiesAppendOnly} from './historical-study-guard.js';
 import {assertAiAppendOnly} from '../domain/ai-analysis.js';
 import{mkdir,readFile,rename,writeFile}from "node:fs/promises";import{dirname}from "node:path";import type{StateStore,StoredState}from "../domain/storage.js";
 export class JsonStateStore implements StateStore {
@@ -8,7 +9,9 @@ export class JsonStateStore implements StateStore {
   state = structuredClone(state);
   const contents = JSON.stringify(state, null, 2);
   const write = async () => {
-   assertAiAppendOnly((await this.load())?.aiLedger, state.aiLedger);
+   const previous = await this.load();
+   assertAiAppendOnly(previous?.aiLedger, state.aiLedger);
+   assertHistoricalStudiesAppendOnly(previous?.perpetualStudies, state.perpetualStudies);
    await mkdir(dirname(this.path), {recursive: true});
    const tmp = this.path + '.tmp';
    await writeFile(tmp, contents, 'utf8');
