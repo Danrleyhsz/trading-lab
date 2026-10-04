@@ -1,4 +1,5 @@
 // First-publication checks only. They grant no execution, provisioning or risk authority.
+import {evaluationWalletCapital} from './evaluation-wallet-bootstrap.js';
 export type LaunchCheck = { id: string; ok: boolean };
 export function validHttpsOrigin(value: string) {
     try {
@@ -26,6 +27,9 @@ export function checkCloudConfiguration(env: NodeJS.ProcessEnv): LaunchCheck[] {
     for (const key of ['PAPER_EVALUATION_ENABLED', 'PERPETUAL_PAPER_ENABLED', 'AUTONOMOUS_PERPETUAL_ENABLED', 'LEGACY_PAPER_EXECUTION_ENABLED'])
         add(key + '_MUST_BE_FALSE', env[key] === 'false');
     add('NO_AUTONOMOUS_STUDY', !env.AUTONOMOUS_STUDY_ID);
+    let walletsValid = true;
+    try { evaluationWalletCapital(env); } catch { walletsValid = false; }
+    add('VALID_INDEPENDENT_WALLET_ALLOCATION', walletsValid);
     add('NO_PAID_OR_PRIVATE_KEYS', ['AI_PROVIDER_API_KEY', 'MARKET_DATA_API_KEY', 'MARKET_DATA_API_SECRET', 'BINANCE_API_KEY', 'BINANCE_API_SECRET'].every(key => !env[key]));
     add('SUPPORTED_MARKET_REQUIRED', env.MARKET_SYMBOL === 'btcusdt');
     const capital = Number(env.INITIAL_PAPER_CAPITAL);

@@ -1,3 +1,4 @@
+import {bootstrapEvaluationWallets} from './application/evaluation-wallet-bootstrap.js';
 import {EventAudit,registerEventAudit} from './application/event-audit.js';
 import {ResearchJobs,registerResearchJobs} from './application/research-jobs.js';
 import type {StoredState} from './domain/storage.js';
@@ -54,6 +55,7 @@ const collaboration=new AgentCollaboration(messages,coordinator,memories),strate
 const accounts=new PaperAccounts(bus,Number(process.env.INITIAL_PAPER_CAPITAL||10000),restored?.paperAccounts??[]);
 const book=new PerpetualPaperBook(bus,restored?.perpetualBook),perpetualHistory=new BinancePerpetualHistory(),perpetualMarket=new BinancePerpetualMarket(),studies=new PerpetualStudies(perpetualHistory,restored?.perpetualStudies??[]);
 const evaluationEnabled=process.env.PAPER_EVALUATION_ENABLED==='true',perpetualEnabled=process.env.PERPETUAL_PAPER_ENABLED==='true';
+bootstrapEvaluationWallets(process.env,book);
 if(evaluationEnabled||perpetualEnabled){const capital=Number(process.env.EVALUATION_PAPER_CAPITAL);if(!Number.isFinite(capital)||capital<=0)throw Error('positive EVALUATION_PAPER_CAPITAL required');for(const agent of agents.list()){if(evaluationEnabled)accounts.ensureEvaluation(agent.id,capital);if(perpetualEnabled)book.ensureEvaluation(agent.id,capital);}}
 let durableAi:AiRecord[]=structuredClone(restored?.aiLedger??[]);
 let durableBook=book.exportState(),writes:Promise<unknown>=Promise.resolve(),persistenceError:string|null=null;
