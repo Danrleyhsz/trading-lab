@@ -1,0 +1,41 @@
+# Daily off-provider copy of the owner-encrypted production snapshot (docs/OFF_PROVIDER_BACKUP.md on the
+# release branches). Uses only the GET-only monitor token; GitHub never sees plaintext or the private key.
+name: Production encrypted backup
+on:
+  schedule:
+    - cron: '23 6 * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: production-backup
+  cancel-in-progress: false
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Download and validate encrypted snapshot
+        env:
+          TOKEN: ${{ secrets.READ_ONLY_ACCESS_TOKEN }}
+          ORIGIN: https://trading-lab-x0yh.onrender.com
+          KEY_FINGERPRINT: a539d19dee549204ae2287a3a3fce503d4596c3a36e24bd24c87c5df1d86bd6c
+        run: |
+          set -euo pipefail
+          test -n "$TOKEN" || { echo "::error::READ_ONLY_ACCESS_TOKEN secret is missing"; exit 1; }
+          mkdir -p out
+          printf 'header = "Authorization: Bearer %s"\n' "$TOKEN" | curl -fsS --retry 3 --retry-delay 20 --max-time 90 -K - -o out/backup.json "$ORIGIN/ops/backup"
+          jq -e --arg fp "$KEY_FINGERPRINT" '.format=="TRADING_LAB_ENCRYPTED_STATE_V1" and .keyFingerprint==$fp and (.ciphertext|length)>1000 and (.plaintextSha256|test("^[0-9a-f]{64}$")) and .persistedAt!=null' out/backup.json >/dev/null \
+            || { echo "::error::backup envelope invalid or produced with an unexpected key"; exit 1; }
+          age=$(( $(date -u +%s) - $(date -u -d "$(jq -r .persistedAt out/backup.json)" +%s) ))
+          test "$age" -lt 7200 || { echo "::error::last durable snapshot is ${age}s old"; exit 1; }
+          name="trading-lab-backup-$(date -u +%Y%m%dT%H%MZ).json"
+          mv out/backup.json "out/$name"
+          (cd out && sha256sum "$name" | tee "$name.sha256")
+          echo "persistedAt=$(jq -r .persistedAt "out/$name") plaintextSha256=$(jq -r .plaintextSha256 "out/$name")" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: trading-lab-backup-${{ github.run_id }}
+          path: out/
+          retention-days: 90
+          if-no-files-found: error

@@ -1,0 +1,42 @@
+# Hourly external alert: a failed run makes GitHub email the owner. GET-only monitor token; no writes.
+name: Production monitor
+on:
+  schedule:
+    - cron: '7 * * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: production-monitor
+  cancel-in-progress: true
+jobs:
+  readiness:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check readiness, persistence, market, funding and guard rails
+        env:
+          TOKEN: ${{ secrets.READ_ONLY_ACCESS_TOKEN }}
+          ORIGIN: https://trading-lab-x0yh.onrender.com
+        run: |
+          set -euo pipefail
+          test -n "$TOKEN" || { echo "::error::READ_ONLY_ACCESS_TOKEN secret is missing"; exit 1; }
+          curl -fsS --retry 3 --retry-delay 15 --max-time 30 "$ORIGIN/health/ready" >/dev/null || { echo "::error::public health check failed"; exit 1; }
+          printf 'header = "Authorization: Bearer %s"\n' "$TOKEN" | curl -fsS --retry 3 --retry-delay 15 --max-time 30 -K - -o readiness.json "$ORIGIN/runtime/readiness"
+          failures=$(jq -r '[
+            (if .ready!=true then "runtime not ready: \(.reasons|join(","))" else empty end),
+            (if .storage.available!=true then "storage unavailable" else empty end),
+            (if .storage.persistenceFailed then "persistence failed" else empty end),
+            (if (.storage.pendingWrites//0)>20 then "pending writes \(.storage.pendingWrites)" else empty end),
+            (if .market.perpetual.status!="HEALTHY" then "USD-M market \(.market.perpetual.status)" else empty end),
+            (if .market.spot.status!="HEALTHY" then "spot market \(.market.spot.status)" else empty end),
+            (if .paper.funding.ready!=true then "funding not ready" else empty end),
+            (if .paper.halted then "new exposure halted" else empty end),
+            (if .paper.autonomousLastAttemptFailed then "autonomous attempt failed" else empty end),
+            (if .jobs.research.persistenceFailed or .jobs.historical.persistenceFailed then "job persistence failed" else empty end),
+            (if .ai.enabled then "paid AI enabled" else empty end),
+            (if .mode!="PAPER_TRADING" then "mode \(.mode)" else empty end)
+          ]|join("; ")' readiness.json)
+          echo "startedAt=$(jq -r .startedAt readiness.json) observedAt=$(jq -r .observedAt readiness.json)" >> "$GITHUB_STEP_SUMMARY"
+          if [ -n "$failures" ]; then echo "::error::$failures"; echo "FAIL: $failures" >> "$GITHUB_STEP_SUMMARY"; exit 1; fi
+          echo "OK" >> "$GITHUB_STEP_SUMMARY"
