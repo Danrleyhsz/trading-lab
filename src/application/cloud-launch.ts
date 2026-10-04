@@ -24,8 +24,14 @@ export function checkCloudConfiguration(env: NodeJS.ProcessEnv): LaunchCheck[] {
     } catch { /* Only fixed check identifiers are returned, never a secret URL. */ }
     add('DIRECT_POSTGRESQL_REQUIRED', databaseValid && directHost);
     add('VERIFIED_TLS_REQUIRED', tlsValid && env.NODE_TLS_REJECT_UNAUTHORIZED !== '0');
-    for (const key of ['PAPER_EVALUATION_ENABLED', 'PERPETUAL_PAPER_ENABLED', 'AUTONOMOUS_PERPETUAL_ENABLED', 'LEGACY_PAPER_EXECUTION_ENABLED'])
+    const controlled = env.CLOUD_LAUNCH_PHASE === 'CONTROLLED_PAPER';
+    add('VALID_LAUNCH_PHASE', env.CLOUD_LAUNCH_PHASE === undefined || env.CLOUD_LAUNCH_PHASE === 'FIRST_PUBLICATION' || controlled);
+    for (const key of ['PAPER_EVALUATION_ENABLED', 'AUTONOMOUS_PERPETUAL_ENABLED', 'LEGACY_PAPER_EXECUTION_ENABLED'])
         add(key + '_MUST_BE_FALSE', env[key] === 'false');
+    if (controlled) {
+        add('CONTROLLED_PERPETUAL_ONLY', env.PERPETUAL_PAPER_ENABLED === 'true');
+        add('INDEPENDENT_WALLETS_REQUIRED', env.EVALUATION_WALLETS_ENABLED === 'true');
+    } else add('PERPETUAL_PAPER_ENABLED_MUST_BE_FALSE', env.PERPETUAL_PAPER_ENABLED === 'false');
     add('NO_AUTONOMOUS_STUDY', !env.AUTONOMOUS_STUDY_ID);
     let walletsValid = true;
     try { evaluationWalletCapital(env); } catch { walletsValid = false; }
@@ -41,7 +47,7 @@ export function checkCloudConfiguration(env: NodeJS.ProcessEnv): LaunchCheck[] {
 
 export function cloudConfigurationReport(env: NodeJS.ProcessEnv) {
     const checks = checkCloudConfiguration(env);
-    return {scope:'FIRST_PUBLICATION_CONFIG_ONLY',ready:checks.every(c=>c.ok),checks,
+    return {scope:env.CLOUD_LAUNCH_PHASE === 'CONTROLLED_PAPER' ? 'CONTROLLED_PAPER_CONFIG_ONLY' : 'FIRST_PUBLICATION_CONFIG_ONLY',ready:checks.every(c=>c.ok),checks,
         unverified:['DATABASE_CONNECTION','CLOUD_HOST','HISTORY_IMPORT','BACKUPS_AND_RESTORE','RELEASE_REVIEW']};
 }
 
