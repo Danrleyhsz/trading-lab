@@ -17,6 +17,8 @@ export class PerpetualPaperBook {
  ensureEvaluation(ownerAgentId:AgentId,initialCash:number){if(!owners.includes(ownerAgentId)||!Number.isFinite(initialCash)||initialCash<=0)throw Error('invalid evaluation endowment');const id=`evaluation:${ownerAgentId}:usdm`;if(!this.state.accounts.some(a=>a.id===id))this.state.accounts.push({id,ownerAgentId,initialCash,createdAt:new Date(this.now()).toISOString(),ledger:[],peakEquity:initialCash,maxDrawdown:0,dailyDate:new Date(this.now()).toISOString().slice(0,10),dailyStartEquity:initialCash,samples:[]});return id;}
  exportState(){return structuredClone(this.state);}
  cursor(){return this.state.fundingCursor;}
+ /** True only when a settlement can be pending (first sync, or the expected funding time has passed without one), so the funding history is not polled on every quote. */
+ fundingDue(markTime:number){const expected=this.state.expectedFundingTime;return !expected||(markTime>=expected&&this.state.fundingCursor<expected);}
  market(){return this.quote?structuredClone(this.quote):null;}
  private fundingReady(){return !this.state.expectedFundingTime||this.now()<this.state.expectedFundingTime||this.state.fundingCursor>=this.state.expectedFundingTime;}
  status(){return {accountCount:this.state.accounts.length,autonomousAccountExists:this.state.accounts.some(a=>a.id==='evaluation:nova:usdm'),fundingCursor:this.state.fundingCursor,expectedFundingTime:this.state.expectedFundingTime??null,fundingReady:this.fundingReady(),halted:this.state.halted,persistenceFailed:this.persistenceFailed,marketReady:!!this.quote&&freshPerpetualQuote(this.quote,this.now()),autonomousCursor:this.state.autonomousCursor??null};}
