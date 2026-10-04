@@ -249,6 +249,7 @@ q('#runResearch').onclick = async () => {
   } finally { button.disabled = false; }
 };
 function renderResearchJobs(jobs) {
+  const focusedJob=document.activeElement?.dataset?.researchJobId;
   const host=q('#researchJobs');host.replaceChildren();
   const labels={QUEUED:'Solicitação registrada',RUNNING:'Em execução · estado registrado',COMPLETED:'Concluída',FAILED:'Falhou',INTERRUPTED:'Interrompida por reinício'};
   const validId=id=>typeof id==='string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
@@ -257,7 +258,7 @@ function renderResearchJobs(jobs) {
   for(const job of jobs){const card=node('li','');card.className='research-job';card.dataset.status=job.status;
     card.append(node('b',labels[job.status]),node('small','Tarefa '+job.id),node('p',job.limit+' candles solicitados · '+date(job.updatedAt)));
     if(job.reason)card.append(node('p',job.reason==='RUNTIME_RESTARTED'?'Sem retomada automática. Revise a evidência antes de uma nova solicitação.':'Falha registrada. Nenhum resultado positivo é presumido.'));
-    if(job.runId){const button=node('button','Abrir resultado original');button.onclick=()=>researchDetails(job.runId);card.append(button);}host.append(card);
+    if(job.runId){const button=node('button','Abrir resultado original');button.dataset.researchJobId=job.id;button.onclick=()=>researchDetails(job.runId);card.append(button);host.append(card);if(focusedJob===job.id)button.focus();}else host.append(card);
   }
 }
 function renderResearch(runs) {

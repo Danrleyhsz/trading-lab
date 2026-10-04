@@ -29,6 +29,7 @@ const settle=()=>new Promise(resolve=>setImmediate(resolve));
 test('research job cards expose original results and clear stale lifecycle on read failure',async()=>{
  const id='00000000-0000-4000-8000-000000000001',runId='00000000-0000-4000-8000-000000000002',responses:Record<string,unknown>={'/research/jobs':[{id,runId,status:'COMPLETED',limit:100,updatedAt:'2026-01-01T00:00:00Z'}]},h=harness(responses);await settle();
  assert.match(flatten(h.ids.get('#researchJobs')!),/Concluída/);assert.match(flatten(h.ids.get('#researchJobs')!),/100 candles/);buttons(h.ids.get('#researchJobs')!)[0].onclick!();await settle();assert.ok(h.requests.includes('/research/runs/'+runId));assert.ok(!h.requests.includes('/research/run'));
+ (h.context.document as any).activeElement=buttons(h.ids.get('#researchJobs')!)[0];await vm.runInContext('refreshOnline()',h.context);assert.equal(buttons(h.ids.get('#researchJobs')!)[0].focusCalls,1);
  responses['/research/jobs']={httpError:401};await vm.runInContext('refreshOnline()',h.context);assert.match(flatten(h.ids.get('#researchJobs')!),/indisponíveis/);assert.doesNotMatch(flatten(h.ids.get('#researchJobs')!),/Concluída/);
 });
 const researchFixture=(id='TEST_ONLY_RESEARCH')=>({id,status:'REJECTED',startedAt:'2026-01-01T00:00:00Z',completedAt:'2026-01-01T00:01:00Z',findings:[{agentId:'vega',metric:'volatility',summary:'TEST_ONLY <script>source text</script>',values:{volatility:0.1}}],events:[{id:'TEST_ONLY_EVENT',type:'RESEARCH_COMPLETED'}],backtest:{netPnl:-10,trades:2}});
