@@ -32,6 +32,8 @@ import {PerpetualPaperBook,type PerpetualBookState} from './application/perpetua
 import {AutonomousPerpetualCycle} from './application/autonomous-perpetual-cycle.js';
 import {registerPerpetualPaperRoutes} from './application/perpetual-paper-routes.js';
 import {registerAccessControl} from './application/access-control.js';
+import {registerEncryptedBackup} from './application/encrypted-backup.js';
+import {BACKUP_PUBLIC_KEY_PEM} from './config/backup-public-key.js';
 import {BinancePublicMarketData} from './infrastructure/binance-market-data.js';
 import {BinanceHistoricalData} from './infrastructure/binance-history.js';
 import {BinanceDerivativesData} from './infrastructure/binance-derivatives.js';
@@ -48,7 +50,7 @@ const app=Fastify({logger:{redact:['req.headers.authorization','req.headers.cook
 registerAccessControl(app,process.env.APP_ACCESS_TOKEN??'',production,process.env.PUBLIC_ORIGIN??'',process.env.READ_ONLY_ACCESS_TOKEN??'');app.get('/',async(_req,reply)=>reply.redirect('/office/index.html'));await app.register(websocket);
 const store=process.env.DATABASE_URL?new PostgresStateStore(process.env.DATABASE_URL,production):new JsonStateStore();if(store instanceof PostgresStateStore)await store.open();const restored=await store.load();
 const runtime=new RuntimeReadiness({production,storage:store instanceof PostgresStateStore?'POSTGRESQL':'JSON_DEVELOPMENT',protectedAccess:!!process.env.APP_ACCESS_TOKEN,httpsOrigin:(process.env.PUBLIC_ORIGIN??'').startsWith('https://'),storageAvailable:()=>!(store instanceof PostgresStateStore)||store.available()});
-let durableSnapshot:StoredState|null=restored?structuredClone(restored):null;
+let durableSnapshot:StoredState|null=restored?structuredClone(restored):null;let durablePersistedAt:string|null=null;
 const domainEvents=structuredClone(restored?.domainEvents??[]);
 const bus=new EventBus(),agents=new AgentRegistry(),coordinator=new AgentCoordinator(agents,bus),memories=new MemoryStore(),messages=new AgentMessageBus(),activity=new AgentActivityJournal(),researchRuns=new ResearchRunStore(),strategies=new StrategyRegistry();
 if(restored){agents.hydrate(restored.agents);memories.hydrate(restored.memories);messages.hydrate(restored.agentMessages??[]);activity.hydrate(restored.agentActivity??[]);researchRuns.hydrate(restored.researchRuns??[]);strategies.hydrate(restored.strategies??[]);}
@@ -60,7 +62,7 @@ bootstrapEvaluationWallets(process.env,book);
 if(evaluationEnabled||perpetualEnabled){const capital=Number(process.env.EVALUATION_PAPER_CAPITAL);if(!Number.isFinite(capital)||capital<=0)throw Error('positive EVALUATION_PAPER_CAPITAL required');for(const agent of agents.list()){if(evaluationEnabled)accounts.ensureEvaluation(agent.id,capital);if(perpetualEnabled)book.ensureEvaluation(agent.id,capital);}}
 let durableAi:AiRecord[]=structuredClone(restored?.aiLedger??[]);
 let durableBook=book.exportState(),writes:Promise<unknown>=Promise.resolve(),persistenceError:string|null=null;
-const persist=(override?:PerpetualBookState,aiOverride?:AiRecord[])=>{runtime.writeQueued();const run=async()=>{try{const snapshot:StoredState={aiLedger:aiOverride??durableAi,domainEvents:structuredClone(domainEvents),agents:agents.list(),memories:memories.list(),agentMessages:messages.list(),agentActivity:activity.list(),paperAccounts:accounts.exportState(),researchRuns:researchRuns.list(),strategies:strategies.list(),perpetualStudies:studies.list(),perpetualBook:override??durableBook};await store.save(snapshot);durableSnapshot=snapshot;if(override)durableBook=structuredClone(override);if(aiOverride)durableAi=structuredClone(aiOverride);persistenceError=null;runtime.writeSucceeded();}catch(error){runtime.writeFailed();persistenceError='state persistence unavailable';throw error;}};const result=writes.then(run);writes=result.catch(()=>{});return result;};
+const persist=(override?:PerpetualBookState,aiOverride?:AiRecord[])=>{runtime.writeQueued();const run=async()=>{try{const snapshot:StoredState={aiLedger:aiOverride??durableAi,domainEvents:structuredClone(domainEvents),agents:agents.list(),memories:memories.list(),agentMessages:messages.list(),agentActivity:activity.list(),paperAccounts:accounts.exportState(),researchRuns:researchRuns.list(),strategies:strategies.list(),perpetualStudies:studies.list(),perpetualBook:override??durableBook};await store.save(snapshot);durableSnapshot=snapshot;durablePersistedAt=new Date().toISOString();if(override)durableBook=structuredClone(override);if(aiOverride)durableAi=structuredClone(aiOverride);persistenceError=null;runtime.writeSucceeded();}catch(error){runtime.writeFailed();persistenceError='state persistence unavailable';throw error;}};const result=writes.then(run);writes=result.catch(()=>{});return result;};
 bus.subscribe(e=>{if(['MARKET_TICK','PERPETUAL_MARKET_UPDATED','MARKET_DATA_FAILED'].includes(e.type))return;domainEvents.push(structuredClone(e));activity.record(e);queueMicrotask(()=>void persist().catch(error=>app.log.error({error},'state persistence failed')));});
 // Actual committed outcomes create agent memories; historical simulations never enter this path.
 bus.subscribe(e=>{const payload=e.payload as any;if(!payload?.accountId?.endsWith(':usdm')&&!payload?.fill?.accountId?.endsWith(':usdm'))return;
@@ -71,7 +73,7 @@ bus.subscribe(e=>{const payload=e.payload as any;if(!payload?.accountId?.endsWit
 const autonomousEnabled=process.env.AUTONOMOUS_PERPETUAL_ENABLED==='true';if(autonomousEnabled&&(!perpetualEnabled||!process.env.AUTONOMOUS_STUDY_ID))throw Error('autonomous perpetual evaluation requires enabled accounts and explicit study ID');
 const cycle=new AutonomousPerpetualCycle(autonomousEnabled,process.env.AUTONOMOUS_STUDY_ID??'',studies,book,perpetualHistory,persist,memories,bus,()=>persist(),Date.now,()=>runtime.control().ready);
 registerAgentProfiles(app,agents,memories,messages,activity,accounts,book);
-registerEventAudit(app,new EventAudit(()=>durableSnapshot));
+registerEventAudit(app,new EventAudit(()=>durableSnapshot));registerEncryptedBackup(app,()=>durableSnapshot?{state:durableSnapshot,persistedAt:durablePersistedAt}:null,BACKUP_PUBLIC_KEY_PEM);
 const research=new ResearchEngine({snapshot:symbol=>derivatives.snapshot(symbol),candles:(symbol,interval,limit)=>history.candles(symbol,interval,limit)},coordinator,collaboration,messages,memories,strategies,strategyLab,backtester,researchRuns,bus);
 const researchJobs=new ResearchJobs(research,bus,()=>persist(),domainEvents,()=>studies.status().busy||agents.get('euler')?.status==='BACKTESTING');
 researchJobs.recover();registerResearchJobs(app,researchJobs);
