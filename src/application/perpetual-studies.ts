@@ -33,8 +33,8 @@ export class PerpetualStudies {
   void task().catch(()=>{this.persistenceError='historical persistence failed';}).finally(finished);return this.get(study.id)!;
  }
 }
-export function registerPerpetualStudies(app:FastifyInstance,studies:PerpetualStudies,persist:()=>Promise<void>,coordinator:AgentCoordinator,bus:EventBus){
+export function registerPerpetualStudies(app:FastifyInstance,studies:PerpetualStudies,persist:()=>Promise<void>,coordinator:AgentCoordinator,bus:EventBus,blocked:()=>boolean=()=>false){
  app.get('/backtests/v2/studies',async()=>studies.summaries());
  app.get<{Params:{id:string}}>('/backtests/v2/studies/:id',async(req,reply)=>studies.get(req.params.id)??reply.code(404).send({error:'unknown study'}));
- app.post('/backtests/v2/studies',async(req,reply)=>{const parsed=schema.safeParse(req.body??{});if(!parsed.success)return reply.code(400).send({error:'invalid study request'});try{return reply.code(202).send(await studies.start(parsed.data,persist,coordinator,bus));}catch(error){if(error instanceof Error&&error.message==='quant job already running')return reply.code(409).send({error:error.message});throw error;}});
+ app.post('/backtests/v2/studies',async(req,reply)=>{const parsed=schema.safeParse(req.body??{});if(!parsed.success)return reply.code(400).send({error:'invalid study request'});if(blocked())return reply.code(409).send({error:'quant job already running'});try{return reply.code(202).send(await studies.start(parsed.data,persist,coordinator,bus));}catch(error){if(error instanceof Error&&error.message==='quant job already running')return reply.code(409).send({error:error.message});throw error;}});
 }

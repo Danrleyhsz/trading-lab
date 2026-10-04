@@ -1,4 +1,5 @@
 import {EventAudit,registerEventAudit} from './application/event-audit.js';
+import {ResearchJobs,registerResearchJobs} from './application/research-jobs.js';
 import type {StoredState} from './domain/storage.js';
 import {RuntimeReadiness,registerRuntimeReadiness} from './application/runtime-readiness.js';
 import {AiAnalysis,registerAiStatus} from './application/ai-analysis.js';
@@ -69,12 +70,14 @@ const cycle=new AutonomousPerpetualCycle(autonomousEnabled,process.env.AUTONOMOU
 registerAgentProfiles(app,agents,memories,messages,activity,accounts,book);
 registerEventAudit(app,new EventAudit(()=>durableSnapshot));
 const research=new ResearchEngine({snapshot:symbol=>derivatives.snapshot(symbol),candles:(symbol,interval,limit)=>history.candles(symbol,interval,limit)},coordinator,collaboration,messages,memories,strategies,strategyLab,backtester,researchRuns,bus);
-registerResearchRoutes(app,research,()=>persist());registerPerpetualStudies(app,studies,()=>persist(),coordinator,bus);
+const researchJobs=new ResearchJobs(research,bus,()=>persist(),domainEvents,()=>studies.status().busy||agents.get('euler')?.status==='BACKTESTING');
+researchJobs.recover();registerResearchJobs(app,researchJobs);
+registerResearchRoutes(app,research,()=>persist(),()=>researchJobs.status().busy||!researchJobs.status().accepting);registerPerpetualStudies(app,studies,()=>persist(),coordinator,bus,()=>researchJobs.status().busy);
 let latest:MarketTick|null=null;registerPaperAccountRoutes(app,accounts,{market:()=>latest,memories,strategies,coordinator,persist:()=>persist(),evaluationEnabled,bus,executionEnabled:process.env.LEGACY_PAPER_EXECUTION_ENABLED==='true'});
 registerPerpetualPaperRoutes(app,book,persist,perpetualEnabled,cycle,()=>readiness().paper.submission.ready);
 const aiAnalysis=new AiAnalysis(ledger=>persist(undefined,ledger),durableAi);
 registerAiStatus(app,aiAnalysis);
-const runtimeInputs=()=>({spot:latest,perpetual:perpetualMarket.snapshot(),book:book.status(),autonomous:cycle.status(),research:research.status(),historical:studies.status(),ai:aiAnalysis.status(),legacyExecutionEnabled:process.env.LEGACY_PAPER_EXECUTION_ENABLED==='true',evaluationEnabled,perpetualEnabled});
+const runtimeInputs=()=>({spot:latest,perpetual:perpetualMarket.snapshot(),book:book.status(),autonomous:cycle.status(),research:researchJobs.status(),historical:studies.status(),ai:aiAnalysis.status(),legacyExecutionEnabled:process.env.LEGACY_PAPER_EXECUTION_ENABLED==='true',evaluationEnabled,perpetualEnabled});
 const readiness=()=>runtime.snapshot(runtimeInputs());
 registerRuntimeReadiness(app,runtime,runtimeInputs);
 registerOfficeAssets(app);
@@ -93,8 +96,8 @@ app.get('/events',{websocket:true},socket=>{const unsubscribe=bus.subscribe(e=>{
 for(const agent of agents.list())if(agent.status!=='IDLE')coordinator.move(agent.id,'IDLE',agent.room,'runtime restarted; unfinished task outcome was not inferred');
 await persist();const legacyMarket=new BinancePublicMarketData(process.env.MARKET_SYMBOL?.toLowerCase()||'btcusdt');await legacyMarket.connect(t=>{latest=t;accounts.mark(t.symbol,t.price);bus.publish(event('MARKET_TICK',t));});
 await perpetualMarket.start(async quote=>{if(runtime.isDraining())return;const settlements=quote.markTime>book.cursor()?await perpetualMarket.funding(book.cursor()+1,quote.markTime):[];await book.synchronize(quote,settlements,persist);bus.publish(event('PERPETUAL_MARKET_UPDATED',quote));if(!runtime.isDraining())await cycle.onMarket();},error=>{app.log.warn({error},'USD-M reconciliation unavailable');bus.publish(event('MARKET_DATA_FAILED',{instrument:'BINANCE_USDM:BTCUSDT',error:error.message}));});
-app.addHook('preClose',async()=>{runtime.draining();research.stopAccepting();studies.stopAccepting();});
-app.addHook('onClose',async()=>{await perpetualMarket.stop();await legacyMarket.disconnect();await studies.drain();await writes;if(store instanceof PostgresStateStore)await store.close();runtime.stopped();});
+app.addHook('preClose',async()=>{runtime.draining();researchJobs.stopAccepting();research.stopAccepting();studies.stopAccepting();});
+app.addHook('onClose',async()=>{await researchJobs.drain();await perpetualMarket.stop();await legacyMarket.disconnect();await studies.drain();await writes;if(store instanceof PostgresStateStore)await store.close();runtime.stopped();});
 let closing=false;
 for(const signal of ['SIGTERM','SIGINT'] as const)process.once(signal,()=>{if(closing)return;closing=true;runtime.draining();const deadline=setTimeout(()=>{app.log.error('shutdown grace expired; incomplete durable studies restore as interrupted');process.exit(1);},30000);void app.close().then(()=>{clearTimeout(deadline);process.exit(0);}).catch(error=>{clearTimeout(deadline);app.log.error({error},'shutdown failed');process.exit(1);});});
 await app.listen({port:Number(process.env.PORT||3000),host:'0.0.0.0'});runtime.serving();

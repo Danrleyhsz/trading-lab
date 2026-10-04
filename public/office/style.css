@@ -1046,3 +1046,12 @@ body[data-view="fit"] #profile{width:min(350px,calc(100% - 24px));max-height:cal
   body[data-view="fit"][data-layout="reference"] .trace{height:25px;margin:1px 0}
   body[data-view="fit"][data-layout="reference"] .market-screen{padding:5px 10px}
 }
+/* Real research lifecycle cards: compact evidence, clear state, touch targets. */
+#researchJobs {list-style:none;padding:0;display:grid;gap:.6rem}
+.research-job {border:1px solid #28435f;border-left:3px solid #58baff;border-radius:8px;background:#0d192c;padding:.75rem;display:grid;gap:.35rem;overflow-wrap:anywhere}
+.research-job small {color:#a9c4df;font-variant-numeric:tabular-nums}
+.research-job p {margin:.15rem 0}
+.research-job button {min-height:44px;justify-self:start}
+.research-job[data-status="COMPLETED"] {border-left-color:#28dba2}
+.research-job[data-status="FAILED"],.research-job[data-status="INTERRUPTED"] {border-left-color:#ffb665}
+@media(max-width:600px){.research-job button{width:100%}.workspace-panel{overflow-wrap:anywhere}}

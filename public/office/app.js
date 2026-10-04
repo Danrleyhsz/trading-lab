@@ -238,15 +238,28 @@ q('#runResearch').onclick = async () => {
   button.disabled = true;
   q('#researchActionStatus').textContent = 'Pesquisa solicitada…';
   try {
-    const response = await fetch('/research/run', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({symbol: 'BTCUSDT'})});
+    const response = await fetch('/research/jobs', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({symbol: 'BTCUSDT'})});
     const run = await response.json();
-    q('#researchActionStatus').textContent = run.status ? 'Resultado registrado: ' + run.status : 'A solicitação falhou. Consulte a atividade registrada.';
+    q('#researchActionStatus').textContent = response.status === 202 ? 'Solicitação registrada: ' + run.id + '. Consulte o estado e o resultado abaixo.' : 'Solicitação recusada ou indisponível. Consulte as tarefas registradas antes de tentar novamente.';
+    await refreshOnline();
     refresh();
     if (selected) details();
   } catch {
-    q('#researchActionStatus').textContent = 'Não foi possível acessar o laboratório.';
+    q('#researchActionStatus').textContent = 'Confirmação indisponível. Consulte as tarefas antes de solicitar novamente; a solicitação pode ter sido registrada.';
   } finally { button.disabled = false; }
 };
+function renderResearchJobs(jobs) {
+  const host=q('#researchJobs');host.replaceChildren();
+  const labels={QUEUED:'Solicitação registrada',RUNNING:'Em execução · estado registrado',COMPLETED:'Concluída',FAILED:'Falhou',INTERRUPTED:'Interrompida por reinício'};
+  const validId=id=>typeof id==='string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+  if(!Array.isArray(jobs)||jobs.length>20||jobs.some(j=>!j||!validId(j.id)||!Object.hasOwn(labels,j.status)||!Number.isInteger(j.limit)||j.limit<100||j.limit>1000||!Number.isFinite(Date.parse(j.updatedAt))||j.runId&&!validId(j.runId))){host.append(node('li','Tarefas indisponíveis · consulte novamente após restabelecer o acesso.'));return;}
+  if(!jobs.length){host.append(node('li','Nenhuma tarefa de pesquisa registrada.'));return;}
+  for(const job of jobs){const card=node('li','');card.className='research-job';card.dataset.status=job.status;
+    card.append(node('b',labels[job.status]),node('small','Tarefa '+job.id),node('p',job.limit+' candles solicitados · '+date(job.updatedAt)));
+    if(job.reason)card.append(node('p',job.reason==='RUNTIME_RESTARTED'?'Sem retomada automática. Revise a evidência antes de uma nova solicitação.':'Falha registrada. Nenhum resultado positivo é presumido.'));
+    if(job.runId){const button=node('button','Abrir resultado original');button.onclick=()=>researchDetails(job.runId);card.append(button);}host.append(card);
+  }
+}
 function renderResearch(runs) {
   records('#researchRuns', [...runs].reverse(), run => {
     const row = node('li', '');
@@ -434,7 +447,7 @@ function renderRuntime(data) {
 async function refreshOnline() {
   if (onlineBusy) return;onlineBusy = true;const version = onlineVersion;
   try {
-    const results = await Promise.allSettled([get('/market/v3'), get('/finance'), get('/backtests/v2/studies'), get('/paper/perpetual/status'), get('/runtime/readiness')]);
+    const results = await Promise.allSettled([get('/market/v3'), get('/finance'), get('/backtests/v2/studies'), get('/paper/perpetual/status'), get('/runtime/readiness'), get('/research/jobs')]);
     if (results[0].status === 'fulfilled' && version === onlineVersion) showPerpetualMarket(results[0].value);
     else if (results[0].status === 'rejected') marketUnavailable('Dados USD-M indisponíveis · preços podem estar desatualizados');
     if (results[1].status === 'fulfilled') {
@@ -451,6 +464,7 @@ async function refreshOnline() {
       const status = results[3].value;q('#riskSummary').textContent = 'Execução ' + (status.executionEnabled ? 'habilitada' : 'desligada') + ' · Autonomia ' + (status.autonomous?.enabled ? 'habilitada' : 'desligada') + (status.halted ? ' · Novas exposições pausadas' : '');halted = status.halted;q('#haltPaper').disabled = typeof halted !== 'boolean';q('#haltPaper').textContent = halted ? 'Retomar exposições paper permitidas' : 'Pausar novas exposições paper';
       q('#onlineStatus').textContent = `Execução perpétua ${status.executionEnabled ? 'habilitada' : 'desligada'} · nova exposição ${halted ? 'pausada' : 'sujeita ao risco'} · autonomia ${status.autonomous?.enabled ? 'habilitada' : 'desligada'} · ${status.autonomous?.reason || 'estado indisponível'}. Somente avaliação independente.`;
     } else { halted = null;q('#riskSummary').textContent = 'Estado de risco indisponível';q('#haltPaper').disabled = true;q('#onlineStatus').textContent = 'Controles indisponíveis · entre se o acesso for exigido'; }
+    renderResearchJobs(results[5].status==='fulfilled' ? results[5].value : null);
     if (results[4].status==='fulfilled' && version===onlineVersion) renderRuntime(results[4].value); else runtimeUnavailable();
   } finally { onlineBusy = false; }
 }

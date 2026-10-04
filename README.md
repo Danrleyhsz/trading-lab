@@ -26,6 +26,8 @@ Secrets never belong in Git. The initial product has no live-money broker. Devel
 
 Latest observation, 2026-10-03: the human's Render deployment started successfully. Independent public checks returned 200 for health/live, health/ready and the office, and 401 for unauthenticated private diagnostics; the human confirmed login and agent loading. Authenticated market/persistence diagnosis, restart/restore/backups and full release review remain pending. Execution/autonomy and AI remain disabled. Earlier blocked-publication statements below describe preparation history.
 
+Bounded durable research admissions and compact recorded-state cards are prepared in a draft; see [research jobs](docs/RESEARCH_JOBS.md). Restart records interruption instead of automatically repeating work. Execution and AI configuration remain unchanged.
+
 Research rows now open original detailed evidence through the existing read API, including sourced measurements, unchanged backtest output and event links. See [recorded research detail](docs/RESEARCH_EVIDENCE.md).
 
 First online launch preparation: [configuration, verification tools and remaining provider acceptance](docs/CLOUD_LAUNCH_READINESS.md). The human created Render web/database resources; startup remains blocked and operational acceptance is pending. Docker and `npm run start:cloud` use the direct compiled `launch-cloud.js` configuration gate before loading the runtime, avoiding quoted platform shell commands. All execution and AI remain off for first publication; original-history migration and release review remain required.

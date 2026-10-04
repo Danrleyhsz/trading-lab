@@ -1,5 +1,9 @@
 # Development continuation queue
 
+## Durable research draft — current increment
+
+Bounded journal-based research admissions now persist before work, expose original outcomes, serialize Quant access and record interruptions without automatic replay. Compact lifecycle cards and read-failure clearing preserve the original office art. See RESEARCH_JOBS.md. Human diagnosis at 2026-10-04T01:15:46Z reported healthy PostgreSQL/market/protected HTTPS, no accounts or enabled execution/AI. This point observation does not verify backups, restore or restart. Next: review and manually deploy the draft stack; validate actual sourced research and hosted restart/restore before enabling independent paper evaluation. No new billing or autonomous activation.
+
 ## Latest authorized functional package — 2026-10-03
 
 Human confirmed online login and eventual loading of the eight agents; do not recreate them. Public health/office200 and private diagnosis401 observed for deployed2878d20. New feature branch from #38 exposes original research evidence via existing APIs, preserves newest-first order and tests request ownership/failure/focus/source coverage. See RESEARCH_EVIDENCE.md. Browser inventory is empty; authenticated hosted diagnosis requested from the human without secrets. Do not claim real source freshness, restart/restore/backups or new frontend deployment without evidence.

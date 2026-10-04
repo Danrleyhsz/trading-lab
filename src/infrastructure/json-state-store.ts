@@ -14,6 +14,9 @@ export class JsonStateStore implements StateStore {
    assertAiAppendOnly(previous?.aiLedger, state.aiLedger);
    assertPerpetualContinuation(previous?.perpetualBook, state.perpetualBook);
    assertHistoricalStudiesAppendOnly(previous?.perpetualStudies, state.perpetualStudies);
+   const oldJobs=(previous?.domainEvents??[]).filter(e=>e.type==='RESEARCH_JOB_UPDATED');
+   const nextJobs=(state.domainEvents??[]).filter(e=>e.type==='RESEARCH_JOB_UPDATED');
+   if(oldJobs.some((e,i)=>JSON.stringify(e)!==JSON.stringify(nextJobs[i])))throw Error('research job history is append-only');
    await mkdir(dirname(this.path), {recursive: true});
    const tmp = this.path + '.tmp';
    await writeFile(tmp, contents, 'utf8');

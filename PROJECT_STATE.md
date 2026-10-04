@@ -1,5 +1,9 @@
 # Trading Lab — Project State
 
+## Current draft
+
+Journal-based bounded research admissions, interruption recovery and compact original-result cards are prepared without enabling trading or AI. See docs/RESEARCH_JOBS.md; deployment and hosted restart acceptance remain separate.
+
 ## Status
 Foundation phase. Cloud-first, mobile-managed, paper-trading only.
 
