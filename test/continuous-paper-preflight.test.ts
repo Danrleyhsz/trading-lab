@@ -12,6 +12,7 @@ import {EventBus} from '../src/application/event-bus.js';
 import {MemoryStore} from '../src/domain/memory.js';
 import {AiAnalysis} from '../src/application/ai-analysis.js';
 import {eligibleStudyFixture} from './fixtures/perpetual-study.js';
+import {validatePerpetualDataset} from '../src/domain/perpetual-backtest.js';
 const now=Date.parse('2026-10-04T11:00:00Z');
 const source={load:async()=>{throw Error('TEST_ONLY unexpected source retrieval');}};
 
@@ -40,6 +41,17 @@ test('NaN/future/missing dates, corrupted hashes/windows, costs and invalid coun
     assert.equal(screenPerpetualStudy(eligibleStudyFixture(now),NaN).eligible,false);
     assert.equal(screenPerpetualStudy(eligibleStudyFixture(now),now+7*86400000).eligible,true);
     assert.equal(screenPerpetualStudy(eligibleStudyFixture(now),now+7*86400000+1).eligible,false);
+});
+test('evidence identity survives PostgreSQL JSONB key reordering but not value changes',()=>{
+    // JSONB returns object keys shortest-first, then bytewise; reproduce that on a reload.
+    const jsonb=(value:unknown):unknown=>Array.isArray(value)?value.map(jsonb):value&&typeof value==='object'?Object.fromEntries(Object.keys(value).sort((a,b)=>a.length-b.length||(a<b?-1:a>b?1:0)).map(k=>[k,jsonb((value as Record<string,unknown>)[k])])):value;
+    const study=eligibleStudyFixture(now);study.dataset!.funding=[{timestamp:study.dataset!.trade[8].timestamp,rate:-0.0001,markPrice:100}];
+    study.datasetHash=validatePerpetualDataset(study.dataset!);study.result!.datasetHash=study.datasetHash;
+    const reloaded=jsonb(structuredClone(study)) as PerpetualStudy;
+    assert.notEqual(JSON.stringify(reloaded.dataset),JSON.stringify(study.dataset));
+    assert.equal(validatePerpetualDataset(reloaded.dataset!),study.datasetHash);
+    assert.equal(screenPerpetualStudy(reloaded,now).eligible,true);
+    reloaded.dataset!.funding[0].rate=0.0001;assert.equal(screenPerpetualStudy(reloaded,now).eligible,false);
 });
 test('malformed study cannot retrieve a signal, persist a cursor or emit a fill/memory',async()=>{
     const study=eligibleStudyFixture(now);study.result!.folds[5].testEnd=NaN;

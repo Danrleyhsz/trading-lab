@@ -15,7 +15,10 @@ export function validatePerpetualDataset(data:PerpetualDataset){
   if(c.timestamp!==data.trade[i].timestamp)throw new Error('unaligned mark candles');
  }
  let previous=-Infinity;for(const f of data.funding){if(!Number.isSafeInteger(f.timestamp)||f.timestamp<=previous||f.timestamp<data.trade[0].timestamp||f.timestamp>=data.trade.at(-1)!.timestamp+hour||!Number.isFinite(f.rate)||!Number.isFinite(f.markPrice)||f.markPrice<=0)throw new Error('invalid funding');previous=f.timestamp;}
- return createHash('sha256').update(JSON.stringify(data)).digest('hex');
+ // Fixed field order (the original adapter's), so storage that reorders object keys, such as PostgreSQL JSONB, cannot change the evidence identity and earlier recorded hashes stay reproducible.
+ const candle=(c:Candle)=>({timestamp:c.timestamp,open:c.open,high:c.high,low:c.low,close:c.close,volume:c.volume});
+ const canonical={instrument:data.instrument,trade:data.trade.map(candle),mark:data.mark.map(candle),funding:data.funding.map(f=>({timestamp:f.timestamp,rate:f.rate,markPrice:f.markPrice}))};
+ return createHash('sha256').update(JSON.stringify(canonical)).digest('hex');
 }
 /** Offline historical simulation only. Never emits broker events or writes account balances. */
 export function backtestPerpetual(data:PerpetualDataset,cfg:PerpetualConfig){
