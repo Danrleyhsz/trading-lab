@@ -43,3 +43,11 @@ The explicit static allowlist serves transitions.js. Its geometry/animation dire
 ## Workstations — 2026-10-03
 
 Workstation geometry/art/monitors remain read-only browser presentation. Source text uses textContent, unknown rooms do not get seats, and original event links require matching state identity/time/room/status/reason. Monitors cannot schedule research, approve risk, submit orders, mutate memory or call AI. The new script and PNG are explicit static allowlist entries. See OFFICE_WORKSTATIONS.md.
+
+## Read-only monitoring token (READ_ONLY_ACCESS_TOKEN)
+
+`READ_ONLY_ACCESS_TOKEN` is optional. When it is set, a `Bearer` with this value may perform **GET/HEAD only**. It cannot log in, create a session, open the `/events` stream or call any mutation; mutations get 403. Startup fails if the value has fewer than 32 characters or equals `APP_ACCESS_TOKEN`.
+
+It exists for unattended monitoring and for the assistant's read-only production checks. The owner generates the value and stores it only in Render `Environment`, a Windows user environment variable and a GitHub Actions secret. It is never committed, printed or placed in a URL. To revoke it, remove or rotate the Render variable and redeploy.
+
+`GET /` now redirects to `/office/index.html` and reveals nothing else.

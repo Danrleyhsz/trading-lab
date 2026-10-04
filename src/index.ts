@@ -45,7 +45,7 @@ const production=process.env.NODE_ENV==='production';
 if(process.env.PAPER_TRADING_ONLY==='false')throw Error('only paper trading is supported');
 if(production&&!process.env.DATABASE_URL)throw Error('PostgreSQL is required in production');
 const app=Fastify({logger:{redact:['req.headers.authorization','req.headers.cookie','res.headers.set-cookie']}});
-registerAccessControl(app,process.env.APP_ACCESS_TOKEN??'',production,process.env.PUBLIC_ORIGIN??'');await app.register(websocket);
+registerAccessControl(app,process.env.APP_ACCESS_TOKEN??'',production,process.env.PUBLIC_ORIGIN??'',process.env.READ_ONLY_ACCESS_TOKEN??'');app.get('/',async(_req,reply)=>reply.redirect('/office/index.html'));await app.register(websocket);
 const store=process.env.DATABASE_URL?new PostgresStateStore(process.env.DATABASE_URL,production):new JsonStateStore();if(store instanceof PostgresStateStore)await store.open();const restored=await store.load();
 const runtime=new RuntimeReadiness({production,storage:store instanceof PostgresStateStore?'POSTGRESQL':'JSON_DEVELOPMENT',protectedAccess:!!process.env.APP_ACCESS_TOKEN,httpsOrigin:(process.env.PUBLIC_ORIGIN??'').startsWith('https://'),storageAvailable:()=>!(store instanceof PostgresStateStore)||store.available()});
 let durableSnapshot:StoredState|null=restored?structuredClone(restored):null;
