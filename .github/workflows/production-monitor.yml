@@ -1,0 +1,48 @@
+# Hourly external alert: a failed run makes GitHub email the owner. GET-only monitor token; no writes.
+name: Production monitor
+on:
+  schedule:
+    - cron: '7 * * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: production-monitor
+  cancel-in-progress: true
+jobs:
+  readiness:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check readiness, persistence, market, funding and guard rails
+        env:
+          TOKEN: ${{ secrets.READ_ONLY_ACCESS_TOKEN }}
+          ORIGIN: https://trading-lab-x0yh.onrender.com
+        run: |
+          set -euo pipefail
+          test -n "$TOKEN" || { echo "::error::READ_ONLY_ACCESS_TOKEN secret is missing"; exit 1; }
+          curl -fsS --retry 3 --retry-delay 15 --max-time 30 "$ORIGIN/health/ready" >/dev/null || { echo "::error::public health check failed"; exit 1; }
+          # Three samples ~25 s apart. Alert only on a condition present in all of them, so a brief source
+          # blip does not page while a persistent outage (for example an exchange IP ban) does.
+          for i in 1 2 3; do
+            printf 'header = "Authorization: Bearer %s"\n' "$TOKEN" | curl -fsS --retry 3 --retry-delay 15 --max-time 30 -K - -o readiness.json "$ORIGIN/runtime/readiness"
+            jq -r '[
+              (if .ready!=true then "runtime not ready" else empty end),
+              (if .storage.available!=true then "storage unavailable" else empty end),
+              (if .storage.persistenceFailed then "persistence failed" else empty end),
+              (if (.storage.pendingWrites//0)>20 then "pending writes above 20" else empty end),
+              (if .market.perpetual.status!="HEALTHY" then "USD-M market unavailable" else empty end),
+              (if .market.spot.status!="HEALTHY" then "spot market unavailable" else empty end),
+              (if .paper.funding.ready!=true then "funding not ready" else empty end),
+              (if .paper.halted then "new exposure halted" else empty end),
+              (if .paper.autonomousLastAttemptFailed then "autonomous attempt failed" else empty end),
+              (if .jobs.research.persistenceFailed or .jobs.historical.persistenceFailed then "job persistence failed" else empty end),
+              (if .ai.enabled then "paid AI enabled" else empty end),
+              (if .mode!="PAPER_TRADING" then "mode is not PAPER_TRADING" else empty end)
+            ]|.[]' readiness.json | sort -u > "sample-$i.txt"
+            echo "sample $i observedAt=$(jq -r .observedAt readiness.json) startedAt=$(jq -r .startedAt readiness.json) issues=[$(paste -sd';' "sample-$i.txt")]" >> "$GITHUB_STEP_SUMMARY"
+            if [ "$i" -lt 3 ]; then sleep 25; fi
+          done
+          failures=$(comm -12 sample-1.txt sample-2.txt | comm -12 - sample-3.txt | paste -sd';')
+          if [ -n "$failures" ]; then echo "::error::persistent: $failures"; echo "FAIL (persistent): $failures" >> "$GITHUB_STEP_SUMMARY"; exit 1; fi
+          echo "OK" >> "$GITHUB_STEP_SUMMARY"
