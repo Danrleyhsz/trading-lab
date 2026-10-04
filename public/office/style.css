@@ -1055,3 +1055,40 @@ body[data-view="fit"] #profile{width:min(350px,calc(100% - 24px));max-height:cal
 .research-job[data-status="COMPLETED"] {border-left-color:#28dba2}
 .research-job[data-status="FAILED"],.research-job[data-status="INTERRUPTED"] {border-left-color:#ffb665}
 @media(max-width:600px){.research-job button{width:100%}.workspace-panel{overflow-wrap:anywhere}}
+
+/* Immersive terminals and original scene interactions. */
+#workspaceDialog,#profile[data-terminal="true"] {width:min(1080px,calc(100vw - 48px));max-height:82dvh;margin:auto;padding:28px;border:3px solid #2d526b;border-radius:16px;background:linear-gradient(135deg,#102033,#080f1d 65%);box-shadow:0 0 0 7px #050b14,0 28px 80px #000a,0 0 35px #35c9ff20;color:#e7eeff}
+body[data-view="fit"] #profile[data-terminal="true"]{width:min(900px,calc(100vw - 48px));margin:auto;inset:0;max-height:82dvh}
+dialog::backdrop{background:#02081291;backdrop-filter:blur(2px)}
+#workspaceTitle{padding:0 44px 16px 0;border-bottom:1px solid #35c9ff44;color:#83dcff;font-size:22px;letter-spacing:.04em}
+#workspaceDialog:after,#profile[data-terminal="true"]:after{content:'TRADING LAB  /  PAPER TERMINAL';display:block;margin-top:24px;border-top:1px solid #28435f;padding-top:12px;color:#7093ad;letter-spacing:.15em;font-size:10px}
+.workspace-panel h3{color:#81dbff;letter-spacing:.04em}.workspace-panel>p{color:#a9bfd2;line-height:1.6}
+.workspace-panel button{min-height:44px;border-radius:7px;background:linear-gradient(#173044,#0b1c2c);border-color:#315a73}
+.workspace-panel button:hover,.workspace-panel button:focus-visible{border-color:#5edbff;box-shadow:0 0 12px #35c9ff30}
+#agentList{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px}
+#agentList .agent-card{display:flex;align-items:center;gap:20px;padding:20px;text-align:left;min-height:166px;background:radial-gradient(ellipse at 20% 90%,#17675b44,transparent 70%),#0a1928;border:1px solid #294b63;overflow:hidden}
+.agent-card>span:last-child{display:grid;gap:8px;min-width:0}.agent-card b{font-size:20px;color:#f2cd80}.agent-card small{color:#a0b7cc;font-size:12px}.agent-card span span{font-size:12px;color:#4ce2ae}
+#agentList .roster-portrait{--sprite-height:100px;width:64px;height:100px;flex:0 0 64px;image-rendering:pixelated;filter:drop-shadow(0 6px 8px #0009)}
+.financial-grid,.market-charts{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:18px}
+.financial-grid article,.lab-card,#researchRuns>li,#studyList>li,#historyList>li{padding:18px;border:1px solid #294b63;border-radius:10px;background:linear-gradient(135deg,#0e2334,#081321);box-shadow:inset 0 1px #ffffff08}
+.financial-grid article h3{color:#f2cd80;margin-top:0}.financial-grid article p{padding:8px 0;margin:0;border-bottom:1px solid #25405766;font-variant-numeric:tabular-nums}
+.market-chart{min-height:180px;background:repeating-linear-gradient(0deg,transparent 0 35px,#31506944 36px),repeating-linear-gradient(90deg,transparent 0 59px,#31506933 60px);padding:10px;border:1px solid #294b63;border-radius:6px}.market-chart svg{width:100%;height:180px}.market-chart small{color:#abc4d8}.market-charts p{font-size:12px;color:#a0b7cc}.equity-trace{background:repeating-linear-gradient(0deg,transparent 0 19px,#31506944 20px);border-radius:5px;margin:12px 0}
+#researchRuns,#studyList{list-style:none;padding:0;display:grid;gap:12px}#researchPanel>h3{margin-top:28px;padding:10px 0;border-bottom:1px solid #2f576e}#researchPanel>button{color:#66efbf}#researchPanel #haltPaper{color:#ffd08b}
+#accessPanel input{min-height:44px;width:min(100%,400px);background:#050e19;border:1px solid #315a73;border-radius:6px;color:#e7eeff;padding:10px}
+/* Hit surfaces preserve the art: labels appear on hover or keyboard focus only. */
+.station-monitor,.station-monitor:hover,.station-monitor:focus-visible,.station-side,.control-zone,.furniture-hit{background:transparent;border:0;box-shadow:none;min-width:0;min-height:0;padding:0}
+.station-monitor{width:2.1cqw;height:2.35cqw}.station-monitor b,.station-monitor small{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+.station-monitor:before,.furniture-hit:before{content:none}.station-monitor:hover,.station-monitor:focus-visible,.control-zone:hover,.control-zone:focus-visible,.furniture-hit:hover,.furniture-hit:focus-visible{outline:1px solid #59e1ff;box-shadow:0 0 12px #35c9ff99;background:#35c9ff14}
+.station-monitor:after,.control-zone:after{content:attr(aria-label);display:none;position:absolute;left:50%;bottom:calc(100% + 8px);transform:translateX(-50%);width:max-content;max-width:240px;background:#071727ed;border:1px solid #35c9ff77;border-radius:4px;padding:7px 10px;color:#d7f6ff;font-size:11px;line-height:1.4;pointer-events:none}
+.station-monitor:hover:after,.station-monitor:focus-visible:after,.control-zone:hover:after,.control-zone:focus-visible:after{display:block}
+#sceneDataCenter{left:13.2%;top:83.3%;width:3.2%;height:4.2%}#sceneWarRoom{left:49.3%;top:74.2%;width:7.2%;height:8%}#sceneMarketAnalysis{left:80.7%;top:72%;width:7.5%;height:5.5%}
+.room h2,body[data-view="fit"] .room h2{top:1%;background:transparent;border:0;box-shadow:none;max-width:95%;font-size:clamp(6px,.65cqw,11px);text-shadow:0 0 6px #35c9ff99}
+.room-hotspot,body[data-view="fit"] .room-hotspot{min-height:0;padding:2px 6px;color:#9adff0;background:#06121bbb;letter-spacing:.08em;border:1px solid #37667855;border-radius:3px}
+.room-hotspot:hover,.room-hotspot:focus-visible{color:#e0fbff;border-color:#65dbff;box-shadow:0 0 12px #35c9ff77}.furniture-hit>span:first-child{opacity:0}.furniture-hit:hover>span:first-child,.furniture-hit:focus-visible>span:first-child{opacity:1}
+@media(max-width:600px){#workspaceDialog,body[data-view="fit"] #profile[data-terminal="true"]{width:calc(100vw - 24px);max-height:88dvh;padding:18px;margin:auto}#agentList{grid-template-columns:1fr 1fr;gap:8px}#agentList .agent-card{flex-direction:column;padding:14px 8px;gap:10px;text-align:center;min-height:220px}.agent-card b{font-size:17px}.market-charts{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:no-preference){dialog[data-terminal="true"][open]{animation:terminal-open .18s ease-out}@keyframes terminal-open{from{opacity:.3;transform:scale(.94)}to{opacity:1;transform:scale(1)}}}
+#agentList .roster-portrait{background-position:calc(32px - var(--sprite-height) * (var(--atlas-width) / 2 - var(--atlas-x))) calc(var(--sprite-height) * var(--atlas-y))}
+#agentList .roster-portrait{background-image:none;overflow:hidden}#agentList .roster-portrait img{position:absolute;max-width:none;width:calc(var(--sprite-height) * var(--atlas-width));height:calc(var(--sprite-height) * var(--atlas-height));left:calc(32px - var(--sprite-height) * (var(--atlas-width) / 2 - var(--atlas-x)));top:calc(var(--sprite-height) * var(--atlas-y));image-rendering:pixelated}
+.agent[data-seated="true"] b{opacity:0;pointer-events:none}.agent[data-seated="true"]:hover b,.agent[data-seated="true"]:focus-visible b{opacity:1}.scene-screen{border-radius:0!important}.lab-card h3{color:#f2cd80}
+@media(max-width:600px){#agentList .roster-portrait{flex:0 0 100px}}
+#profilePortrait[data-sprite]{--sprite-height:94px;height:94px}

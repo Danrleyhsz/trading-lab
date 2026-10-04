@@ -4,6 +4,7 @@ function observeTrace(source, price, timestamp) {
   const series = traces[source], time = timestamp ? new Date(timestamp).getTime() : NaN;
   if (series.length && ((Number.isFinite(time) && time <= series[series.length-1].time) || (!Number.isFinite(time) && price === series[series.length-1].price))) return;
   series.push({price,time});if (series.length > 90) series.shift();
+  renderMarketChart(source);
   const host = q(source === 'spot' ? '#spotTrace' : '#markTrace');host.replaceChildren();
   if (series.length < 2) {host.textContent = 'Aguardando mais observações';return;}
   host.textContent = '';
@@ -15,6 +16,17 @@ function observeTrace(source, price, timestamp) {
 }
 function marketUnavailable(reason) {
   q('#marketV3').textContent = reason;q('#markPrice').textContent = 'Indisponível';q('#fundingRate').textContent = '—';q('#spreadQuote').textContent = '—';q('#quoteTime').textContent = reason;
+  q('#markChartStatus').textContent=reason+' · o traçado abaixo é histórico desta sessão.';
+}
+function renderMarketChart(source){
+ const host=q(source==='spot'?'#spotChart':'#markChart'),status=q(source==='spot'?'#spotChartStatus':'#markChartStatus'),series=traces[source];host.replaceChildren();
+ status.textContent=series.length+' observações recebidas nesta sessão · sem histórico simulado';
+ if(series.length<2){host.append(node('p','Aguardando duas observações reais para desenhar o traçado.'));return;}
+ const low=Math.min(...series.map(p=>p.price)),high=Math.max(...series.map(p=>p.price));
+ host.append(node('small','Mínimo '+money(low)+' · máximo '+money(high)));
+ if(!document.createElementNS)return;
+ const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.setAttribute('viewBox','0 0 600 180');svg.setAttribute('role','img');svg.setAttribute('aria-label','Traçado de preço '+(source==='spot'?'BTC spot':'BTC USD-M')+' observado nesta sessão, '+series.length+' amostras');
+ const line=document.createElementNS('http://www.w3.org/2000/svg','polyline');line.setAttribute('points',series.map((p,i)=>(i*600/(series.length-1)).toFixed(1)+','+(165-(p.price-low)/(high-low||1)*150).toFixed(1)).join(' '));line.setAttribute('stroke',source==='spot'?'#ffcb62':'#35c9ff');line.setAttribute('stroke-width','2');line.setAttribute('fill','none');svg.append(line);host.append(svg);
 }
 function outcomeLabel(performance) {
   if (!performance?.available) return 'Métricas de operações indisponíveis';
@@ -77,7 +89,9 @@ function renderFinancialOverview(data) {
   if (!count) {positions.textContent = 'Nenhuma posição aberta registrada.';positions.className='empty-state';} else positions.className='';
   if (!performance.children.length) {performance.textContent = 'Contas de avaliação ainda não configuradas.';performance.className='empty-state';} else performance.className='';
 }
-function openPanel(panel, title, navId) { stopPresence();
+let terminalOpener=null;
+function openPanel(panel, title, navId) { stopPresence();terminalOpener=document.activeElement;
+  q('#workspaceDialog').dataset.terminal='false';
   for (const id of ['agentsPanel','financePanel','marketPanel','researchPanel','historyPanel','accessPanel']) q('#'+id).hidden = id !== panel;
   q('#workspaceTitle').textContent = title;
   for (const id of ['navOffice','navAgents','navFinance','navMarket','navResearch','navHistory','navAccess']) {
@@ -115,8 +129,14 @@ function renderStations(){
    const monitor=node('button',''),name=node('b',''),state=node('small',''),chair=node('span','');
    monitor.className='station-monitor';monitor.dataset.station=station.id;monitor.append(name,state);
    const {width,height}=OfficeNavigation.scene;
-   monitor.setAttribute('style','left:'+station.mx/width*100+'%;top:'+station.my/height*100+'%');
-   monitor.onclick=()=>profile(station.id);
+   monitor.setAttribute('style','left:'+station.mx/width*100+'%;top:'+(station.my-16)/height*100+'%');
+   monitor.onclick=()=>{profile(station.id);q('#profile').dataset.terminal='true';};
+   for(const [screen,offset] of [['left',-47],['right',47]]){
+    const side=node('button','');side.className='station-monitor station-side';side.dataset.stationScreen=station.id+':'+screen;
+    side.setAttribute('style','left:'+(station.mx+offset)/width*100+'%;top:'+(station.my-16)/height*100+'%');
+    const action=screen==='right'?{panel:'historyPanel',title:'Registro geral de evidências',nav:'navHistory'}:station.room==='Trading Floor'?{panel:'marketPanel',title:'Terminal de mercado',nav:'navMarket'}:{panel:'researchPanel',title:'Bancada de pesquisa e risco',nav:'navResearch'};
+    side.setAttribute('aria-label',station.id+' · '+action.title);side.setAttribute('title',action.title);side.onclick=()=>{openPanel(action.panel,action.title,action.nav);q('#workspaceDialog').dataset.terminal='true';};q('#office').append(side);
+   }
    chair.className='station-chair'+(station.room==='Research Lab'?' research-chair':'');chair.setAttribute('aria-hidden','true');
    chair.setAttribute('style','left:'+station.cx/width*100+'%;top:'+station.cy/height*100+'%;width:'+station.cw/width*100+'%;height:'+station.ch/height*100+'%;background-position:-'+station.cx/width*100+'cqw -'+station.cy/width*100+'cqw');
    q('#office').append(monitor,chair);view={monitor,name,state,chair};stationViews.set(station.id,view);
@@ -165,7 +185,7 @@ function render(movingEvent){
   }
   transitions.update(view,agent,slot,{from:wasTraveling?null:from,event:movingEvent?.payload?.id===agent.id?movingEvent:undefined,bounds,occupied,startPoint});
   if(agent.id===focusedAgent)button.focus?.({preventScroll:true});
-  const row=node('button',agent.name+' · '+agent.room+' · '+(statusLabels[agent.status]||agent.status));row.onclick=()=>profile(agent.id);q('#agentList').append(row);
+  const row=node('button',''),portrait=node('span',''),copy=node('span','');row.className='agent-card';portrait.className='sprite roster-portrait';portrait.setAttribute('aria-hidden','true');sprite(portrait,agent.id);const image=node('img','');image.setAttribute('src','/office/agent-sprites.png');image.setAttribute('alt','');portrait.append(image);copy.append(node('b',agent.name),node('small',roleLabels[agent.id]||agent.role),node('span',statusLabels[agent.status]||agent.status),node('small',agent.room));row.append(portrait,copy);row.setAttribute('aria-label',agent.name+' · '+agent.room+' · '+(statusLabels[agent.status]||agent.status));row.onclick=()=>profile(agent.id);q('#agentList').append(row);
  }
  q('#office').dataset.presence=motionAllowed()?'on':'off';
  q('#togglePresence').textContent=reducedMotion?.matches?'Movimento reduzido':selectedHandoff?'Presença pausada':presenceEnabled?'Pausar animações':'Animar escritório';q('#togglePresence').disabled=!!reducedMotion?.matches||!!selectedHandoff;q('#togglePresence').setAttribute('aria-pressed',String(presenceEnabled&&!selectedHandoff&&!reducedMotion?.matches));
@@ -183,6 +203,7 @@ function renderState() {
   q('#updated').textContent = 'Estado atualizado pelo backend: ' + date(agent.updatedAt);
 }
 async function profile(id) {
+  q('#profile').dataset.terminal='false';
   profileOpener=document.activeElement;stopPresence();selected = id;
   q('#profile').showModal();
   renderState();
@@ -645,3 +666,21 @@ for(const feature of OfficeNavigation.features){
 }
 q('#workspaceDialog').addEventListener('close',()=>{if(furnitureReturn){document.querySelector('button[data-furniture="'+furnitureReturn+'"]')?.focus?.({preventScroll:true});furnitureReturn=null;}});
 globalThis.addEventListener?.('resize',()=>{stopPresence();render();});
+
+// Scene monitor surfaces open existing read panels; they never submit jobs or orders.
+for(const [id,action] of Object.entries({sceneDataCenter:{panel:'accessPanel',title:'Data Center · serviço e persistência',nav:'navAccess'},sceneWarRoom:{panel:'financePanel',title:'War Room · capital e portfólio',nav:'navFinance'},sceneMarketAnalysis:{panel:'marketPanel',title:'Observatório · mercado recebido',nav:'navMarket'}}))q('#'+id).onclick=()=>{openPanel(action.panel,action.title,action.nav);q('#workspaceDialog').dataset.terminal='true';};
+
+for(const screen of [
+ {id:'war-left',x:766,y:627,w:128,h:72,panel:'financePanel',title:'War Room · contas independentes',nav:'navFinance'},
+ {id:'war-right',x:1053,y:627,w:128,h:72,panel:'historyPanel',title:'War Room · auditoria',nav:'navHistory'},
+ {id:'market-upper-right',x:1658,y:607,w:140,h:48,panel:'marketPanel',title:'Mercado · traçados recebidos',nav:'navMarket'},
+ {id:'market-lower-left',x:1493,y:664,w:140,h:48,panel:'marketPanel',title:'Mercado · cotações e funding',nav:'navMarket'},
+ {id:'market-lower-right',x:1658,y:664,w:140,h:48,panel:'historyPanel',title:'Mercado · fontes e eventos',nav:'navHistory'},
+ {id:'meeting-wall',x:1559,y:369,w:184,h:62,panel:'agentsPanel',title:'Meeting Room · equipe',nav:'navAgents'},
+ {id:'risk-wall',x:1634,y:147,w:156,h:62,panel:'researchPanel',title:'Risk Desk · controles determinísticos',nav:'navResearch'},
+ {id:'trading-empty-left',x:902,y:180,w:36,h:40,panel:'marketPanel',title:'Trading Floor · mercado spot',nav:'navMarket'},
+ {id:'trading-empty-center',x:949,y:180,w:36,h:40,panel:'financePanel',title:'Trading Floor · portfólio',nav:'navFinance'},
+ {id:'trading-empty-right',x:992,y:180,w:36,h:40,panel:'historyPanel',title:'Trading Floor · auditoria',nav:'navHistory'}
+]){const hit=node('button','');hit.className='control-zone scene-screen';hit.dataset.sceneScreen=screen.id;hit.setAttribute('aria-label',screen.title);hit.setAttribute('title',screen.title);hit.setAttribute('style','left:'+screen.x/1852*100+'%;top:'+screen.y/849*100+'%;width:'+screen.w/1852*100+'%;height:'+screen.h/849*100+'%;transform:translate(-50%,-50%)');hit.onclick=()=>{openPanel(screen.panel,screen.title,screen.nav);q('#workspaceDialog').dataset.terminal='true';};q('#office').append(hit);}
+
+q('#workspaceDialog').addEventListener('close',()=>{if(q('#workspaceDialog').dataset.terminal==='true' && terminalOpener?.isConnected)terminalOpener.focus?.({preventScroll:true});terminalOpener=null;});

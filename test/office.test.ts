@@ -26,6 +26,19 @@ function harness(overrides:Record<string,unknown>={},reduceMotion=false,geometry
   return {ids,rooms,requests,intervals,context,get socket(){return socket}};
 }
 const settle=()=>new Promise(resolve=>setImmediate(resolve));
+test('agent cards keep original character identity and open actual profiles',async()=>{
+ const h=harness();await settle();const card=h.ids.get('#agentList')!.children[0];assert.equal((card as any).className,'agent-card');assert.equal(card.children[0].dataset.sprite,'atlas');assert.equal(card.children[0].children[0].attributes.src,'/office/agent-sprites.png');assert.match(flatten(card),/Coordenação de pesquisa/);card.onclick!();await settle();assert.ok(h.requests.includes('/agents/atlas/profile'));assert.equal(h.ids.get('#profile')!.dataset.terminal,'false');
+});
+test('three workstation screen surfaces open separate read views with floating terminal and return focus',async()=>{
+ const h=harness();await settle();const office=h.ids.get('#office')!,central=office.children.find(e=>e.dataset.station==='atlas')!,left=office.children.find(e=>e.dataset.stationScreen==='atlas:left')!,right=office.children.find(e=>e.dataset.stationScreen==='atlas:right')!;
+ central.onclick!();await settle();assert.equal(h.ids.get('#profile')!.dataset.terminal,'true');h.ids.get('#profile')!.close();(h.context.document as any).activeElement=left;left.onclick!();assert.equal(h.ids.get('#researchPanel')!.hidden,false);assert.equal(h.ids.get('#workspaceDialog')!.dataset.terminal,'true');h.ids.get('#workspaceDialog')!.close();assert.equal(left.focusCalls,1);right.onclick!();assert.equal(h.ids.get('#historyPanel')!.hidden,false);assert.ok(!h.requests.includes('/research/jobs')||h.requests.filter(p=>p==='/research/jobs').length<3);
+});
+test('scene display surfaces route data center to readiness and wall screens to existing panels',async()=>{
+ const h=harness();await settle();h.ids.get('#sceneDataCenter')!.onclick!();assert.equal(h.ids.get('#accessPanel')!.hidden,false);assert.equal(h.ids.get('#workspaceDialog')!.dataset.terminal,'true');const wall=h.ids.get('#office')!.children.find(e=>e.dataset.sceneScreen==='risk-wall')!;wall.onclick!();assert.equal(h.ids.get('#researchPanel')!.hidden,false);assert.equal(h.ids.get('#office')!.children.filter(e=>e.dataset.sceneScreen).length,10);
+});
+test('market terminals draw only observed session prices and retain explicit stale status on failure',async()=>{
+ const h=harness({},false,true);await settle();await vm.runInContext("observeTrace('mark',100,'2026-01-01T00:00:00Z');observeTrace('mark',101,'2026-01-01T00:00:01Z')",h.context);assert.match(flatten(h.ids.get('#markChart')!),/100.00 USDT/);assert.match(h.ids.get('#markChartStatus')!.textContent,/2 observações/);assert.ok(h.ids.get('#markChart')!.children.some(e=>e.attributes.role==='img'));await vm.runInContext("marketUnavailable('TEST_ONLY source unavailable')",h.context);assert.match(h.ids.get('#markChartStatus')!.textContent,/histórico desta sessão/);assert.ok(!h.requests.some(p=>p.includes('/orders')));
+});
 test('research job cards expose original results and clear stale lifecycle on read failure',async()=>{
  const id='00000000-0000-4000-8000-000000000001',runId='00000000-0000-4000-8000-000000000002',responses:Record<string,unknown>={'/research/jobs':[{id,runId,status:'COMPLETED',limit:100,updatedAt:'2026-01-01T00:00:00Z'}]},h=harness(responses);await settle();
  assert.match(flatten(h.ids.get('#researchJobs')!),/Concluída/);assert.match(flatten(h.ids.get('#researchJobs')!),/100 candles/);buttons(h.ids.get('#researchJobs')!)[0].onclick!();await settle();assert.ok(h.requests.includes('/research/runs/'+runId));assert.ok(!h.requests.includes('/research/run'));
@@ -107,7 +120,7 @@ test('a received room transition animates a stable view while all labels immedia
  const actual={id:'atlas',name:'Atlas',room:'Quant Lab',status:'BACKTESTING',experience:3};
  h.socket.onmessage({data:JSON.stringify({id:'TEST_ONLY_RECEIVED_STATE',type:'AGENT_STATE_CHANGED',occurredAt:new Date().toISOString(),payload:actual})});
  assert.equal(h.rooms[1].children[0].children[0],agent);assert.equal(agent.dataset.room,'Quant Lab');assert.equal(agent.dataset.status,'BACKTESTING');assert.equal(agent.dataset.travel,'recorded');assert.equal(animations.length,1);
- assert.match(h.ids.get('#agentList')!.children[0].textContent,/Quant Lab/);assert.equal(h.ids.get('#activeAgents')!.textContent,'1 / 1');
+ assert.match(flatten(h.ids.get('#agentList')!.children[0]),/Quant Lab/);assert.equal(h.ids.get('#activeAgents')!.textContent,'1 / 1');
  h.socket.onmessage({data:JSON.stringify({id:'TEST_ONLY_NEW_STATUS',type:'AGENT_STATE_CHANGED',occurredAt:new Date().toISOString(),payload:{...actual,status:'IDLE'}})});
  animations[0].onfinish();assert.equal(agent.dataset.travel,undefined);assert.equal(animations[0].cancels,1);assert.equal(animations.length,1);assert.equal(h.ids.get('#activeAgents')!.textContent,'0 / 1');
  assert.ok(!h.requests.some(url=>url.includes('/orders')||url.includes('/ai/')));
