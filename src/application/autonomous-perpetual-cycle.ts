@@ -6,6 +6,7 @@ import type {MemoryStore} from '../domain/memory.js';
 import type {EventBus} from './event-bus.js';
 import {event} from '../domain/events.js';
 import {screenPerpetualStudy} from './perpetual-study-screen.js';
+import type {PilotDecisionContext} from './pilot-team-briefing.js';
 export function studyEligibility(study:PerpetualStudy|undefined,now=Date.now()){
  const {eligible,reason}=screenPerpetualStudy(study,now);return {eligible,reason};
 }
@@ -16,12 +17,14 @@ export interface PilotOptions {
  maxLossFraction?:number;
  /** Back-off after a failed attempt so an outage never turns into a request loop. */
  retryDelayMs?:number;
+ /** Team briefing hook; it never affects the decision and its failures are contained. */
+ onDecision?:(context:PilotDecisionContext)=>void;
 }
 export class AutonomousPerpetualCycle {
  private busy=false;private error:string|null=null;private nextAttemptAt=0;private stopReason:string|null=null;private lastAttemptFailed=false;
- private readonly blockedReason:string|null;private readonly maxLossFraction:number;private readonly retryDelayMs:number;
+ private readonly blockedReason:string|null;private readonly maxLossFraction:number;private readonly retryDelayMs:number;private readonly onDecision?:(context:PilotDecisionContext)=>void;
  constructor(private enabled:boolean,private studyId:string,private studies:PerpetualStudies,private book:PerpetualPaperBook,private source:{load(count:number):Promise<PerpetualDataset>},private save:(state:PerpetualBookState)=>Promise<void>,private memories:MemoryStore,private bus:EventBus,private persist:()=>Promise<void>,private now:()=>number=Date.now,private canContinue:()=>boolean=()=>true,options:PilotOptions={}){
-  this.blockedReason=options.blockedReason??null;this.maxLossFraction=options.maxLossFraction??0.03;this.retryDelayMs=options.retryDelayMs??300000;
+  this.blockedReason=options.blockedReason??null;this.maxLossFraction=options.maxLossFraction??0.03;this.retryDelayMs=options.retryDelayMs??300000;this.onDecision=options.onDecision;
   if(!(this.maxLossFraction>0&&this.maxLossFraction<0.1))throw Error('pilot loss limit must be between 0 and the 10% risk drawdown limit');
  }
  private active(){return this.enabled&&!this.blockedReason;}
@@ -51,7 +54,8 @@ export class AutonomousPerpetualCycle {
    const direction=perpetualDirection(data.trade,configuration,current);
    // Persist the decision cursor before execution: restart never duplicates this candle.
    await this.book.checkpoint(last.timestamp,this.save);const decision=event('AUTONOMOUS_DECISION',{accountId:account.id,studyId:study.id,studyDatasetHash:study.result!.datasetHash,signalDatasetHash:hash,signalDataset:data,candleTimestamp:last.timestamp,direction,configuration});this.bus.publish(decision);
-   this.memories.add({agentId:'nova',kind:'OBSERVATION',summary:'computed paper signal from closed USD-M candles',sourceEventId:decision.id,strategyId:study.id,metadata:{accountId:account.id,candleTimestamp:last.timestamp,signalDatasetHash:hash,direction}});await this.persist();
+   this.memories.add({agentId:'nova',kind:'OBSERVATION',summary:'computed paper signal from closed USD-M candles',sourceEventId:decision.id,strategyId:study.id,metadata:{accountId:account.id,candleTimestamp:last.timestamp,signalDatasetHash:hash,direction}});
+   try{this.onDecision?.({data,quote:this.book.market(),direction,currentQuantity:current,configuration,studyId:study.id,candleTimestamp:last.timestamp,decisionEventId:decision.id});}catch{/* Advisory briefing only; never blocks the decision. */}await this.persist();
    if(current&&Math.sign(current)!==direction)await this.book.propose(account.id,current>0?'SELL':'BUY',Math.abs(current),this.save,study.id);
    const fresh=this.book.list().find(a=>a.id===account.id)!;if(!fresh.portfolio.positions.length&&direction&&fresh.portfolio.equity>0){const quote=this.book.market();if(!quote)throw Error('market unavailable');await this.book.propose(account.id,direction>0?'BUY':'SELL',fresh.portfolio.equity*0.1/(direction>0?quote.ask:quote.bid),this.save,study.id);}
    this.succeeded();

@@ -30,6 +30,7 @@ import {PaperAccounts} from './application/paper-accounts.js';
 import {registerPaperAccountRoutes} from './application/paper-account-routes.js';
 import {PerpetualPaperBook,type PerpetualBookState} from './application/perpetual-paper-book.js';
 import {AutonomousPerpetualCycle} from './application/autonomous-perpetual-cycle.js';
+import {PilotTeamBriefing} from './application/pilot-team-briefing.js';
 import {registerPerpetualPaperRoutes} from './application/perpetual-paper-routes.js';
 import {registerAccessControl} from './application/access-control.js';
 import {registerEncryptedBackup} from './application/encrypted-backup.js';
@@ -72,9 +73,12 @@ bus.subscribe(e=>{const payload=e.payload as any;if(!payload?.accountId?.endsWit
 });
 const autonomousEnabled=process.env.AUTONOMOUS_PERPETUAL_ENABLED==='true';if(autonomousEnabled&&(!perpetualEnabled||!process.env.AUTONOMOUS_STUDY_ID))throw Error('autonomous perpetual evaluation requires enabled accounts and explicit study ID');
 // The pilot runs only on the exact release the owner approved (Render exposes the deployed commit as RENDER_GIT_COMMIT).
+const pilotTeam=new PilotTeamBriefing(messages);
 const pilotPhase=process.env.CLOUD_LAUNCH_PHASE==='CONTINUOUS_PAPER_PILOT',deployedCommit=process.env.RENDER_GIT_COMMIT??'';
 const releasePinned=pilotPhase&&/^[0-9a-f]{40}$/.test(deployedCommit)&&process.env.CONTINUOUS_RELEASE_COMMIT===deployedCommit;
-const cycle=new AutonomousPerpetualCycle(autonomousEnabled,process.env.AUTONOMOUS_STUDY_ID??'',studies,book,perpetualHistory,persist,memories,bus,()=>persist(),Date.now,()=>runtime.control().ready,{blockedReason:autonomousEnabled&&production&&!releasePinned?'RELEASE_NOT_APPROVED':null,maxLossFraction:process.env.PILOT_MAX_LOSS===undefined?0.03:Number(process.env.PILOT_MAX_LOSS)});
+const cycle=new AutonomousPerpetualCycle(autonomousEnabled,process.env.AUTONOMOUS_STUDY_ID??'',studies,book,perpetualHistory,persist,memories,bus,()=>persist(),Date.now,()=>runtime.control().ready,{blockedReason:autonomousEnabled&&production&&!releasePinned?'RELEASE_NOT_APPROVED':null,maxLossFraction:process.env.PILOT_MAX_LOSS===undefined?0.03:Number(process.env.PILOT_MAX_LOSS),onDecision:context=>pilotTeam.brief(context)});
+// Sentinel records every risk decision on the pilot account as a team message.
+bus.subscribe(e=>{if((e.type==='RISK_APPROVED'||e.type==='RISK_REJECTED')&&(e.payload as {accountId?:string})?.accountId==='evaluation:nova:usdm'&&autonomousEnabled)pilotTeam.riskReview(e.type==='RISK_APPROVED',e.payload as never);});
 registerAgentProfiles(app,agents,memories,messages,activity,accounts,book);
 registerEventAudit(app,new EventAudit(()=>durableSnapshot));registerEncryptedBackup(app,()=>durableSnapshot?{state:durableSnapshot,persistedAt:durablePersistedAt}:null,BACKUP_PUBLIC_KEY_PEM);
 const research=new ResearchEngine({snapshot:symbol=>derivatives.snapshot(symbol),candles:(symbol,interval,limit)=>history.candles(symbol,interval,limit)},coordinator,collaboration,messages,memories,strategies,strategyLab,backtester,researchRuns,bus);

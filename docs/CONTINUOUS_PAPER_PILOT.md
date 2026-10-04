@@ -44,3 +44,28 @@ A durable cursor is saved before execution, so a restart never repeats a candle.
 ## Rollback
 
 Set `CLOUD_LAUNCH_PHASE=CONTROLLED_PAPER` and `AUTONOMOUS_PERPETUAL_ENABLED=false`, remove `AUTONOMOUS_STUDY_ID`, and deploy. An open position stays in the ledger and can be reduced through the normal risk-checked order route. Nothing is deleted or rewritten.
+
+## Team participation (advisory)
+
+Each hourly pilot decision is published to the team as structured agent messages, visible in the office's agent communication panels:
+- **Satoshi:** 24h and 7d momentum.
+- **Vega:** daily realized volatility, 24h vs 7d.
+- **Flux:** funding rate, spread and last settled funding.
+- **Oracle:** regime relative to the 240-hour average.
+- **Nova:** the execution plan from the screened study's signal.
+- **Sentinel:** the deterministic risk decision on every pilot order.
+
+Researcher findings are **advisory context only** (`advisoryOnly: true`). They are computed from the same closed candles and live quote, but they do not change the decision, because no combined rule has been tested. A failing briefing can never block a decision.
+
+## Accelerated team drill (TEST_ONLY)
+
+`STUDY_FILE=<full study JSON> HOURS=336 REPORT_PATH=drill.json npm run team-drill` replays recorded real candles hour by hour. It uses the production cycle, paper book, risk engine and team briefing, entirely in memory. There is no database, no exchange and no production access. Study eligibility is stubbed, because the live screen remains the authority.
+
+Results on 2026-10-04 with study d674cb32's own dataset:
+
+| Window | Decisions | Messages per researcher | Sentinel reviews | Fills | Funding settlements | Failures |
+|---|---|---|---|---|---|---|
+| 14 days (2026-09-20 → 10-04) | 337 | 337 each | 1 (approved) | 1 | 40 | 0 |
+| 125 days (2026-06-01 → 10-04) | 3 001 | 3 001 each | 7 (approved) | 7 | 374 | 0 |
+
+The drill's equity is **not performance evidence**: the replay overlaps the study's own training and test data. It proves the team pipeline, nothing about edge.

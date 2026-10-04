@@ -70,3 +70,20 @@ test('only the explicit pilot phase may enable autonomy, with an explicit study 
  assert.ok(failed({...pilot,PILOT_MAX_LOSS:'0.2'}).includes('VALID_PILOT_LOSS_LIMIT'));
  assert.ok(failed({...pilot,LEGACY_PAPER_EXECUTION_ENABLED:'true'}).includes('LEGACY_PAPER_EXECUTION_ENABLED_MUST_BE_FALSE'));
 });
+
+test('team briefing publishes advisory researcher findings, Nova plan and Sentinel review without changing the decision',async()=>{
+ const {AgentMessageBus}=await import('../src/domain/agent-messages.js');const {PilotTeamBriefing,teamObservations}=await import('../src/application/pilot-team-briefing.js');
+ const messages=new AgentMessageBus(),team=new PilotTeamBriefing(messages);let briefed=0;
+ const {book,events,save}=await setup({onDecision:context=>{briefed++;team.brief(context);}});
+ // A throwing hook must never block trading: rebuild the cycle with one and confirm the decision still executes.
+ const cycleWithFailingHook=new AutonomousPerpetualCycle(true,'controlled-study',new PerpetualStudies({load:async()=>dataset()},[eligibleStudyFixture(start)]),book,{load:async()=>dataset()},save,new MemoryStore(),new EventBus(),async()=>{},now,()=>true,{onDecision:()=>{throw Error('TEST_ONLY briefing failure');}});
+ await cycleWithFailingHook.onMarket();assert.equal(book.list()[0].fills,1,'decision executed despite a failing briefing hook');assert.equal(briefed,0);
+ const data=dataset();const o=teamObservations({data,quote:quote(199),direction:1,currentQuantity:0,configuration:eligibleStudyFixture(start).result!.folds[0].configuration,studyId:'controlled-study',candleTimestamp:data.trade.at(-1)!.timestamp,decisionEventId:'TEST_ONLY'});
+ assert.ok(o.satoshi.change24h!>0);assert.equal(o.oracle.regime,'UNKNOWN','fewer than 240 bars');assert.ok(o.flux.spreadBps!>0);
+ const plan=team.brief({data,quote:quote(199),direction:1,currentQuantity:0,configuration:{...eligibleStudyFixture(start).result!.folds[0].configuration,strategy:'BREAKOUT',slowPeriod:480},studyId:'d674cb32-2ba0',candleTimestamp:data.trade.at(-1)!.timestamp,decisionEventId:'TEST_ONLY'});
+ const sent=messages.list();assert.deepEqual(sent.map(m=>m.from),['satoshi','vega','flux','oracle','nova']);
+ assert.ok(sent.every(m=>m.context.advisoryOnly===true));assert.match(plan.summary,/be long \(BREAKOUT 480/);
+ const review=team.riskReview(false,{order:{side:'BUY',quantity:2,proposalId:'p'},decision:{reasons:['DRAWDOWN_LIMIT']},accountId:'evaluation:nova:usdm'});
+ assert.equal(review.from,'sentinel');assert.match(review.summary,/Rejected BUY 2 BTC: DRAWDOWN_LIMIT/);
+ assert.ok(events.length>0);
+});
