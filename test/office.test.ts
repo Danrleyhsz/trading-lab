@@ -26,6 +26,22 @@ function harness(overrides:Record<string,unknown>={},reduceMotion=false,geometry
   return {ids,rooms,requests,intervals,context,get socket(){return socket}};
 }
 const settle=()=>new Promise(resolve=>setImmediate(resolve));
+const preflightFixture=()=>({scope:'READ_ONLY_CONTINUOUS_PREFLIGHT',observedAt:new Date().toISOString(),activationReady:false,cycleEnabled:false,configuredStudyId:null,runtimePrerequisites:{ready:false,reasons:['EXPLICIT_STUDY_REQUIRED']},unverified:['AUTOMATIC_OFF_PROVIDER_BACKUP','EXTERNAL_FAILURE_ALERTS'],studies:[{studyId:'TEST_ONLY_NEGATIVE',configured:false,eligible:false,evidence:{netPnl:-131.51},checks:['COMPLETED_V2_STUDY','RECORDED_USDM_EVIDENCE','NONOVERLAPPING_TEST_WINDOWS','MINIMUM_TEST_FOLDS','MINIMUM_CLOSED_TRADES','POSITIVE_RECONCILED_OOS_PNL','NO_MODELED_LIQUIDATIONS','BOUNDED_TEST_DRAWDOWN','COMPATIBLE_SIGNAL_AND_COSTS','RECENT_CLOSED_EVIDENCE'].map(id=>({id,ok:id!=='POSITIVE_RECONCILED_OOS_PNL'}))}]});
+test('continuous preflight shows rejection, original study link and external gates without activating work',async()=>{
+ const data=preflightFixture(),responses:Record<string,unknown>={'/paper/perpetual/preflight':data},h=harness(responses);await settle();
+ const text=flatten(h.ids.get('#continuousPreflight')!);assert.match(text,/Não elegível/);assert.match(text,/-131.51/);assert.match(text,/Backup automático fora do provedor/);assert.match(text,/Alertas externos/);assert.match(text,/Pendente: P&L fora da amostra positivo/);
+ assert.match(h.ids.get('#preflightStatus')!.textContent,/Ciclo desligado.*nenhum estudo/);buttons(h.ids.get('#continuousPreflight')!)[0].onclick!();await settle();assert.ok(h.requests.includes('/backtests/v2/studies/TEST_ONLY_NEGATIVE'));assert.ok(!h.requests.some(p=>p.includes('/orders')));
+ (h.context.document as any).activeElement=buttons(h.ids.get('#continuousPreflight')!)[0];await vm.runInContext('refreshOnline()',h.context);assert.equal(buttons(h.ids.get('#continuousPreflight')!)[0].focusCalls,1);
+ responses['/paper/perpetual/preflight']={httpError:401};await vm.runInContext('refreshOnline()',h.context);assert.equal(h.ids.get('#continuousPreflight')!.children.length,0);assert.match(h.ids.get('#preflightStatus')!.textContent,/indisponível/);
+});
+test('preflight rejects stale, contradictory and malformed checks and clears after source failure',async()=>{
+ for(const mutate of [(d:any)=>d.observedAt='2020-01-01T00:00:00Z',(d:any)=>d.studies[0].eligible=true,(d:any)=>d.studies[0].checks[0].id='UNKNOWN',(d:any)=>d.studies[0].checks[1]=d.studies[0].checks[0],(d:any)=>d.activationReady=true]){
+  const data=preflightFixture();mutate(data);const h=harness({'/paper/perpetual/preflight':data});await settle();assert.equal(h.ids.get('#continuousPreflight')!.children.length,0);
+ }
+ const h=harness({'/paper/perpetual/preflight':preflightFixture()});await settle();assert.ok(h.ids.get('#continuousPreflight')!.children.length>0);
+ h.socket.onmessage({data:JSON.stringify({id:'TEST_ONLY_FAILURE',type:'MARKET_DATA_FAILED'})});assert.equal(h.ids.get('#continuousPreflight')!.children.length,0);
+ assert.match(h.ids.get('#accountScope')!.textContent,/Avaliações legadas não configuradas.*USD-M/);
+});
 test('agent cards keep original character identity and open actual profiles',async()=>{
  const h=harness();await settle();const card=h.ids.get('#agentList')!.children[0];assert.equal((card as any).className,'agent-card');assert.equal(card.children[0].dataset.sprite,'atlas');assert.equal(card.children[0].children[0].attributes.src,'/office/agent-sprites.png');assert.match(flatten(card),/Coordenação de pesquisa/);card.onclick!();await settle();assert.ok(h.requests.includes('/agents/atlas/profile'));assert.equal(h.ids.get('#profile')!.dataset.terminal,'false');
 });

@@ -1,4 +1,5 @@
 import {bootstrapEvaluationWallets} from './application/evaluation-wallet-bootstrap.js';
+import {registerContinuousPaperPreflight} from './application/continuous-paper-preflight.js';
 import {EventAudit,registerEventAudit} from './application/event-audit.js';
 import {ResearchJobs,registerResearchJobs} from './application/research-jobs.js';
 import type {StoredState} from './domain/storage.js';
@@ -82,6 +83,7 @@ registerAiStatus(app,aiAnalysis);
 const runtimeInputs=()=>({spot:latest,perpetual:perpetualMarket.snapshot(),book:book.status(),autonomous:cycle.status(),research:researchJobs.status(),historical:studies.status(),ai:aiAnalysis.status(),legacyExecutionEnabled:process.env.LEGACY_PAPER_EXECUTION_ENABLED==='true',evaluationEnabled,perpetualEnabled});
 const readiness=()=>runtime.snapshot(runtimeInputs());
 registerRuntimeReadiness(app,runtime,runtimeInputs);
+registerContinuousPaperPreflight(app,studies,readiness);
 registerOfficeAssets(app);
 app.get('/health',async(_req,reply)=>reply.code(persistenceError||(store instanceof PostgresStateStore&&!store.available())?503:200).send({ok:!persistenceError&&(!(store instanceof PostgresStateStore)||store.available()),mode:'PAPER_TRADING',storage:store instanceof PostgresStateStore?'POSTGRESQL':'JSON_DEVELOPMENT',marketStatus:perpetualMarket.snapshot().status}));
 app.get('/agents',async()=>agents.list());app.get('/agent-messages',async(req)=>messages.list((req.query as any).agentId));app.get('/strategies',async()=>strategies.list());

@@ -155,3 +155,6 @@ Local verification before PR: typecheck/build passed;185 tests total,184 passed 
 ## Workstations — 2026-10-03
 
 Workstation increment on feat/office-workstations (stacked on draft #32): eight assigned seated poses, a clipped original three-desk Research variant, chair foreground, seat-access legs and real-state monitor projection. Typecheck/build;191 local tests:190 pass/1 PostgreSQL skip;70 compiled office checks. Actual desktop/mobile reviewed. See docs/OFFICE_WORKSTATIONS.md. No runtime activation, merge or deployment. Temporal gait/mobile asset transfer and richer job evidence remain.
+## Continuous paper preflight — 2026-10-04
+
+PR44 controlled paper accepted online with eight retained independent wallets, sourced studies, logical restore drill, risk-checked bounded Nova entry/exit and a real restart preserving ledger/fund separation. This next draft provides source/hash/date/window/cost-checked eligibility and authenticated read-only preflight. The known negative USD-M study is not promoted. External daily backup/alert delivery, selected eligible study and reviewed continuous-launch phase remain pending. No continuous activation, paid AI, production mutation or new service/cost occurs here. See docs/CONTINUOUS_PAPER_PREFLIGHT.md and workspace continuation for exact release/verification IDs. Earlier state entries are historical.

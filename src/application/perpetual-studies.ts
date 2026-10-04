@@ -7,9 +7,11 @@ import type {PerpetualDataset,PerpetualConfig} from '../domain/perpetual-backtes
 import type {AgentCoordinator} from './agent-coordinator.js';
 import type {EventBus} from './event-bus.js';
 import {event} from '../domain/events.js';
+import {screenPerpetualStudy,studyScreenAtTime} from './perpetual-study-screen.js';
 const schema=z.object({bars:z.number().int().min(300).max(5000).default(1000),trainBars:z.number().int().min(100).max(3000).default(400),testBars:z.number().int().min(50).max(1000).default(100)}).strict().refine(v=>v.bars>=v.trainBars+v.testBars,'insufficient study windows');
 export interface PerpetualStudy {id:string;status:'QUEUED'|'RUNNING'|'COMPLETED'|'FAILED'|'INTERRUPTED';createdAt:string;request:z.infer<typeof schema>;dataset?:PerpetualDataset;datasetHash?:string;result?:ReturnType<typeof walkForwardPerpetual>;error?:string;completedAt?:string}
 export class PerpetualStudies {
+ private screens=new WeakMap<PerpetualStudy,ReturnType<typeof screenPerpetualStudy>>();
  private records:PerpetualStudy[];private busy=false;private accepting=true;private activeTasks=new Set<Promise<void>>();private persistenceError:string|null=null;
  constructor(private source:{load(count:number):Promise<PerpetualDataset>},restored:PerpetualStudy[]=[],private simulator:HistoricalStudySimulator=new HistoricalStudyRunner()){this.records=structuredClone(restored).map(s=>s.status==='RUNNING'||s.status==='QUEUED'?{...s,status:'INTERRUPTED',error:'server restarted before completion'}:s);}
  list(){return structuredClone(this.records);}
@@ -18,6 +20,11 @@ export class PerpetualStudies {
  async drain(){this.stopAccepting();await Promise.all([...this.activeTasks]);}
  summaries(){return this.records.slice(-20).reverse().map(({dataset,result,...s})=>({...s,netPnl:result?.netPnl,folds:result?.folds.length}));}
  get(id:string){return structuredClone(this.records.find(s=>s.id===id));}
+ screen(id:string,now=Date.now()){
+  const study=this.records.find(s=>s.id===id);if(!study||study.status!=='COMPLETED')return screenPerpetualStudy(study,now);
+  let cached=this.screens.get(study);if(!cached){cached=screenPerpetualStudy(study,now);this.screens.set(study,cached);}
+  return studyScreenAtTime(study,cached,now);
+ }
  async start(request:z.infer<typeof schema>,persist:()=>Promise<void>,coordinator:AgentCoordinator,bus:EventBus){
   if(!this.accepting)throw new Error('historical runtime draining');
   if(this.busy||coordinator.registry.get('euler')?.status==='BACKTESTING'||coordinator.registry.get('atlas')?.status==='RESEARCHING')throw new Error('quant job already running');

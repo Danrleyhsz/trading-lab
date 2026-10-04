@@ -24,6 +24,8 @@ Secrets never belong in Git. The initial product has no live-money broker. Devel
 
 ## Online Paper V2
 
+Controlled paper acceptance completed on 2026-10-04 with eight independent evaluation wallets, a separate backup restore/restart verification and one audited Nova round trip. The next draft adds [continuous-paper preflight](docs/CONTINUOUS_PAPER_PREFLIGHT.md): shared source/eligibility checks and read-only original-study diagnostics. It has not been deployed; continuous evaluation and paid AI remain disabled. External scheduled backup/alert acceptance and an eligible retained study remain prerequisites. Historical pending-provider statements below describe earlier increments.
+
 Latest observation, 2026-10-03: the human's Render deployment started successfully. Independent public checks returned 200 for health/live, health/ready and the office, and 401 for unauthenticated private diagnostics; the human confirmed login and agent loading. Authenticated market/persistence diagnosis, restart/restore/backups and full release review remain pending. Execution/autonomy and AI remain disabled. Earlier blocked-publication statements below describe preparation history.
 
 Bounded durable research admissions and compact recorded-state cards are prepared in a draft; see [research jobs](docs/RESEARCH_JOBS.md). Restart records interruption instead of automatically repeating work. Execution and AI configuration remain unchanged.

@@ -357,7 +357,7 @@ function renderAccounts(items) {
     row.append(node('b', account.kind === 'FUND' ? 'Fundo · portfólio paper oficial separado' : 'Avaliação · ' + account.ownerAgentId), node('p', 'Patrimônio: ' + money(account.portfolio.equity)), node('p', 'P&L líquido: ' + money(account.portfolio.equity - account.initialCash)), node('small', `${account.fills} fills registrados · Capital virtual inicial: ${money(account.initialCash)}`));
     host.append(row);
   }
-  q('#accountScope').textContent = items.some(account => account.kind === 'EVALUATION') ? 'Capital de avaliação independente. Os saldos não são somados ao patrimônio do fundo.' : 'Contas de avaliação não configuradas. O fundo permanece separado.';
+  q('#accountScope').textContent = items.some(account => account.kind === 'EVALUATION') ? 'Avaliações legadas independentes. Os saldos não são somados ao patrimônio do fundo.' : 'Avaliações legadas não configuradas. As contas USD-M aparecem nos cards financeiros acima; o fundo permanece separado.';
 }
 async function refresh() {
   if (busy) return;
@@ -416,7 +416,7 @@ refresh();
 setInterval(() => { renderStations();if(selected)renderState();refresh(); if (selected) details(); }, 5000);
 connect();
 
-let onlineBusy = false, onlineVersion = 0, halted = null, runtimeObservedAt = 0;
+let onlineBusy = false, onlineVersion = 0, halted = null, runtimeObservedAt = 0, preflightObservedAt = 0;
 function showPerpetualMarket(market) {
   const quote = market.quote;
   if (market.status !== 'HEALTHY' || !quote || !Number.isFinite(quote.markTime) || Date.now()-quote.markTime > 15000) {
@@ -449,6 +449,25 @@ function runtimeUnavailable() {
   runtimeObservedAt = 0;
   q('#runtimeStatus').textContent = 'Diagnóstico indisponível ou desatualizado · entre se o acesso for exigido';
   q('#runtimeDetails').replaceChildren();
+  preflightUnavailable();
+}
+const screenCheckLabels={COMPLETED_V2_STUDY:'Estudo V2 concluído, com data válida',RECORDED_USDM_EVIDENCE:'Dataset USD-M e hashes conferidos',NONOVERLAPPING_TEST_WINDOWS:'Janelas fora da amostra sem sobreposição',MINIMUM_TEST_FOLDS:'Pelo menos 3 janelas de teste',MINIMUM_CLOSED_TRADES:'Pelo menos 10 operações históricas encerradas',POSITIVE_RECONCILED_OOS_PNL:'P&L fora da amostra positivo e reconciliado',NO_MODELED_LIQUIDATIONS:'Nenhuma liquidação modelada',BOUNDED_TEST_DRAWDOWN:'Drawdown por janela entre 0 e 15%',COMPATIBLE_SIGNAL_AND_COSTS:'Sinal e custos compatíveis com o paper',RECENT_CLOSED_EVIDENCE:'Evidência fechada com até 7 dias'};
+function preflightUnavailable(){preflightObservedAt=0;q('#preflightStatus').textContent='Diagnóstico do ciclo indisponível ou desatualizado.';q('#continuousPreflight').replaceChildren();}
+function renderPreflight(data){
+  const observed=Date.parse(data?.observedAt), checks=Object.keys(screenCheckLabels);
+  if(data?.scope!=='READ_ONLY_CONTINUOUS_PREFLIGHT'||!Number.isFinite(observed)||Date.now()-observed>15000||observed>Date.now()+5000||data.activationReady!==false||typeof data.cycleEnabled!=='boolean'||!Array.isArray(data.studies)||data.studies.length>21||!Array.isArray(data.unverified)||!data.runtimePrerequisites||typeof data.runtimePrerequisites.ready!=='boolean'||!Array.isArray(data.runtimePrerequisites.reasons)||data.studies.some(s=>typeof s.studyId!=='string'||typeof s.eligible!=='boolean'||typeof s.configured!=='boolean'||!s.evidence||!Array.isArray(s.checks)||s.checks.length!==checks.length||new Set(s.checks.map(c=>c.id)).size!==checks.length||s.checks.some(c=>!checks.includes(c.id)||typeof c.ok!=='boolean')||s.eligible!==s.checks.every(c=>c.ok))) {preflightUnavailable();return;}
+  preflightObservedAt=observed;const host=q('#continuousPreflight'), focusedStudy=document.activeElement?.dataset?.preflightStudy;host.replaceChildren();
+  q('#preflightStatus').textContent='Ciclo '+(data.cycleEnabled?'configurado como habilitado':'desligado')+' · '+(data.configuredStudyId?'estudo explicitamente configurado':'nenhum estudo selecionado')+' · ativação exige aceitação operacional externa.';
+  const blockers={EXPLICIT_STUDY_REQUIRED:'Escolher explicitamente um estudo elegível',CONFIGURED_STUDY_NOT_ELIGIBLE:'O estudo configurado não passa na triagem',NEW_EXPOSURE_HALTED:'Novas exposições pausadas',PERPETUAL_EXECUTION_DISABLED:'Execução paper desligada',HISTORICAL_PERSISTENCE_FAILED:'Gravação de estudo falhou',PERPETUAL_SOURCE_UNAVAILABLE:'Fonte de mercado indisponível',FUNDING_RECONCILIATION_PENDING:'Funding aguardando conciliação'};
+  for(const reason of data.runtimePrerequisites.reasons)host.append(node('p',blockers[reason]||'Bloqueio operacional: '+reason));
+  const external={AUTOMATIC_OFF_PROVIDER_BACKUP:'Backup automático fora do provedor',EXTERNAL_FAILURE_ALERTS:'Alertas externos de falhas',CONTINUOUS_RELEASE_REVIEW:'Revisão da release contínua'};
+  for(const item of data.unverified)host.append(node('p','Aceitação externa pendente: '+(external[item]||item)));
+  if(!data.studies.length)host.append(node('p','Nenhum estudo registrado para triagem.'));
+  for(const study of data.studies){
+    const card=node('article','');card.append(node('h4',study.eligible?'Elegível para avaliação paper, sujeito aos demais controles':'Não elegível para ciclo contínuo'),node('small',study.studyId+(study.configured?' · configurado':'')),node('p','P&L histórico fora da amostra: '+money(study.evidence.netPnl)));
+    const criteria=node('details',''),list=node('ul','');criteria.append(node('summary','Conferir critérios · '+study.checks.filter(c=>!c.ok).length+' pendentes'));for(const check of study.checks)list.append(node('li',(check.ok?'✓ ':'Pendente: ')+screenCheckLabels[check.id]));criteria.append(list);card.append(criteria);
+    const detail=node('button','Abrir evidência original');detail.dataset.preflightStudy=study.studyId;detail.onclick=()=>studyDetails(study.studyId);card.append(detail);host.append(card);if(focusedStudy===study.studyId)detail.focus();
+  }
 }
 function renderRuntime(data) {
   const observed = Date.parse(data?.observedAt), phases = {STARTING:'Inicializando',SERVING:'Em serviço',DRAINING:'Encerrando',STOPPED:'Encerrado'};
@@ -471,7 +490,7 @@ function renderRuntime(data) {
 async function refreshOnline() {
   if (onlineBusy) return;onlineBusy = true;const version = onlineVersion;
   try {
-    const results = await Promise.allSettled([get('/market/v3'), get('/finance'), get('/backtests/v2/studies'), get('/paper/perpetual/status'), get('/runtime/readiness'), get('/research/jobs')]);
+    const results = await Promise.allSettled([get('/market/v3'), get('/finance'), get('/backtests/v2/studies'), get('/paper/perpetual/status'), get('/runtime/readiness'), get('/research/jobs'),get('/paper/perpetual/preflight')]);
     if (results[0].status === 'fulfilled' && version === onlineVersion) showPerpetualMarket(results[0].value);
     else if (results[0].status === 'rejected') marketUnavailable('Dados USD-M indisponíveis · preços podem estar desatualizados');
     if (results[1].status === 'fulfilled') {
@@ -490,6 +509,7 @@ async function refreshOnline() {
     } else { halted = null;q('#riskSummary').textContent = 'Estado de risco indisponível';q('#haltPaper').disabled = true;q('#onlineStatus').textContent = 'Controles indisponíveis · entre se o acesso for exigido'; }
     renderResearchJobs(results[5].status==='fulfilled' ? results[5].value : null);
     if (results[4].status==='fulfilled' && version===onlineVersion) renderRuntime(results[4].value); else runtimeUnavailable();
+    if(results[6].status==='fulfilled'&&version===onlineVersion)renderPreflight(results[6].value);else preflightUnavailable();
   } finally { onlineBusy = false; }
 }
 q('#runStudy').onclick = async () => {
@@ -506,7 +526,7 @@ q('#loginPanel').onclick = async () => {
   try { const response = await fetch('/auth/login', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({accessToken:q('#accessToken').value})});q('#accessToken').value = '';q('#loginStatus').textContent = response.ok ? 'Acesso autorizado' : 'Acesso recusado';if (response.ok) { await refresh();await refreshOnline(); } }
   catch { q('#loginStatus').textContent = 'Não foi possível acessar o laboratório'; }
 };
-refreshOnline();setInterval(() => {refreshOnline();if (!runtimeObservedAt || Date.now()-runtimeObservedAt>15000 || runtimeObservedAt>Date.now()+5000) runtimeUnavailable();}, 5000);
+refreshOnline();setInterval(() => {refreshOnline();if (!runtimeObservedAt || Date.now()-runtimeObservedAt>15000 || runtimeObservedAt>Date.now()+5000) runtimeUnavailable();if(!preflightObservedAt||Date.now()-preflightObservedAt>15000||preflightObservedAt>Date.now()+5000)preflightUnavailable();}, 5000);
 
 q('#navOffice').onclick = () => q('#workspaceDialog').close();
 q('#navAgents').onclick = () => openPanel('agentsPanel','Equipe do laboratório','navAgents');

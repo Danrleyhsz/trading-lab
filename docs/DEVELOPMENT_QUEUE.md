@@ -1,5 +1,11 @@
 # Development continuation queue
 
+## 2026-10-04 continuous preflight — current increment
+
+Controlled paper was accepted on PR44/26d1269: real restore/restart, eight wallets and one risk-checked audited Nova round trip. The human now asks to advance. New branch `feat/continuous-paper-preflight` adds a shared source/window/date/cost-checked eligibility screen and bounded authenticated read-only preflight in the Quant panel. It does not select/activate a study; known study d0c3bbe7 has negative OOS P&L. See CONTINUOUS_PAPER_PREFLIGHT.md. Verify the new draft CI before publication. Browser access to the online office was denied this execution; do not work around that denial or claim current production state/deployment.
+
+Next: reviewed manual publication on the existing service when access is available; backup including actual controlled fills, external daily backup/alert acceptance and one predeclared bounded research protocol. Passing thresholds and explicit source identity are required before preparing/reviewing a continuous launch phase. Existing launcher rejects autonomy. No new costs, paid AI, lowering thresholds, historical rewrites, extra wallet reseeding, automatic architectural merge or continuous activation. Earlier pending-cloud/wallet entries below are historical.
+
 ## Durable research draft — current increment
 
 Bounded journal-based research admissions now persist before work, expose original outcomes, serialize Quant access and record interruptions without automatic replay. Compact lifecycle cards and read-failure clearing preserve the original office art. See RESEARCH_JOBS.md. Human diagnosis at 2026-10-04T01:15:46Z reported healthy PostgreSQL/market/protected HTTPS, no accounts or enabled execution/AI. This point observation does not verify backups, restore or restart. Next: review and manually deploy the draft stack; validate actual sourced research and hosted restart/restore before enabling independent paper evaluation. No new billing or autonomous activation.
