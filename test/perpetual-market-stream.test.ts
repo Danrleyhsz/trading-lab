@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {BinancePerpetualMarket,type QuoteSocket} from '../src/infrastructure/binance-perpetual-market.js';
+import {BinancePerpetualMarket,STREAM_URLS,type QuoteSocket} from '../src/infrastructure/binance-perpetual-market.js';
 import {PerpetualPaperBook} from '../src/application/perpetual-paper-book.js';
 import {EventBus} from '../src/application/event-bus.js';
 let clock=1700000000000;const now=()=>clock;
@@ -11,7 +11,7 @@ const mark=(t:number)=>JSON.stringify({stream:'btcusdt@markPrice@1s',data:{e:'ma
 test('streamed book and mark become the same validated quote; malformed, foreign or stale frames never do',()=>{
  clock=1700000000000;const sockets:FakeSocket[]=[];const market=new BinancePerpetualMarket(async()=>{throw Error('TEST_ONLY no REST');},now,()=>{const s=new FakeSocket();sockets.push(s);return s;});
  assert.equal(market.streamQuote(),null);
- (market as any).stopped=false;(market as any).connect();const s=sockets[0];
+ (market as any).stopped=false;(market as any).connect(STREAM_URLS[0]);const s=sockets[0];
  s.emit('message','not json');s.emit('message',JSON.stringify({data:{e:'bookTicker',s:'ETHUSDT',b:'1',a:'2',T:clock}}));s.emit('message',book(clock));assert.equal(market.streamQuote(),null);
  s.emit('message',mark(clock));const quote=market.streamQuote()!;
  assert.deepEqual([quote.bid,quote.ask,quote.markPrice,quote.indexPrice,quote.fundingRate,quote.bookTime,quote.markTime],[100,101,100.5,100.4,0.0001,clock,clock]);
@@ -21,17 +21,19 @@ test('streamed book and mark become the same validated quote; malformed, foreign
 
 test('quotes are delivered from the stream without REST calls; a closed socket is reopened',async()=>{
  clock=1700000000000;let rest=0;const sockets:FakeSocket[]=[];
- const market=new BinancePerpetualMarket(async()=>{rest++;throw Error('TEST_ONLY no REST');},now,()=>{const s=new FakeSocket();sockets.push(s);s.emit('message',book(clock));s.emit('message',mark(clock));return s;});
- const opened=(socket:FakeSocket)=>{socket.emit('message',book(clock));socket.emit('message',mark(clock));};
+ const urls:string[]=[];const market=new BinancePerpetualMarket(async()=>{rest++;throw Error('TEST_ONLY no REST');},now,url=>{const s=new FakeSocket();sockets.push(s);urls.push(url);return s;});
+ // Raw (unwrapped) frames, as the /public/ws and /market/ws endpoints send them.
+ const opened=()=>{sockets[0].emit('message',JSON.stringify(JSON.parse(book(clock)).data));sockets[1].emit('message',JSON.stringify(JSON.parse(mark(clock)).data));};
  const delivered:number[]=[];
  await market.start(async q=>{delivered.push(q.markTime);},()=>{});
  try{
- opened(sockets[0]);await new Promise(r=>setTimeout(r,2500));
+ assert.deepEqual(urls,[...STREAM_URLS],'book on /public and mark on /market');assert.match(urls[0],/\/public\/ws\/btcusdt@bookTicker$/);assert.match(urls[1],/\/market\/ws\/btcusdt@markPrice@1s$/);
+ opened();await new Promise(r=>setTimeout(r,2500));
  assert.ok(delivered.length>=1);assert.equal(market.snapshot().transport,'WEBSOCKET');assert.equal(market.snapshot().status,'HEALTHY');assert.equal(rest,0,'no REST while the stream is fresh');
  sockets[0].emit('close');await new Promise(r=>setTimeout(r,2100));
- assert.equal(sockets.length,2,'reconnected after backoff');
+ assert.equal(sockets.length,3,'only the closed stream reconnected after backoff');assert.equal(urls[2],STREAM_URLS[0]);
  }finally{await market.stop();}
- assert.equal(sockets[1].terminated,true);
+ assert.equal(sockets[1].terminated,true);assert.equal(sockets[2].terminated,true);
 });
 
 test('418/429 pause REST for Retry-After instead of retrying into a longer IP ban',async()=>{
