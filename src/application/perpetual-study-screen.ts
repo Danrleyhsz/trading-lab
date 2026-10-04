@@ -23,7 +23,7 @@ export function screenPerpetualStudy(study:PerpetualStudy|undefined, now=Date.no
     try { if(study?.dataset) sourceHash=validatePerpetualDataset(study.dataset); } catch { /* Fixed check only; no raw source exception. */ }
     add('RECORDED_USDM_EVIDENCE',!!sourceHash&&sourceHash===study?.datasetHash&&sourceHash===result?.datasetHash);
     const request=study?.request, trainBars=request?.trainBars??0, testBars=request?.testBars??0;
-    const windowsValid=Number.isSafeInteger(trainBars)&&trainBars>=100&&trainBars<=3000&&Number.isSafeInteger(testBars)&&testBars>=50&&testBars<=1000&&Number.isSafeInteger(request?.bars)&&request!.bars>=300&&request!.bars<=5000&&request!.bars===study?.dataset?.trade.length;
+    const windowsValid=Number.isSafeInteger(trainBars)&&trainBars>=100&&trainBars<=3000&&Number.isSafeInteger(testBars)&&testBars>=50&&testBars<=1000&&Number.isSafeInteger(request?.bars)&&request!.bars>=300&&request!.bars<=5000&&request!.bars===study?.dataset?.trade?.length;
     const expectedFolds=windowsValid?Math.floor((request!.bars-trainBars)/testBars):0;
     add('NONOVERLAPPING_TEST_WINDOWS',windowsValid&&folds.length===expectedFolds&&folds.length>0&&folds.every((f,i)=>{
         const candles=study!.dataset!.trade, start=trainBars+i*testBars;

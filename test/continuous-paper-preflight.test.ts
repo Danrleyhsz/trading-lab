@@ -26,7 +26,7 @@ test('NaN/future/missing dates, corrupted hashes/windows, costs and invalid coun
     const changes:Array<(s:PerpetualStudy)=>void>=[
         s=>{s.completedAt='invalid';},s=>{s.completedAt=new Date(now+1).toISOString();},s=>{s.result!.folds[5].testEnd=NaN;},
         s=>{s.result!.folds[5].testEnd=now;},s=>{s.result!.folds[5].testEnd-=8*86400000;},
-        s=>{s.dataset!.trade[0].volume=2;},s=>{s.datasetHash='forged';},s=>{delete s.dataset;},
+        s=>{s.dataset!.trade[0].volume=2;},s=>{s.datasetHash='forged';},s=>{delete s.dataset;},s=>{s.dataset!.trade=undefined as any;},s=>{s.dataset!.trade=null as any;},
         s=>{s.result!.folds[1].testStart=s.result!.folds[0].testStart;},
         s=>{s.result!.folds[0].configuration.fastPeriod=0;},s=>{s.result!.folds[0].configuration.feeRate=0;},
         s=>{s.result!.folds[0].configuration.strategy='UNKNOWN' as any;},s=>{s.result!.folds[0].configuration.slowPeriod=5001;},
