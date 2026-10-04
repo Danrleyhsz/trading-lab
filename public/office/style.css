@@ -1094,3 +1094,6 @@ dialog::backdrop{background:#02081291;backdrop-filter:blur(2px)}
 .agent[data-seated="true"] b{opacity:0;pointer-events:none}.agent[data-seated="true"]:hover b,.agent[data-seated="true"]:focus-visible b{opacity:1}.scene-screen{border-radius:0!important}.lab-card h3{color:#f2cd80}
 @media(max-width:600px){#agentList .roster-portrait{flex:0 0 100px}}
 #profilePortrait[data-sprite]{--sprite-height:94px;height:94px}
+#continuousPreflight .lab-card{margin-block:12px;overflow-wrap:anywhere}
+#continuousPreflight summary{min-height:44px;display:list-item;align-content:center;cursor:pointer;color:#81dbff}
+#continuousPreflight summary:focus-visible{outline:2px solid #5edbff;outline-offset:3px}

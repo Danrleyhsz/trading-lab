@@ -35,7 +35,7 @@ test('continuous preflight shows rejection, original study link and external gat
  responses['/paper/perpetual/preflight']={httpError:401};await vm.runInContext('refreshOnline()',h.context);assert.equal(h.ids.get('#continuousPreflight')!.children.length,0);assert.match(h.ids.get('#preflightStatus')!.textContent,/indisponível/);
 });
 test('preflight rejects stale, contradictory and malformed checks and clears after source failure',async()=>{
- for(const mutate of [(d:any)=>d.observedAt='2020-01-01T00:00:00Z',(d:any)=>d.studies[0].eligible=true,(d:any)=>d.studies[0].checks[0].id='UNKNOWN',(d:any)=>d.studies[0].checks[1]=d.studies[0].checks[0],(d:any)=>d.activationReady=true]){
+ for(const mutate of [(d:any)=>d.observedAt='2020-01-01T00:00:00Z',(d:any)=>d.studies[0].eligible=true,(d:any)=>d.studies[0].checks[0].id='UNKNOWN',(d:any)=>d.studies[0].checks[1]=d.studies[0].checks[0],(d:any)=>d.activationReady=true,(d:any)=>d.studies[0]=null,(d:any)=>d.studies[0].checks[0]=null,(d:any)=>d.studies.push(d.studies[0]),(d:any)=>d.studies[0].configured=true]){
   const data=preflightFixture();mutate(data);const h=harness({'/paper/perpetual/preflight':data});await settle();assert.equal(h.ids.get('#continuousPreflight')!.children.length,0);
  }
  const h=harness({'/paper/perpetual/preflight':preflightFixture()});await settle();assert.ok(h.ids.get('#continuousPreflight')!.children.length>0);
