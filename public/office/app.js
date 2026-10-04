@@ -15,6 +15,7 @@ function observeTrace(source, price, timestamp) {
   const line = document.createElementNS('http://www.w3.org/2000/svg','polyline');line.setAttribute('points',points);line.setAttribute('fill','none');line.setAttribute('stroke','#18dba0');line.setAttribute('stroke-width','2');svg.append(line);host.append(svg);
 }
 function marketUnavailable(reason) {
+  screens.update({quote:null});
   q('#marketV3').textContent = reason;q('#markPrice').textContent = 'Indisponível';q('#fundingRate').textContent = '—';q('#spreadQuote').textContent = '—';q('#quoteTime').textContent = reason;
   q('#markChartStatus').textContent=reason+' · o traçado abaixo é histórico desta sessão.';
 }
@@ -153,14 +154,19 @@ function renderStations(){
 }
 
 const reducedMotion=globalThis.matchMedia?.('(prefers-reduced-motion: reduce)');
-const motionAllowed=()=>presenceEnabled&&!selectedHandoff&&!reducedMotion?.matches&&!document.hidden&&!['#profile','#workspaceDialog','#roomDialog','#auditDialog','#studyDialog','#researchDialog'].some(id=>q(id).open);
+// The owner may explicitly animate the office even when the operating system asks for reduced motion.
+let motionChoice=(()=>{try{return globalThis.localStorage?.getItem('trading-lab.motion.v1')==='on'?'on':'system';}catch{return 'system';}})();
+const systemReducesMotion=()=>!!reducedMotion?.matches&&motionChoice!=='on';
+const motionAllowed=()=>presenceEnabled&&!selectedHandoff&&!systemReducesMotion()&&!document.hidden&&!['#profile','#workspaceDialog','#roomDialog','#auditDialog','#studyDialog','#researchDialog'].some(id=>q(id).open);
 const presence=new OfficePresence.Director(motionAllowed);
 const transitions=new OfficeTransitions.Director(motionAllowed,view=>presence.stop(view),view=>presence.update(view,view.agent,view.slot,view.host));
-function stopPresence(){q('#office').dataset.presence='off';for(const view of agentViews.values()){transitions.stop(view);presence.stop(view);}}
+const screens=new OfficeScreens.Screens(q('#office'));
+const life=new OfficeLife.Director({allowed:motionAllowed,bounds:()=>q('#office').getBoundingClientRect?.()});
+function stopPresence(){q('#office').dataset.presence='off';for(const view of agentViews.values()){life.stop(view);transitions.stop(view);presence.stop(view);}}
 function render(movingEvent){
  const focusedAgent=document.activeElement?.dataset?.agentId,slots=new Map(),placements=new Map();q('#agentList').replaceChildren();
  for(const agent of agents.values()){const slot=slots.get(agent.room)||0;slots.set(agent.room,slot+1);placements.set(agent.id,slot);}
- for(const [id,view] of agentViews)if(!agents.has(id)){transitions.stop(view);presence.forget(view);clearViewSpeech(view);view.button.remove();agentViews.delete(id);}
+ for(const [id,view] of agentViews)if(!agents.has(id)){life.forget(view);transitions.stop(view);presence.forget(view);clearViewSpeech(view);view.button.remove();agentViews.delete(id);}
  for(const agent of agents.values()){
   let view=agentViews.get(agent.id);
   if(!view){
@@ -178,7 +184,7 @@ function render(movingEvent){
   const point=(view.station?OfficeTransitions.local(agent.room,view.station.point):OfficePresence.floorPoint(agent.room,slot))||{x:50,y:88};
   button.dataset.seated=String(!!view.station);button.dataset.stationScale=String(!!view.station||!!from?.station||wasTraveling);
   if(button.parentElement!==host)host.append(button);button.setAttribute('style','left:'+point.x+'%;top:'+point.y+'%');
-  presence.update(view,agent,slot,host);
+  presence.update(view,agent,slot,host);life.update(view);
   const occupied=[];
   for(const other of agents.values())if(other.id!==agent.id){const anchor=OfficeWorkstations.seat(other)?.point||OfficeTransitions.anchor(other.room,placements.get(other.id));if(anchor)occupied.push(anchor);}
   for(const other of agentViews.values())if(other!==view){
@@ -190,7 +196,9 @@ function render(movingEvent){
   const row=node('button',''),portrait=node('span',''),copy=node('span','');row.className='agent-card';portrait.className='sprite roster-portrait';portrait.setAttribute('aria-hidden','true');sprite(portrait,agent.id);const image=node('img','');image.setAttribute('src','/office/agent-sprites.png');image.setAttribute('alt','');portrait.append(image);copy.append(node('b',agent.name),node('small',roleLabels[agent.id]||agent.role),node('span',statusLabels[agent.status]||agent.status),node('small',agent.room));row.append(portrait,copy);row.setAttribute('aria-label',agent.name+' · '+agent.room+' · '+(statusLabels[agent.status]||agent.status));row.onclick=()=>profile(agent.id);q('#agentList').append(row);
  }
  q('#office').dataset.presence=motionAllowed()?'on':'off';
- q('#togglePresence').textContent=reducedMotion?.matches?'Movimento reduzido':selectedHandoff?'Presença pausada':presenceEnabled?'Pausar animações':'Animar escritório';q('#togglePresence').disabled=!!reducedMotion?.matches||!!selectedHandoff;q('#togglePresence').setAttribute('aria-pressed',String(presenceEnabled&&!selectedHandoff&&!reducedMotion?.matches));
+ q('#togglePresence').textContent=systemReducesMotion()?'Ativar animações':selectedHandoff?'Presença pausada':presenceEnabled?'Pausar animações':'Animar escritório';q('#togglePresence').disabled=!!selectedHandoff;q('#togglePresence').setAttribute('aria-pressed',String(presenceEnabled&&!selectedHandoff&&!systemReducesMotion()));
+ q('#togglePresence').setAttribute('title',systemReducesMotion()?'Seu sistema pede movimento reduzido. Clique para animar o escritório mesmo assim.':'Animações são apenas visuais; não alteram trabalho nem resultados.');if(document.body)document.body.dataset.motion=motionChoice;
+ renderLastWords();
  q('#activeAgents').textContent=[...agents.values()].filter(agent=>agent.status!=='IDLE').length+' / '+agents.size;
  renderStations();if(selected)renderState();if(inspectedRoom&&q('#roomDialog').open)renderRoom();renderHandoffs();
 }
@@ -427,7 +435,7 @@ function showPerpetualMarket(market) {
     q('#fundingRate').textContent = Number.isFinite(quote.fundingRate) ? (quote.fundingRate * 100).toFixed(4) + '%' : '—';
     q('#spreadQuote').textContent = money(quote.bid) + ' / ' + money(quote.ask);
     q('#quoteTime').textContent = market.status + ' · ' + date(quote.markTime);
-    observeTrace('mark', quote.markPrice, quote.markTime);
+    observeTrace('mark', quote.markPrice, quote.markTime);screens.update({quote,trace:traces.mark.map(p=>p.price)});
   } else marketUnavailable('USD-M indisponível · ordens bloqueadas');
   q('#marketV3').textContent = quote ? `BTCUSDT perpetual · bid ${money(quote.bid)} · ask ${money(quote.ask)} · mark ${money(quote.markPrice)} · funding cotado ${(quote.fundingRate * 100).toFixed(4)}% · ${market.status}. Atualizado em ${date(quote.markTime)}` : 'USD-M indisponível · ordens paper bloqueadas';
 }
@@ -495,7 +503,7 @@ async function refreshOnline() {
     if (results[0].status === 'fulfilled' && version === onlineVersion) showPerpetualMarket(results[0].value);
     else if (results[0].status === 'rejected') marketUnavailable('Dados USD-M indisponíveis · preços podem estar desatualizados');
     if (results[1].status === 'fulfilled') {
-      const data = results[1].value, host = q('#finance');host.replaceChildren();renderFinancialOverview(data);
+      const data = results[1].value, host = q('#finance');host.replaceChildren();renderFinancialOverview(data);screens.update({finance:data,names:agentNames()});
       for (const account of [...(data.legacyAccounts || []), ...(data.perpetualAccounts || [])]) {
         const card = node('article', '');const net = account.portfolio.equity - account.initialCash;
         card.append(node('h3', account.kind === 'FUND' ? 'Fundo · portfólio paper separado' : 'Avaliação · ' + account.ownerAgentId), node('p', account.instrument), node('p', 'Patrimônio: ' + money(account.portfolio.equity)), node('p', 'P&L líquido: ' + money(net)), node('p', 'Taxas: ' + money(account.feesPaid)), node('p', 'Funding: ' + money(account.fundingCashDelta)), node('p', 'Drawdown máximo observado: ' + (Number.isFinite(account.maxDrawdown) ? (account.maxDrawdown * 100).toFixed(2) + '%' : 'indisponível')));
@@ -509,7 +517,7 @@ async function refreshOnline() {
       q('#onlineStatus').textContent = `Execução perpétua ${status.executionEnabled ? 'habilitada' : 'desligada'} · nova exposição ${halted ? 'pausada' : 'sujeita ao risco'} · autonomia ${status.autonomous?.enabled ? 'habilitada' : 'desligada'} · ${status.autonomous?.reason || 'estado indisponível'}. Somente avaliação independente.`;
     } else { halted = null;q('#riskSummary').textContent = 'Estado de risco indisponível';q('#haltPaper').disabled = true;q('#onlineStatus').textContent = 'Controles indisponíveis · entre se o acesso for exigido'; }
     renderResearchJobs(results[5].status==='fulfilled' ? results[5].value : null);
-    if (results[4].status==='fulfilled' && version===onlineVersion) renderRuntime(results[4].value); else runtimeUnavailable();
+    if (results[4].status==='fulfilled' && version===onlineVersion) {renderRuntime(results[4].value);screens.update({readiness:runtimeObservedAt?results[4].value:null});} else {runtimeUnavailable();screens.update({readiness:null});}
     if(results[6].status==='fulfilled'&&version===onlineVersion)renderPreflight(results[6].value);else preflightUnavailable();
   } finally { onlineBusy = false; }
 }
@@ -619,6 +627,20 @@ function renderRoom(){
  const list=q('#roomMessages'),rows=messages.slice().reverse().map(message=>messageCard(message,controls));list.replaceChildren(...rows);if(focused&&q('#roomDialog').open)(controls.find(button=>button.dataset.roomControl===focused)||q('#closeRoom')).focus?.({preventScroll:true});
  q('#roomMessageStatus').textContent=communicationReady?(messages.length?'Comunicações registradas · horário e participantes originais.':'Nenhuma comunicação registrada para esta sala.'):'Comunicações indisponíveis ou ainda não recebidas.';
 }
+const agentNames=()=>Object.fromEntries([...agents.values()].map(a=>[a.id,a.name||a.id]));
+const ago=value=>{const minutes=Math.max(0,Math.round((Date.now()-Date.parse(value))/60000));return minutes<1?'agora':minutes<60?'há '+minutes+' min':'há '+Math.floor(minutes/60)+' h'+(minutes%60?' '+(minutes%60)+' min':'');};
+// Each agent's latest recorded message (up to two hours old) stays above the character, with its age.
+function renderLastWords(){
+ for(const [id,view] of agentViews){
+  const latest=communicationReady?[...communications].reverse().find(m=>m.from===id):null,age=latest?Date.now()-Date.parse(latest.createdAt):Infinity;
+  if(!latest||!(age>=-60000&&age<=7200000)){view.lastWords?.remove();view.lastWords=undefined;continue;}
+  if(!view.lastWords){view.lastWords=node('span','');view.lastWords.className='last-words';view.lastWords.setAttribute('aria-hidden','true');}
+  const text=OfficeLife.text(latest)||latest.summary,when=ago(latest.createdAt);
+  if(view.lastWords.dataset.id!==latest.id||view.lastWords.dataset.when!==when){view.lastWords.replaceChildren(node('span',text),node('small',when+' · registro original'));view.lastWords.dataset.id=latest.id;view.lastWords.dataset.when=when;}
+  view.lastWords.setAttribute('title',(messageKinds[latest.kind]||latest.kind)+' · '+date(latest.createdAt)+' · '+latest.id);
+  if(view.lastWords.parentElement!==view.button)view.button.append(view.lastWords);
+ }
+}
 function clearViewSpeech(view){view.speech?.remove();view.speech=null;if(view.speechTimer!==undefined)clearTimeout(view.speechTimer);view.speechTimer=undefined;delete view.button.dataset.delivery;}
 function clearSpeech(){for(const view of agentViews.values())clearViewSpeech(view);}
 function showMessage(message){
@@ -658,12 +680,17 @@ async function refreshCommunications(){
   const data=await get('/agent-messages');if(version!==communicationVersion)return;if(!Array.isArray(data))throw Error('invalid communications');
   const recent=OfficeCollaboration.read(data,spriteIds,messageKinds,communications);
   const initial=!communicationReady;communications=recent;
-  if(!initial)for(const message of recent){const age=Date.now()-Date.parse(message.createdAt);if(!seenCommunications.has(message.id)&&age>=0&&age<=30000)showMessage(message);}
+  if(!initial)for(const message of recent){const age=Date.now()-Date.parse(message.createdAt);if(!seenCommunications.has(message.id)&&age>=0&&age<=30000){showMessage(message);life.react(message,agentNames());}}
   seenCommunications=new Set(recent.map(m=>m.id));communicationReady=true;
  }catch{communications=[];communicationReady=false;clearSpeech();}
- finally{communicationBusy=false;if(inspectedRoom)renderRoom();renderHandoffs();if(!selectedHandoff)render();}
+ finally{communicationBusy=false;screens.update({messages:communicationReady?communications:[],names:agentNames()});if(inspectedRoom)renderRoom();renderHandoffs();if(!selectedHandoff)render();}
 }
-q('#togglePresence').onclick=()=>{presenceEnabled=!presenceEnabled;stopPresence();render();};
+q('#togglePresence').onclick=()=>{
+ if(systemReducesMotion()){motionChoice='on';presenceEnabled=true;try{globalThis.localStorage?.setItem('trading-lab.motion.v1','on');}catch{}}
+ else presenceEnabled=!presenceEnabled;
+ stopPresence();render();
+};
+setInterval(()=>life.tick(),1000);
 q('#openCollaboration').onclick=()=>openRoom('Meeting Room');q('#closeRoom').onclick=()=>q('#roomDialog').close();
 for(const button of document.querySelectorAll('button[data-space]'))button.onclick=()=>openRoom(button.dataset.space);
 for(const id of ['#roomDialog','#profile','#workspaceDialog','#auditDialog','#studyDialog'])q(id).addEventListener('close',()=>{render();if(id==='#profile'){const opener=profileOpener;profileOpener=null;if(handoffProfileFocus)restoreHandoffFocus();else if(opener?.isConnected)opener.focus?.({preventScroll:true});else if(q('#workspaceDialog').open)q('#closeWorkspace').focus?.();else if(q('#roomDialog').open)q('#closeRoom').focus?.();}});

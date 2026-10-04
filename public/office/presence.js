@@ -14,7 +14,8 @@
    const key=agent.room+'|'+agent.status+'|'+slot;
    if(entry.key!==key){this.stop(entry);entry.key=key;}
    entry.agent=agent;entry.slot=slot;entry.host=host;this.entries.set(agent.id,entry);
-   if(entry.station&&!entry.transitionRoute){this.stop(entry);return;}
+   // A seated agent on a living-office walk keeps the pose owned by OfficeLife.
+   if(entry.station&&!entry.transitionRoute){if(!entry.life)this.stop(entry);return;}
    if(!this.allowed()){this.stop(entry);return;}
    if(entry.transitionRoute)return;
    if(agent.status!=='IDLE'||!floorPoint(agent.room,slot)){entry.button.dataset.pose=agent.status==='IDLE'?'rest':'task';return;}

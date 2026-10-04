@@ -15,7 +15,7 @@ test('office serves binary artwork with correct type and never exposes arbitrary
   assert.equal((await app.inject('/office/subdir/index.html')).statusCode,404);
   assert.equal((await app.inject('/office/characters/unknown.png')).statusCode,404);
   assert.equal((await app.inject('/office/characters/atlas.png/extra')).statusCode,404);
-  for(const name of ['presence.js','navigation.js','collaboration.js','transitions.js','character-frames.js','sprites.js','workstations.js','display.js']){const presentation=await app.inject('/office/'+name);assert.equal(presentation.statusCode,200);assert.match(presentation.headers['content-type']!,/javascript/);}
+  for(const name of ['presence.js','navigation.js','collaboration.js','transitions.js','life.js','screens.js','character-frames.js','sprites.js','workstations.js','display.js']){const presentation=await app.inject('/office/'+name);assert.equal(presentation.statusCode,200);assert.match(presentation.headers['content-type']!,/javascript/);}
   const page=await app.inject('/office/index.html');
   assert.match(page.body,/lang="pt-BR"/);
   assert.equal((await app.inject('/office')).statusCode,302);
