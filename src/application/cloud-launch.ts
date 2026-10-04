@@ -1,4 +1,5 @@
-// First-publication checks only. They grant no execution, provisioning or risk authority.
+// Launch configuration checks. They grant no execution, provisioning or risk authority; the runtime still
+// enforces risk, eligibility and the release pin for the continuous pilot.
 import {evaluationWalletCapital} from './evaluation-wallet-bootstrap.js';
 export type LaunchCheck = { id: string; ok: boolean };
 export function validHttpsOrigin(value: string) {
@@ -24,15 +25,24 @@ export function checkCloudConfiguration(env: NodeJS.ProcessEnv): LaunchCheck[] {
     } catch { /* Only fixed check identifiers are returned, never a secret URL. */ }
     add('DIRECT_POSTGRESQL_REQUIRED', databaseValid && directHost);
     add('VERIFIED_TLS_REQUIRED', tlsValid && env.NODE_TLS_REJECT_UNAUTHORIZED !== '0');
-    const controlled = env.CLOUD_LAUNCH_PHASE === 'CONTROLLED_PAPER';
+    const pilot = env.CLOUD_LAUNCH_PHASE === 'CONTINUOUS_PAPER_PILOT';
+    const controlled = env.CLOUD_LAUNCH_PHASE === 'CONTROLLED_PAPER' || pilot;
     add('VALID_LAUNCH_PHASE', env.CLOUD_LAUNCH_PHASE === undefined || env.CLOUD_LAUNCH_PHASE === 'FIRST_PUBLICATION' || controlled);
-    for (const key of ['PAPER_EVALUATION_ENABLED', 'AUTONOMOUS_PERPETUAL_ENABLED', 'LEGACY_PAPER_EXECUTION_ENABLED'])
+    for (const key of ['PAPER_EVALUATION_ENABLED', 'LEGACY_PAPER_EXECUTION_ENABLED'])
         add(key + '_MUST_BE_FALSE', env[key] === 'false');
+    // Only the explicit pilot phase may enable the autonomous cycle, and only with an explicit study and a pinned release.
+    if (pilot) add('AUTONOMOUS_PERPETUAL_ENABLED_MUST_BE_TRUE', env.AUTONOMOUS_PERPETUAL_ENABLED === 'true');
+    else add('AUTONOMOUS_PERPETUAL_ENABLED_MUST_BE_FALSE', env.AUTONOMOUS_PERPETUAL_ENABLED === 'false');
     if (controlled) {
         add('CONTROLLED_PERPETUAL_ONLY', env.PERPETUAL_PAPER_ENABLED === 'true');
         add('INDEPENDENT_WALLETS_REQUIRED', env.EVALUATION_WALLETS_ENABLED === 'true');
     } else add('PERPETUAL_PAPER_ENABLED_MUST_BE_FALSE', env.PERPETUAL_PAPER_ENABLED === 'false');
-    add('NO_AUTONOMOUS_STUDY', !env.AUTONOMOUS_STUDY_ID);
+    if (pilot) {
+        add('EXPLICIT_PILOT_STUDY', /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(env.AUTONOMOUS_STUDY_ID ?? ''));
+        add('PINNED_RELEASE_COMMIT', /^[0-9a-f]{40}$/.test(env.CONTINUOUS_RELEASE_COMMIT ?? ''));
+        const loss = env.PILOT_MAX_LOSS === undefined ? 0.03 : Number(env.PILOT_MAX_LOSS);
+        add('VALID_PILOT_LOSS_LIMIT', Number.isFinite(loss) && loss > 0 && loss < 0.1);
+    } else add('NO_AUTONOMOUS_STUDY', !env.AUTONOMOUS_STUDY_ID);
     let walletsValid = true;
     try { evaluationWalletCapital(env); } catch { walletsValid = false; }
     add('VALID_INDEPENDENT_WALLET_ALLOCATION', walletsValid);
@@ -47,7 +57,8 @@ export function checkCloudConfiguration(env: NodeJS.ProcessEnv): LaunchCheck[] {
 
 export function cloudConfigurationReport(env: NodeJS.ProcessEnv) {
     const checks = checkCloudConfiguration(env);
-    return {scope:env.CLOUD_LAUNCH_PHASE === 'CONTROLLED_PAPER' ? 'CONTROLLED_PAPER_CONFIG_ONLY' : 'FIRST_PUBLICATION_CONFIG_ONLY',ready:checks.every(c=>c.ok),checks,
+    const phase = env.CLOUD_LAUNCH_PHASE;
+    return {scope:phase === 'CONTINUOUS_PAPER_PILOT' ? 'CONTINUOUS_PAPER_PILOT_CONFIG_ONLY' : phase === 'CONTROLLED_PAPER' ? 'CONTROLLED_PAPER_CONFIG_ONLY' : 'FIRST_PUBLICATION_CONFIG_ONLY',ready:checks.every(c=>c.ok),checks,
         unverified:['DATABASE_CONNECTION','CLOUD_HOST','HISTORY_IMPORT','BACKUPS_AND_RESTORE','RELEASE_REVIEW']};
 }
 

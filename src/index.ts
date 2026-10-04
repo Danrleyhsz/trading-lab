@@ -71,7 +71,10 @@ bus.subscribe(e=>{const payload=e.payload as any;if(!payload?.accountId?.endsWit
  if(e.type==='PAPER_FILL'){memories.add({agentId:payload.fill.agentId,kind:'DECISION',summary:'perpetual paper fill recorded',sourceEventId:e.id,strategyId:payload.fill.strategyId,metadata:{accountId:payload.fill.accountId,fillId:payload.fill.id}});coordinator.move(payload.fill.agentId,'IDLE','Trading Floor','perpetual paper fill recorded '+e.id);}
 });
 const autonomousEnabled=process.env.AUTONOMOUS_PERPETUAL_ENABLED==='true';if(autonomousEnabled&&(!perpetualEnabled||!process.env.AUTONOMOUS_STUDY_ID))throw Error('autonomous perpetual evaluation requires enabled accounts and explicit study ID');
-const cycle=new AutonomousPerpetualCycle(autonomousEnabled,process.env.AUTONOMOUS_STUDY_ID??'',studies,book,perpetualHistory,persist,memories,bus,()=>persist(),Date.now,()=>runtime.control().ready);
+// The pilot runs only on the exact release the owner approved (Render exposes the deployed commit as RENDER_GIT_COMMIT).
+const pilotPhase=process.env.CLOUD_LAUNCH_PHASE==='CONTINUOUS_PAPER_PILOT',deployedCommit=process.env.RENDER_GIT_COMMIT??'';
+const releasePinned=pilotPhase&&/^[0-9a-f]{40}$/.test(deployedCommit)&&process.env.CONTINUOUS_RELEASE_COMMIT===deployedCommit;
+const cycle=new AutonomousPerpetualCycle(autonomousEnabled,process.env.AUTONOMOUS_STUDY_ID??'',studies,book,perpetualHistory,persist,memories,bus,()=>persist(),Date.now,()=>runtime.control().ready,{blockedReason:autonomousEnabled&&production&&!releasePinned?'RELEASE_NOT_APPROVED':null,maxLossFraction:process.env.PILOT_MAX_LOSS===undefined?0.03:Number(process.env.PILOT_MAX_LOSS)});
 registerAgentProfiles(app,agents,memories,messages,activity,accounts,book);
 registerEventAudit(app,new EventAudit(()=>durableSnapshot));registerEncryptedBackup(app,()=>durableSnapshot?{state:durableSnapshot,persistedAt:durablePersistedAt}:null,BACKUP_PUBLIC_KEY_PEM);
 const research=new ResearchEngine({snapshot:symbol=>derivatives.snapshot(symbol),candles:(symbol,interval,limit)=>history.candles(symbol,interval,limit)},coordinator,collaboration,messages,memories,strategies,strategyLab,backtester,researchRuns,bus);
@@ -85,7 +88,7 @@ registerAiStatus(app,aiAnalysis);
 const runtimeInputs=()=>({spot:latest,perpetual:perpetualMarket.snapshot(),book:book.status(),autonomous:cycle.status(),research:researchJobs.status(),historical:studies.status(),ai:aiAnalysis.status(),legacyExecutionEnabled:process.env.LEGACY_PAPER_EXECUTION_ENABLED==='true',evaluationEnabled,perpetualEnabled});
 const readiness=()=>runtime.snapshot(runtimeInputs());
 registerRuntimeReadiness(app,runtime,runtimeInputs);
-registerContinuousPaperPreflight(app,studies,readiness);
+registerContinuousPaperPreflight(app,studies,readiness,Date.now,()=>({phase:process.env.CLOUD_LAUNCH_PHASE??'FIRST_PUBLICATION',releasePinned,deployedCommit:deployedCommit||null}));
 registerOfficeAssets(app);
 app.get('/health',async(_req,reply)=>reply.code(persistenceError||(store instanceof PostgresStateStore&&!store.available())?503:200).send({ok:!persistenceError&&(!(store instanceof PostgresStateStore)||store.available()),mode:'PAPER_TRADING',storage:store instanceof PostgresStateStore?'POSTGRESQL':'JSON_DEVELOPMENT',marketStatus:perpetualMarket.snapshot().status}));
 app.get('/agents',async()=>agents.list());app.get('/agent-messages',async(req)=>messages.list((req.query as any).agentId));app.get('/strategies',async()=>strategies.list());
@@ -101,7 +104,7 @@ app.get('/events',{websocket:true},socket=>{const unsubscribe=bus.subscribe(e=>{
 // No restored visual task is treated as still running in the new process.
 for(const agent of agents.list())if(agent.status!=='IDLE')coordinator.move(agent.id,'IDLE',agent.room,'runtime restarted; unfinished task outcome was not inferred');
 await persist();const legacyMarket=new BinancePublicMarketData(process.env.MARKET_SYMBOL?.toLowerCase()||'btcusdt');await legacyMarket.connect(t=>{latest=t;accounts.mark(t.symbol,t.price);bus.publish(event('MARKET_TICK',t));});
-await perpetualMarket.start(async quote=>{if(runtime.isDraining())return;const settlements=quote.markTime>book.cursor()&&book.fundingDue(quote.markTime)?await perpetualMarket.funding(book.cursor()+1,quote.markTime):[];await book.synchronize(quote,settlements,persist);bus.publish(event('PERPETUAL_MARKET_UPDATED',quote));if(!runtime.isDraining())await cycle.onMarket();},error=>{app.log.warn({error},'USD-M reconciliation unavailable');bus.publish(event('MARKET_DATA_FAILED',{instrument:'BINANCE_USDM:BTCUSDT',error:error.message}));});
+await perpetualMarket.start(async quote=>{if(runtime.isDraining())return;const settlements=quote.markTime>book.cursor()&&book.fundingDue(quote.markTime)?await perpetualMarket.funding(book.cursor()+1,quote.markTime):[];await book.synchronize(quote,settlements,persist);bus.publish(event('PERPETUAL_MARKET_UPDATED',quote));if(!runtime.isDraining())await cycle.onMarket().catch(error=>app.log.warn({error},'autonomous pilot attempt failed; retry deferred'));},error=>{app.log.warn({error},'USD-M reconciliation unavailable');bus.publish(event('MARKET_DATA_FAILED',{instrument:'BINANCE_USDM:BTCUSDT',error:error.message}));});
 app.addHook('preClose',async()=>{runtime.draining();researchJobs.stopAccepting();research.stopAccepting();studies.stopAccepting();});
 app.addHook('onClose',async()=>{await researchJobs.drain();await perpetualMarket.stop();await legacyMarket.disconnect();await studies.drain();await writes;if(store instanceof PostgresStateStore)await store.close();runtime.stopped();});
 let closing=false;

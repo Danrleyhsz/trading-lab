@@ -5,7 +5,8 @@ import {PAPER_SCREEN_POLICY} from './perpetual-study-screen.js';
 
 type Diagnosis=ReturnType<RuntimeReadiness['snapshot']>;
 /** No save, source retrieval, environment mutation, strategy selection or execution capability. */
-export function continuousPaperPreflight(studies:PerpetualStudies,diagnosis:Diagnosis,now=Date.now()) {
+export interface PilotRelease {phase:string;releasePinned:boolean;deployedCommit:string|null}
+export function continuousPaperPreflight(studies:PerpetualStudies,diagnosis:Diagnosis,now=Date.now(),release:PilotRelease={phase:'FIRST_PUBLICATION',releasePinned:false,deployedCommit:null}) {
     const selectedId=diagnosis.paper.autonomousStudyId;
     const recent=studies.summaries().map(s=>s.id);
     // Include the explicitly configured original even if it is outside the recent window.
@@ -20,11 +21,13 @@ export function continuousPaperPreflight(studies:PerpetualStudies,diagnosis:Diag
     if(diagnosis.jobs.autonomousBusy)reasons.push('AUTONOMOUS_BUSY');
     return {scope:'READ_ONLY_CONTINUOUS_PREFLIGHT',observedAt:new Date(now).toISOString(),policy:PAPER_SCREEN_POLICY,
         accountId:'evaluation:nova:usdm',configuredStudyId:selectedId,cycleEnabled:!diagnosis.paper.autonomous.reasons.includes('AUTONOMOUS_DISABLED'),
-        runtimePrerequisites:{ready:reasons.length===0,reasons},activationReady:false,
-        unverified:['AUTOMATIC_OFF_PROVIDER_BACKUP','EXTERNAL_FAILURE_ALERTS','CONTINUOUS_RELEASE_REVIEW'],
+        // Backups and alerts run outside the service (scheduled GitHub workflows); the runtime reports them as not observable.
+        // The release review is observable: the pilot phase must run the exact pinned commit.
+        runtimePrerequisites:{ready:reasons.length===0,reasons},activationReady:release.phase==='CONTINUOUS_PAPER_PILOT'&&release.releasePinned&&reasons.length===0,
+        release,unverified:['AUTOMATIC_OFF_PROVIDER_BACKUP','EXTERNAL_FAILURE_ALERTS',...(release.releasePinned?[]:['CONTINUOUS_RELEASE_REVIEW'])],
         limits:{instrument:'BINANCE_USDM:BTCUSDT',signalInterval:'1h',positionFraction:0.1,maxPositionFraction:0.2,maxLeverage:1,maxObservedDrawdown:0.1,maxDailyLoss:0.05,fundIsTarget:false,paidAiEnabled:diagnosis.ai.enabled,recoveryPolicy:'AT_MOST_ONCE_ATTEMPT'},
         studies:screenings,limitations:['SCREEN_IS_NOT_RISK_APPROVAL','NO_AUTOMATIC_STUDY_SELECTION','EXTERNAL_OPERATIONAL_ACCEPTANCE_REQUIRED','NO_ACTIVATION_CAPABILITY']};
 }
-export function registerContinuousPaperPreflight(app:FastifyInstance,studies:PerpetualStudies,diagnosis:()=>Diagnosis,now:()=>number=Date.now) {
-    app.get('/paper/perpetual/preflight',async()=>continuousPaperPreflight(studies,diagnosis(),now()));
+export function registerContinuousPaperPreflight(app:FastifyInstance,studies:PerpetualStudies,diagnosis:()=>Diagnosis,now:()=>number=Date.now,release?:()=>PilotRelease) {
+    app.get('/paper/perpetual/preflight',async()=>continuousPaperPreflight(studies,diagnosis(),now(),release?.()));
 }

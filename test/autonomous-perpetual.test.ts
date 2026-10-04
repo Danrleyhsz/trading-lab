@@ -39,7 +39,8 @@ test('a halt, expired quote/funding/study or runtime drain during signal retriev
 });
 test('a source outage can recover on the same closed candle without inventing a failed signal or repeated fill',async()=>{
  let available=false,calls=0;const source={load:async()=>{calls++;if(!available)throw Error('fixture source unavailable');return dataset();}},bus=new EventBus(),events:string[]=[],book=new PerpetualPaperBook(bus,undefined,()=>now),memories=new MemoryStore();bus.subscribe(e=>events.push(e.type));book.ensureEvaluation('nova',1000);await book.synchronize(liveQuote(now),[],async()=>{});
- const cycle=new AutonomousPerpetualCycle(true,'controlled-study',new PerpetualStudies(source,[eligible()]),book,source,async()=>{},memories,bus,async()=>{},()=>now);
+ // Zero back-off isolates recovery semantics; the default back-off is covered in continuous-pilot.test.ts.
+ const cycle=new AutonomousPerpetualCycle(true,'controlled-study',new PerpetualStudies(source,[eligible()]),book,source,async()=>{},memories,bus,async()=>{},()=>now,()=>true,{retryDelayMs:0});
  await assert.rejects(cycle.onMarket(),/source unavailable/);assert.equal(book.status().autonomousCursor,null);assert.equal(memories.list().length,0);assert.equal(book.list()[0].fills,0);
  available=true;await cycle.onMarket();await cycle.onMarket();assert.equal(calls,2);assert.equal(cycle.status().error,null);assert.equal(book.list()[0].fills,1);assert.equal(events.filter(e=>e==='AUTONOMOUS_DECISION').length,1);assert.equal(events.filter(e=>e==='RISK_APPROVED').length,1);
 });

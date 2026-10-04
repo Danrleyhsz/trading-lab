@@ -102,6 +102,10 @@ export class RuntimeReadiness {
             autonomous.push('NOVA_ACCOUNT_UNAVAILABLE');
         if (input.autonomous.busy)
             autonomous.push('AUTONOMOUS_BUSY');
+        if (input.autonomous.blockedReason)
+            autonomous.push(input.autonomous.blockedReason);
+        if (input.autonomous.stopReason)
+            autonomous.push('PILOT_STOPPED_' + input.autonomous.stopReason);
         const legacy = [...control.reasons];
         if (!input.legacyExecutionEnabled)
             legacy.push('LEGACY_EXECUTION_DISABLED');
