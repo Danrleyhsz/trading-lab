@@ -39,6 +39,12 @@ test('scene display surfaces route data center to readiness and wall screens to 
 test('market terminals draw only observed session prices and retain explicit stale status on failure',async()=>{
  const h=harness({},false,true);await settle();await vm.runInContext("observeTrace('mark',100,'2026-01-01T00:00:00Z');observeTrace('mark',101,'2026-01-01T00:00:01Z')",h.context);assert.match(flatten(h.ids.get('#markChart')!),/100.00 USDT/);assert.match(h.ids.get('#markChartStatus')!.textContent,/2 observações/);assert.ok(h.ids.get('#markChart')!.children.some(e=>e.attributes.role==='img'));await vm.runInContext("marketUnavailable('TEST_ONLY source unavailable')",h.context);assert.match(h.ids.get('#markChartStatus')!.textContent,/histórico desta sessão/);assert.ok(!h.requests.some(p=>p.includes('/orders')));
 });
+test('market chart spacing reflects actual timestamps and labels missing time without inventing it',async()=>{
+ const h=harness({},false,true);await settle();vm.runInContext("observeTrace('mark',100,'2026-01-01T00:00:00Z');observeTrace('mark',101,'2026-01-01T00:00:01Z');observeTrace('mark',102,'2026-01-01T00:00:10Z')",h.context);
+ const chart=h.ids.get('#markChart')!,svg=chart.children.find(e=>e.attributes.role==='img')!;assert.match(svg.children[0].attributes.points,/0.0,165.0 60.0,90.0 600.0,15.0/);assert.match(flatten(chart),/eixo por tempo observado/);
+ vm.runInContext("observeTrace('mark',103,null)",h.context);assert.match(flatten(chart),/Horário indisponível/);assert.match(flatten(chart),/ordem de recebimento/);
+});
+
 test('research job cards expose original results and clear stale lifecycle on read failure',async()=>{
  const id='00000000-0000-4000-8000-000000000001',runId='00000000-0000-4000-8000-000000000002',responses:Record<string,unknown>={'/research/jobs':[{id,runId,status:'COMPLETED',limit:100,updatedAt:'2026-01-01T00:00:00Z'}]},h=harness(responses);await settle();
  assert.match(flatten(h.ids.get('#researchJobs')!),/Concluída/);assert.match(flatten(h.ids.get('#researchJobs')!),/100 candles/);buttons(h.ids.get('#researchJobs')!)[0].onclick!();await settle();assert.ok(h.requests.includes('/research/runs/'+runId));assert.ok(!h.requests.includes('/research/run'));

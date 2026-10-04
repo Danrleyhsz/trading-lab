@@ -8,7 +8,9 @@ Data Center uses its actual single monitor to open service/access diagnostics. T
 
 Room names are small illuminated signs near the wall rather than large placards. Tooltips and focus glow provide discoverability. Opened monitor panels use a floating bezel, dimmed backdrop, constrained height, scrollable content, reduced-motion-aware opening animation and focus return to the clicked monitor. Original scene interactions are read-only; research/order control buttons remain explicit actions inside their respective panels.
 
-The market tab adds larger spot and USD-M line charts from at most 90 session observations already received by the frontend. They are sampled price traces with observation-index spacing, not historical OHLC candles, trend forecasts or backtests. Empty sources wait for evidence; source failure labels the retained trace as session history. Equity charts continue using actual retained account samples; fund and evaluation capital remain separate.
+The market tab adds larger spot and USD-M line charts from at most 90 session observations already received by the frontend. Valid source timestamps determine horizontal spacing and the displayed received time window; missing timestamps explicitly fall back to observation order without inventing time. They are sampled price traces, not historical OHLC candles, trend forecasts or backtests. Empty sources wait for evidence; source failure labels the retained trace as session history. Equity charts continue using actual retained account samples; fund and evaluation capital remain separate.
+
+The three original bottom display controls use center anchors on both axes. The café interaction follows the existing coffee machine artwork, with no extra emoji covering it and no invented consumption/activity. Its existing read-only Lounge function remains unchanged.
 
 Portfolio, research, history and access use a consistent trading laboratory terminal theme. Existing API/authentication, source identity, archived results, persistence, paper gates and AI configuration are unchanged. No dependency, new service, background activation or paid call is added.
 

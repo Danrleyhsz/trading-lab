@@ -23,10 +23,12 @@ function renderMarketChart(source){
  status.textContent=series.length+' observações recebidas nesta sessão · sem histórico simulado';
  if(series.length<2){host.append(node('p','Aguardando duas observações reais para desenhar o traçado.'));return;}
  const low=Math.min(...series.map(p=>p.price)),high=Math.max(...series.map(p=>p.price));
+ const span=series[series.length-1].time-series[0].time, timed=series.every(p=>Number.isFinite(p.time))&&span>0;
  host.append(node('small','Mínimo '+money(low)+' · máximo '+money(high)));
+ host.append(node('small',timed?'Janela recebida: '+new Date(series[0].time).toLocaleTimeString()+' → '+new Date(series[series.length-1].time).toLocaleTimeString()+' · eixo por tempo observado':'Horário indisponível · eixo por ordem de recebimento'));
  if(!document.createElementNS)return;
  const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.setAttribute('viewBox','0 0 600 180');svg.setAttribute('role','img');svg.setAttribute('aria-label','Traçado de preço '+(source==='spot'?'BTC spot':'BTC USD-M')+' observado nesta sessão, '+series.length+' amostras');
- const line=document.createElementNS('http://www.w3.org/2000/svg','polyline');line.setAttribute('points',series.map((p,i)=>(i*600/(series.length-1)).toFixed(1)+','+(165-(p.price-low)/(high-low||1)*150).toFixed(1)).join(' '));line.setAttribute('stroke',source==='spot'?'#ffcb62':'#35c9ff');line.setAttribute('stroke-width','2');line.setAttribute('fill','none');svg.append(line);host.append(svg);
+ const line=document.createElementNS('http://www.w3.org/2000/svg','polyline');line.setAttribute('points',series.map((p,i)=>((timed?(p.time-series[0].time)/span:i/(series.length-1))*600).toFixed(1)+','+(165-(p.price-low)/(high-low||1)*150).toFixed(1)).join(' '));line.setAttribute('stroke',source==='spot'?'#ffcb62':'#35c9ff');line.setAttribute('stroke-width','2');line.setAttribute('fill','none');svg.append(line);host.append(svg);
 }
 function outcomeLabel(performance) {
   if (!performance?.available) return 'Métricas de operações indisponíveis';
