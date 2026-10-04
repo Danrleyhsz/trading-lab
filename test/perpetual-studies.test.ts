@@ -1,7 +1,8 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import Fastify from 'fastify';
-import {PerpetualStudies,registerPerpetualStudies} from '../src/application/perpetual-studies.js';
+import {PerpetualStudies,registerPerpetualStudies,studyCandidates,STUDY_CANDIDATE_SETS} from '../src/application/perpetual-studies.js';
+import {screenPerpetualStudy} from '../src/application/perpetual-study-screen.js';
 import {AgentRegistry} from '../src/domain/agents.js';
 import {AgentCoordinator} from '../src/application/agent-coordinator.js';
 import {EventBus} from '../src/application/event-bus.js';
@@ -58,4 +59,22 @@ import {validatePerpetualDataset} from '../src/domain/perpetual-backtest.js';
 test('worker timeout retains durable input evidence and failure, with no completion or broker event',async()=>{
  const bus=new EventBus(),events:string[]=[];bus.subscribe(e=>events.push(e.type));const coordinator=new AgentCoordinator(new AgentRegistry(),bus),studies=new PerpetualStudies({load:async()=>data(300)},[],new HistoricalStudyRunner(1));let retained:ReturnType<PerpetualStudies['list']>=[];
  const accepted=await studies.start({bars:300,trainBars:100,testBars:50},async()=>{retained=studies.list();},coordinator,bus);await studies.drain();const record=retained.find(s=>s.id===accepted.id)!;assert.equal(record.status,'FAILED');assert.equal(record.error,'historical simulation timed out');assert.equal(record.datasetHash,validatePerpetualDataset(record.dataset!));assert.equal(record.result,undefined);assert.equal(coordinator.registry.get('euler')!.status,'IDLE');assert.ok(events.includes('BACKTEST_FAILED'));assert.ok(!events.includes('BACKTEST_COMPLETED'));assert.ok(!events.includes('PAPER_FILL'));assert.equal(studies.status().activeTasks,0);
+});
+
+test('pre-declared candidate sets are recorded, fixed and pass the shared cost/signal screen shape',async()=>{
+ assert.deepEqual(Object.keys(STUDY_CANDIDATE_SETS),['SHORT_HORIZON_V1','MULTI_DAY_TREND_V1']);
+ assert.equal(studyCandidates().length,5);assert.deepEqual(studyCandidates(),studyCandidates('SHORT_HORIZON_V1'));
+ assert.deepEqual(studyCandidates('MULTI_DAY_TREND_V1').map(c=>[c.strategy??'SMA',c.fastPeriod,c.slowPeriod]),[['SMA',48,240],['SMA',72,480],['BREAKOUT',10,480]]);
+ const copy=studyCandidates('MULTI_DAY_TREND_V1');copy[0].slowPeriod=1;assert.equal(studyCandidates('MULTI_DAY_TREND_V1')[0].slowPeriod,240);
+ const seen:number[][]=[];const simulator={run:async(d:PerpetualDataset,c:any[],train:number,test:number)=>{seen.push(c.map(x=>x.slowPeriod));return walkForwardPerpetual(d,c,train,test);}};
+ const bus=new EventBus(),coordinator=new AgentCoordinator(new AgentRegistry(),bus),studies=new PerpetualStudies({load:async(n:number)=>data(n)},[],simulator as any);const app=Fastify();registerPerpetualStudies(app,studies,async()=>{},coordinator,bus);
+ try{
+  assert.equal((await app.inject({method:'POST',url:'/backtests/v2/studies',payload:{bars:900,trainBars:400,testBars:100,candidateSet:'MULTI_DAY_TREND_V1'}})).statusCode,400);
+  assert.equal((await app.inject({method:'POST',url:'/backtests/v2/studies',payload:{bars:900,trainBars:500,testBars:100,candidateSet:'UNDECLARED'}})).statusCode,400);
+  const response=await app.inject({method:'POST',url:'/backtests/v2/studies',payload:{bars:700,trainBars:500,testBars:100,candidateSet:'MULTI_DAY_TREND_V1'}});assert.equal(response.statusCode,202);
+  for(let i=0;i<50&&studies.get(response.json().id)!.status!=='COMPLETED';i++)await new Promise(r=>setTimeout(r,10));
+  const study=studies.get(response.json().id)!;assert.equal(study.status,'COMPLETED');assert.equal(study.request.candidateSet,'MULTI_DAY_TREND_V1');assert.deepEqual(seen,[[240,480,480]]);
+  assert.ok(screenPerpetualStudy(study,Date.now()).checks.find(c=>c.id==='COMPATIBLE_SIGNAL_AND_COSTS')!.ok);
+  const legacy=await app.inject({method:'POST',url:'/backtests/v2/studies',payload:{}});assert.equal(legacy.statusCode,202);assert.equal(legacy.json().request.candidateSet,undefined);
+ }finally{await app.close();}
 });
