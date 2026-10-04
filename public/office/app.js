@@ -131,7 +131,7 @@ function renderStations(){
 }
 
 const reducedMotion=globalThis.matchMedia?.('(prefers-reduced-motion: reduce)');
-const motionAllowed=()=>presenceEnabled&&!selectedHandoff&&!reducedMotion?.matches&&!document.hidden&&!['#profile','#workspaceDialog','#roomDialog','#auditDialog','#studyDialog'].some(id=>q(id).open);
+const motionAllowed=()=>presenceEnabled&&!selectedHandoff&&!reducedMotion?.matches&&!document.hidden&&!['#profile','#workspaceDialog','#roomDialog','#auditDialog','#studyDialog','#researchDialog'].some(id=>q(id).open);
 const presence=new OfficePresence.Director(motionAllowed);
 const transitions=new OfficeTransitions.Director(motionAllowed,view=>presence.stop(view),view=>presence.update(view,view.agent,view.slot,view.host));
 function stopPresence(){q('#office').dataset.presence='off';for(const view of agentViews.values()){transitions.stop(view);presence.stop(view);}}
@@ -257,9 +257,61 @@ function renderResearch(runs) {
       row.append(node('small',run.backtest.model==='SPOT_SMA_NEXT_OPEN_V2'?'Modelo registrado: sinal fechado → abertura seguinte · taxas de entrada e saída incluídas':'Simulação anterior: modelo e custos não versionados neste registro'));
       if(Number.isFinite(run.backtest.feesPaid))row.append(node('small','Taxas históricas registradas: '+money(run.backtest.feesPaid)));
     }
+    const button = node('button', 'Abrir pesquisa e evidências');
+    button.dataset.researchId = run.id;
+    button.onclick = () => researchDetails(run.id);
+    row.append(button);
     return row;
   });
 }
+let researchDetailVersion = 0, researchOpener = null;
+async function researchDetails(id) {
+  stopPresence();
+  const version = ++researchDetailVersion, dialog = q('#researchDialog');
+  if (!dialog.open) { researchOpener = document.activeElement; dialog.showModal(); }
+  q('#researchDetails').replaceChildren();
+  q('#researchDetailStatus').textContent = 'Consultando pesquisa registrada…';
+  try {
+    const run = await get('/research/runs/' + encodeURIComponent(id));
+    if (version !== researchDetailVersion || !dialog.open) return;
+    if (run?.id !== id || !['SCREEN_PASSED','REJECTED','FAILED'].includes(run.status) || !Array.isArray(run.findings) || run.findings.length > 8 || !Array.isArray(run.events) || run.events.length > 100 || !Number.isFinite(Date.parse(run.startedAt)) || !Number.isFinite(Date.parse(run.completedAt))) throw Error('invalid research evidence');
+    const host = q('#researchDetails');
+    host.append(node('p', 'ID: ' + run.id), node('p', 'Resultado registrado: ' + run.status), node('p', 'Execução: ' + date(run.startedAt) + ' → ' + date(run.completedAt)), node('p', 'Pesquisa histórica concluída; não representa tarefa atual, ordem paper ou P&L das contas.'));
+    if (run.error) host.append(node('p', 'Falha registrada: ' + String(run.error).slice(0,1000)));
+    if (run.dataset) {
+      const d = run.dataset;
+      if (d.symbol !== 'BTCUSDT' || d.interval !== '1h' || d.historyMarket !== 'BINANCE_SPOT' || d.snapshotMarket !== 'BINANCE_USDM' || !/^[a-f0-9]{64}$/.test(d.hash) || !Array.isArray(d.candles) || d.candles.length < 64 || d.candles.length > 1000 || !Number.isFinite(Date.parse(d.retrievedAt))) throw Error('invalid dataset evidence');
+      host.append(node('h3', 'Fontes registradas'), node('p', 'Candles: BINANCE_SPOT · contexto: BINANCE_USDM · BTCUSDT · 1h'), node('p', 'Coleta: ' + date(d.retrievedAt)), node('p', d.candles.length + ' candles fechados · ' + date(d.candles[0].timestamp) + ' → ' + date(d.candles.at(-1).timestamp)), node('p', 'SHA-256 registrado: ' + d.hash));
+    } else host.append(node('p', 'Dataset não disponível neste registro; não inferimos evidências.'));
+    host.append(node('h3', 'Observações dos especialistas'));
+    for (const finding of run.findings) {
+      host.append(node('p', String(finding.agentId) + ' · ' + String(finding.metric)), node('p', String(finding.summary)), node('pre', JSON.stringify(finding.values,null,2)));
+    }
+    if (!run.findings.length) host.append(node('p', 'Nenhuma observação registrada.'));
+    if (run.backtest) {
+      host.append(node('h3', 'Backtest histórico'), node('p', 'Resultado in-sample: não é validação fora da amostra nem autorização de operação.'), node('p', run.backtest.model || 'Modelo antigo não versionado'), node('pre', JSON.stringify(run.backtest,null,2)));
+    }
+    if (run.strategyId) host.append(node('p', 'Estratégia registrada: ' + run.strategyId));
+    host.append(node('h3', 'Eventos de origem'));
+    for (const record of run.events) {
+      if (typeof record?.id !== 'string' || typeof record?.type !== 'string') throw Error('invalid event evidence');
+      host.append(node('p', record.type + ' · ' + record.id), sourceButton(record.id));
+    }
+    q('#researchDetailStatus').textContent = 'Registro retornado pela API. Eventos podem ser consultados separadamente no histórico gravado.';
+  } catch {
+    if (version !== researchDetailVersion || !dialog.open) return;
+    q('#researchDetails').replaceChildren();
+    q('#researchDetailStatus').textContent = 'Pesquisa indisponível ou evidência inválida. Confira o acesso e tente novamente.';
+  }
+}
+q('#closeResearch').onclick = () => q('#researchDialog').close();
+q('#researchDialog').addEventListener('close', () => {
+  researchDetailVersion++; q('#researchDetails').replaceChildren();
+  if (researchOpener?.isConnected) researchOpener.focus();
+  else if(q('#workspaceDialog').open) q('#closeWorkspace').focus();
+  else q('#navResearch').focus();
+  researchOpener = null; render();
+});
 function renderAccounts(items) {
   const host = q('#accounts');
   host.replaceChildren();

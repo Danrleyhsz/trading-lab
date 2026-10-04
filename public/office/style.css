@@ -877,6 +877,7 @@ select{font:inherit;color:var(--text);background:#101c33;border:1px solid var(--
 .source-link{display:block;max-width:100%;min-height:44px;margin:7px 0;text-align:left;overflow-wrap:anywhere;font-size:11px}
 .audit-toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 #historyList{list-style:none;padding:0}#auditContent{overflow-wrap:anywhere}#auditContent pre{white-space:pre-wrap;overflow-wrap:anywhere;max-height:260px;overflow:auto;background:#050d1b;padding:12px;border:1px solid var(--line);font-size:11px}#auditContent summary{cursor:pointer;min-height:44px;padding:12px 0}
+#researchDetails{overflow-wrap:anywhere;min-width:0}#researchDetails pre{white-space:pre-wrap;overflow-wrap:anywhere;max-height:260px;overflow:auto;background:#050d1b;padding:12px;border:1px solid var(--line);font-size:12px}#researchDetails button{min-height:44px;max-width:100%;overflow-wrap:anywhere}
 #eventType:focus-visible{outline:3px solid var(--cyan);outline-offset:3px}
 #olderEvents,#auditOlder,#auditBack{min-height:44px;margin:10px 0}
 [hidden]{display:none!important}

@@ -26,6 +26,42 @@ function harness(overrides:Record<string,unknown>={},reduceMotion=false,geometry
   return {ids,rooms,requests,intervals,context,get socket(){return socket}};
 }
 const settle=()=>new Promise(resolve=>setImmediate(resolve));
+const researchFixture=(id='TEST_ONLY_RESEARCH')=>({id,status:'REJECTED',startedAt:'2026-01-01T00:00:00Z',completedAt:'2026-01-01T00:01:00Z',findings:[{agentId:'vega',metric:'volatility',summary:'TEST_ONLY <script>source text</script>',values:{volatility:0.1}}],events:[{id:'TEST_ONLY_EVENT',type:'RESEARCH_COMPLETED'}],backtest:{netPnl:-10,trades:2}});
+test('research detail reads actual retained evidence without scheduling work and preserves source text',async()=>{
+ const run=researchFixture(),h=harness({['/research/runs/'+run.id]:run});await settle();
+ await vm.runInContext(`researchDetails('${run.id}')`,h.context);
+ const text=flatten(h.ids.get('#researchDetails')!);assert.match(text,/não representa tarefa atual/);assert.match(text,/fora da amostra/);assert.match(text,/<script>source text<\/script>/);assert.match(text,/TEST_ONLY_EVENT/);
+ assert.ok(h.requests.includes('/research/runs/'+run.id));assert.ok(!h.requests.includes('/research/run'));
+});
+test('research failures remain failures with unavailable source coverage rather than invented results',async()=>{
+ const run={...researchFixture(),status:'FAILED',findings:[],events:[],backtest:undefined,error:'TEST_ONLY_SOURCE_FAILURE'},h=harness({['/research/runs/'+run.id]:run});await settle();
+ await vm.runInContext(`researchDetails('${run.id}')`,h.context);
+ const text=flatten(h.ids.get('#researchDetails')!);assert.match(text,/TEST_ONLY_SOURCE_FAILURE/);assert.match(text,/Dataset não disponível/);assert.doesNotMatch(text,/Backtest histórico/);
+});
+test('research dataset provenance separates hourly spot history from USD-M context and rejects mismatches',async()=>{
+ const run={...researchFixture(),dataset:{symbol:'BTCUSDT',interval:'1h',historyMarket:'BINANCE_SPOT',snapshotMarket:'BINANCE_USDM',hash:'a'.repeat(64),retrievedAt:'2026-01-01T00:00:00Z',candles:Array.from({length:64},(_,i)=>({timestamp:Date.parse('2025-12-29T00:00:00Z')+i*3600000}))}};
+ const responses:Record<string,unknown>={['/research/runs/'+run.id]:run},h=harness(responses);await settle();await vm.runInContext(`researchDetails('${run.id}')`,h.context);
+ const text=flatten(h.ids.get('#researchDetails')!);assert.match(text,/BINANCE_SPOT/);assert.match(text,/BINANCE_USDM/);assert.match(text,/64 candles fechados/);assert.match(text,/a{64}/);
+ responses['/research/runs/'+run.id]={...run,dataset:{...run.dataset,historyMarket:'TEST_ONLY_OTHER'}};await vm.runInContext(`researchDetails('${run.id}')`,h.context);assert.equal(h.ids.get('#researchDetails')!.children.length,0);
+});
+test('research list retains backend newest-first order and dialog closing returns to a connected opener',async()=>{
+ const h=harness({'/research/runs':[researchFixture('TEST_ONLY_NEW'),researchFixture('TEST_ONLY_OLD')]});await settle();
+ const buttons=h.ids.get('#researchRuns')!.children.map(row=>row.children.at(-1)!);assert.equal(buttons[0]!.dataset.researchId,'TEST_ONLY_NEW');assert.equal(buttons[1]!.dataset.researchId,'TEST_ONLY_OLD');
+ (h.context.document as any).activeElement=buttons[0];await vm.runInContext("researchDetails('TEST_ONLY_NEW')",h.context);h.ids.get('#researchDialog')!.close();assert.equal(buttons[0]!.focusCalls,1);
+});
+test('wrong-identity and unauthorized research responses clear previous detail and never use summary fallback',async()=>{
+ const run=researchFixture(),responses:Record<string,unknown>={['/research/runs/'+run.id]:run},h=harness(responses);await settle();
+ await vm.runInContext(`researchDetails('${run.id}')`,h.context);
+ responses['/research/runs/'+run.id]={...run,id:'TEST_ONLY_OTHER'};await vm.runInContext(`researchDetails('${run.id}')`,h.context);assert.equal(h.ids.get('#researchDetails')!.children.length,0);
+ responses['/research/runs/'+run.id]={httpError:401};await vm.runInContext(`researchDetails('${run.id}')`,h.context);assert.equal(h.ids.get('#researchDetails')!.children.length,0);assert.match(h.ids.get('#researchDetailStatus')!.textContent,/indisponível/);
+});
+test('late research responses cannot overwrite a newer selection or populate a closed dialog',async()=>{
+ let finish!:(value:unknown)=>void;const pending=new Promise(resolve=>{finish=resolve}),next=researchFixture('TEST_ONLY_NEXT');
+ const h=harness({'/research/runs/TEST_ONLY_PENDING':pending,['/research/runs/'+next.id]:next});await settle();
+ const first=vm.runInContext("researchDetails('TEST_ONLY_PENDING')",h.context);await settle();await vm.runInContext(`researchDetails('${next.id}')`,h.context);finish(researchFixture('TEST_ONLY_PENDING'));await first;
+ assert.match(flatten(h.ids.get('#researchDetails')!),/TEST_ONLY_NEXT/);assert.doesNotMatch(flatten(h.ids.get('#researchDetails')!),/TEST_ONLY_PENDING/);
+ let done!:(value:unknown)=>void;const h2=harness({'/research/runs/TEST_ONLY_CLOSE':new Promise(resolve=>{done=resolve})});await settle();const request=vm.runInContext("researchDetails('TEST_ONLY_CLOSE')",h2.context);await settle();h2.ids.get('#researchDialog')!.close();done(researchFixture('TEST_ONLY_CLOSE'));await request;assert.equal(h2.ids.get('#researchDetails')!.children.length,0);
+});
 test('reference control areas open existing read panels without inventing agent rooms or scheduling work',async()=>{
  const h=harness();await settle();const before=[...h.requests];
  for(const [id,panel] of [['sceneDataCenter','accessPanel'],['sceneWarRoom','financePanel'],['sceneMarketAnalysis','marketPanel']]){

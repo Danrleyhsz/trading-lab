@@ -1,5 +1,11 @@
 # Development continuation queue
 
+## Latest authorized functional package — 2026-10-03
+
+Human confirmed online login and eventual loading of the eight agents; do not recreate them. Public health/office200 and private diagnosis401 observed for deployed2878d20. New feature branch from #38 exposes original research evidence via existing APIs, preserves newest-first order and tests request ownership/failure/focus/source coverage. See RESEARCH_EVIDENCE.md. Browser inventory is empty; authenticated hosted diagnosis requested from the human without secrets. Do not claim real source freshness, restart/restore/backups or new frontend deployment without evidence.
+
+Next after this draft passes CI: bounded durable research admission/recovery/drain, then initial actual sourced studies and the historical-bootstrap adapter with compatible dataset rights. Keep compute/storage bounded on existing resources; no new paid services, paid AI, autonomous activation or architectural merge. Earlier blocked-publication entries are historical context.
+
 ## Latest human priority — first online publication preparation
 
 Current checkpoint 2026-10-03: human-created Render DB/web resources exist; first web build succeeded at db8ae61 but both quoted shell variants failed before configuration checks (exit 127). Use the direct compiled `node dist/src/launch-cloud.js` entrypoint on the new fix branch after its CI, preserving missing PUBLIC_ORIGIN/DATABASE_URL until history/TLS/access are resolved. This is not a healthy hosted deployment. Do not duplicate resources, auto-merge architecture or restart the user's preview. Read workspace continuation for exact new commit/PR/CI and guide human Settings changes; no secret values belong in chat.
