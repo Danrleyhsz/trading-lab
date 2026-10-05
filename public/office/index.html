@@ -1,38 +1,49 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#090f20"><title>Trading Lab · Escritório</title>
-<link rel="stylesheet" href="/office/style.css">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#070d1c"><title>Trading Lab · Escritório</title>
+<link rel="stylesheet" href="/office/style.css"><link rel="stylesheet" href="/office/v3.css">
 </head>
-<body data-view="fit">
+<body class="v3" data-view="fit">
 <header class="topbar">
   <a class="brand" href="/office"><svg class="brand-mark" aria-hidden="true" viewBox="0 0 44 44"><path fill="currentColor" d="M3 32h6v9H3zm10-7h6v16h-6zm10-7h6v23h-6zm10-8h6v31h-6z"/><path fill="none" stroke="currentColor" stroke-width="4" d="m3 26 12-12 8 4L39 3M29 3h10v10"/></svg><span>AI TRADING LAB<small>VIRTUAL HEDGE FUND</small></span></a>
-  <div class="metric"><small>Patrimônio do fundo</small><strong id="equity">—</strong></div>
-  <div class="metric"><small>P&amp;L líquido do fundo</small><strong id="pnl">—</strong></div>
-  <div class="metric compact"><small>Agentes em atividade</small><strong id="activeAgents">—</strong></div>
-  <div class="metric compact"><small>Posições abertas</small><strong id="openPositionCount">—</strong></div>
-  <div class="mode"><span class="status-dot"></span> PAPER TRADING</div>
+  <div class="metric wide" title="Soma do fundo e das contas de avaliação independentes. As avaliações não fazem parte do patrimônio do fundo."><small>Capital Virtual Total</small><div class="metric-line"><strong id="capitalTotal">—</strong><span id="capitalChange" class="delta"></span><span id="capitalChangeUsd" class="delta"></span></div></div>
+  <div class="metric wide" title="Variação do dia (UTC) nas contas com amostras de equity"><small>PnL Diário</small><div class="metric-line"><strong id="dailyPnl">—</strong><span id="dailyPnlUsd" class="delta"></span></div></div>
+  <div class="metric" title="Agentes com tarefa registrada ou mensagem na última hora"><small>Agentes Ativos</small><strong id="activeAgents">—</strong></div>
+  <div class="metric" title="Posições abertas em todas as contas paper"><small>Operações Abertas</small><strong id="openPositionCount">—</strong></div>
+  <div class="metric mode"><small>Modo</small><strong><span class="mode-icon" aria-hidden="true">◉</span> PAPER TRADING</strong></div>
+  <div class="header-right">
+    <button id="lightingToggle" class="icon-button" aria-label="Iluminação do escritório: automática" title="Iluminação: automática pelo horário"><span aria-hidden="true">☀</span></button>
+    <div class="clock"><span id="clockDate">—</span><strong id="clockTime">—</strong></div>
+    <div class="market-status"><span id="marketDot" class="status-dot"></span>Mercado: <b id="marketStatus">—</b></div>
+  </div>
 </header>
 <nav class="rail" aria-label="Navegação do laboratório">
-  <button id="navOffice" class="nav active" aria-current="page"><span aria-hidden="true">⌂</span>Escritório</button>
-  <button id="navAgents" class="nav"><span aria-hidden="true">♟</span>Agentes</button>
-  <button id="navFinance" class="nav"><span aria-hidden="true">▥</span>Portfólio</button>
-  <button id="navMarket" class="nav"><span aria-hidden="true">↗</span>Mercado</button>
-  <button id="navResearch" class="nav"><span aria-hidden="true">⚗</span>Pesquisa</button>
-  <button id="navHistory" class="nav"><span aria-hidden="true">≡</span>Histórico</button>
-  <button id="navAccess" class="nav"><span aria-hidden="true">⚙</span>Acesso</button>
+  <button id="navOffice" class="nav active" aria-current="page"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M3 11 12 3l9 8v10h-6v-6H9v6H3z"/></svg>Escritório</button>
+  <button id="navAgents" class="nav"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="9" cy="8" r="4"/><circle cx="17" cy="9" r="3"/><path d="M1 21c0-4 4-7 8-7s8 3 8 7zm16-6c3 0 6 2 6 5v1h-5c0-2-1-4-1-6z"/></svg>Agentes</button>
+  <button id="navFinance" class="nav"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M3 21V11h4v10zm7 0V5h4v16zm7 0V8h4v13z"/></svg>Portfólio</button>
+  <button id="navOperations" class="nav"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 7h13l-3-3 1.5-1.5L21 8l-5.5 5.5L14 12l3-3H4zm16 10H7l3 3-1.5 1.5L3 16l5.5-5.5L10 12l-3 3h13z"/></svg>Operações</button>
+  <button id="navMarket" class="nav"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M3 3h2v16h16v2H3zm4 12 4-5 3 3 5-7 1.6 1.2-6.4 9-3-3-2.6 3.2z"/></svg>Mercado</button>
+  <button id="navResearch" class="nav"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M9 2h6v2h-1v5l6 10a2 2 0 0 1-2 3H6a2 2 0 0 1-2-3l6-10V4H9z"/></svg>Estratégias</button>
+  <button id="navMemory" class="nav"><svg aria-hidden="true" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 7v4c0 1.7 3.6 3 8 3s8-1.3 8-3V7c0 1.7-3.6 3-8 3S4 8.7 4 7zm0 6v4c0 1.7 3.6 3 8 3s8-1.3 8-3v-4c0 1.7-3.6 3-8 3s-8-1.3-8-3z"/></svg>Memória</button>
+  <button id="navHistory" class="nav"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M6 2h9l5 5v15H6zm8 1v5h5M9 12h8v2H9zm0 4h8v2H9z"/></svg>Relatórios</button>
+  <button id="navAccess" class="nav"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="m10 2h4l.6 3 2.4 1.4 2.9-1 2 3.4-2.3 2v2.4l2.3 2-2 3.4-2.9-1L14.6 19 14 22h-4l-.6-3L7 17.6l-2.9 1-2-3.4 2.3-2v-2.4l-2.3-2 2-3.4 2.9 1L9.4 5zM12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"/></svg>Config</button>
 </nav>
 <main class="workspace">
-  <section class="market-wall" aria-label="Telas do mercado real">
-    <article class="market-screen spot"><div class="screen-title"><span class="coin">₿</span><div>BTC / USDT<small>BINANCE · SPOT</small></div></div><strong id="market">Aguardando cotação</strong><div id="spotTrace" class="trace" aria-label="Preços observados nesta sessão"></div><small>Traçado desta sessão · sem histórico simulado</small></article>
-    <article class="market-screen"><div class="screen-title"><span class="coin cyan">₿</span><div>BTC / USDT<small>USD-M · PERPÉTUO</small></div></div><strong id="markPrice">—</strong><div id="markTrace" class="trace" aria-label="Mark prices observados nesta sessão"></div><small id="quoteTime">Aguardando fonte pública</small></article>
-    <article class="market-screen context"><small>FUNDING COTADO</small><strong id="fundingRate">—</strong><small>Melhor compra / venda</small><b id="spreadQuote">—</b><small>Fonte pública · contratos USDT</small></article>
-    <article class="market-screen risk-screen"><small>RISK DESK</small><b>Risco determinístico</b><p id="riskSummary">Aguardando estado</p><small>Capital virtual · contas independentes</small><button id="openControls">Controles do laboratório ↗</button></article>
-  </section>
-  <div class="connection-bar"><span id="connection" role="status">Conectando…</span><span id="sync">Aguardando estado do sistema</span></div>
-  <section class="office-shell" aria-label="Centro de controle em pixel art">
-    <div class="scene-caption"><span>ESCRITÓRIO / VISÃO GERAL</span><div class="scene-tools"><button id="openDisplay">Tela e escala</button><button id="togglePresence" aria-pressed="true">Pausar animações</button><button id="openCollaboration">Colaboração</button><button id="toggleTeamFeed" aria-expanded="false" aria-controls="teamFeed">Feed</button></div></div>
+  <section class="stage" aria-label="Escritório e telões">
+    <div class="wall" id="wall" aria-label="Telões de mercado com dados públicos reais">
+      <div class="wall-art" aria-hidden="true"><span>₿</span></div>
+      <article class="wall-screen coin-screen" data-wall="BTCUSDT"><div class="wall-head"><span class="coin btc" aria-hidden="true">₿</span><b>BTC/USDT</b></div><strong data-field="price">—</strong><span data-field="change" class="delta"></span><div data-field="chart" class="wall-chart"></div></article>
+      <article class="wall-screen coin-screen" data-wall="ETHUSDT"><div class="wall-head"><span class="coin eth" aria-hidden="true">Ξ</span><b>ETH/USDT</b></div><strong data-field="price">—</strong><span data-field="change" class="delta"></span><div data-field="chart" class="wall-chart"></div></article>
+      <article class="wall-screen triple">
+        <section data-wall="funding"><small>FUNDING RATE</small><strong data-field="value">—</strong><span data-field="sub"></span><div data-field="chart" class="wall-chart"></div></section>
+        <section data-wall="oi"><small>OPEN INTEREST</small><strong data-field="value">—</strong><span data-field="sub" class="delta"></span><div data-field="chart" class="wall-chart"></div></section>
+        <section data-wall="liquidations"><small>LIQUIDAÇÕES 24H</small><strong data-field="value" class="down">—</strong><span data-field="longs"></span><span data-field="shorts"></span></section>
+      </article>
+      <article class="wall-screen map-screen" data-wall="sessions"><div data-field="map" class="world-map"></div><small data-field="label">Sessões de mercado</small></article>
+      <article class="wall-screen list-screen" data-wall="alts"><ol data-field="list"></ol></article>
+    </div>
     <div class="scene-scroll" tabindex="0" aria-label="Mapa das salas; em telas pequenas, deslize para explorar">
       <section id="office" aria-label="Salas do escritório">
         <section class="room" data-room="Research Lab"><h2><button class="room-hotspot" data-space="Research Lab" aria-label="Explorar Research Lab">RESEARCH LAB</button></h2><div class="occupants"></div></section>
@@ -41,39 +52,60 @@
         <section class="room" data-room="Quant Lab"><h2><button class="room-hotspot" data-space="Quant Lab" aria-label="Explorar Quant Lab">QUANT LAB</button></h2><div class="occupants"></div></section>
         <section class="room" data-room="Lounge"><h2><button class="room-hotspot" data-space="Lounge" aria-label="Explorar Lounge">LOUNGE</button></h2><div class="occupants"></div></section>
         <section class="room" data-room="Meeting Room"><h2><button class="room-hotspot" data-space="Meeting Room" aria-label="Explorar Meeting Room">MEETING ROOM</button></h2><div class="occupants"></div></section>
-        <button id="sceneDataCenter" class="control-zone" aria-label="Data Center: consultar estado do serviço"></button>
-        <button id="sceneWarRoom" class="control-zone" aria-label="War Room: consultar portfólio e contas"></button>
-        <button id="sceneMarketAnalysis" class="control-zone" aria-label="Análise de mercado: consultar dados recebidos"></button>
+        <button id="sceneDataCenter" class="control-zone" aria-label="Data Center: consultar estado do serviço">DATA CENTER</button>
+        <button id="sceneWarRoom" class="control-zone" aria-label="War Room: ampliar telões de capital">WAR ROOM</button>
+        <button id="sceneMarketAnalysis" class="control-zone" aria-label="Análise de mercado: ampliar telões">ANÁLISE DE MERCADO</button>
+        <div id="lighting" aria-hidden="true"></div>
       </section>
+    <div class="scene-tools" role="toolbar" aria-label="Controles da cena"><button id="openDisplay">Tela e escala</button><button id="togglePresence" aria-pressed="true">Pausar animações</button><button id="openCollaboration">Colaboração</button><button id="toggleTeamFeed" aria-expanded="false" aria-controls="teamFeed">Feed</button></div>
+    <div class="stage-status"><span id="connection" role="status">Conectando…</span><span id="sync">Aguardando estado do sistema</span></div>
     </div>
+    <aside id="agentCard" class="agent-dock" aria-labelledby="cardName" hidden>
+      <button id="closeCard" class="close" aria-label="Fechar card do agente">×</button>
+      <div class="dock-head"><span id="cardPortrait" class="sprite dock-portrait" aria-hidden="true"></span><div><h2 id="cardName">—</h2><p id="cardRole"></p><p id="cardStatus" class="dock-status"></p></div></div>
+      <blockquote id="cardQuote"></blockquote>
+      <div class="dock-tabs" role="tablist"><button role="tab" data-tab="status" aria-selected="true">Status</button><button role="tab" data-tab="trades" aria-selected="false">Operações</button><button role="tab" data-tab="strategies" aria-selected="false">Estratégias</button><button role="tab" data-tab="memory" aria-selected="false">Memória</button></div>
+      <div id="cardBody" class="dock-body" role="tabpanel"></div>
+      <button id="cardProfile" class="dock-more">Perfil completo e evidências ↗</button>
+    </aside>
     <div id="unmapped" aria-label="Agentes em salas não reconhecidas"></div>
     <section id="teamFeed" class="handoff-board" aria-labelledby="handoffTitle"><h2 id="handoffTitle">Comunicação da equipe</h2><p id="handoffStatus" role="status">Aguardando mensagens registradas.</p><div class="handoff-layout"><ol id="handoffList"></ol><div id="handoffDetail"></div></div><button id="clearHandoff" hidden>Limpar destaque</button></section>
-    <p class="scene-note">Clique nas salas, personagens e objetos para explorar. Sentado não significa trabalhando: os monitores mostram o estado recebido. Clique em um monitor para consultar motivo, fontes e histórico.</p>
+    <div id="toasts" class="toasts" role="status" aria-live="polite"></div>
   </section>
   <section class="bottom-panels">
-    <article class="panel"><h2><span class="status-dot"></span> Atividades recebidas</h2><small>Eventos reais desta sessão</small><ol id="events"><li>Nenhum evento de atividade recebido nesta sessão.</li></ol></article>
-    <article class="panel"><h2>Posições abertas</h2><small>Fundo e avaliações identificados separadamente</small><div id="positions">Aguardando posições</div></article>
-    <article class="panel"><h2>Contas dos agentes</h2><small>P&amp;L vem das contas atribuídas, não de estudos históricos</small><div id="performance">Aguardando contas</div></article>
+    <article class="panel"><h2>Atividades Recentes</h2><ol id="recentActivity" class="activity-list"><li class="empty-state">Aguardando registros</li></ol></article>
+    <article class="panel"><h2>Posições Abertas <span id="positionsCount">(0)</span></h2><div id="positions" class="table-host">Aguardando posições</div></article>
+    <article class="panel"><h2>Performance dos Agentes</h2><div id="performance" class="table-host">Aguardando contas</div></article>
   </section>
-  <footer>Dados reais de mercado · Execução exclusivamente simulada · Nenhum dinheiro real conectado</footer>
 </main>
 <dialog id="displayDialog" aria-labelledby="displayTitle">
   <button id="closeDisplay" class="close" aria-label="Fechar opções de tela">×</button><h2 id="displayTitle">Tela e escala</h2>
   <p>Enquadre todas as salas ou amplie para explorar os detalhes. A arte mantém suas proporções.</p>
   <label for="viewScale">Visualização</label><select id="viewScale"><option value="fit">Ajustar tudo à tela</option><option value="width">Preencher largura · rolagem vertical</option><option value="50">50% da cena</option><option value="75">75% da cena</option><option value="100">100% da cena</option><option value="125">125% da cena</option></select>
-  <label for="viewLayout">Composição dos painéis</label><select id="viewLayout"><option value="auto">Automática · aproveita a altura disponível</option><option value="reference">Referência · mercado acima, atividade abaixo</option></select>
+  <label for="viewLayout">Composição dos painéis</label><select id="viewLayout"><option value="auto">Referência · telões no topo, tabelas abaixo</option><option value="reference">Referência (fixa)</option></select>
   <label for="viewResolution">Resolução da cena</label><select id="viewResolution"><option value="960">960 × 440 · compacto</option><option value="1280">1280 × 587</option><option value="1536">1536 × 704</option><option value="1852" selected>1852 × 849 · original</option><option value="1920">1920 × 880</option><option value="2560">2560 × 1174</option></select>
   <small>O tamanho da cena afeta as opções percentuais. Ajustar à tela usa o espaço disponível; estas opções não alteram a resolução do seu monitor.</small>
   <p id="displayStatus" role="status"></p><button id="resetDisplay">Restaurar ajuste automático</button>
 </dialog>
+<dialog id="screenDialog" class="screen-dialog" aria-labelledby="screenTitle">
+  <button id="closeScreen" class="close" aria-label="Fechar telões ampliados">×</button><h2 id="screenTitle">Telões</h2><p id="screenNote"></p>
+  <div id="screenGrid" class="screen-grid"></div><button id="screenDetails">Abrir painel detalhado ↗</button>
+</dialog>
 <dialog id="workspaceDialog" aria-labelledby="workspaceTitle">
   <button id="closeWorkspace" class="close" aria-label="Fechar painel">×</button><h2 id="workspaceTitle">Laboratório</h2>
   <section id="agentsPanel" class="workspace-panel" hidden><p>Funções definidas; atividade e experiência vêm do backend.</p><div id="agentList"></div></section>
-  <section id="financePanel" class="workspace-panel" hidden><h3>Capital independente × fundo</h3><p>O capital de avaliação não é somado ao patrimônio do fundo.</p><div id="finance" class="financial-grid"></div><p id="accountScope">Aguardando contas</p><ul id="accounts"></ul></section>
-  <section id="marketPanel" class="workspace-panel" hidden><h3>Observatório de mercado · BTC</h3><div class="market-charts"><article class="lab-card"><h3>₿ BTC / USDT · Spot</h3><div id="spotChart" class="market-chart"><p>Aguardando observações reais</p></div><p id="spotChartStatus">Traçado desta sessão</p></article><article class="lab-card"><h3>◈ BTC / USDT · USD-M</h3><div id="markChart" class="market-chart"><p>Aguardando observações reais</p></div><p id="markChartStatus">Traçado desta sessão</p></article></div><p id="marketV3">Aguardando dados USD-M</p><p>As duas cotações representam instrumentos diferentes. O funding exibido é cotado; pagamentos usam registros de liquidação da fonte.</p></section>
-  <section id="researchPanel" class="workspace-panel" hidden><h3>Research Lab</h3><p>Consulta evidências públicas e registra resultados positivos, negativos e falhas. Não envia ordens.</p><button id="runResearch">Executar pesquisa</button><p id="researchActionStatus" role="status"></p><h3>Tarefas de pesquisa</h3><p>Estados registrados pelo servidor. Resultados históricos não representam operações paper.</p><ul id="researchJobs"></ul><h3>Resultados registrados</h3><ul id="researchRuns"></ul><h3>Quant Lab · Estudos históricos</h3><p>Simulação histórica com dados reais. Resultados não são P&amp;L das contas.</p><button id="runStudy">Executar estudo histórico</button><p id="studyActionStatus" role="status"></p><ul id="studyList"></ul><h3>Preparação do ciclo contínuo</h3><p>Critérios do servidor, sem seleção automática de estratégia ou ativação. Elegibilidade histórica não aprova uma ordem.</p><p id="preflightStatus" role="status">Aguardando diagnóstico do ciclo.</p><div id="continuousPreflight"></div><h3>Risk Desk · Controles</h3><p id="onlineStatus" role="status">Aguardando risco e execução</p><button id="haltPaper" disabled>Pausar novas exposições paper</button></section>
-  <section id="historyPanel" class="workspace-panel" hidden><h3>Histórico gravado</h3><p>Eventos preservados no backend. As atividades recebidas nesta sessão aparecem separadamente no escritório.</p><div class="audit-toolbar"><label for="eventType">Filtrar eventos</label><select id="eventType"><option value="">Todos os tipos</option value="AGENT_STATE_CHANGED">Estado dos agentes</option><option value="PAPER_FILL">Fills paper</option><option value="RISK_REJECTED">Risco rejeitado</option><option value="FUNDING_SETTLED">Funding liquidado</option><option value="BACKTEST_FAILED">Falhas de estudos</option><option value="RESEARCH_COMPLETED">Pesquisas concluídas</option><option value="AUTONOMOUS_DECISION">Decisões autônomas</option></select><button id="reloadEvents">Atualizar histórico</button></div><p id="historyStatus" role="status"></p><ol id="historyList"></ol><button id="olderEvents" disabled>Ver eventos anteriores</button></section>
-  <section id="accessPanel" class="workspace-panel" hidden><h3>Acesso protegido</h3><label for="accessToken">Código de acesso</label><input id="accessToken" type="password" autocomplete="current-password"><button id="loginPanel">Entrar</button><p id="loginStatus" role="status"></p><p>O código não é guardado no navegador. A sessão online usa um cookie protegido.</p><h3>Estado do serviço</h3><p id="runtimeStatus" role="status">Aguardando diagnóstico do serviço.</p><ul id="runtimeDetails"></ul><p><a href="/runtime/readiness" target="_blank" rel="noopener">Ver diagnóstico registrado pelo serviço ↗</a></p></section>
+  <section id="financePanel" class="workspace-panel" hidden><h3>Capital independente × fundo</h3><p>O capital de avaliação não é somado ao patrimônio do fundo. Fundo: <strong id="equity">—</strong> · P&amp;L líquido do fundo: <strong id="pnl">—</strong></p><div id="finance" class="financial-grid"></div><p id="accountScope">Aguardando contas</p><ul id="accounts"></ul></section>
+  <section id="operationsPanel" class="workspace-panel" hidden><h3>Operações paper registradas</h3><p>Fills e funding de todas as contas USD-M, a partir do registro de cada conta.</p><p id="operationsStatus" role="status">Aguardando contas</p><div id="operationsList" class="table-host"></div></section>
+  <section id="marketPanel" class="workspace-panel" hidden><h3>Observatório de mercado · BTC</h3>
+    <div class="quote-cards"><article class="lab-card"><small>BINANCE · SPOT</small><strong id="market">Aguardando cotação</strong><div id="spotTrace" class="trace" aria-label="Preços observados nesta sessão"></div></article><article class="lab-card"><small>USD-M · PERPÉTUO</small><strong id="markPrice">—</strong><div id="markTrace" class="trace" aria-label="Mark prices observados nesta sessão"></div><small id="quoteTime">Aguardando fonte pública</small></article><article class="lab-card"><small>FUNDING COTADO</small><strong id="fundingRate">—</strong><small>Melhor compra / venda</small><b id="spreadQuote">—</b></article></div>
+    <div class="market-charts"><article class="lab-card"><h3>₿ BTC / USDT · Spot</h3><div id="spotChart" class="market-chart"><p>Aguardando observações reais</p></div><p id="spotChartStatus">Traçado desta sessão</p></article><article class="lab-card"><h3>◈ BTC / USDT · USD-M</h3><div id="markChart" class="market-chart"><p>Aguardando observações reais</p></div><p id="markChartStatus">Traçado desta sessão</p></article></div>
+    <h3>Contexto público (telões)</h3><div id="panoramaDetails" class="panorama-details"><p>Aguardando dados públicos</p></div>
+    <p id="marketV3">Aguardando dados USD-M</p><p>As duas cotações representam instrumentos diferentes. O funding exibido é cotado; pagamentos usam registros de liquidação da fonte. ETH, altcoins, open interest, liquidações, livro e fluxo são contexto público e não alimentam sinais nem risco.</p></section>
+  <section id="researchPanel" class="workspace-panel" hidden><h3>Research Lab</h3><p>Consulta evidências públicas e registra resultados positivos, negativos e falhas. Não envia ordens.</p><button id="runResearch">Executar pesquisa</button><p id="researchActionStatus" role="status"></p><h3>Tarefas de pesquisa</h3><p>Estados registrados pelo servidor. Resultados históricos não representam operações paper.</p><ul id="researchJobs"></ul><h3>Resultados registrados</h3><ul id="researchRuns"></ul><h3>Quant Lab · Estudos históricos</h3><p>Simulação histórica com dados reais. Resultados não são P&amp;L das contas.</p><button id="runStudy">Executar estudo histórico</button><p id="studyActionStatus" role="status"></p><ul id="studyList"></ul><h3>Preparação do ciclo contínuo</h3><p>Critérios do servidor, sem seleção automática de estratégia ou ativação. Elegibilidade histórica não aprova uma ordem.</p><p id="preflightStatus" role="status">Aguardando diagnóstico do ciclo.</p><div id="continuousPreflight"></div><h3>Risk Desk · Controles</h3><p id="riskSummary">Aguardando estado</p><p id="onlineStatus" role="status">Aguardando risco e execução</p><button id="haltPaper" disabled>Pausar novas exposições paper</button><button id="openControls" hidden>Controles do laboratório</button></section>
+  <section id="memoryPanel" class="workspace-panel" hidden><h3>Memória da equipe</h3><p>Memórias registradas pelos agentes: observações, decisões, falhas e lições, com a origem preservada.</p><label for="memoryAgent">Agente</label><select id="memoryAgent"><option value="">Todos</option></select><p id="memoryStatus" role="status">Aguardando</p><ol id="memoryList" class="memory-list"></ol></section>
+  <section id="historyPanel" class="workspace-panel" hidden><h3>Linha do tempo do piloto · 7 dias</h3><p id="timelineStatus" role="status">Aguardando histórico do piloto</p><div id="pilotTimeline" class="pilot-timeline"></div><h3>Histórico gravado</h3><p>Eventos preservados no backend.</p><div class="audit-toolbar"><label for="eventType">Filtrar eventos</label><select id="eventType"><option value="">Todos os tipos</option><option value="AGENT_STATE_CHANGED">Estado dos agentes</option><option value="PAPER_FILL">Fills paper</option><option value="RISK_REJECTED">Risco rejeitado</option><option value="FUNDING_SETTLED">Funding liquidado</option><option value="BACKTEST_FAILED">Falhas de estudos</option><option value="RESEARCH_COMPLETED">Pesquisas concluídas</option><option value="AUTONOMOUS_DECISION">Decisões autônomas</option></select><button id="reloadEvents">Atualizar histórico</button></div><p id="historyStatus" role="status"></p><ol id="historyList"></ol><button id="olderEvents" disabled>Ver eventos anteriores</button><h3>Recebidos nesta sessão</h3><ol id="events"><li>Nenhum evento de atividade recebido nesta sessão.</li></ol></section>
+  <section id="accessPanel" class="workspace-panel" hidden><h3>Preferências do escritório</h3><div class="config-grid"><button id="configDisplay">Tela e escala…</button><label for="lightingMode">Iluminação</label><select id="lightingMode"><option value="auto">Automática pelo horário</option><option value="day">Dia</option><option value="dusk">Entardecer</option><option value="night">Noite</option></select><button id="configNotifications">Ativar notificações do navegador</button><p id="notificationStatus" role="status"></p></div>
+    <h3>Acesso protegido</h3><label for="accessToken">Código de acesso</label><input id="accessToken" type="password" autocomplete="current-password"><button id="loginPanel">Entrar</button><p id="loginStatus" role="status"></p><p>O código não é guardado no navegador. A sessão online usa um cookie protegido.</p><h3>Estado do serviço</h3><p id="runtimeStatus" role="status">Aguardando diagnóstico do serviço.</p><ul id="runtimeDetails"></ul><p><a href="/runtime/readiness" target="_blank" rel="noopener">Ver diagnóstico registrado pelo serviço ↗</a></p></section>
 </dialog>
 <dialog id="profile" aria-labelledby="profileTitle">
   <button id="closeProfile" class="close" aria-label="Fechar perfil">×</button>
@@ -88,5 +120,5 @@
 <dialog id="auditDialog" aria-labelledby="auditTitle"><button id="closeAudit" class="close" aria-label="Fechar auditoria">×</button><h2 id="auditTitle">Auditoria</h2><p id="auditStatus" role="status"></p><button id="auditBack" hidden>Voltar às operações da conta</button><div id="auditContent"></div><button id="auditOlder" hidden>Ver operações anteriores</button></dialog>
 <dialog id="roomDialog" aria-labelledby="roomTitle"><button id="closeRoom" class="close" aria-label="Fechar sala">×</button><h2 id="roomTitle"></h2><p id="roomDescription"></p><div id="roomPeople" class="room-people"></div><div id="roomActions" class="room-actions"></div><h3>Objetos e funções da sala</h3><div id="roomObjects" class="room-objects"></div><h3>Comunicação entre agentes</h3><p id="roomMessageStatus" role="status"></p><ol id="roomMessages"></ol></dialog>
 <script src="/office/collaboration.js"></script><script src="/office/navigation.js"></script><script src="/office/workstations.js"></script><script src="/office/presence.js"></script><script src="/office/transitions.js"></script><script src="/office/life.js"></script><script src="/office/screens.js"></script><script src="/office/character-frames.js"></script><script src="/office/sprites.js"></script>
-<script src="/office/app.js"></script><script src="/office/display.js"></script>
+<script src="/office/app.js"></script><script src="/office/dashboard.js"></script><script src="/office/display.js"></script>
 </body></html>

@@ -7,10 +7,10 @@
   {id:'war-equity',x:705,y:595,w:124,h:68,title:'EQUITY · NOVA (PILOTO)'},
   {id:'war-positions',x:841,y:595,w:141,h:68,title:'POSIÇÕES ABERTAS'},
   {id:'war-drawdown',x:995,y:595,w:115,h:68,title:'DRAWDOWN'},
-  {id:'analysis-mark',x:1421,y:585,w:145,h:50,title:'BTC USD-M · MARK'},
-  {id:'analysis-funding',x:1583,y:585,w:148,h:50,title:'FUNDING'},
-  {id:'analysis-book',x:1421,y:643,w:145,h:47,title:'LIVRO · BID / ASK'},
-  {id:'analysis-pilot',x:1583,y:643,w:148,h:47,title:'PILOTO · PRÓXIMA DECISÃO'},
+  {id:'analysis-book',x:1421,y:585,w:145,h:50,title:'ORDER BOOK'},
+  {id:'analysis-flow',x:1583,y:585,w:148,h:50,title:'FOOTPRINT · DELTA 1 MIN'},
+  {id:'analysis-liquidations',x:1421,y:643,w:145,h:47,title:'LIQUIDAÇÕES (24H)'},
+  {id:'analysis-profile',x:1583,y:643,w:148,h:47,title:'VOLUME PROFILE'},
   {id:'meeting-briefing',x:1470,y:335,w:185,h:62,title:'ÚLTIMO BRIEFING DA EQUIPE'},
   {id:'risk-board',x:1558,y:111,w:160,h:71,title:'RISK DESK'},
   {id:'data-center',x:218,y:690,w:52,h:31,title:'SERVIÇO'}
@@ -28,6 +28,27 @@
   const points=values.map((v,i)=>(i/(values.length-1)*100).toFixed(2)+','+(28-(v-low)/(high-low||1)*26).toFixed(2)).join(' ');
   if(fill){const area=document.createElementNS(svgNS,'polygon');area.setAttribute('points','0,30 '+points+' 100,30');area.setAttribute('fill',color);area.setAttribute('opacity','.18');svg.append(area);}
   const path=document.createElementNS(svgNS,'polyline');path.setAttribute('points',points);path.setAttribute('fill','none');path.setAttribute('stroke',color);path.setAttribute('stroke-width','1.6');path.setAttribute('vector-effect','non-scaling-stroke');svg.append(path);return svg;
+ }
+ function bars(items,{height=30,colors}){
+  if(!document.createElementNS||!items.length)return null;const svg=document.createElementNS(svgNS,'svg');svg.setAttribute('viewBox','0 0 100 '+height);svg.setAttribute('preserveAspectRatio','none');svg.setAttribute('aria-hidden','true');
+  const max=Math.max(...items.map(i=>Math.abs(i.a)+Math.abs(i.b||0)),1e-12),w=100/items.length;
+  items.forEach((item,i)=>{let y=height;for(const [value,color] of [[item.a,colors[0]],[item.b||0,colors[1]]]){const h=Math.abs(value)/max*(height-2);if(h<=0)continue;y-=h;const r=document.createElementNS(svgNS,'rect');r.setAttribute('x',String(i*w+w*0.12));r.setAttribute('width',String(w*0.76));r.setAttribute('y',String(y));r.setAttribute('height',String(h));r.setAttribute('fill',color);svg.append(r);}});
+  return svg;
+ }
+ /** Cumulative depth: bids to the left (green), asks to the right (red). */
+ function depth(book){
+  if(!document.createElementNS||!book)return null;const svg=document.createElementNS(svgNS,'svg');svg.setAttribute('viewBox','0 0 100 30');svg.setAttribute('preserveAspectRatio','none');svg.setAttribute('aria-hidden','true');
+  const cum=rows=>{let s=0;return rows.map(([p,q])=>[p,s+=q]);},bids=cum(book.bids),asks=cum(book.asks),low=bids.at(-1)[0],high=asks.at(-1)[0],max=Math.max(bids.at(-1)[1],asks.at(-1)[1]);
+  const x=p=>(p-low)/(high-low||1)*100,y=v=>30-v/max*28;
+  for(const [rows,color] of [[bids,'#22e39f'],[asks,'#ff5577']]){const pts=rows.map(([p,v])=>x(p).toFixed(2)+','+y(v).toFixed(2)),edge=x(rows[0][0]).toFixed(2);
+   const area=document.createElementNS(svgNS,'polygon');area.setAttribute('points',edge+',30 '+pts.join(' ')+' '+x(rows.at(-1)[0]).toFixed(2)+',30');area.setAttribute('fill',color);area.setAttribute('opacity','.55');svg.append(area);}
+  return svg;
+ }
+ function profileBars(profile,price){
+  if(!document.createElementNS||!profile?.buckets?.length)return null;const svg=document.createElementNS(svgNS,'svg');svg.setAttribute('viewBox','0 0 100 30');svg.setAttribute('preserveAspectRatio','none');svg.setAttribute('aria-hidden','true');
+  const rows=[...profile.buckets].reverse(),max=Math.max(...rows.map(b=>b.volume),1e-12),h=30/rows.length,step=rows.length>1?Math.abs(rows[0].price-rows[1].price):Infinity;
+  rows.forEach((b,i)=>{const r=document.createElementNS(svgNS,'rect');r.setAttribute('x','0');r.setAttribute('y',String(i*h+h*0.12));r.setAttribute('height',String(h*0.76));r.setAttribute('width',String(b.volume/max*100));r.setAttribute('fill',Number.isFinite(price)&&Math.abs(b.price-price)<=step/2?'#ffb547':'#3d8bff');svg.append(r);});
+  return svg;
  }
  const finite=a=>Array.isArray(a)?a.filter(s=>Number.isFinite(s?.equity)&&Number.isFinite(s?.timestamp)):[];
  /** Pure projections, exported for tests. */
@@ -94,18 +115,19 @@
    else this.fill('war-positions',[el('span','Contas indisponíveis','muted')],'stale');
    if(e){this.fill('war-drawdown',[el('b',pct(e.drawdown),e.drawdown<0?'down':'up'),el('small','máx. observado '+(e.maxDrawdown===null?'—':num(e.maxDrawdown*100)+'%')),line(e.drawdowns.length>1?e.drawdowns:[0,0],{color:'#ff5c7a',fill:true})]);}
    else this.fill('war-drawdown',[el('span','—','muted')],'stale');
-   if(freshQuote){
-    this.fill('analysis-mark',[el('b',num(quote.markPrice)),line(trace,{color:'#35c9ff'})]);
-    const due=Number.isFinite(quote.nextFundingTime)?quote.nextFundingTime-now:null;
-    this.fill('analysis-funding',[el('b',num(quote.fundingRate*100,4)+'%',quote.fundingRate>=0?'up':'down'),el('small',due!==null&&due>0?'próxima liquidação em '+span(due):'aguardando liquidação')]);
-    const spread=(quote.ask-quote.bid)/((quote.ask+quote.bid)/2)*10000;
-    this.fill('analysis-book',[el('span',num(quote.bid)+' / '+num(quote.ask)),el('small','spread '+num(spread,3)+' bps')]);
-   } else for(const id of ['analysis-mark','analysis-funding','analysis-book'])this.fill(id,[el('span','Cotação indisponível ou atrasada','muted')],'stale');
-   if(finance?.autonomous){const next=nextDecision(now,finance.autonomous);
-    this.fill('analysis-pilot',[el('b',next.due?'em '+span(next.due-now):'—'),el('small',next.label),el('small',Number.isFinite(finance.autonomous.lastProcessedCandle)?'último candle: '+clock(finance.autonomous.lastProcessedCandle):'nenhum candle processado')],next.due?undefined:'stale');}
-   else this.fill('analysis-pilot',[el('span','Estado do piloto indisponível','muted')],'stale');
-   const brief=briefingLines(messages,names);
-   if(brief)this.fill('meeting-briefing',[el('small','candle '+clock(brief.candle)+' · registrado '+clock(Date.parse(brief.at))),...brief.lines.map(t=>el('span',t))]);
+   const p=this.state.panorama;
+   if(p?.book){const b=p.book,spread=(b.asks[0][0]-b.bids[0][0])/((b.asks[0][0]+b.bids[0][0])/2)*10000;this.fill('analysis-book',[el('small',num(b.bids[0][0])+' / '+num(b.asks[0][0])+' · spread '+num(spread,3)+' bps'),depth(b)]);}
+   else this.fill('analysis-book',[el('span','Livro indisponível ou atrasado','muted')],'stale');
+   const flow=(p?.flow||[]).slice(-40);
+   if(flow.length>1){const delta=flow.reduce((s,f)=>s+f.buy-f.sell,0);this.fill('analysis-flow',[el('small','delta '+flow.length+' min: '+(delta>=0?'+':'')+num(delta,1)+' BTC',delta>=0?'up':'down'),bars(flow.map(f=>({a:Math.max(0,f.buy-f.sell),b:Math.max(0,f.sell-f.buy)})),{colors:['#22e39f','#ff5577']})]);}
+   else this.fill('analysis-flow',[el('span','Fluxo indisponível','muted')],'stale');
+   const liq=p?.liquidations;
+   if(liq){this.fill('analysis-liquidations',[el('small','longs '+num(liq.longs/1e6,2)+' mi · shorts '+num(liq.shorts/1e6,2)+' mi'+(liq.coverageHours<23.9?' · '+num(liq.coverageHours,1)+' h observadas':'')),bars(liq.hourly.map(h=>({a:h.longs,b:h.shorts})),{colors:['#ff5577','#22e39f']})]);}
+   else this.fill('analysis-liquidations',[el('span','Liquidações indisponíveis','muted')],'stale');
+   if(p?.volumeProfile){this.fill('analysis-profile',[el('small','24h · faixa '+num(p.volumeProfile.buckets[0].price,0)+'–'+num(p.volumeProfile.buckets.at(-1).price,0)),profileBars(p.volumeProfile,freshQuote?quote.markPrice:NaN)]);}
+   else this.fill('analysis-profile',[el('span','Perfil de volume indisponível','muted')],'stale');
+   const brief=briefingLines(messages,names),next=finance?.autonomous?nextDecision(now,finance.autonomous):null;
+   if(brief)this.fill('meeting-briefing',[el('small','candle '+clock(brief.candle)+(next?.due?' · próximo em '+span(next.due-now):'')),...brief.lines.map(t=>el('span',t))]);
    else this.fill('meeting-briefing',[el('span','Nenhum briefing registrado ainda','muted')]);
    const checks=riskChecks(finance,nova);
    if(checks.length)this.fill('risk-board',checks.map(c=>el('span',(c.ok?'✓ ':'✗ ')+c.label,c.ok?'up':'down')),checks.every(c=>c.ok)?undefined:'alert');

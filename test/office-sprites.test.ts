@@ -38,7 +38,8 @@ test('unknown identities never display another actor and known recovery restores
 test('all eight directional sheets have 24 audited bounded frames and match their actual PNG bytes',()=>{
  const api=environment();assert.equal(Object.keys(api.sheets).length,8);const hashes=new Set<string>();
  for(const [id,sheet] of Object.entries(api.sheets) as [string,any][]){
-  const png=readFileSync('public/office/characters/'+id+'.png');assert.equal(png.readUInt32BE(16),sheet.width);assert.equal(png.readUInt32BE(20),sheet.height);assert.equal(png[25],6); // RGBA encoding; transparent pixels were checked in the source audit.
+  const png=readFileSync('public/office/characters/'+id+'.png');// Sheets are delivered at pixelScale (0.5 since 2026-10-05); frame metadata stays in the audited source coordinates.
+  assert.equal(sheet.pixelScale,0.5);assert.equal(png.readUInt32BE(16),sheet.width*sheet.pixelScale);assert.equal(png.readUInt32BE(20),sheet.height*sheet.pixelScale);assert.equal(png[25],6); // RGBA encoding; transparent pixels were checked in the source audit.
   assert.equal(createHash('sha256').update(png).digest('hex'),sheet.sha256);hashes.add(sheet.sha256);assert.equal(Object.isFrozen(sheet),true);assert.equal(sheet.frames.length,24);assert.equal(sheet.columnCuts.length,6);
   for(const [i,frame] of sheet.frames.entries()){
    const column=i%6,row=Math.floor(i/6),cuts=sheet.columnCuts[column];

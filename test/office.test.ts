@@ -289,7 +289,9 @@ test('invalid communication participants or timestamps do not create visual char
 test('only a newly observed recent original message creates a temporary speech indicator',async()=>{
  const messages:any[]=[],h=harness({'/agent-messages':messages});await settle();const agent=h.rooms[0].children[0].children[0];
  messages.push({id:'new-original',from:'atlas',to:['euler'],kind:'HYPOTHESIS',summary:'Actual test fixture message',createdAt:new Date().toISOString(),context:{}});
- h.intervals.forEach(fn=>fn());await settle();assert.equal(agent.children.filter(c=>(c as any).className==='recorded-speech').length,1);assert.match(flatten(agent),/Hipótese → euler/);assert.equal(agent.dataset.status,'IDLE');assert.equal(h.ids.get('#activeAgents')!.textContent,'0 / 1');
+ h.intervals.forEach(fn=>fn());await settle();assert.equal(agent.children.filter(c=>(c as any).className==='recorded-speech').length,1);assert.match(flatten(agent),/Hipótese → euler/);assert.equal(agent.dataset.status,'IDLE');
+ // The header counts an agent with a recorded message in the last hour as active; the backend status is unchanged.
+ assert.equal(h.ids.get('#activeAgents')!.textContent,'1 / 1');
  const original=agent.children.find(c=>(c as any).className==='recorded-speech');h.intervals.forEach(fn=>fn());await settle();assert.equal(agent.children.find(c=>(c as any).className==='recorded-speech'),original);
 });
 test('room communication refresh preserves focused participants and safely closes with the actual state unchanged',async()=>{

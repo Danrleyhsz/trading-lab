@@ -67,38 +67,46 @@ function renderEquitySamples(card,account) {
   const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.setAttribute('viewBox','0 0 300 80');svg.setAttribute('role','img');svg.setAttribute('aria-label','Equity observada de '+account.id+' de '+date(start)+' até '+date(end));svg.setAttribute('class','equity-trace');
   const line=document.createElementNS('http://www.w3.org/2000/svg','polyline');line.setAttribute('points',samples.map(s=>((s.timestamp-start)/(end-start||1)*300).toFixed(1)+','+(74-(s.equity-low)/(high-low||1)*66).toFixed(1)).join(' '));line.setAttribute('stroke','#35c9ff');line.setAttribute('stroke-width','2');line.setAttribute('fill','none');svg.append(line);card.append(svg);
 }
+const fmtBr=(v,d=2)=>Number.isFinite(v)?v.toLocaleString('pt-BR',{minimumFractionDigits:d,maximumFractionDigits:d}):'—';
+const pctBr=v=>Number.isFinite(v)?(v>=0?'+':'')+fmtBr(v*100)+'%':'—';
+function cell(text,className){const element=node('td',text);if(className)element.className=className;return element;}
+function tableOf(headers,rows){const table=node('table','');table.className='data-table';const head=node('thead',''),line=node('tr','');for(const h of headers)line.append(node('th',h));head.append(line);const body=node('tbody','');body.append(...rows);table.append(head,body);return table;}
 function renderFinancialOverview(data) {
   const all = [...(data.legacyAccounts || []), ...(data.perpetualAccounts || [])];
   const positions = q('#positions'), performance = q('#performance');positions.replaceChildren();performance.replaceChildren();
-  let count = 0;
+  const quote=screens.state.quote,mark=quote&&Date.now()-quote.markTime<=15000?quote.markPrice:null;
+  const positionRows=[],performanceRows=[];
   for (const account of all) {
     const name = account.kind === 'FUND' ? 'Fundo' : (agents.get(account.ownerAgentId)?.name || account.ownerAgentId || account.id);
-    const instrument = account.instrument === 'BINANCE_USDM:BTCUSDT' ? 'USD-M' : 'Legado';
+    const usdm = account.instrument === 'BINANCE_USDM:BTCUSDT';
     for (const position of account.portfolio.positions || []) {
       if (!Number.isFinite(position.quantity) || position.quantity === 0) continue;
-      const row = node('div','');row.className = 'data-row';
-      row.append(node('b',position.symbol + ' · ' + (position.quantity > 0 ? 'LONG' : 'SHORT')),node('span',Math.abs(position.quantity) + ' · ' + name));
-      row.append(node('small',instrument + ' · entrada ' + money(position.averageEntry) + (account.valuationFresh === false ? ' · avaliação desatualizada' : '')));
-      positions.append(row);count++;
+      const long=position.quantity>0,current=usdm?mark:null,move=current&&position.averageEntry>0?(current/position.averageEntry-1)*(long?1:-1):null;
+      const row=node('tr',''),asset=cell(usdm?'BTC-PERP':position.symbol);asset.append(node('small',' · '+name+(account.valuationFresh === false ? ' · avaliação desatualizada' : '')));
+      row.append(asset,cell(long?'LONG':'SHORT',long?'up':'down'),cell(fmtBr(position.averageEntry)),cell(current?fmtBr(current):'—'),cell(pctBr(move),move===null?'':move>=0?'up':'down'),cell(fmtBr(Math.abs(position.quantity),4)+' BTC'));
+      positionRows.push(row);
     }
     if (account.kind !== 'FUND') {
-      const row = node('div','');row.className = 'data-row';
-      const label = node('span',name + ' · ' + instrument);label.append(node('small','Patrimônio ' + money(account.portfolio.equity) + (account.valuationFresh === false ? ' · desatualizado' : '')));
-      label.append(node('small',outcomeLabel(account.performance)));const pnl = node('b',money(account.portfolio.equity-account.initialCash));pnl.className = account.portfolio.equity >= account.initialCash ? 'positive' : 'negative';
-      row.append(label,pnl);performance.append(row);
+      const s=account.performance?.summary,winRate=account.performance?.available&&s?.winRate!==null&&s?.winRate!==undefined?s.winRate:null,change=account.portfolio.equity/account.initialCash-1;
+      const row=node('tr',''),who=cell(name);who.dataset.agent=account.ownerAgentId||'';
+      const bar=node('span','');bar.className='win-bar';bar.setAttribute('style','--win:'+(winRate===null?0:Math.round(winRate*100)));bar.dataset.tone=winRate===null?'none':winRate>=0.5?'up':'down';
+      const rate=cell(winRate===null?'—':fmtBr(winRate*100,1)+'%');rate.append(bar);
+      row.append(who,cell(fmtBr(account.portfolio.equity)+(account.valuationFresh === false ? ' *' : '')),cell(pctBr(change),change>=0?'up':'down'),cell(String(s?.closedTrades??0)),rate);
+      row.title=outcomeLabel(account.performance);row.dataset.change=String(change);performanceRows.push(row);
     }
   }
-  q('#openPositionCount').textContent=String(count);
-  if (!count) {positions.textContent = 'Nenhuma posição aberta registrada.';positions.className='empty-state';} else positions.className='';
-  if (!performance.children.length) {performance.textContent = 'Contas de avaliação ainda não configuradas.';performance.className='empty-state';} else performance.className='';
+  performanceRows.sort((a,b)=>Number(b.dataset.change)-Number(a.dataset.change));
+  q('#openPositionCount').textContent=String(positionRows.length);if(q('#positionsCount'))q('#positionsCount').textContent='('+positionRows.length+')';
+  if (!positionRows.length) {positions.textContent = 'Nenhuma posição aberta registrada.';positions.className='empty-state';} else {positions.className='table-host';positions.append(tableOf(['Ativo','Direção','Entrada','Preço Atual','P&L','Tamanho'],positionRows));}
+  if (!performanceRows.length) {performance.textContent = 'Contas de avaliação ainda não configuradas.';performance.className='empty-state';} else {performance.className='table-host';performance.append(tableOf(['Agente','Capital','P&L','Trades','Win Rate'],performanceRows));}
 }
 let terminalOpener=null;
 function openPanel(panel, title, navId) { stopPresence();terminalOpener=document.activeElement;
   q('#workspaceDialog').dataset.terminal='false';
-  for (const id of ['agentsPanel','financePanel','marketPanel','researchPanel','historyPanel','accessPanel']) q('#'+id).hidden = id !== panel;
+  for (const id of ['agentsPanel','financePanel','operationsPanel','marketPanel','researchPanel','memoryPanel','historyPanel','accessPanel']) if(q('#'+id))q('#'+id).hidden = id !== panel;
   q('#workspaceTitle').textContent = title;
   for (const id of ['navOffice','navAgents','navFinance','navMarket','navResearch','navHistory','navAccess']) {
-    q('#'+id).className = 'nav' + (id === navId ? ' active' : '');
+    if(!q('#'+id))continue;q('#'+id).className = 'nav' + (id === navId ? ' active' : '');
     q('#'+id).setAttribute('aria-current', id === navId ? 'page' : 'false');
   }
   q('#workspaceDialog').showModal();
@@ -157,7 +165,7 @@ const reducedMotion=globalThis.matchMedia?.('(prefers-reduced-motion: reduce)');
 // The owner may explicitly animate the office even when the operating system asks for reduced motion.
 let motionChoice=(()=>{try{return globalThis.localStorage?.getItem('trading-lab.motion.v1')==='on'?'on':'system';}catch{return 'system';}})();
 const systemReducesMotion=()=>!!reducedMotion?.matches&&motionChoice!=='on';
-const motionAllowed=()=>presenceEnabled&&!selectedHandoff&&!systemReducesMotion()&&!document.hidden&&!['#profile','#workspaceDialog','#roomDialog','#auditDialog','#studyDialog','#researchDialog'].some(id=>q(id).open);
+const motionAllowed=()=>presenceEnabled&&!selectedHandoff&&!systemReducesMotion()&&!document.hidden&&!['#profile','#workspaceDialog','#roomDialog','#auditDialog','#studyDialog','#researchDialog','#screenDialog'].some(id=>q(id).open);
 const presence=new OfficePresence.Director(motionAllowed);
 const transitions=new OfficeTransitions.Director(motionAllowed,view=>presence.stop(view),view=>presence.update(view,view.agent,view.slot,view.host));
 const screens=new OfficeScreens.Screens(q('#office'));
@@ -171,7 +179,7 @@ function render(movingEvent){
   let view=agentViews.get(agent.id);
   if(!view){
    const button=node('button',''),avatar=node('span',''),label=node('b',''),status=node('small',''),shadow=node('span','');
-   button.className='agent';avatar.className='sprite';shadow.className='foot-shadow';avatar.setAttribute('aria-hidden','true');shadow.setAttribute('aria-hidden','true');sprite(avatar,agent.id,true);button.append(avatar,label,status,shadow);button.onclick=()=>profile(agent.id);
+   button.className='agent';avatar.className='sprite';shadow.className='foot-shadow';avatar.setAttribute('aria-hidden','true');shadow.setAttribute('aria-hidden','true');sprite(avatar,agent.id,true);button.append(avatar,label,status,shadow);button.onclick=()=>globalThis.OfficeDashboard?OfficeDashboard.selectAgent(agent.id):profile(agent.id);
    view={button,avatar,label,status};agentViews.set(agent.id,view);
   }
   const from=view.agent?{room:view.agent.room,slot:view.slot,station:view.station}:null,wasTraveling=!!view.transitionRoute;
@@ -199,7 +207,7 @@ function render(movingEvent){
  q('#togglePresence').textContent=systemReducesMotion()?'Ativar animações':selectedHandoff?'Presença pausada':presenceEnabled?'Pausar animações':'Animar escritório';q('#togglePresence').disabled=!!selectedHandoff;q('#togglePresence').setAttribute('aria-pressed',String(presenceEnabled&&!selectedHandoff&&!systemReducesMotion()));
  q('#togglePresence').setAttribute('title',systemReducesMotion()?'Seu sistema pede movimento reduzido. Clique para animar o escritório mesmo assim.':'Animações são apenas visuais; não alteram trabalho nem resultados.');if(document.body)document.body.dataset.motion=motionChoice;
  renderLastWords();
- q('#activeAgents').textContent=[...agents.values()].filter(agent=>agent.status!=='IDLE').length+' / '+agents.size;
+ q('#activeAgents').textContent=[...agents.values()].filter(agent=>agent.status!=='IDLE'||(communicationReady&&communications.some(m=>m.from===agent.id&&Date.now()-Date.parse(m.createdAt)<=65*60000&&Date.parse(m.createdAt)<=Date.now()+60000))).length+' / '+agents.size;
  renderStations();if(selected)renderState();if(inspectedRoom&&q('#roomDialog').open)renderRoom();renderHandoffs();
 }
 function renderState() {
@@ -593,7 +601,7 @@ async function loadEventHistory(before){
  try{const result=await get('/audit/events?limit=25'+(type?'&type='+encodeURIComponent(type):'')+(before?'&before='+encodeURIComponent(before):''));if(version!==historyVersion)return;if(result.source!=='DURABLE_SNAPSHOT'||!Array.isArray(result.events))throw Error('invalid audit response');const rows=result.events.map(record=>{const li=node('li',''),button=node('button',date(record.occurredAt)+' · '+eventLabel(record));button.className='event-button';button.onclick=()=>{auditReturn=null;showEvent(record.id);};li.append(button);return li;});q('#historyList').replaceChildren(...rows);q('#historyStatus').textContent=result.events.length?result.events.length+' eventos nesta página. Ordenação pela data original; IDs preservados.':'Nenhum evento gravado para este filtro.';historyCursor=result.nextCursor||null;q('#olderEvents').disabled=!historyCursor;}
  catch{if(version===historyVersion)q('#historyStatus').textContent='Histórico gravado indisponível. Confira o acesso e atualize.';}
 }
-q('#navHistory').onclick=()=>{openPanel('historyPanel','Histórico gravado','navHistory');loadEventHistory();};
+q('#navHistory').onclick=()=>{openPanel('historyPanel','Relatórios · piloto e histórico gravado','navHistory');loadEventHistory();};
 q('#reloadEvents').onclick=()=>loadEventHistory();q('#eventType').onchange=()=>loadEventHistory();q('#olderEvents').onclick=()=>{if(historyCursor)loadEventHistory(historyCursor);};
 q('#auditOlder').onclick=()=>{if(auditCursor&&auditAccount)openAccountAudit(auditAccount,auditCursor);};
 function configureAuditBack(){if(auditReturn){q('#auditBack').hidden=false;q('#auditBack').onclick=()=>{auditVersion++;auditReturn();};}}
