@@ -132,7 +132,9 @@ function renderStations(){
     side.setAttribute('aria-label',station.id+' · '+action.title);side.setAttribute('title',action.title);side.onclick=()=>{openPanel(action.panel,action.title,action.nav);q('#workspaceDialog').dataset.terminal='true';};q('#office').append(side);
    }
    chair.className='station-chair'+(station.room==='Research Lab'?' research-chair':'');chair.setAttribute('aria-hidden','true');
-   chair.setAttribute('style','left:'+station.cx/width*100+'%;top:'+station.cy/height*100+'%;width:'+station.cw/width*100+'%;height:'+station.ch/height*100+'%;background-position:-'+station.cx/width*100+'cqw -'+station.cy/width*100+'cqw');
+   // Cenário modular: a cadeira é a peça própria apoiada no ponto do agente; na arte atual, um recorte do fundo.
+   if(globalThis.OfficeCenario?.modular){const r=OfficeCenario.chairRect(station);chair.setAttribute('style','left:'+r.x/width*100+'%;top:'+r.y/height*100+'%;width:'+r.w/width*100+'%;height:'+r.h/height*100+'%');}
+   else chair.setAttribute('style','left:'+station.cx/width*100+'%;top:'+station.cy/height*100+'%;width:'+station.cw/width*100+'%;height:'+station.ch/height*100+'%;background-position:-'+station.cx/width*100+'cqw -'+station.cy/width*100+'cqw');
    q('#office').append(monitor,chair);view={monitor,name,state,chair};stationViews.set(station.id,view);
   }
   const agent=agents.get(station.id),occupant=OfficeWorkstations.seat(agent),p=stationProjection(agent);

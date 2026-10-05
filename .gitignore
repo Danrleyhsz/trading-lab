@@ -18,3 +18,6 @@ __pycache__/
 
 # Runtime state belongs on a durable cloud volume, never in source control.
 /data/
+
+# Saídas do compositor de cenário (copiar para public/office as que forem usadas)
+scripts/assets/out/

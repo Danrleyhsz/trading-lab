@@ -14,6 +14,17 @@
   euler:{left:[[152,408],[182,397],[181,430],[142,438]],center:[[192,395],[220,395],[220,427],[190,429]],right:[[228,398],[268,407],[268,441],[232,430]]},
   vega:{left:[[341,417],[382,397],[381,432],[340,436]],center:[[393,395],[420,396],[421,427],[390,427]],right:[[430,402],[449,409],[449,429],[431,431]]}
  };
+ // Telas das mesas no cenário modular (calculadas pelo compositor a partir da peça estacao-mesa-3-monitores).
+ const QUADS_MODULAR={
+  atlas:{left:[[102,187],[141,173],[139,199],[102,211]],center:[[145,171],[202,171],[202,201],[145,201]],right:[[206,173],[245,186],[246,213],[206,199]]},
+  satoshi:{left:[[274,187],[313,173],[311,199],[274,211]],center:[[317,171],[374,171],[374,201],[317,201]],right:[[378,173],[417,186],[418,213],[378,199]]},
+  oracle:{left:[[447,187],[486,173],[484,199],[447,211]],center:[[490,171],[547,171],[547,201],[490,201]],right:[[551,173],[590,186],[591,213],[551,199]]},
+  nova:{left:[[688,188],[727,174],[725,200],[688,212]],center:[[731,172],[788,172],[788,202],[731,202]],right:[[792,174],[831,187],[832,214],[792,200]]},
+  flux:{left:[[1053,188],[1092,174],[1090,200],[1053,212]],center:[[1096,172],[1153,172],[1153,202],[1096,202]],right:[[1157,174],[1196,187],[1197,214],[1157,200]]},
+  sentinel:{left:[[1370,188],[1409,174],[1407,200],[1370,212]],center:[[1413,172],[1470,172],[1470,202],[1413,202]],right:[[1474,174],[1513,187],[1514,214],[1474,200]]},
+  euler:{left:[[132,431],[171,417],[169,443],[132,455]],center:[[175,415],[232,415],[232,445],[175,445]],right:[[236,417],[275,430],[276,457],[236,443]]},
+  vega:{left:[[334,431],[373,417],[371,443],[334,455]],center:[[377,415],[434,415],[434,445],[377,445]],right:[[438,417],[477,430],[478,457],[438,443]]}
+ };
  const C={bg:'#0a1b33',grid:'#12294a',line:'#5fb6ff',up:'#22e39f',down:'#ff6b6b',gold:'#ffd166',dim:'#16304f'};
  let canvas=null,ctx=null,last=null;
  function ensure(){
@@ -57,11 +68,12 @@
    atlas:line((p?.openInterest?.history??[]).map(x=>x.usd),'#7ad7ff'),
    euler:bars((p?.liquidations?.hourly??[]).map(x=>x.shorts-x.longs),v=>v>=0?C.up:C.down)
   };
-  for(const [id,q] of Object.entries(QUADS)){
+  const quads=D.body?.dataset?.cenario==='modular'?QUADS_MODULAR:QUADS;
+  for(const [id,q] of Object.entries(quads)){
    onQuad(q.left,line(closes.slice(-48),C.line));
    onQuad(q.center,center[id]);
    const act=activity(data.messages,id,now);onQuad(q.right,act.some(Boolean)?bars(act,()=>C.up):off);
   }
  }
- globalThis.OfficeDeskScreens=Object.freeze({QUADS,paint,redraw:()=>last&&paint(last)});
+ globalThis.OfficeDeskScreens=Object.freeze({QUADS,QUADS_MODULAR,paint,redraw:()=>last&&paint(last)});
 })();

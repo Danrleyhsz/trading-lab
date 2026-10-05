@@ -1,0 +1,1059 @@
+{
+ "_sobre": "Planta do escritório montado com as peças geradas (px da cena 1852 × 849). Mantém as posições da arte atual: cadeiras dos 8 agentes, corredores (y 300, 544, 812), passagens (x 632, 1267, 475, 1320), telões nos retângulos de screens.js e áreas clicáveis de app.js. O vidro das janelas fica transparente para a cidade ao vivo.",
+ "scene": {
+  "width": 1852,
+  "height": 849
+ },
+ "janelas": {
+  "y": 10,
+  "trechos": [
+   [
+    18,
+    634
+   ],
+   [
+    648,
+    1254
+   ],
+   [
+    1268,
+    1834
+   ]
+  ]
+ },
+ "pisos": [
+  {
+   "rect": [
+    18,
+    90,
+    616,
+    214
+   ],
+   "textura": "madeira"
+  },
+  {
+   "rect": [
+    648,
+    90,
+    606,
+    214
+   ],
+   "textura": "madeira"
+  },
+  {
+   "rect": [
+    1268,
+    90,
+    566,
+    214
+   ],
+   "textura": "madeira"
+  },
+  {
+   "rect": [
+    18,
+    304,
+    1816,
+    252
+   ],
+   "textura": "madeira"
+  },
+  {
+   "rect": [
+    656,
+    398,
+    590,
+    158
+   ],
+   "textura": "carpete"
+  },
+  {
+   "rect": [
+    1290,
+    398,
+    544,
+    158
+   ],
+   "textura": "carpete"
+  },
+  {
+   "rect": [
+    18,
+    556,
+    1816,
+    274
+   ],
+   "textura": "madeira"
+  },
+  {
+   "rect": [
+    18,
+    700,
+    437,
+    130
+   ],
+   "textura": "porcelanato",
+   "escurecer": 0.45
+  },
+  {
+   "rect": [
+    495,
+    700,
+    805,
+    130
+   ],
+   "textura": "carpete"
+  },
+  {
+   "rect": [
+    1340,
+    700,
+    494,
+    130
+   ],
+   "textura": "carpete"
+  },
+  {
+   "rect": [
+    612,
+    304,
+    44,
+    252
+   ],
+   "textura": "porcelanato"
+  },
+  {
+   "rect": [
+    1246,
+    304,
+    44,
+    252
+   ],
+   "textura": "porcelanato"
+  },
+  {
+   "rect": [
+    455,
+    556,
+    40,
+    274
+   ],
+   "textura": "porcelanato"
+  },
+  {
+   "rect": [
+    1300,
+    556,
+    40,
+    274
+   ],
+   "textura": "porcelanato"
+  }
+ ],
+ "paredes": [
+  {
+   "face": [
+    18,
+    90,
+    616,
+    96
+   ]
+  },
+  {
+   "face": [
+    648,
+    90,
+    606,
+    96
+   ]
+  },
+  {
+   "face": [
+    1268,
+    90,
+    566,
+    96
+   ]
+  },
+  {
+   "face": [
+    18,
+    312,
+    594,
+    86
+   ]
+  },
+  {
+   "face": [
+    656,
+    312,
+    590,
+    86
+   ]
+  },
+  {
+   "face": [
+    1290,
+    312,
+    544,
+    86
+   ]
+  },
+  {
+   "face": [
+    18,
+    564,
+    437,
+    136
+   ]
+  },
+  {
+   "face": [
+    495,
+    564,
+    805,
+    136
+   ]
+  },
+  {
+   "face": [
+    1340,
+    564,
+    494,
+    136
+   ]
+  }
+ ],
+ "topos": [
+  [
+   18,
+   304,
+   594,
+   8
+  ],
+  [
+   656,
+   304,
+   590,
+   8
+  ],
+  [
+   1290,
+   304,
+   544,
+   8
+  ],
+  [
+   18,
+   556,
+   437,
+   8
+  ],
+  [
+   495,
+   556,
+   805,
+   8
+  ],
+  [
+   1340,
+   556,
+   494,
+   8
+  ]
+ ],
+ "divisorias": [
+  {
+   "x": 634,
+   "y0": 10,
+   "y1": 304
+  },
+  {
+   "x": 1254,
+   "y0": 10,
+   "y1": 304
+  },
+  {
+   "x": 606,
+   "y0": 304,
+   "y1": 556
+  },
+  {
+   "x": 656,
+   "y0": 304,
+   "y1": 556
+  },
+  {
+   "x": 1240,
+   "y0": 304,
+   "y1": 556
+  },
+  {
+   "x": 1290,
+   "y0": 304,
+   "y1": 556
+  },
+  {
+   "x": 449,
+   "y0": 556,
+   "y1": 830
+  },
+  {
+   "x": 495,
+   "y0": 556,
+   "y1": 830
+  },
+  {
+   "x": 1294,
+   "y0": 556,
+   "y1": 830
+  },
+  {
+   "x": 1340,
+   "y0": 556,
+   "y1": 830
+  }
+ ],
+ "moldura": {
+  "esquerda": 18,
+  "direita": 1834,
+  "topo": 10,
+  "base": 830
+ },
+ "telas": {
+  "estacao-mesa-3-monitores": {
+   "left": [
+    [
+     31,
+     55
+    ],
+    [
+     151,
+     13
+    ],
+    [
+     145,
+     93
+    ],
+    [
+     33,
+     130
+    ]
+   ],
+   "center": [
+    [
+     162,
+     8
+    ],
+    [
+     336,
+     7
+    ],
+    [
+     335,
+     97
+    ],
+    [
+     162,
+     98
+    ]
+   ],
+   "right": [
+    [
+     347,
+     12
+    ],
+    [
+     466,
+     54
+    ],
+    [
+     468,
+     135
+    ],
+    [
+     348,
+     93
+    ]
+   ]
+  },
+  "eletronico-telao": {
+   "inner": [
+    23,
+    27,
+    604,
+    216
+   ]
+  },
+  "eletronico-tv-parede": {
+   "inner": [
+    19,
+    26,
+    335,
+    175
+   ]
+  }
+ },
+ "estacoes": {
+  "mesa": "estacao-mesa-3-monitores",
+  "recuo": 26,
+  "ids": [
+   "atlas",
+   "satoshi",
+   "oracle",
+   "nova",
+   "flux",
+   "sentinel",
+   "euler",
+   "vega"
+  ],
+  "tampo": [
+   {
+    "id": "mesa-porta-lapis",
+    "dx": -64,
+    "dy": -50
+   },
+   {
+    "id": "mesa-planta-mesa",
+    "dx": 70,
+    "dy": -56
+   },
+   {
+    "id": "mesa-pilha-papeis",
+    "dx": -40,
+    "dy": -40
+   }
+  ]
+ },
+ "objetos": [
+  {
+   "id": "decoracao-estante-livros",
+   "x": 58,
+   "base": 210
+  },
+  {
+   "id": "decoracao-quadro",
+   "x": 300,
+   "base": 150,
+   "parede": true
+  },
+  {
+   "id": "item-mapa-mundi",
+   "x": 470,
+   "base": 152,
+   "parede": true
+  },
+  {
+   "id": "item-arandela",
+   "x": 395,
+   "base": 132,
+   "parede": true
+  },
+  {
+   "id": "decoracao-costela-de-adao",
+   "x": 36,
+   "base": 290
+  },
+  {
+   "id": "decoracao-palmeira",
+   "x": 612,
+   "base": 246
+  },
+  {
+   "id": "decoracao-estante-livros",
+   "x": 690,
+   "base": 210
+  },
+  {
+   "id": "estacao-mesa-3-monitores",
+   "x": 947,
+   "base": 274,
+   "estacao": "trading-vazia"
+  },
+  {
+   "id": "estacao-lixeira",
+   "x": 860,
+   "base": 282
+  },
+  {
+   "id": "eletronico-impressora",
+   "x": 1050,
+   "base": 206
+  },
+  {
+   "id": "item-prateleira-parede",
+   "x": 845,
+   "base": 142,
+   "parede": true
+  },
+  {
+   "id": "eletronico-painel-led",
+   "x": 1170,
+   "base": 140,
+   "parede": true
+  },
+  {
+   "id": "decoracao-costela-de-adao",
+   "x": 668,
+   "base": 290
+  },
+  {
+   "id": "decoracao-palmeira",
+   "x": 1236,
+   "base": 246
+  },
+  {
+   "id": "decoracao-estante-livros",
+   "x": 1300,
+   "base": 210
+  },
+  {
+   "id": "eletronico-telao",
+   "fit": [
+    1558,
+    111,
+    160,
+    71
+   ],
+   "parede": true
+  },
+  {
+   "id": "decoracao-luminaria-chao",
+   "x": 1790,
+   "base": 236
+  },
+  {
+   "id": "decoracao-palmeira",
+   "x": 1812,
+   "base": 290
+  },
+  {
+   "id": "item-arquivo-aco",
+   "x": 1530,
+   "base": 236
+  },
+  {
+   "id": "decoracao-estante-livros",
+   "x": 64,
+   "base": 420
+  },
+  {
+   "id": "item-arquivo-aco",
+   "x": 120,
+   "base": 416
+  },
+  {
+   "id": "item-quadro-branco",
+   "x": 300,
+   "base": 418
+  },
+  {
+   "id": "eletronico-rack-servidor",
+   "x": 560,
+   "base": 440
+  },
+  {
+   "id": "decoracao-costela-de-adao",
+   "x": 34,
+   "base": 556
+  },
+  {
+   "id": "decoracao-palmeira",
+   "x": 586,
+   "base": 520
+  },
+  {
+   "id": "estar-tapete",
+   "x": 850,
+   "base": 540,
+   "chao": true
+  },
+  {
+   "id": "assento-sofa-frente",
+   "x": 850,
+   "base": 470
+  },
+  {
+   "id": "assento-poltrona-lado",
+   "x": 760,
+   "base": 520
+  },
+  {
+   "id": "estar-mesa-centro",
+   "x": 850,
+   "base": 515
+  },
+  {
+   "id": "assento-poltrona-lado-esq",
+   "x": 940,
+   "base": 520
+  },
+  {
+   "id": "decoracao-quadro",
+   "x": 790,
+   "base": 372,
+   "parede": true
+  },
+  {
+   "id": "decoracao-relogio",
+   "x": 930,
+   "base": 368,
+   "parede": true
+  },
+  {
+   "id": "copa-bancada-pia",
+   "x": 1062,
+   "base": 462
+  },
+  {
+   "id": "copa-cafeteira",
+   "x": 1030,
+   "base": 422,
+   "z": 463
+  },
+  {
+   "id": "copa-micro-ondas",
+   "x": 1088,
+   "base": 422,
+   "z": 463
+  },
+  {
+   "id": "copa-bebedouro",
+   "x": 1182,
+   "base": 472
+  },
+  {
+   "id": "decoracao-costela-de-adao",
+   "x": 684,
+   "base": 440
+  },
+  {
+   "id": "decoracao-palmeira",
+   "x": 1222,
+   "base": 430
+  },
+  {
+   "id": "eletronico-telao",
+   "fit": [
+    1470,
+    335,
+    185,
+    62
+   ],
+   "parede": true
+  },
+  {
+   "id": "assento-reuniao-frente",
+   "x": 1505,
+   "base": 438
+  },
+  {
+   "id": "assento-reuniao-frente",
+   "x": 1565,
+   "base": 438
+  },
+  {
+   "id": "assento-reuniao-frente",
+   "x": 1625,
+   "base": 438
+  },
+  {
+   "id": "estar-mesa-reuniao",
+   "x": 1565,
+   "base": 488
+  },
+  {
+   "id": "assento-reuniao-costas",
+   "x": 1505,
+   "base": 522
+  },
+  {
+   "id": "assento-reuniao-costas",
+   "x": 1565,
+   "base": 522
+  },
+  {
+   "id": "assento-reuniao-costas",
+   "x": 1625,
+   "base": 522
+  },
+  {
+   "id": "assento-reuniao-lado",
+   "x": 1448,
+   "base": 486
+  },
+  {
+   "id": "assento-reuniao-lado-esq",
+   "x": 1684,
+   "base": 486
+  },
+  {
+   "id": "decoracao-palmeira",
+   "x": 1316,
+   "base": 470
+  },
+  {
+   "id": "decoracao-luminaria-chao",
+   "x": 1800,
+   "base": 470
+  },
+  {
+   "id": "eletronico-rack-servidor",
+   "x": 78,
+   "base": 714
+  },
+  {
+   "id": "eletronico-rack-servidor",
+   "x": 146,
+   "base": 714
+  },
+  {
+   "id": "eletronico-rack-servidor",
+   "x": 336,
+   "base": 714
+  },
+  {
+   "id": "eletronico-rack-servidor",
+   "x": 404,
+   "base": 714
+  },
+  {
+   "id": "estacao-mesa-simples",
+   "x": 244,
+   "base": 790
+  },
+  {
+   "id": "eletronico-tv-parede",
+   "fit": [
+    218,
+    690,
+    52,
+    31
+   ],
+   "z": 791
+  },
+  {
+   "id": "decoracao-costela-de-adao",
+   "x": 40,
+   "base": 826
+  },
+  {
+   "id": "eletronico-telao",
+   "fit": [
+    705,
+    595,
+    124,
+    68
+   ],
+   "parede": true
+  },
+  {
+   "id": "eletronico-telao",
+   "fit": [
+    841,
+    595,
+    141,
+    68
+   ],
+   "parede": true
+  },
+  {
+   "id": "eletronico-telao",
+   "fit": [
+    995,
+    595,
+    115,
+    68
+   ],
+   "parede": true
+  },
+  {
+   "id": "decoracao-estante-livros",
+   "x": 548,
+   "base": 716
+  },
+  {
+   "id": "estacao-mesa-2-monitores",
+   "x": 760,
+   "base": 772
+  },
+  {
+   "id": "estacao-mesa-2-monitores",
+   "x": 910,
+   "base": 772
+  },
+  {
+   "id": "estacao-mesa-2-monitores",
+   "x": 1060,
+   "base": 772
+  },
+  {
+   "id": "cadeira-costas",
+   "x": 760,
+   "base": 798
+  },
+  {
+   "id": "cadeira-costas",
+   "x": 910,
+   "base": 798
+  },
+  {
+   "id": "cadeira-costas",
+   "x": 1060,
+   "base": 798
+  },
+  {
+   "id": "item-prateleira-parede",
+   "x": 1200,
+   "base": 610,
+   "parede": true
+  },
+  {
+   "id": "decoracao-costela-de-adao",
+   "x": 522,
+   "base": 770
+  },
+  {
+   "id": "decoracao-palmeira",
+   "x": 1272,
+   "base": 790
+  },
+  {
+   "id": "eletronico-telao",
+   "fit": [
+    1421,
+    585,
+    145,
+    50
+   ],
+   "parede": true
+  },
+  {
+   "id": "eletronico-telao",
+   "fit": [
+    1583,
+    585,
+    148,
+    50
+   ],
+   "parede": true
+  },
+  {
+   "id": "eletronico-telao",
+   "fit": [
+    1421,
+    643,
+    145,
+    47
+   ],
+   "parede": true
+  },
+  {
+   "id": "eletronico-telao",
+   "fit": [
+    1583,
+    643,
+    148,
+    47
+   ],
+   "parede": true
+  },
+  {
+   "id": "estacao-mesa-3-monitores",
+   "x": 1495,
+   "base": 772
+  },
+  {
+   "id": "estacao-mesa-3-monitores",
+   "x": 1665,
+   "base": 772
+  },
+  {
+   "id": "cadeira-costas",
+   "x": 1495,
+   "base": 798
+  },
+  {
+   "id": "cadeira-costas",
+   "x": 1665,
+   "base": 798
+  },
+  {
+   "id": "decoracao-costela-de-adao",
+   "x": 1366,
+   "base": 760
+  },
+  {
+   "id": "decoracao-palmeira",
+   "x": 1812,
+   "base": 812
+  },
+  {
+   "id": "item-prateleira-parede",
+   "x": 220,
+   "base": 140,
+   "parede": true
+  },
+  {
+   "id": "item-arandela",
+   "x": 150,
+   "base": 132,
+   "parede": true
+  },
+  {
+   "id": "decoracao-planta-pendente",
+   "x": 560,
+   "base": 168,
+   "parede": true
+  },
+  {
+   "id": "decoracao-quadro",
+   "x": 760,
+   "base": 150,
+   "parede": true
+  },
+  {
+   "id": "decoracao-relogio",
+   "x": 947,
+   "base": 128,
+   "parede": true
+  },
+  {
+   "id": "item-arandela",
+   "x": 900,
+   "base": 132,
+   "parede": true
+  },
+  {
+   "id": "item-arandela",
+   "x": 1000,
+   "base": 132,
+   "parede": true
+  },
+  {
+   "id": "decoracao-quadro",
+   "x": 1385,
+   "base": 150,
+   "parede": true
+  },
+  {
+   "id": "item-arandela",
+   "x": 1460,
+   "base": 132,
+   "parede": true
+  },
+  {
+   "id": "decoracao-quadro",
+   "x": 232,
+   "base": 372,
+   "parede": true
+  },
+  {
+   "id": "item-mapa-mundi",
+   "x": 430,
+   "base": 372,
+   "parede": true
+  },
+  {
+   "id": "item-arandela",
+   "x": 340,
+   "base": 350,
+   "parede": true
+  },
+  {
+   "id": "item-prateleira-parede",
+   "x": 1150,
+   "base": 370,
+   "parede": true
+  },
+  {
+   "id": "decoracao-planta-pendente",
+   "x": 1000,
+   "base": 395,
+   "parede": true
+  },
+  {
+   "id": "item-arandela",
+   "x": 1420,
+   "base": 352,
+   "parede": true
+  },
+  {
+   "id": "item-arandela",
+   "x": 1705,
+   "base": 352,
+   "parede": true
+  },
+  {
+   "id": "decoracao-relogio",
+   "x": 1765,
+   "base": 368,
+   "parede": true
+  },
+  {
+   "id": "item-arandela",
+   "x": 245,
+   "base": 605,
+   "parede": true
+  },
+  {
+   "id": "item-arandela",
+   "x": 680,
+   "base": 610,
+   "parede": true
+  },
+  {
+   "id": "item-arandela",
+   "x": 1135,
+   "base": 610,
+   "parede": true
+  },
+  {
+   "id": "item-arandela",
+   "x": 1392,
+   "base": 610,
+   "parede": true
+  },
+  {
+   "id": "item-arandela",
+   "x": 1762,
+   "base": 610,
+   "parede": true
+  },
+  {
+   "id": "item-mapa-mundi",
+   "x": 1225,
+   "base": 660,
+   "parede": true
+  },
+  {
+   "id": "copa-maquina-snacks",
+   "x": 978,
+   "base": 452
+  },
+  {
+   "id": "estacao-lixeira",
+   "x": 305,
+   "base": 528
+  },
+  {
+   "id": "item-extintor",
+   "x": 440,
+   "base": 770
+  },
+  {
+   "id": "item-vaso-galhos",
+   "x": 1312,
+   "base": 520
+  },
+  {
+   "id": "decoracao-globo",
+   "x": 1530,
+   "base": 200,
+   "z": 237
+  }
+ ],
+ "cidade": {
+  "inicio": 0.42
+ }
+}
