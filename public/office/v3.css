@@ -68,8 +68,6 @@ body.v3 .room-hotspot{color:#fff;font-size:clamp(6px,.72cqw,14px)!important;padd
 body.v3 .control-zone:not(.scene-screen){width:1px;height:1px;padding:0;overflow:hidden;clip-path:inset(50%);border:0;background:none;font-size:clamp(6px,.72cqw,14px)}
 body.v3 .control-zone:not(.scene-screen):focus-visible{width:auto;height:auto;clip-path:none;overflow:visible;padding:.25cqw .9cqw;background:#0b1730f0;border:1px solid #9fb6d8;color:#fff}
 /* O Data Center vira uma área clicável invisível sobre os servidores e o monitor (como os telões). */
-body.v3 #sceneDataCenter{left:4.2%;top:69.5%;width:18.5%;height:17%;transform:none;clip-path:none;overflow:visible;font-size:0;color:transparent}
-body.v3 #sceneDataCenter:hover,body.v3 #sceneDataCenter:focus-visible{outline:2px solid #35c9ff;outline-offset:-2px;background:#35c9ff14;font-size:0}
 
 /* Name plates above every character, bubbles above the plate. */
 body.v3 .agent b{opacity:0!important;top:auto!important;bottom:calc(100% + .25cqw)!important;font-size:clamp(6px,.62cqw,12px)!important;background:#0b1730f2!important;border:1px solid #6f8db8!important;border-radius:2px!important;padding:.05cqw .45cqw!important;color:#fff!important;font-weight:800}
@@ -205,9 +203,6 @@ body.v3[data-view="fit"] .workspace>.bottom-panels{grid-column:1!important;grid-
 body.v3 .triple strong{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 body.v3 .list-screen ol{grid-template-rows:repeat(6,minmax(0,1fr));overflow:hidden}
 body.v3 .list-screen li{font-size:.6cqw}
-/* Daytime art (generated from the night scene by tools/dayart.ps1); the tint layer only adds warmth. */
-#office[data-lighting="day"]{background-image:url('/office/office-day.png')!important}
-#office[data-lighting="day"] .station-chair{background-image:url('/office/office-day.png')}
 /* Dia: luz quente suave entrando pelas janelas e sumindo até o meio da sala (antes era um véu creme na tela toda). */
 #lighting[data-phase="day"]{--ambient:linear-gradient(to bottom,#ffe6b0 0,#ffe6b099 18%,#ffe6b000 55%)}
 #lighting[data-phase="day"]:before{opacity:0}#lighting[data-phase="day"]:after{opacity:.14}
@@ -253,15 +248,22 @@ body.v3 .agent[data-activity="waiting"] .state-badge{background:#2b0f16f0;border
 #agentList .agent-card .agent-doing{color:#cfe0f0;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 /* Monitores das mesas com dados reais: acima da arte e da luz ambiente, abaixo dos personagens e das cadeiras. */
 #deskScreens{position:absolute;inset:0;width:100%;height:100%;z-index:2;pointer-events:none}
-/* Cenário modular (beta, escolhido em Config): arte montada com as peças geradas, vidro transparente e a cidade
+/* Cenário oficial: arte montada com as peças geradas, vidro transparente e a cidade
    numa faixa atrás das janelas (y 10–92 da cena), trocando de dia, entardecer e noite pela luz do escritório.
    Posição vertical da faixa: 10/849 da cena, convertido para a regra de % do background-position (1,304%). */
-body[data-cenario="modular"] #office{background-image:url('/office/cenario-modular.png'),url('/office/cidade-faixa-noite.png')!important;background-size:100% 100%,100% 9.658%!important;background-position:0 0,0 1.304%!important;background-repeat:no-repeat!important;background-color:#0b1220!important}
-body[data-cenario="modular"] #office[data-lighting="day"]{background-image:url('/office/cenario-modular.png'),url('/office/cidade-faixa-dia.png')!important}
-body[data-cenario="modular"] #office[data-lighting="dusk"]{background-image:url('/office/cenario-modular.png'),url('/office/cidade-faixa-entardecer.png')!important}
-body[data-cenario="modular"] .station-chair,body[data-cenario="modular"] #office[data-lighting] .station-chair{background-image:url('/office/assets/cadeira-costas.png')!important;background-size:100% 100%!important;background-position:0 0!important;clip-path:none!important}
-/* Entardecer no cenário modular: a cidade já vem alaranjada (faixa de entardecer), então a camada não repinta as
+#office{background-image:url('/office/cenario-modular.png'),url('/office/cidade-faixa-noite.png')!important;background-size:100% 100%,100% 9.658%!important;background-position:0 0,0 1.304%!important;background-repeat:no-repeat!important;background-color:#0b1220!important}
+#office[data-lighting="day"]{background-image:url('/office/cenario-modular.png'),url('/office/cidade-faixa-dia.png')!important}
+#office[data-lighting="dusk"]{background-image:url('/office/cenario-modular.png'),url('/office/cidade-faixa-entardecer.png')!important}
+/* Entardecer: a cidade já vem alaranjada (faixa de entardecer), então a camada não repinta as
    janelas; só uma luz quente suave entra por elas e some até o meio da sala, sem acinzentar o escritório. */
-body[data-cenario="modular"] #lighting[data-phase="dusk"]:before{opacity:0}
-body[data-cenario="modular"] #lighting[data-phase="dusk"]{--ambient:linear-gradient(to bottom,#ff9a5a 0,#ff9a5a88 22%,#ff7a4a00 60%)}
-body[data-cenario="modular"] #lighting[data-phase="dusk"]:after{opacity:.22}
+#lighting[data-phase="dusk"]:before{opacity:0}
+#lighting[data-phase="dusk"]{--ambient:linear-gradient(to bottom,#ff9a5a 0,#ff9a5a88 22%,#ff7a4a00 60%)}
+#lighting[data-phase="dusk"]:after{opacity:.22}
+/* Áreas clicáveis no formato exato das telas (monitores das mesas e telões): a caixa do botão envolve a tela e só o
+   polígono da tela recebe o clique e mostra o destaque, contornando a borda, inclusive nas telas inclinadas. */
+#office .quad-hit,#office .quad-hit:hover,#office .quad-hit:focus-visible{position:absolute;transform:none!important;pointer-events:none!important;background:transparent!important;border:0!important;outline:none!important;box-shadow:none!important;min-width:0!important;min-height:0!important;padding:0!important;clip-path:none!important;overflow:visible!important;font-size:0}
+#office .quad-hit .quad-shape{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+#office .quad-hit .quad-shape polygon{pointer-events:all;fill:transparent;stroke:transparent;stroke-width:2;vector-effect:non-scaling-stroke;cursor:pointer;transition:fill .15s,stroke .15s}
+#office .quad-hit:hover .quad-shape polygon,#office .quad-hit:focus-visible .quad-shape polygon{fill:#35c9ff1f;stroke:#59e1ff}
+#office .quad-hit:hover .quad-shape,#office .quad-hit:focus-visible .quad-shape{filter:drop-shadow(0 0 4px #35c9ff)}
+#office .quad-hit:after{font-size:clamp(9px,.7cqw,13px)}

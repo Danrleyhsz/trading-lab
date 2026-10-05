@@ -123,18 +123,20 @@ function renderStations(){
    const monitor=node('button',''),name=node('b',''),state=node('small',''),chair=node('span','');
    monitor.className='station-monitor';monitor.dataset.station=station.id;monitor.append(name,state);
    const {width,height}=OfficeNavigation.scene;
-   monitor.setAttribute('style','left:'+station.mx/width*100+'%;top:'+(station.my-16)/height*100+'%');
+   // Área clicável no formato exato da tela central da mesa (cai no quadrado antigo se o módulo não carregar).
+   const deskQuads=globalThis.OfficeSceneQuads?.desk()[station.id];
+   if(!globalThis.OfficeSceneQuads?.place(monitor,deskQuads?.center))monitor.setAttribute('style','left:'+station.mx/width*100+'%;top:'+(station.my-16)/height*100+'%');
    monitor.onclick=()=>{profile(station.id);q('#profile').dataset.terminal='true';};
    for(const [screen,offset] of [['left',-47],['right',47]]){
     const side=node('button','');side.className='station-monitor station-side';side.dataset.stationScreen=station.id+':'+screen;
-    side.setAttribute('style','left:'+(station.mx+offset)/width*100+'%;top:'+(station.my-16)/height*100+'%');
+    if(!globalThis.OfficeSceneQuads?.place(side,deskQuads?.[screen]))side.setAttribute('style','left:'+(station.mx+offset)/width*100+'%;top:'+(station.my-16)/height*100+'%');
     const action=screen==='right'?{panel:'historyPanel',title:'Registro geral de evidências',nav:'navHistory'}:station.room==='Trading Floor'?{panel:'marketPanel',title:'Terminal de mercado',nav:'navMarket'}:{panel:'researchPanel',title:'Bancada de pesquisa e risco',nav:'navResearch'};
     side.setAttribute('aria-label',station.id+' · '+action.title);side.setAttribute('title',action.title);side.onclick=()=>{openPanel(action.panel,action.title,action.nav);q('#workspaceDialog').dataset.terminal='true';};q('#office').append(side);
    }
-   chair.className='station-chair'+(station.room==='Research Lab'?' research-chair':'');chair.setAttribute('aria-hidden','true');
-   // Cenário modular: a cadeira é a peça própria apoiada no ponto do agente; na arte atual, um recorte do fundo.
-   if(globalThis.OfficeCenario?.modular){const r=OfficeCenario.chairRect(station);chair.setAttribute('style','left:'+r.x/width*100+'%;top:'+r.y/height*100+'%;width:'+r.w/width*100+'%;height:'+r.h/height*100+'%');}
-   else chair.setAttribute('style','left:'+station.cx/width*100+'%;top:'+station.cy/height*100+'%;width:'+station.cw/width*100+'%;height:'+station.ch/height*100+'%;background-position:-'+station.cx/width*100+'cqw -'+station.cy/width*100+'cqw');
+   chair.className='station-chair';chair.setAttribute('aria-hidden','true');
+   // A cadeira é a peça própria (cadeira-costas) apoiada no ponto do agente.
+   const cr=globalThis.OfficeSceneQuads?.chairRect(station)??{x:station.x-24,y:station.y-56,w:48,h:64};
+   chair.setAttribute('style','left:'+cr.x/width*100+'%;top:'+cr.y/height*100+'%;width:'+cr.w/width*100+'%;height:'+cr.h/height*100+'%');
    q('#office').append(monitor,chair);view={monitor,name,state,chair};stationViews.set(station.id,view);
   }
   const agent=agents.get(station.id),occupant=OfficeWorkstations.seat(agent),p=stationProjection(agent);
@@ -524,7 +526,7 @@ refreshCommunications();setInterval(refreshCommunications,5000);
 
 const furnitureActions={
  library:{panel:'researchPanel',title:'Biblioteca · pesquisas registradas',nav:'navResearch'},
- terminal:{panel:'marketPanel',title:'Terminal · mercado observado',nav:'navMarket'},
+ terminal:{panel:'marketPanel',title:'Relógio · mercado observado',nav:'navMarket'},
  'risk-board':{panel:'researchPanel',title:'Quadro · controles de risco',nav:'navResearch'},
  'quant-servers':{panel:'researchPanel',title:'Bancada · estudos históricos',nav:'navResearch'}
 };
@@ -536,11 +538,24 @@ function openFurniture(id){
 }
 for(const feature of OfficeNavigation.features){
  const room=[...document.querySelectorAll('.room[data-room]')].find(element=>element.dataset.room===feature.room);if(!room)continue;
- const button=node('button',''),icon=node('span',feature.icon),label=node('span',feature.label);button.className='furniture-hit';button.dataset.furniture=feature.id;button.setAttribute('aria-label',feature.label);button.setAttribute('style','left:'+feature.x+'%;top:'+feature.y+'%');icon.setAttribute('aria-hidden','true');label.className='furniture-label';button.append(icon,label);button.onclick=()=>openFurniture(feature.id);room.append(button);
+ // No cenário oficial o objeto vira uma área no formato da peça (estante, relógio, rack, cafeteira, mesa); o quadro de
+ // risco já é clicável como telão. Sem o módulo, fica o ponto antigo dentro da sala.
+ const Q=globalThis.OfficeSceneQuads,office=q('#office');if(Q&&office&&Q.SCREEN_FEATURES.includes(feature.id))continue;
+ const button=node('button',''),icon=node('span',feature.icon),label=node('span',feature.label);button.className='furniture-hit';button.dataset.furniture=feature.id;button.setAttribute('aria-label',feature.label);button.setAttribute('style','left:'+feature.x+'%;top:'+feature.y+'%');icon.setAttribute('aria-hidden','true');label.className='furniture-label';button.append(icon,label);button.onclick=()=>openFurniture(feature.id);
+ const shape=Q?.feature(feature.id);if(shape&&office&&Q.place(button,shape))office.append(button);else room.append(button);
 }
 q('#workspaceDialog').addEventListener('close',()=>{if(furnitureReturn){document.querySelector('button[data-furniture="'+furnitureReturn+'"]')?.focus?.({preventScroll:true});furnitureReturn=null;}});
 globalThis.addEventListener?.('resize',()=>{stopPresence();render();});
 
+// Telas da cena: cada área clicável tem o formato exato da tela (telões pelos retângulos de screens.js, monitores pelas
+// telas medidas das mesas). Mapeia cada área ao telão que ela abre.
+const SCREEN_HIT_SURFACE={'war-left':'war-equity',sceneWarRoom:'war-positions','war-right':'war-drawdown',sceneMarketAnalysis:'analysis-book','market-upper-right':'analysis-flow','market-lower-left':'analysis-liquidations','market-lower-right':'analysis-profile','meeting-wall':'meeting-briefing','risk-wall':'risk-board',sceneDataCenter:'data-center'};
+function placeScreenHit(button,id){
+ const Q=globalThis.OfficeSceneQuads;if(!Q)return false;
+ const empty=/^trading-empty-(left|center|right)$/.exec(id);if(empty)return Q.place(button,Q.desk()['trading-empty']?.[empty[1]]);
+ const surface=globalThis.OfficeScreens?.surfaces?.find(s=>s.id===SCREEN_HIT_SURFACE[id]);return !!surface&&Q.place(button,Q.rect([surface.x,surface.y,surface.w,surface.h]));
+}
+for(const id of ['sceneDataCenter','sceneWarRoom','sceneMarketAnalysis']){const b=q('#'+id);if(b&&placeScreenHit(b,id))b.classList?.add('scene-screen');}
 // Scene monitor surfaces open existing read panels; they never submit jobs or orders.
 for(const [id,action] of Object.entries({sceneDataCenter:{panel:'accessPanel',title:'Data Center · serviço e persistência',nav:'navAccess'},sceneWarRoom:{panel:'financePanel',title:'War Room · capital e portfólio',nav:'navFinance'},sceneMarketAnalysis:{panel:'marketPanel',title:'Observatório · mercado recebido',nav:'navMarket'}}))q('#'+id).onclick=()=>{openPanel(action.panel,action.title,action.nav);q('#workspaceDialog').dataset.terminal='true';};
 
@@ -555,6 +570,6 @@ for(const screen of [
  {id:'trading-empty-left',x:902,y:180,w:36,h:40,panel:'marketPanel',title:'Trading Floor · mercado spot',nav:'navMarket'},
  {id:'trading-empty-center',x:949,y:180,w:36,h:40,panel:'financePanel',title:'Trading Floor · portfólio',nav:'navFinance'},
  {id:'trading-empty-right',x:992,y:180,w:36,h:40,panel:'historyPanel',title:'Trading Floor · auditoria',nav:'navHistory'}
-]){const hit=node('button','');hit.className='control-zone scene-screen';hit.dataset.sceneScreen=screen.id;hit.setAttribute('aria-label',screen.title);hit.setAttribute('title',screen.title);hit.setAttribute('style','left:'+screen.x/1852*100+'%;top:'+screen.y/849*100+'%;width:'+screen.w/1852*100+'%;height:'+screen.h/849*100+'%;transform:translate(-50%,-50%)');hit.onclick=()=>{openPanel(screen.panel,screen.title,screen.nav);q('#workspaceDialog').dataset.terminal='true';};q('#office').append(hit);}
+]){const hit=node('button','');hit.className='control-zone scene-screen';hit.dataset.sceneScreen=screen.id;hit.setAttribute('aria-label',screen.title);hit.setAttribute('title',screen.title);if(!placeScreenHit(hit,screen.id))hit.setAttribute('style','left:'+screen.x/1852*100+'%;top:'+screen.y/849*100+'%;width:'+screen.w/1852*100+'%;height:'+screen.h/849*100+'%;transform:translate(-50%,-50%)');hit.onclick=()=>{openPanel(screen.panel,screen.title,screen.nav);q('#workspaceDialog').dataset.terminal='true';};q('#office').append(hit);}
 
 q('#workspaceDialog').addEventListener('close',()=>{if(q('#workspaceDialog').dataset.terminal==='true' && terminalOpener?.isConnected)terminalOpener.focus?.({preventScroll:true});terminalOpener=null;});

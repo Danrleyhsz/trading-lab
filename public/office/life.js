@@ -2,7 +2,7 @@
 // old make their sender walk to the recipient. Neither changes backend state, work, experience or P&L.
 (() => {
  const W=1852,H=849;
- // Walkable lanes in scene pixels (feet line), authored against office-reference-v2.png: the front aisle of
+ // Walkable lanes in scene pixels (feet line), authored against the original art (same geometry as cenario-modular.png): the front aisle of
  // each row and the vertical passages between rows.
  const lanes=Object.freeze({r1:{y:300,from:80,to:1720},r2:{y:544,from:90,to:1760},r3:{y:812,from:120,to:1760}});
  const passages=Object.freeze([{x:632,a:'r1',b:'r2'},{x:1267,a:'r1',b:'r2'},{x:475,a:'r2',b:'r3'},{x:1320,a:'r2',b:'r3'}]);

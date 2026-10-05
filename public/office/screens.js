@@ -2,7 +2,7 @@
 // recorded messages); a screen without a fresh source says so instead of drawing a placeholder.
 (() => {
  const W=1852,H=849;
- // Inner screen rectangles measured on office-reference-v2.png (scene pixels).
+ // Inner screen rectangles measured on the original art; cenario-modular.png keeps the same telões (scene pixels).
  const surfaces=Object.freeze([
   {id:'war-equity',x:705,y:595,w:124,h:68,title:'EQUITY · NOVA (PILOTO)'},
   {id:'war-positions',x:841,y:595,w:141,h:68,title:'POSIÇÕES ABERTAS'},

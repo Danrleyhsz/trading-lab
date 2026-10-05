@@ -316,7 +316,8 @@ input{
   width:100%;
   min-width:740px;
   aspect-ratio:1852/849;
-  background:url('/office/office-reference-v2.png') center/100% 100% no-repeat;
+  /* Cenário oficial montado com as peças (vidro transparente) e, atrás das janelas, a faixa da cidade (y 10–92). */
+  background:url('/office/cenario-modular.png') 0 0/100% 100% no-repeat,url('/office/cidade-faixa-noite.png') 0 1.304%/100% 9.658% no-repeat #0b1220;
   isolation:isolate
 }
 .room{
@@ -932,7 +933,7 @@ select{font:inherit;color:var(--text);background:#101c33;border:1px solid var(--
 .agent[data-seated="true"] small{display:none}
 .agent[data-seated="true"] .foot-shadow{display:none}
 .agent[data-seated="true"] .sprite{translate:0 -1.35cqw}
-.station-chair{position:absolute;z-index:4;pointer-events:none;background-image:url('/office/office-reference-v2.png');background-size:100cqw 45.842333cqw;clip-path:polygon(7% 0,93% 0,100% 90%,84% 100%,16% 100%,0 90%);image-rendering:pixelated}
+.station-chair{position:absolute;z-index:4;pointer-events:none;background:url('/office/assets/cadeira-costas.png') 0 0/100% 100% no-repeat}
 .station-monitor{position:absolute;z-index:5;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;justify-content:center;width:2cqw;height:1.45cqw;min-height:0;padding:1px;background:#06182a;border:1px solid #295170;border-radius:0;color:#a8c7dc;gap:1px;font-size:clamp(4px,.4cqw,8px);line-height:1.1}
 .station-monitor b,.station-monitor small{font-size:inherit;white-space:nowrap}.station-monitor[data-active="true"]{color:#53f5b7;border-color:#18dba0}.station-monitor:hover,.station-monitor:focus-visible{outline:2px solid #35c9ff;background:#11273d}.station-monitor:before{content:'';position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:max(100%,44px);height:max(100%,44px)}
 .terminal-detail{border:1px solid #295170;background:#06182a;padding:12px;margin:12px 0}.terminal-detail p{margin:8px 0}.terminal-detail small{color:var(--muted)}
@@ -1082,7 +1083,7 @@ dialog::backdrop{background:#02081291;backdrop-filter:blur(2px)}
 .station-monitor:after,.control-zone:after{content:attr(aria-label);display:none;position:absolute;left:50%;bottom:calc(100% + 8px);transform:translateX(-50%);width:max-content;max-width:240px;background:#071727ed;border:1px solid #35c9ff77;border-radius:4px;padding:7px 10px;color:#d7f6ff;font-size:11px;line-height:1.4;pointer-events:none}
 .station-monitor:hover:after,.station-monitor:focus-visible:after,.control-zone:hover:after,.control-zone:focus-visible:after{display:block}
 #sceneDataCenter{left:13.2%;top:83.3%;width:3.2%;height:4.2%;transform:translate(-50%,-50%)}#sceneWarRoom{left:49.3%;top:74.2%;width:7.2%;height:8%;transform:translate(-50%,-50%)}#sceneMarketAnalysis{left:80.7%;top:72%;width:7.5%;height:5.5%;transform:translate(-50%,-50%)}
-.furniture-hit[data-furniture="coffee"]{left:76.8%!important;top:23.5%!important;width:5.5%;height:14%;transform:translate(-50%,-50%);border-radius:3px}
+.furniture-hit[data-furniture="coffee"]:not(.quad-hit){left:76.8%!important;top:23.5%!important;width:5.5%;height:14%;transform:translate(-50%,-50%);border-radius:3px}
 .furniture-hit[data-furniture="coffee"]>span:first-child{display:none}
 .room h2,body[data-view="fit"] .room h2{top:1%;background:transparent;border:0;box-shadow:none;max-width:95%;font-size:clamp(6px,.65cqw,11px);text-shadow:0 0 6px #35c9ff99}
 .room-hotspot,body[data-view="fit"] .room-hotspot{min-height:0;padding:2px 6px;color:#9adff0;background:#06121bbb;letter-spacing:.08em;border:1px solid #37667855;border-radius:3px}
