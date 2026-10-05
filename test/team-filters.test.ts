@@ -34,3 +34,19 @@ test('only declared filter keys are accepted, and every team set is a single bre
  assert.throws(()=>backtestPerpetual(data,{...base,filters:{leverage:true} as never}),/team filters/);
  assert.ok(Number.isFinite(backtestPerpetual(data,{...base,filters:{regime:true,volatility:true,momentum:true}}).netPnl));
 });
+
+test('proteções: pausa após encerrar e após perdas seguidas; só bloqueiam abrir, nunca fechar', async()=>{
+ const {protectionsAllowEntry,validProtections}=await import('../src/domain/perpetual-signals.js');
+ const H=3600000,p={cooldownHours:24,maxConsecutiveLosses:2,lossPauseHours:72};
+ assert.deepEqual(protectionsAllowEntry(p,[],0),{allowed:true,reason:null});
+ assert.equal(protectionsAllowEntry(p,[{closedAt:0,netPnl:5}],10*H).reason,'COOLDOWN');
+ assert.equal(protectionsAllowEntry(p,[{closedAt:0,netPnl:5}],25*H).allowed,true);
+ assert.equal(protectionsAllowEntry(p,[{closedAt:0,netPnl:-1},{closedAt:H,netPnl:-2}],40*H).reason,'LOSS_STREAK_PAUSE');
+ assert.equal(protectionsAllowEntry(p,[{closedAt:0,netPnl:-1},{closedAt:H,netPnl:-2}],80*H).allowed,true);
+ assert.equal(validProtections({cooldownHours:0}),false);assert.equal(validProtections({maxConsecutiveLosses:2}),false,'pausa por perdas exige as duas chaves');assert.equal(validProtections({leverage:3}),false);
+ // No backtest, a configuração protegida nunca opera mais vezes que a mesma sem proteção.
+ const closes=Array.from({length:1500},(_,i)=>100+Math.sin(i/9)*6+(i%37===0?8:0));
+ const data={instrument:'BINANCE_USDM:BTCUSDT' as const,trade:candles(closes),mark:candles(closes),funding:[]};
+ const plain=backtestPerpetual(data,{...base,slowPeriod:30}),guarded=backtestPerpetual(data,{...base,slowPeriod:30,protections:p});
+ assert.ok(guarded.trades<plain.trades,'proteção reduz entradas: '+guarded.trades+' vs '+plain.trades);
+});

@@ -15,7 +15,7 @@
  const svg=(w,h)=>{if(!D.createElementNS)return null;const s=D.createElementNS(svgNS,'svg');s.setAttribute('viewBox','0 0 '+w+' '+h);s.setAttribute('preserveAspectRatio','none');s.setAttribute('aria-hidden','true');return s;};
  const shape=(name,attrs)=>{const s=D.createElementNS(svgNS,name);for(const [k,v] of Object.entries(attrs))s.setAttribute(k,String(v));return s;};
  const store={get:(key,fallback)=>{try{return globalThis.localStorage?.getItem(key)??fallback;}catch{return fallback;}},set:(key,value)=>{try{globalThis.localStorage?.setItem(key,value);}catch{}}};
- const state={panorama:null,activity:[],seenEvents:new Set(),eventsReady:false,selected:'nova',tab:'status',profiles:new Map(),ledgers:new Map(),timeline:null,positionKey:null};
+ const state={scorecard:null,panorama:null,activity:[],seenEvents:new Set(),eventsReady:false,selected:'nova',tab:'status',profiles:new Map(),ledgers:new Map(),timeline:null,positionKey:null};
  const finance=()=>screens.state.finance,quote=()=>{const q=screens.state.quote;return q&&Date.now()-q.markTime<=15000?q:null;};
  const name=id=>agents.get(id)?.name||id;
  const accountOf=id=>finance()?.perpetualAccounts?.find(a=>a.ownerAgentId===id);
@@ -108,6 +108,7 @@
    const grid=el('div',undefined,'dock-grid');for(const [label,value,cls] of cells){const c=el('div');c.append(el('small',label),el('b',value,cls||''));grid.append(c);}body.append(grid);
    const auto=finance()?.autonomous;if(id==='nova'&&auto){const next=OfficeScreens.nextDecision(Date.now(),auto);body.append(el('p',auto.enabled?'Piloto ativo · próxima decisão em '+(next.due?span(next.due-Date.now()):'—')+' · limite de perda '+fmt((auto.maxLossFraction||0)*100,0)+'%':'Piloto: '+next.label,'dock-note'));}
    if(!a)body.append(el('p','Sem conta de avaliação atribuída.','dock-note'));
+   const card=state.scorecard?.scorecard?.find(s=>s.agentId===id);if(card)body.append(el('p','Placar das previsões (24 h): '+(card.settled?Math.round(card.hitRate*100)+'% de acerto em '+card.settled+' conferidas':'nenhuma conferida ainda')+' · '+card.pending+' aguardando · 50% equivale a cara ou coroa','dock-note'));
   } else if(state.tab==='trades'){
    const fills=(state.ledgers.get(id)||[]).filter(e=>e.type==='PAPER_FILL').slice(-8).reverse();
    if(!fills.length)body.append(el('p','Nenhuma operação registrada nesta conta.','dock-note'));
@@ -118,7 +119,9 @@
    const ids=state.profiles.get(id)?.evidence?.strategyIds||[];for(const s of ids.slice(-6))body.append(el('p','Estratégia estudada: '+s,'dock-note'));
    if(!ids.length&&!(id==='nova'&&auto?.studyId))body.append(el('p','Nenhuma estratégia registrada para este agente.','dock-note'));
   } else {
-   const mem=(state.profiles.get(id)?.memories||[]).slice(-6).reverse();if(!mem.length)body.append(el('p','Nenhuma memória registrada.','dock-note'));
+   // Memórias em destaque: recência + importância + relevância, calculadas no servidor (/agents/scorecard).
+   const highlighted=state.scorecard?.highlights?.[id];const mem=highlighted?.length?highlighted:(state.profiles.get(id)?.memories||[]).slice(-6).reverse();if(!mem.length)body.append(el('p','Nenhuma memória registrada.','dock-note'));
+   if(highlighted?.length)body.append(el('p','Em destaque: mais recentes, mais importantes (lições, erros) primeiro.','dock-note'));
    for(const m of mem){const r=el('div','','dock-row');r.append(el('b',OfficeI18n.kind(m.kind)),el('span',OfficeI18n.text(m.summary)),el('small',new Date(m.createdAt).toLocaleString('pt-BR')));body.append(r);}
   }
  }
@@ -233,7 +236,12 @@
    host.replaceChildren(head,grid,el('p','Próximo passo pré-declarado: '+r.nextStep,'dock-note'));}
   catch{$('#reportStatus').textContent='Avaliação indisponível. Confira o acesso.';host.replaceChildren();}
  }
- async function loadTimeline(){loadReport();
+ async function loadScorecard(){try{const s=await get('/agents/scorecard');if(s?.policy?.version)state.scorecard=s;}catch{}renderScorecard();}
+ function renderScorecard(){
+  const host=$('#teamScorecard');if(!host)return;const s=state.scorecard;if(!s){host.replaceChildren(el('p','Placar indisponível.','dock-note'));return;}
+  host.replaceChildren(table(['Pesquisador','Conferidas','Acertos','Taxa','Aguardando'],s.scorecard.map(c=>({cells:[name(c.agentId),String(c.settled),String(c.hits),c.hitRate===null?'—':Math.round(c.hitRate*100)+'%',String(c.pending)]}))),el('p',s.policy.version+' · cada observação do briefing vira uma previsão para 24 h e é conferida com candles fechados. Em direção, 50% equivale a cara ou coroa. É só medição: não muda decisões.','dock-note'));
+ }
+ async function loadTimeline(){loadReport();loadScorecard();
   const host=$('#pilotTimeline');$('#timelineStatus').textContent='Consultando a linha do tempo…';
   try{const t=await get('/paper/perpetual/pilot/timeline?days=7');if(t?.scope!=='RECORDED_PILOT_HISTORY')throw Error('invalid');state.timeline=t;drawTimeline(host,t);}
   catch{$('#timelineStatus').textContent='Linha do tempo indisponível. Confira o acesso.';host.replaceChildren();}
@@ -267,7 +275,7 @@
  globalThis.OfficeDashboard={selectAgent,paint,eventLine,isActive,toast,notifyEvent,state};
  notifySettings();lighting();
  if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('/office/sw.js',{scope:'/office/'}).catch(()=>{});
- setInterval(header,1000);setInterval(paint,3000);setInterval(loadPanorama,5000);setInterval(loadActivity,20000);
+ setInterval(header,1000);setInterval(paint,3000);setInterval(loadPanorama,5000);setInterval(loadActivity,20000);setInterval(loadScorecard,60000);loadScorecard();
  setTimeout(paint,800);
  loadPanorama();loadActivity();
 })();

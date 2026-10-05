@@ -44,3 +44,17 @@ An accepted rule may be considered for a **new** pilot after the current one end
 - Oracle's and Vega's filters avoided losing entries in this sample, but 3–8 trades over seven months is not evidence.
 - Satoshi's rule is redundant with a breakout.
 - No hypothesis is eligible. Nothing changes in the running pilot.
+
+## Correção de 05/10/2026 (replay refeito)
+
+O walk-forward perdia as primeiras 240 h de cada janela de teste nos conjuntos com o filtro de regime de 720 h (ver docs/ROBUSTEZ_DE_ESTUDOS.md). Com a correção, o replay offline sobre o mesmo dataset dá:
+
+| Conjunto | P&L fora da amostra | Operações | Janelas negativas |
+|---|---|---|---|
+| Controle | +83,60 | 8 | 4 |
+| Oracle (regime) | +83,60 (igual ao controle: o regime de 30 dias não vetou nada) | 8 | 4 |
+| Vega (volatilidade) | +151,95 | 7 | 3 |
+| Satoshi (momentum) | +83,60 | 8 | 4 |
+| Combinado | +151,95 | 7 | 3 |
+
+A vantagem do Oracle no relatório anterior (+172,23) era um artefato do bug. Só a Vega continua acima do controle, ainda com poucas operações e nenhuma hipótese elegível. Isso bate com o placar de previsões (docs/MEMORIA_DA_EQUIPE.md): a volatilidade tem memória, a direção não.

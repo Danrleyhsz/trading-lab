@@ -1,4 +1,4 @@
-import {perpetualDirection,teamFilterWarmup} from '../domain/perpetual-signals.js';
+import {perpetualDirection,teamFilterWarmup,protectionsAllowEntry} from '../domain/perpetual-signals.js';
 import {validatePerpetualDataset,type PerpetualDataset} from '../domain/perpetual-backtest.js';
 import type {PerpetualStudies,PerpetualStudy} from './perpetual-studies.js';
 import type {PerpetualPaperBook,PerpetualBookState} from './perpetual-paper-book.js';
@@ -57,7 +57,11 @@ export class AutonomousPerpetualCycle {
    this.memories.add({agentId:'nova',kind:'OBSERVATION',summary:'computed paper signal from closed USD-M candles',sourceEventId:decision.id,strategyId:study.id,metadata:{accountId:account.id,candleTimestamp:last.timestamp,signalDatasetHash:hash,direction}});
    try{this.onDecision?.({data,quote:this.book.market(),direction,currentQuantity:current,configuration,studyId:study.id,candleTimestamp:last.timestamp,decisionEventId:decision.id});}catch{/* Advisory briefing only; never blocks the decision. */}await this.persist();
    if(current&&Math.sign(current)!==direction)await this.book.propose(account.id,current>0?'SELL':'BUY',Math.abs(current),this.save,study.id);
-   const fresh=this.book.list().find(a=>a.id===account.id)!;if(!fresh.portfolio.positions.length&&direction&&fresh.portfolio.equity>0){const quote=this.book.market();if(!quote)throw Error('market unavailable');await this.book.propose(account.id,direction>0?'BUY':'SELL',fresh.portfolio.equity*0.1/(direction>0?quote.ask:quote.bid),this.save,study.id);}
+   const fresh=this.book.list().find(a=>a.id===account.id)!;
+   // Proteções do estudo (se houver): mesma regra do backtest; só impedem abrir, nunca fechar.
+   const closed=(this.book.performance(account.id)?.closedTrades??[]).map(t=>({closedAt:Date.parse(t.closedAt),netPnl:t.netPnl}));const guard=protectionsAllowEntry(configuration.protections,closed,this.now());
+   if(!fresh.portfolio.positions.length&&direction&&!guard.allowed)this.memories.add({agentId:'sentinel',kind:'DECISION',summary:'entrada bloqueada pela proteção '+guard.reason,sourceEventId:decision.id,strategyId:study.id,metadata:{accountId:account.id,candleTimestamp:last.timestamp,reason:guard.reason,direction}});
+   if(!fresh.portfolio.positions.length&&direction&&guard.allowed&&fresh.portfolio.equity>0){const quote=this.book.market();if(!quote)throw Error('market unavailable');await this.book.propose(account.id,direction>0?'BUY':'SELL',fresh.portfolio.equity*0.1/(direction>0?quote.ask:quote.bid),this.save,study.id);}
    this.succeeded();
   }catch(error){this.error=error instanceof Error?error.message:'autonomous evaluation unavailable';this.lastAttemptFailed=true;this.nextAttemptAt=this.now()+this.retryDelayMs;throw error;}finally{this.busy=false;}
  }

@@ -3,6 +3,7 @@ import {registerContinuousPaperPreflight} from './application/continuous-paper-p
 import {EventAudit,registerEventAudit} from './application/event-audit.js';
 import {registerPilotTimeline} from './application/pilot-timeline.js';
 import {registerPilotReport} from './application/pilot-report.js';
+import {StudyRobustnessRunner,registerStudyRobustness} from './application/study-robustness-runner.js';
 import {backendFingerprint,releaseApproval} from './application/release-fingerprint.js';
 import {BinanceMarketPanorama} from './infrastructure/binance-market-panorama.js';
 import {ResearchJobs,registerResearchJobs} from './application/research-jobs.js';
@@ -35,6 +36,8 @@ import {registerPaperAccountRoutes} from './application/paper-account-routes.js'
 import {PerpetualPaperBook,type PerpetualBookState} from './application/perpetual-paper-book.js';
 import {AutonomousPerpetualCycle} from './application/autonomous-perpetual-cycle.js';
 import {PilotTeamBriefing} from './application/pilot-team-briefing.js';
+import {TeamPredictions,scorecard,rankMemories,PREDICTION_POLICY} from './application/team-predictions.js';
+import {MarketTriggers,readingFrom,TRIGGER_POLICY} from './application/market-triggers.js';
 import {registerPerpetualPaperRoutes} from './application/perpetual-paper-routes.js';
 import {registerAccessControl} from './application/access-control.js';
 import {registerEncryptedBackup} from './application/encrypted-backup.js';
@@ -77,7 +80,7 @@ bus.subscribe(e=>{const payload=e.payload as any;if(!payload?.accountId?.endsWit
 });
 const autonomousEnabled=process.env.AUTONOMOUS_PERPETUAL_ENABLED==='true';if(autonomousEnabled&&(!perpetualEnabled||!process.env.AUTONOMOUS_STUDY_ID))throw Error('autonomous perpetual evaluation requires enabled accounts and explicit study ID');
 // The pilot runs only on the exact release the owner approved (Render exposes the deployed commit as RENDER_GIT_COMMIT).
-const pilotTeam=new PilotTeamBriefing(messages);
+const pilotTeam=new PilotTeamBriefing(messages,new TeamPredictions(memories));
 // A pinned backend fingerprint also approves releases that change only the office (public/) files.
 const pilotPhase=process.env.CLOUD_LAUNCH_PHASE==='CONTINUOUS_PAPER_PILOT',deployedCommit=process.env.RENDER_GIT_COMMIT??'';
 const release=releaseApproval(process.env,backendFingerprint().fingerprint);
@@ -93,6 +96,8 @@ const research=new ResearchEngine({snapshot:symbol=>derivatives.snapshot(symbol)
 const researchJobs=new ResearchJobs(research,bus,()=>persist(),domainEvents,()=>studies.status().busy||agents.get('euler')?.status==='BACKTESTING');
 researchJobs.recover();registerResearchJobs(app,researchJobs);
 registerResearchRoutes(app,research,()=>persist(),()=>researchJobs.status().busy||!researchJobs.status().accepting);registerPerpetualStudies(app,studies,()=>persist(),coordinator,bus,()=>researchJobs.status().busy);
+// Robustez (Deflated Sharpe, PBO): só leitura, calculada sob demanda numa thread separada.
+registerStudyRobustness(app,new StudyRobustnessRunner(studies));
 let latest:MarketTick|null=null;registerPaperAccountRoutes(app,accounts,{market:()=>latest,memories,strategies,coordinator,persist:()=>persist(),evaluationEnabled,bus,executionEnabled:process.env.LEGACY_PAPER_EXECUTION_ENABLED==='true'});
 registerPerpetualPaperRoutes(app,book,persist,perpetualEnabled,cycle,()=>readiness().paper.submission.ready);
 const aiAnalysis=new AiAnalysis(ledger=>persist(undefined,ledger),durableAi);
@@ -106,8 +111,14 @@ app.get('/health',async(_req,reply)=>reply.code(persistenceError||(store instanc
 app.get('/agents',async()=>agents.list());app.get('/agent-messages',async(req)=>messages.list((req.query as any).agentId));app.get('/strategies',async()=>strategies.list());
 // Client-supplied alleged work/results cannot change agent history or validate a strategy.
 for(const path of ['/agent-messages/hypothesis','/agent-messages/backtest','/agent-messages/risk','/agent-messages/execution','/strategies/:id/backtest/start','/strategies/:id/backtest/complete'])app.post(path,async(_req,reply)=>reply.code(410).send({error:'use server-owned research and historical studies'}));
+// Placar da equipe: taxa de acerto das previsões conferidas e memórias em destaque de cada agente.
+app.get('/agents/scorecard',async()=>{const all=memories.query();return {policy:PREDICTION_POLICY,scorecard:scorecard(all),highlights:Object.fromEntries(['atlas','satoshi','oracle','nova','flux','sentinel','euler','vega'].map(id=>[id,rankMemories(all.filter(m=>m.agentId===id),Date.now()).map(r=>({...r.memory,score:Number(r.score.toFixed(3))}))]))};});
 app.get('/memories',async(req)=>memories.query(req.query as any));app.get('/market/latest',async()=>latest??{status:'waiting'});app.get('/market/:symbol/snapshot',async(req)=>derivatives.snapshot((req.params as {symbol:string}).symbol));app.get('/market/v3',async()=>perpetualMarket.snapshot());
 const panorama=new BinanceMarketPanorama();app.get('/market/panorama',async()=>panorama.snapshot());
+// Gatilhos fora do normal (P5/P95): só mensagens e memórias para a equipe; nunca sinal, risco ou execução.
+const triggers=new MarketTriggers(()=>readingFrom(panorama.snapshot(),perpetualMarket.snapshot().quote?.fundingRate??null),messages,memories);
+const triggerTimer=setInterval(()=>{try{triggers.sample();}catch{/* amostra perdida não afeta nada */}},TRIGGER_POLICY.sampleMinutes*60000);
+app.get('/market/triggers',async()=>triggers.status());
 const legacyBacktestRequest=z.object({symbol:z.literal('BTCUSDT').default('BTCUSDT'),interval:z.literal('1h').default('1h'),limit:z.number().int().min(100).max(1000).default(500),initialCapital:z.number().finite().positive().default(10000),feeRate:z.number().finite().min(0).max(0.1).default(0.00055),slippageBps:z.number().finite().min(0).max(100).default(1),fastPeriod:z.number().int().min(1).max(100).default(10),slowPeriod:z.number().int().min(2).max(200).default(30)}).strict().refine(v=>v.slowPeriod>v.fastPeriod&&v.limit>v.slowPeriod);
 app.post('/backtests/sma',async(req,reply)=>{const parsed=legacyBacktestRequest.safeParse(req.body??{});if(!parsed.success)return reply.code(400).send({error:'invalid legacy backtest request'});const cfg=parsed.data;return backtester.run(await history.candles(cfg.symbol,cfg.interval,cfg.limit),cfg);});
 app.post('/strategies',async(_req,reply)=>reply.code(410).send({error:'use server-owned research hypotheses'}));
@@ -122,7 +133,7 @@ await persist();const legacyMarket=new BinancePublicMarketData(process.env.MARKE
 void panorama.start().catch(()=>{});
 await perpetualMarket.start(async quote=>{if(runtime.isDraining())return;const settlements=quote.markTime>book.cursor()&&book.fundingDue(quote.markTime)?await perpetualMarket.funding(book.cursor()+1,quote.markTime):[];await book.synchronize(quote,settlements,persist);bus.publish(event('PERPETUAL_MARKET_UPDATED',quote));if(!runtime.isDraining())await cycle.onMarket().catch(error=>app.log.warn({error},'autonomous pilot attempt failed; retry deferred'));},error=>{app.log.warn({error},'USD-M reconciliation unavailable');bus.publish(event('MARKET_DATA_FAILED',{instrument:'BINANCE_USDM:BTCUSDT',error:error.message}));});
 app.addHook('preClose',async()=>{runtime.draining();researchJobs.stopAccepting();research.stopAccepting();studies.stopAccepting();});
-app.addHook('onClose',async()=>{await researchJobs.drain();await perpetualMarket.stop();await panorama.stop();await legacyMarket.disconnect();await studies.drain();await writes;if(store instanceof PostgresStateStore)await store.close();runtime.stopped();});
+app.addHook('onClose',async()=>{await researchJobs.drain();await perpetualMarket.stop();await panorama.stop();clearInterval(triggerTimer);await legacyMarket.disconnect();await studies.drain();await writes;if(store instanceof PostgresStateStore)await store.close();runtime.stopped();});
 let closing=false;
 for(const signal of ['SIGTERM','SIGINT'] as const)process.once(signal,()=>{if(closing)return;closing=true;runtime.draining();const deadline=setTimeout(()=>{app.log.error('shutdown grace expired; incomplete durable studies restore as interrupted');process.exit(1);},30000);void app.close().then(()=>{clearTimeout(deadline);process.exit(0);}).catch(error=>{clearTimeout(deadline);app.log.error({error},'shutdown failed');process.exit(1);});});
 await app.listen({port:Number(process.env.PORT||3000),host:'0.0.0.0'});runtime.serving();
