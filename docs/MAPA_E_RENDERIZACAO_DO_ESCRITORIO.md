@@ -30,7 +30,7 @@ O editor ganhou um terceiro modo, "mover cadeiras e destinos": arraste os pontos
 
 - A cadeira desenhada por cima do personagem é recortada da arte no novo lugar: assento, monitor e recorte andam juntos
   pelo mesmo deslocamento. Para ficar bonito, solte o ponto sobre uma cadeira que exista na arte.
-- Os ajustes ficam no navegador () e são lidos antes de montar o escritório, por isso
+- Os ajustes ficam no navegador (`trading-lab.office-layout.v1`) e são lidos antes de montar o escritório, por isso
   salvar recarrega a página.
 - Ajustes inválidos são ignorados: id desconhecido, número inválido, ponto fora da cena ou deslocamento acima de 400 px.
 - "Exportar JSON" agora leva piso, cadeiras e destinos juntos (versão 2), para virar o padrão de todos num PR.
@@ -57,7 +57,7 @@ Sem inventar trabalho: cada selo vem de um fato registrado.
 A revisão de risco é instantânea (proposta e decisão no mesmo instante), então um balão "aguardando" durante a revisão
 seria inventado. O selo ✋ aparece só quando existe uma espera real pelo dono:
 
-- "aguardando você (pausado)": novas exposições pausadas ();
+- "aguardando você (pausado)": novas exposições pausadas (`halted`);
 - "aguardando você (piloto encerrado)": o piloto parou por regra pré-declarada e espera a sua decisão;
 - "aguardando liberação": o release em produção não é o aprovado, e a autonomia fica bloqueada.
 
