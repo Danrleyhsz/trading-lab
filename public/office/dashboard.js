@@ -287,12 +287,21 @@
  // ---------- tick ----------
  // Estados visuais ligados a fatos reais: lendo (pesquisa/risco), digitando (teste/execução) e aguardando
  // (próximo candle do piloto, estudo ou pesquisa em andamento no servidor).
+ /** Esperas reais que dependem do dono, a partir do estado recebido do servidor. */
+ function waitingForOwner(f){
+  if(f?.risk?.halted===true)return 'aguardando você (pausado)';
+  if(f?.autonomous?.stopReason)return 'aguardando você (piloto encerrado)';
+  if(f?.autonomous&&!f.autonomous.enabled&&f.autonomous.blockedReason)return 'aguardando liberação';
+  return null;
+ }
  function activity(){
   const auto=finance()?.autonomous,jobs=screens.state.readiness?.jobs,badges={};
   if(auto?.enabled&&!auto.stopReason){const next=OfficeScreens.nextDecision(Date.now(),auto);if(next.due)badges.nova='⏳ candle das '+hhmm(next.due-60000);}
   if(jobs?.historical?.busy)badges.euler='⏳ estudo em andamento';if(jobs?.research?.busy)badges.atlas='⏳ pesquisa em andamento';
+  // "Aguardando aprovação" só quando existe uma espera real pelo dono (a revisão de risco em si é instantânea).
+  const waiting=waitingForOwner(finance());if(waiting)badges.sentinel='✋ '+waiting;
   for(const [id,view] of agentViews){
-   const status=agents.get(id)?.status;view.button.dataset.activity=status==='RESEARCHING'||status==='REVIEWING_RISK'?'reading':status==='BACKTESTING'||status==='TRADING'?'typing':'idle';
+   const status=agents.get(id)?.status;view.button.dataset.activity=id==='sentinel'&&waiting?'waiting':status==='RESEARCHING'||status==='REVIEWING_RISK'?'reading':status==='BACKTESTING'||status==='TRADING'?'typing':'idle';
    let badge=view.button.querySelector?.('.state-badge');if(badges[id]){if(!badge){badge=el('span','','state-badge');badge.setAttribute('aria-hidden','true');view.button.append(badge);}badge.textContent=badges[id];}else badge?.remove();
   }
  }

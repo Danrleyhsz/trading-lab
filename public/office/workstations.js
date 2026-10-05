@@ -9,7 +9,7 @@
   {id:'sentinel',room:'Risk Desk',x:1442,y:300,mx:1442,my:194,cx:1416,cy:238,cw:48,ch:40},
   {id:'euler',room:'Quant Lab',x:204,y:543,mx:204,my:434,cx:180,cy:477,cw:45,ch:37},
   {id:'vega',room:'Quant Lab',x:406,y:543,mx:406,my:434,cx:383,cy:477,cw:47,ch:38}
- ].map(s=>Object.freeze({...s,point:Object.freeze({x:s.x/OfficeNavigation.scene.width*100,y:s.y/OfficeNavigation.scene.height*100})}));Object.freeze(catalog);
+ ].map(s=>globalThis.OfficeLayout?.seat(s)??s).map(s=>Object.freeze({...s,point:Object.freeze({x:s.x/OfficeNavigation.scene.width*100,y:s.y/OfficeNavigation.scene.height*100})}));Object.freeze(catalog);
  const labels={IDLE:'Sem tarefa',RESEARCHING:'Pesquisando',BACKTESTING:'Backtest',TRADING:'Paper',REVIEWING_RISK:'Risco',MEETING:'Reunião'};
  function seat(agent){return catalog.find(s=>s.id===agent?.id&&s.room===agent.room)||null;}
  function project(agent,{observedAt=0,connected=false,now=Date.now(),events=[]}={}){

@@ -20,7 +20,7 @@
   {id:'analysis',lane:'r3',x:1580,facing:'up',text:'Na Análise de Mercado'},
   {id:'data-center',lane:'r3',x:160,facing:'up',text:'Visitando o Data Center'},
   {id:'stretch',lane:'r2',x:560,facing:'down',text:'🙆 Alongando'}
- ]);
+ ].map(p=>globalThis.OfficeLayout?.place(p)??p));
  const laneOf=y=>Object.entries(lanes).reduce((best,[id,lane])=>Math.abs(lane.y-y)<Math.abs(lanes[best].y-y)?id:best,'r1');
  const clamp=(id,x)=>Math.min(lanes[id].to,Math.max(lanes[id].from,x));
  const point=(id,x)=>({x:clamp(id,x),y:lanes[id].y});

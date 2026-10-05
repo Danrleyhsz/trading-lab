@@ -144,3 +144,18 @@ test('renderizador em canvas é opcional: padrão continua no DOM e os botões d
  assert.ok(rule.includes('visibility:hidden')&&!/\.agent[,{]/.test(rule.replace('.agent .sprite-frame','')),'só a pintura é escondida; o botão continua clicável');
  assert.match(css,/#sceneCanvas\{[^}]*pointer-events:none/);
 });
+
+test('cadeiras e destinos movidos no editor: cadeira, monitor e recorte andam juntos; dado inválido é ignorado',()=>{
+ const store=new Map<string,string>([['trading-lab.office-layout.v1',JSON.stringify({version:1,seats:{nova:{x:800,y:310},vega:{x:'x',y:1},intruso:{x:10,y:10},flux:{x:5000,y:300}},places:{coffee:{x:1000,y:480}}})]]);
+ const context=vm.createContext({document:{createElement:()=>new Element(),activeElement:null},setTimeout,clearTimeout,console,btoa,atob,localStorage:{getItem:(k:string)=>store.get(k)??null,setItem:(k:string,v:string)=>store.set(k,v),removeItem:(k:string)=>store.delete(k)}});
+ for(const name of ['navigation','office-layout','workstations','life','office-map'])vm.runInContext(readFileSync('public/office/'+name+'.js','utf8'),context);
+ const {OfficeWorkstations,OfficeLife,OfficeMap}=context as any;
+ const nova=OfficeWorkstations.catalog.find((s:any)=>s.id==='nova');
+ assert.equal(nova.x,800);assert.equal(nova.y,310);assert.equal(nova.cx,738+40);assert.equal(nova.cy,238+10);assert.equal(nova.mx,760+40);
+ assert.equal(OfficeWorkstations.catalog.find((s:any)=>s.id==='vega').x,406,'número inválido é ignorado');
+ assert.equal(OfficeWorkstations.catalog.find((s:any)=>s.id==='flux').x,1125,'fora da cena é ignorado');
+ assert.equal(OfficeWorkstations.catalog.length,8,'id desconhecido não cria cadeira');
+ const coffee=OfficeLife.places.find((p:any)=>p.id==='coffee');assert.equal(coffee.to.x,1000);assert.equal(coffee.to.y,480);
+ // O piso padrão é refeito com as posições novas: a cadeira movida continua alcançando todo destino.
+ const grid=OfficeMap.defaultGrid();for(const place of OfficeLife.places){const target=place.to??{x:place.x,y:OfficeLife.lanes[place.lane].y};assert.ok(OfficeMap.route({x:nova.x,y:nova.y},target,grid).length>=2,'nova → '+place.id);}
+});
