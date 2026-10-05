@@ -243,8 +243,19 @@
    const head=el('div','','report-verdict');head.dataset.verdict=r.verdict;head.append(el('small',r.verdict==='IN_PROGRESS'?'Veredito (em andamento)':'Veredito final'),el('b',verdictLabels[r.verdict]||r.verdict));
    if(r.verdict==='IN_PROGRESS')head.append(el('span','Se terminasse agora: '+(verdictLabels[r.provisionalVerdict]||r.provisionalVerdict)));
    const grid=el('div','','dock-grid report-grid');for(const [label,value,cls] of [['P&L do piloto',signedUsd(r.pnl),tone(r.pnl)],['Decisões',r.decisions.total+' ('+r.decisions.long+' long · '+r.decisions.short+' short · '+r.decisions.flat+' flat)'],['Operações fechadas',r.closedTrades+' de '+r.protocol.minimumClosedTrades+' mínimas'],['Fills · taxas · funding',r.fills+' · '+usd(r.fees,4)+' · '+usd(r.funding,4)],['BTC no período',pct(r.benchmarks.btcReturn),tone(r.benchmarks.btcReturn)],['Buy and hold (mesma exposição)',signedUsd(r.benchmarks.buyAndHoldSameExposure),tone(r.benchmarks.buyAndHoldSameExposure)]]){const c=el('div');c.append(el('small',label),el('b',value,cls||''));grid.append(c);}
-   host.replaceChildren(head,grid,el('p','Próximo passo pré-declarado: '+r.nextStep,'dock-note'),el('h4','Métricas do período do piloto'),metricsView(r.metrics));}
+   const parity=el('div','','parity-view');parity.append(el('p','Conferindo decisões contra o histórico…','dock-note'));
+   host.replaceChildren(head,grid,el('p','Próximo passo pré-declarado: '+r.nextStep,'dock-note'),el('h4','Métricas do período do piloto'),metricsView(r.metrics),el('h4','Paridade: piloto ao vivo × histórico'),parity);loadParity(parity);}
   catch{$('#reportStatus').textContent='Avaliação indisponível. Confira o acesso.';host.replaceChildren();}
+ }
+ // Paridade (PILOT_PARITY_V1): cada decisão refeita com os candles gravados e com o histórico baixado depois.
+ async function loadParity(host){
+  try{const p=await get('/paper/perpetual/pilot/parity');if(p?.scope!=='READ_ONLY_PILOT_PARITY'||!p.summary)throw Error('invalid');const s=p.summary;
+   const grid=el('div','','dock-grid report-grid');
+   for(const [label,value,cls] of [['Resultado',p.passed?'Aprovada':'Reprovada',p.passed?'up':'down'],['Mesma direção no histórico',(s.decisionsChecked-s.historyDifference-s.codeDifference)+' de '+s.decisionsChecked],['Candles revisados depois',s.dataDifference+' decisão(ões)'],['Execução do lado decidido',s.executionMatch+' de '+s.decisions+(s.executionExplained?' · '+s.executionExplained+' com motivo gravado':'')],['Atraso da decisão',p.decisionLatencySeconds?'mediana '+p.decisionLatencySeconds.median.toFixed(1)+' s após o fechamento':'—']]){const box=el('div');box.append(el('small',label),el('b',value,cls||''));grid.append(box);}
+   const notes=[];if(s.codeDifference)notes.push(s.codeDifference+' decisão(ões) não se reproduzem com a regra atual: código ou regra mudou.');
+   if(s.dataDifference)notes.push('O último candle usado pelo piloto mudou depois (a Binance ainda soma negócios nos primeiros segundos após o fechamento). '+(p.passed?'Até agora isso não mudou nenhuma direção.':'Confira as decisões com direção diferente.'));
+   host.replaceChildren(grid,...notes.map(n=>el('p',n,'dock-note')));}
+  catch{host.replaceChildren(el('p','Paridade indisponível agora (histórico público fora do ar ou acesso).','dock-note'));}
  }
  async function loadScorecard(){try{const s=await get('/agents/scorecard');if(s?.policy?.version)state.scorecard=s;}catch{}renderScorecard();}
  function renderScorecard(){
