@@ -216,7 +216,7 @@
  async function loadOperations(){
   const host=$('#operationsList');$('#operationsStatus').textContent='Consultando registros…';
   try{const [fills,funding]=await Promise.all([get('/audit/events?type=PAPER_FILL&limit=50&compact=1'),get('/audit/events?type=FUNDING_SETTLED&limit=25&compact=1')]);
-   const rows=[...fills.events,...funding.events].sort((a,b)=>Date.parse(b.occurredAt)-Date.parse(a.occurredAt));
+   const rows=[...fills.events,...funding.events].sort((a,b)=>Date.parse(b.occurredAt)-Date.parse(a.occurredAt));OfficePanelData.operations=rows;globalThis.OfficePanels?.render();
    $('#operationsStatus').textContent=rows.length?rows.length+' registros mais recentes · clique para abrir o original.':'Nenhuma operação registrada.';
    host.replaceChildren(table(['Quando','Conta','Evento','Detalhe'],rows.map(e=>{const l=eventLine(e)||{who:'',text:e.type};return {cells:[new Date(e.occurredAt).toLocaleString('pt-BR'),name(l.who)||'—',e.type==='PAPER_FILL'?'Fill':'Funding',l.text],open:()=>showEvent(e.id)};})));}
   catch{$('#operationsStatus').textContent='Registros indisponíveis. Confira o acesso.';}
@@ -224,7 +224,7 @@
  async function loadMemory(){
   const select=$('#memoryAgent');if(select.options.length<=1)for(const a of agents.values())select.append(Object.assign(el('option',a.name),{value:a.id}));
   $('#memoryStatus').textContent='Consultando memórias…';
-  try{const rows=await get('/memories'+(select.value?'?agentId='+encodeURIComponent(select.value):''));if(!Array.isArray(rows))throw Error('invalid');const recent=rows.slice(-60).reverse();
+  try{const rows=await get('/memories'+(select.value?'?agentId='+encodeURIComponent(select.value):''));if(!Array.isArray(rows))throw Error('invalid');const recent=rows.slice(-60).reverse();OfficePanelData.memories={agent:select.value,rows};if(!select.value)OfficePanelData.memoriesAll=rows;globalThis.OfficePanels?.render();
    $('#memoryStatus').textContent=rows.length+' memórias registradas'+(rows.length>60?' · mostrando as 60 mais recentes':'');
    $('#memoryList').replaceChildren(...recent.map(m=>{const li=el('li');const who=el('b',name(m.agentId));who.style.color=agentColors[m.agentId]||'';li.append(who,el('span',' · '+OfficeI18n.kind(m.kind)),el('p',OfficeI18n.text(m.summary)),el('small',new Date(m.createdAt).toLocaleString('pt-BR')));if(m.sourceEventId)li.append(sourceButton(m.sourceEventId));return li;}));}
   catch{$('#memoryStatus').textContent='Memórias indisponíveis. Confira o acesso.';}
@@ -236,6 +236,7 @@
  async function loadReport(){
   const host=$('#pilotReport');$('#reportStatus').textContent='Consultando avaliação…';
   try{const r=await get('/paper/perpetual/pilot/report');if(r?.scope!=='PILOT_EVALUATION')throw Error('invalid');
+   OfficePanelData.report=r;globalThis.OfficePanels?.render();
    if(r.status==='NO_DECISIONS'){$('#reportStatus').textContent='Nenhuma decisão do piloto registrada ainda.';host.replaceChildren();return;}
    $('#reportStatus').textContent=r.protocol.version+' · declarado em '+r.protocol.declaredAt+' · '+r.hours+' h desde '+new Date(r.startedAt).toLocaleString('pt-BR');
    const head=el('div','','report-verdict');head.dataset.verdict=r.verdict;head.append(el('small',r.verdict==='IN_PROGRESS'?'Veredito (em andamento)':'Veredito final'),el('b',verdictLabels[r.verdict]||r.verdict));

@@ -7,6 +7,8 @@ function node(tag, text) {
   element.textContent = text;
   return element;
 }
+// Dados já recebidos que os resumos visuais da barra lateral (panels.js) reaproveitam; só leitura.
+globalThis.OfficePanelData = globalThis.OfficePanelData || {};
 async function get(url) {
   const response = await fetch(url, {cache: 'no-store', signal: typeof AbortSignal!=='undefined' && AbortSignal.timeout ? AbortSignal.timeout(10000) : undefined});
   if (!response.ok) { const error=Error(url);error.status=response.status;throw error; }
