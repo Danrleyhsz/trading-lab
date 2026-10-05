@@ -184,7 +184,7 @@ a arte atual. Trocar recarrega a página.
 **O que muda**
 - **Fundo:** `public/office/cenario-modular.png`, montado com 108 peças posicionadas em
   `public/office/assets/cenario-modular.json`. O vidro das janelas é transparente.
-- **Cidade:** uma faixa atrás das janelas (`cidade-faixa-dia|entardecer|noite.png`) que troca com a luz do escritório
+- **Cidade:** uma faixa atrás das janelas (`cidade-faixa-dia|entardecer|noite.png`) que troca com a luz do escritório. No entardecer, a camada de luz não repinta as janelas (a cidade já vem alaranjada) e só uma luz quente suave entra por elas
   (dia, entardecer, noite).
 - **Cadeiras:** as dos 8 agentes passam a ser a peça `cadeira-costas`, apoiada no ponto de cada agente, e não um
   recorte do fundo. O encosto cobre as costas do personagem sentado e a cabeça fica por cima.

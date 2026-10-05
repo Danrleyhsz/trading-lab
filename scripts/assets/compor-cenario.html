@@ -46,8 +46,11 @@ const save=(name,cv)=>fetch('/save?name='+name,{method:'POST',body:cv.toDataURL(
  const bandH=winBottom-L.janelas.y,cs=W*1.15/city.noite.width;
  for(const [fase,c] of Object.entries(city)){const b=document.createElement('canvas');b.width=W;b.height=bandH;const k=b.getContext('2d');k.imageSmoothingQuality='high';k.drawImage(c,0,c.height*(L.cidade?.inicio??0.22),c.width,bandH/cs,-20,0,c.width*cs,bandH);await save('cidade-faixa-'+fase,b);}
  // 7) prévias: cidade atrás + cenário; e conferência com cadeiras, corredores, telas e telões
- for(const fase of ['noite','dia']){const pv=document.createElement('canvas');pv.width=W;pv.height=H;const p=pv.getContext('2d');p.fillStyle='#0b1220';p.fillRect(0,0,W,H);
-  const band=await load('/out/cidade-faixa-'+fase+'.png?'+Date.now());p.drawImage(band,0,L.janelas.y);p.drawImage(cv,0,0);await save('previa-'+fase,pv);
+ for(const fase of ['noite','dia','entardecer']){const pv=document.createElement('canvas');pv.width=W;pv.height=H;const p=pv.getContext('2d');p.fillStyle='#0b1220';p.fillRect(0,0,W,H);
+  const band=await load('/out/cidade-faixa-'+fase+'.png?'+Date.now());p.drawImage(band,0,L.janelas.y);p.drawImage(cv,0,0);
+  // Prévia do entardecer com a mesma luz suave do escritório (v3.css): quente nas janelas, sumindo até o meio.
+  if(fase==='entardecer'){p.save();p.globalCompositeOperation='soft-light';p.globalAlpha=.22;const gr=p.createLinearGradient(0,0,0,H);gr.addColorStop(0,'#ff9a5a');gr.addColorStop(.22,'#ff9a5a88');gr.addColorStop(.6,'#ff7a4a00');p.fillStyle=gr;p.fillRect(0,0,W,H);p.restore();}
+  await save('previa-'+fase,pv);
   if(fase==='noite'){p.lineWidth=2;
    for(const lane of Object.values(OfficeLife.lanes)){p.strokeStyle='rgba(53,201,255,.8)';p.beginPath();p.moveTo(lane.from,lane.y);p.lineTo(lane.to,lane.y);p.stroke();}
    for(const ps of OfficeLife.passages){p.strokeStyle='rgba(53,201,255,.8)';p.beginPath();p.moveTo(ps.x,OfficeLife.lanes[ps.a].y);p.lineTo(ps.x,OfficeLife.lanes[ps.b].y);p.stroke();}

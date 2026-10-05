@@ -260,3 +260,8 @@ body[data-cenario="modular"] #office{background-image:url('/office/cenario-modul
 body[data-cenario="modular"] #office[data-lighting="day"]{background-image:url('/office/cenario-modular.png'),url('/office/cidade-faixa-dia.png')!important}
 body[data-cenario="modular"] #office[data-lighting="dusk"]{background-image:url('/office/cenario-modular.png'),url('/office/cidade-faixa-entardecer.png')!important}
 body[data-cenario="modular"] .station-chair,body[data-cenario="modular"] #office[data-lighting] .station-chair{background-image:url('/office/assets/cadeira-costas.png')!important;background-size:100% 100%!important;background-position:0 0!important;clip-path:none!important}
+/* Entardecer no cenário modular: a cidade já vem alaranjada (faixa de entardecer), então a camada não repinta as
+   janelas; só uma luz quente suave entra por elas e some até o meio da sala, sem acinzentar o escritório. */
+body[data-cenario="modular"] #lighting[data-phase="dusk"]:before{opacity:0}
+body[data-cenario="modular"] #lighting[data-phase="dusk"]{--ambient:linear-gradient(to bottom,#ff9a5a 0,#ff9a5a88 22%,#ff7a4a00 60%)}
+body[data-cenario="modular"] #lighting[data-phase="dusk"]:after{opacity:.22}
