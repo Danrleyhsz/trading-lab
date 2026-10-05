@@ -79,6 +79,39 @@ export function probabilityOfBacktestOverfitting(matrix:number[][],blocks=10){
  }
  return {pbo:below/combos.length,combinations:combos.length,selectedOutOfSampleSharpes:oos,reason:null as string|null};
 }
+/**
+ * CPCV (validação cruzada combinatória com purga), de López de Prado. Sem código copiado; implementação própria.
+ * `matrix[t][c]` = retorno do candidato c na hora t. O tempo é dividido em `groups` grupos seguidos; cada divisão
+ * usa `testGroups` grupos como teste e o resto como treino. No treino escolhe-se o candidato de maior Sharpe; no
+ * teste mede-se só esse escolhido. Horas de treino vizinhas ao teste são removidas: `purge` antes de cada trecho
+ * de teste e `embargo` depois (posições e médias carregam informação de uma hora para a outra).
+ * Cada grupo aparece no teste em C(groups-1, testGroups-1) divisões; juntando, na ordem, um pedaço de cada grupo
+ * formam-se esse mesmo número de caminhos completos fora da amostra, sem nenhuma hora repetida dentro do caminho.
+ */
+export function combinatorialPurgedCv(matrix:number[][],options:{groups?:number;testGroups?:number;purge?:number;embargo?:number}={}){
+ const groups=options.groups??10,testGroups=options.testGroups??2,candidates=matrix[0]?.length??0,T=matrix.length;
+ const purge=options.purge??1,embargo=options.embargo??Math.max(24,Math.ceil(T*0.01));
+ const empty=(reason:string)=>({splits:0,paths:[] as {sharpe:number;totalReturn:number;hours:number}[],selections:{} as Record<number,number>,purge,embargo,groups,testGroups,reason});
+ if(candidates<1)return empty('CPCV exige pelo menos 1 candidato');
+ if(!(testGroups>=1&&testGroups<groups)||T<groups*48)return empty('horas insuficientes para os grupos do CPCV');
+ const size=Math.floor(T/groups),bounds=Array.from({length:groups},(_,g)=>[g*size,g===groups-1?T:(g+1)*size] as const);
+ const splits=combinations(groups,testGroups),selections:Record<number,number>={};
+ // pieces[g] = lista, na ordem das divisões, dos retornos do candidato escolhido no grupo g quando ele foi teste.
+ const pieces:number[][][]=Array.from({length:groups},()=>[]);
+ for(const test of splits){
+  const isTest=new Uint8Array(T);for(const g of test)for(let t=bounds[g][0];t<bounds[g][1];t++)isTest[t]=1;
+  const train=new Uint8Array(T);for(let t=0;t<T;t++)train[t]=isTest[t]?0:1;
+  for(const g of test){const [a,b]=bounds[g];for(let t=Math.max(0,a-purge);t<a;t++)train[t]=0;for(let t=b;t<Math.min(T,b+embargo);t++)train[t]=0;}
+  const trainSharpe=Array.from({length:candidates},(_,c)=>{const r:number[]=[];for(let t=0;t<T;t++)if(train[t])r.push(matrix[t][c]);return sharpeOf(r);});
+  const best=trainSharpe.reduce((b,v,i)=>Number.isFinite(v)&&(!Number.isFinite(trainSharpe[b])||v>trainSharpe[b])?i:b,0);
+  selections[best]=(selections[best]??0)+1;
+  for(const g of test)pieces[g].push(matrix.slice(bounds[g][0],bounds[g][1]).map(row=>row[best]));
+ }
+ const pathCount=pieces[0].length;
+ const paths=Array.from({length:pathCount},(_,j)=>{const r=pieces.flatMap(p=>p[j]);return {sharpe:sharpeOf(r),totalReturn:r.reduce((e,x)=>e*(1+x),1)-1,hours:r.length};});
+ return {splits:splits.length,paths,selections,purge,embargo,groups,testGroups,reason:null as string|null};
+}
+
 /** Retornos horários a partir da série de equity da simulação (último ponto de cada hora). */
 export function hourlyReturns(series:{timestamp:number;equity:number}[]){
  const byHour=new Map<number,number>();for(const p of series)byHour.set(Math.floor(p.timestamp/3600000),p.equity);

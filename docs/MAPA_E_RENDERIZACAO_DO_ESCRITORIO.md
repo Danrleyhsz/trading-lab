@@ -24,6 +24,18 @@ para o servidor, nada altera mensagens, memórias, decisões ou o piloto.
 - "Restaurar padrão" volta aos corredores autorizados.
 - Com o editor aberto, os personagens ficam parados (`body[data-editing="on"]`).
 
+### Cadeiras e destinos (05/10/2026)
+
+O editor ganhou um terceiro modo, "mover cadeiras e destinos": arraste os pontos laranja (cadeiras) e azuis (destinos).
+
+- A cadeira desenhada por cima do personagem é recortada da arte no novo lugar: assento, monitor e recorte andam juntos
+  pelo mesmo deslocamento. Para ficar bonito, solte o ponto sobre uma cadeira que exista na arte.
+- Os ajustes ficam no navegador (`trading-lab.office-layout.v1`) e são lidos antes de montar o escritório, por isso
+  salvar recarrega a página.
+- Ajustes inválidos são ignorados: id desconhecido, número inválido, ponto fora da cena ou deslocamento acima de 400 px.
+- "Exportar JSON" agora leva piso, cadeiras e destinos juntos (versão 2), para virar o padrão de todos num PR.
+- "Restaurar padrão" também devolve cadeiras e destinos ao lugar original.
+
 Teste: `test/office-life.test.ts` confere que, no mapa padrão, toda cadeira alcança todo destino, só por células
 andáveis e sem diagonal, e que sem piso não existe caminho (ninguém atravessa parede).
 
@@ -39,6 +51,15 @@ Sem inventar trabalho: cada selo vem de um fato registrado.
   - Nova: "⏳ candle das HH:MM" quando o piloto está ativo e esperando o próximo fechamento de hora;
   - Euler: "⏳ estudo em andamento" enquanto a fila de estudos históricos está ocupada;
   - Atlas: "⏳ pesquisa em andamento" enquanto a fila de pesquisa está ocupada.
+
+### "Aguardando aprovação" do Sentinel (05/10/2026)
+
+A revisão de risco é instantânea (proposta e decisão no mesmo instante), então um balão "aguardando" durante a revisão
+seria inventado. O selo ✋ aparece só quando existe uma espera real pelo dono:
+
+- "aguardando você (pausado)": novas exposições pausadas (`halted`);
+- "aguardando você (piloto encerrado)": o piloto parou por regra pré-declarada e espera a sua decisão;
+- "aguardando liberação": o release em produção não é o aprovado, e a autonomia fica bloqueada.
 
 ## Renderização em canvas (item 6, experimental)
 

@@ -2,20 +2,23 @@ import type {MemoryRecord,MemoryStore} from '../domain/memory.js';
 import type {Candle} from '../domain/backtest.js';
 
 /**
- * Previsões verificáveis da equipe (TEAM_PREDICTIONS_V1, declarado em 05/10/2026, ver docs/MEMORIA_DA_EQUIPE.md).
- * Cada observação do briefing vira uma previsão para as próximas 24 h; quando o prazo passa, o resultado
- * real (candles fechados) é gravado como avaliação. As previsões são só medição: não mudam nenhuma decisão.
+ * Previsões verificáveis da equipe (ver docs/MEMORIA_DA_EQUIPE.md). V1 (05/10/2026): cada observação do briefing
+ * vira uma previsão para as próximas 24 h. V2 (05/10/2026): além disso, uma vez por dia (candle das 00:00 UTC), a
+ * mesma observação vira uma previsão para 7 dias. Quando o prazo passa, o resultado real (candles fechados) é
+ * gravado como avaliação. As previsões são só medição: não mudam nenhuma decisão.
  */
-export const PREDICTION_POLICY=Object.freeze({version:'TEAM_PREDICTIONS_V1',horizonHours:24,rangeThreshold:0.01,crowdedFunding:0.0001,lessonEvery:10});
+export const PREDICTION_POLICY=Object.freeze({version:'TEAM_PREDICTIONS_V2',horizonHours:24,weeklyHorizonHours:168,weeklyAtUtcHour:0,rangeThreshold:0.01,crowdedFunding:0.0001,lessonEvery:10});
+const horizonOf=(p:{horizonHours?:unknown})=>typeof p.horizonHours==='number'?p.horizonHours:PREDICTION_POLICY.horizonHours;
+const horizonText=(h:number)=>h===168?'7 dias':h+' h';
 export type Expectation='UP'|'DOWN'|'RANGE'|'VOL_HIGH'|'VOL_NORMAL';
-export interface Prediction {agentId:'satoshi'|'vega'|'flux'|'oracle';metric:string;expectation:Expectation;basis:string;refClose:number;candleTimestamp:number;horizonEnd:number;decisionEventId:string}
+export interface Prediction {agentId:'satoshi'|'vega'|'flux'|'oracle';metric:string;expectation:Expectation;basis:string;refClose:number;candleTimestamp:number;horizonEnd:number;horizonHours?:number;decisionEventId:string}
 type Observations={satoshi:{change24h:number|null};vega:{dailyVolatility7d:number|null;volatilityExpanding:boolean|null};flux:{fundingRate:number|null};oracle:{regime:string}};
 const HOUR=3600000;
 
 /** Regras pré-declaradas: o que cada pesquisador "espera" a partir da própria observação. */
-export function predictionsFrom(o:Observations,closes:Candle[],decisionEventId:string):Prediction[]{
+export function predictionsFrom(o:Observations,closes:Candle[],decisionEventId:string,horizonHours:number=PREDICTION_POLICY.horizonHours):Prediction[]{
  const last=closes.at(-1);if(!last)return [];
- const base={refClose:last.close,candleTimestamp:last.timestamp,horizonEnd:last.timestamp+PREDICTION_POLICY.horizonHours*HOUR,decisionEventId};
+ const base={refClose:last.close,candleTimestamp:last.timestamp,horizonEnd:last.timestamp+horizonHours*HOUR,horizonHours,decisionEventId};
  const out:Prediction[]=[];
  // Satoshi: momentum de 24 h continua na mesma direção.
  if(Number.isFinite(o.satoshi.change24h)&&o.satoshi.change24h!==0)out.push({...base,agentId:'satoshi',metric:'momentum_24h',expectation:o.satoshi.change24h!>0?'UP':'DOWN',basis:'continuação do momentum de 24 h'});
@@ -31,7 +34,7 @@ function dailyVolatility(closes:number[]){const r=closes.slice(1).map((c,i)=>Mat
 /** Confere uma previsão com os candles fechados. Devolve null se ainda não há dados até o fim do prazo. */
 export function settle(p:Prediction&{vol7d?:number},candles:Candle[]){
  const window=candles.filter(c=>c.timestamp>p.candleTimestamp&&c.timestamp<=p.horizonEnd);
- if(window.length<PREDICTION_POLICY.horizonHours||window.at(-1)!.timestamp!==p.horizonEnd)return null;
+ if(window.length<horizonOf(p)||window.at(-1)!.timestamp!==p.horizonEnd)return null;
  const ret=window.at(-1)!.close/p.refClose-1;
  let hit:boolean;
  if(p.expectation==='UP')hit=ret>0;else if(p.expectation==='DOWN')hit=ret<0;else if(p.expectation==='RANGE')hit=Math.abs(ret)<PREDICTION_POLICY.rangeThreshold;
@@ -43,7 +46,9 @@ const words:Record<Expectation,string>={UP:'alta',DOWN:'queda',RANGE:'movimento 
 export class TeamPredictions {
  constructor(private memories:MemoryStore){}
  record(o:Observations,candles:Candle[],decisionEventId:string){
-  for(const p of predictionsFrom(o,candles,decisionEventId))this.memories.add({agentId:p.agentId,kind:'PREDICTION',summary:'prevejo '+words[p.expectation]+' nas próximas 24 h ('+p.basis+')',sourceEventId:decisionEventId,tags:['previsao',p.metric],metadata:{policy:PREDICTION_POLICY.version,...p,...(p.agentId==='vega'?{vol7d:o.vega.dailyVolatility7d}:{})}});
+  const last=candles.at(-1),daily=!!last&&new Date(last.timestamp).getUTCHours()===PREDICTION_POLICY.weeklyAtUtcHour;
+  const all=[...predictionsFrom(o,candles,decisionEventId),...(daily?predictionsFrom(o,candles,decisionEventId,PREDICTION_POLICY.weeklyHorizonHours):[])];
+  for(const p of all)this.memories.add({agentId:p.agentId,kind:'PREDICTION',summary:'prevejo '+words[p.expectation]+(horizonOf(p)===168?' nos próximos 7 dias':' nas próximas 24 h')+' ('+p.basis+')',sourceEventId:decisionEventId,tags:['previsao',p.metric,...(horizonOf(p)===168?['7d']:[])],metadata:{policy:PREDICTION_POLICY.version,...p,...(p.agentId==='vega'?{vol7d:o.vega.dailyVolatility7d}:{})}});
  }
  /** Taxa de acerto de cada pesquisador nas avaliações já conferidas. */
  hitRates(){return Object.fromEntries(scorecard(this.memories.query()).map(s=>[s.agentId,{hitRate:s.hitRate,settled:s.settled}]));}
@@ -53,24 +58,28 @@ export class TeamPredictions {
   for(const m of this.pending()){
    const p=m.metadata as unknown as Prediction&{vol7d?:number};if(!p||!Number.isFinite(p.horizonEnd))continue;
    const r=settle(p,candles);if(!r)continue;
-   this.memories.add({agentId:m.agentId,kind:'EVALUATION',summary:(r.hit?'acertei':'errei')+': previ '+words[p.expectation]+'; o BTC variou '+(r.realizedReturn*100).toFixed(2).replace('.',',')+'% em 24 h',sourceEventId:m.sourceEventId,tags:['avaliacao',p.metric],confidence:r.hit?1:0,metadata:{policy:PREDICTION_POLICY.version,predictionId:m.id,hit:r.hit,realizedReturn:r.realizedReturn,expectation:p.expectation,horizonEnd:p.horizonEnd}});
-   this.maybeLesson(m.agentId);
+   this.memories.add({agentId:m.agentId,kind:'EVALUATION',summary:(r.hit?'acertei':'errei')+': previ '+words[p.expectation]+'; o BTC variou '+(r.realizedReturn*100).toFixed(2).replace('.',',')+'% em '+horizonText(horizonOf(p)),sourceEventId:m.sourceEventId,tags:['avaliacao',p.metric,...(horizonOf(p)===168?['7d']:[])],confidence:r.hit?1:0,metadata:{policy:PREDICTION_POLICY.version,predictionId:m.id,hit:r.hit,realizedReturn:r.realizedReturn,expectation:p.expectation,horizonEnd:p.horizonEnd,horizonHours:horizonOf(p)}});
+   this.maybeLesson(m.agentId,horizonOf(p));
   }
  }
- /** Reflexão a cada 10 avaliações: uma lição com a taxa de acerto recente (sem IA, só contagem). */
- private maybeLesson(agentId:string){
-  const evaluations=this.memories.query({agentId,kind:'EVALUATION'});if(!evaluations.length||evaluations.length%PREDICTION_POLICY.lessonEvery!==0)return;
+ /** Reflexão a cada 10 avaliações do mesmo prazo: uma lição com a taxa de acerto recente (sem IA, só contagem). */
+ private maybeLesson(agentId:string,horizon:number){
+  const evaluations=this.memories.query({agentId,kind:'EVALUATION'}).filter(e=>horizonOf(e.metadata??{})===horizon);if(!evaluations.length||evaluations.length%PREDICTION_POLICY.lessonEvery!==0)return;
   const recent=evaluations.slice(-PREDICTION_POLICY.lessonEvery),hits=recent.filter(e=>e.metadata?.hit===true).length,rate=hits/recent.length;
-  this.memories.add({agentId,kind:'LESSON',summary:'acertei '+hits+' de '+recent.length+' previsões recentes ('+Math.round(rate*100)+'%)'+(rate<0.5?': meu sinal está pior que uma moeda; tratar com cautela':rate>=0.6?': meu sinal tem ajudado':': resultado neutro'),tags:['reflexao','placar'],confidence:rate,metadata:{policy:PREDICTION_POLICY.version,hits,total:recent.length}});
+  this.memories.add({agentId,kind:'LESSON',summary:'acertei '+hits+' de '+recent.length+' previsões recentes'+(horizon===168?' de 7 dias':'')+' ('+Math.round(rate*100)+'%)'+(rate<0.5?': meu sinal está pior que uma moeda; tratar com cautela':rate>=0.6?': meu sinal tem ajudado':': resultado neutro'),tags:['reflexao','placar'],confidence:rate,metadata:{policy:PREDICTION_POLICY.version,hits,total:recent.length,horizonHours:horizon}});
  }
 }
 /** Placar por pesquisador, a partir das avaliações gravadas. */
 export function scorecard(memories:MemoryRecord[]){
  const agents=['satoshi','vega','flux','oracle'];
  return agents.map(agentId=>{
-  const ev=memories.filter(m=>m.agentId===agentId&&m.kind==='EVALUATION'),hits=ev.filter(m=>m.metadata?.hit===true).length;
-  const pending=memories.filter(m=>m.agentId===agentId&&m.kind==='PREDICTION').length-ev.length;
-  return {agentId,settled:ev.length,hits,hitRate:ev.length?hits/ev.length:null,pending:Math.max(0,pending),last:ev.slice(-10).map(m=>({at:m.createdAt,hit:m.metadata?.hit===true,summary:m.summary}))};
+  // Placar principal: 24 h (como na V1). O de 7 dias fica separado em `weekly`.
+  const of=(h:number,kind:string)=>memories.filter(m=>m.agentId===agentId&&m.kind===kind&&horizonOf(m.metadata??{})===h);
+  const ev=of(PREDICTION_POLICY.horizonHours,'EVALUATION'),hits=ev.filter(m=>m.metadata?.hit===true).length;
+  const pending=of(PREDICTION_POLICY.horizonHours,'PREDICTION').length-ev.length;
+  const wev=of(PREDICTION_POLICY.weeklyHorizonHours,'EVALUATION'),whits=wev.filter(m=>m.metadata?.hit===true).length,wpending=of(PREDICTION_POLICY.weeklyHorizonHours,'PREDICTION').length-wev.length;
+  return {agentId,settled:ev.length,hits,hitRate:ev.length?hits/ev.length:null,pending:Math.max(0,pending),last:ev.slice(-10).map(m=>({at:m.createdAt,hit:m.metadata?.hit===true,summary:m.summary})),
+   weekly:{settled:wev.length,hits:whits,hitRate:wev.length?whits/wev.length:null,pending:Math.max(0,wpending)}};
  });
 }
 /**

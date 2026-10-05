@@ -43,3 +43,38 @@ Arquivo: `src/infrastructure/cross-venue-market.ts`. Só APIs públicas, sem cha
 - Nenhuma ordem, nenhuma chave, nenhuma conta em outra corretora.
 
 Testes: `test/cross-venue-market.test.ts` (conversão do funding horário, consenso, divergência e pausa após 429).
+
+## Plano B do piloto: Bybit quando a Binance bloquear (05/10/2026)
+
+Item 8a da pesquisa. Serve para o caso do HTTP 418 que já aconteceu: a Binance bloqueia o IP do servidor e o piloto
+fica sem candles para decidir.
+
+- `BybitPerpetualHistory`: candles de 1 h, candles de mark e funding públicos do BTCUSDT linear da Bybit.
+  - O dataset sai com instrumento próprio, `BYBIT_LINEAR:BTCUSDT`, então nunca se confunde com dados da Binance na
+    auditoria nem nos hashes de evidência.
+  - A Bybit não informa o mark da liquidação de funding; usamos a abertura do candle de mark daquela hora.
+- `ResilientPerpetualHistory`: tenta a Binance e, se ela falhar, usa a Bybit.
+  - Só com `PERPETUAL_HISTORY_FALLBACK=bybit` no Render. Desligado por padrão, e não deve ser ligado no piloto em curso.
+  - `GET /paper/perpetual/history-source` mostra se a reserva está ligada, quantas vezes foi usada e o último motivo.
+- Só o ciclo do piloto usa a reserva. Os estudos continuam sempre só com a Binance.
+- **Regra de segurança:** com dados de reserva o piloto pode fechar ou reduzir posição, mas nunca abre.
+  - Quando o sinal mandaria abrir, o Sentinel grava "entrada adiada: sinal calculado com dados de reserva".
+  - A decisão grava os candles usados, com o instrumento, para a auditoria e a paridade.
+
+### Por que só fechar
+
+Medido em 05/10/2026 com as últimas 1 000 horas:
+
+- **Preço:** o fechamento de 1 h da Bybit difere do da Binance em 0,5 ponto-base na mediana (95% até 1,6; máximo 4,6).
+- **Regra do piloto** (BREAKOUT 480): a mesma direção em 516 de 518 horas.
+- **Onde diverge:** as 2 divergências (15/09 e 21/09, às 14:00 UTC) caíram justamente em horas de rompimento, que é
+  quando a regra abre posição.
+
+Para manter o piloto vivo e fechar posição numa queda da Binance, a reserva basta. Para abrir posição, a diferença
+entre corretoras pode decidir o rompimento, então o piloto espera a Binance voltar.
+
+Testes: `test/bybit-history.test.ts`:
+
+- paginação, alinhamento de mark e funding e instrumento próprio;
+- a reserva só entra quando ligada e quando a Binance falha;
+- com dados de reserva o piloto fecha, mas não abre.

@@ -243,13 +243,25 @@
    const head=el('div','','report-verdict');head.dataset.verdict=r.verdict;head.append(el('small',r.verdict==='IN_PROGRESS'?'Veredito (em andamento)':'Veredito final'),el('b',verdictLabels[r.verdict]||r.verdict));
    if(r.verdict==='IN_PROGRESS')head.append(el('span','Se terminasse agora: '+(verdictLabels[r.provisionalVerdict]||r.provisionalVerdict)));
    const grid=el('div','','dock-grid report-grid');for(const [label,value,cls] of [['P&L do piloto',signedUsd(r.pnl),tone(r.pnl)],['Decisões',r.decisions.total+' ('+r.decisions.long+' long · '+r.decisions.short+' short · '+r.decisions.flat+' flat)'],['Operações fechadas',r.closedTrades+' de '+r.protocol.minimumClosedTrades+' mínimas'],['Fills · taxas · funding',r.fills+' · '+usd(r.fees,4)+' · '+usd(r.funding,4)],['BTC no período',pct(r.benchmarks.btcReturn),tone(r.benchmarks.btcReturn)],['Buy and hold (mesma exposição)',signedUsd(r.benchmarks.buyAndHoldSameExposure),tone(r.benchmarks.buyAndHoldSameExposure)]]){const c=el('div');c.append(el('small',label),el('b',value,cls||''));grid.append(c);}
-   host.replaceChildren(head,grid,el('p','Próximo passo pré-declarado: '+r.nextStep,'dock-note'),el('h4','Métricas do período do piloto'),metricsView(r.metrics));}
+   const parity=el('div','','parity-view');parity.append(el('p','Conferindo decisões contra o histórico…','dock-note'));
+   host.replaceChildren(head,grid,el('p','Próximo passo pré-declarado: '+r.nextStep,'dock-note'),el('h4','Métricas do período do piloto'),metricsView(r.metrics),el('h4','Paridade: piloto ao vivo × histórico'),parity);loadParity(parity);}
   catch{$('#reportStatus').textContent='Avaliação indisponível. Confira o acesso.';host.replaceChildren();}
+ }
+ // Paridade (PILOT_PARITY_V1): cada decisão refeita com os candles gravados e com o histórico baixado depois.
+ async function loadParity(host){
+  try{const p=await get('/paper/perpetual/pilot/parity');if(p?.scope!=='READ_ONLY_PILOT_PARITY'||!p.summary)throw Error('invalid');const s=p.summary;
+   const grid=el('div','','dock-grid report-grid');
+   for(const [label,value,cls] of [['Resultado',p.passed?'Aprovada':'Reprovada',p.passed?'up':'down'],['Mesma direção no histórico',(s.decisionsChecked-s.historyDifference-s.codeDifference)+' de '+s.decisionsChecked],['Candles revisados depois',s.dataDifference+' decisão(ões)'],['Execução do lado decidido',s.executionMatch+' de '+s.decisions+(s.executionExplained?' · '+s.executionExplained+' com motivo gravado':'')],['Atraso da decisão',p.decisionLatencySeconds?'mediana '+p.decisionLatencySeconds.median.toFixed(1)+' s após o fechamento':'—']]){const box=el('div');box.append(el('small',label),el('b',value,cls||''));grid.append(box);}
+   const notes=[];if(s.codeDifference)notes.push(s.codeDifference+' decisão(ões) não se reproduzem com a regra atual: código ou regra mudou.');
+   if(s.dataDifference)notes.push('O último candle usado pelo piloto mudou depois (a Binance ainda soma negócios nos primeiros segundos após o fechamento). '+(p.passed?'Até agora isso não mudou nenhuma direção.':'Confira as decisões com direção diferente.'));
+   host.replaceChildren(grid,...notes.map(n=>el('p',n,'dock-note')));}
+  catch{host.replaceChildren(el('p','Paridade indisponível agora (histórico público fora do ar ou acesso).','dock-note'));}
  }
  async function loadScorecard(){try{const s=await get('/agents/scorecard');if(s?.policy?.version)state.scorecard=s;}catch{}renderScorecard();}
  function renderScorecard(){
   const host=$('#teamScorecard');if(!host)return;const s=state.scorecard;if(!s){host.replaceChildren(el('p','Placar indisponível.','dock-note'));return;}
-  host.replaceChildren(table(['Pesquisador','Conferidas','Acertos','Taxa','Aguardando'],s.scorecard.map(c=>({cells:[name(c.agentId),String(c.settled),String(c.hits),c.hitRate===null?'—':Math.round(c.hitRate*100)+'%',String(c.pending)]}))),el('p',s.policy.version+' · cada observação do briefing vira uma previsão para 24 h e é conferida com candles fechados. Em direção, 50% equivale a cara ou coroa. É só medição: não muda decisões.','dock-note'));
+  const rate=v=>v===null||v===undefined?'—':Math.round(v*100)+'%';
+  host.replaceChildren(table(['Pesquisador','24 h: conferidas','Acertos','Taxa','Aguardando','7 dias: taxa (conferidas)'],s.scorecard.map(c=>({cells:[name(c.agentId),String(c.settled),String(c.hits),rate(c.hitRate),String(c.pending),c.weekly?rate(c.weekly.hitRate)+' ('+c.weekly.settled+(c.weekly.pending?', '+c.weekly.pending+' aguardando':'')+')':'—']}))),el('p',s.policy.version+' · cada observação do briefing vira uma previsão para 24 h e, uma vez por dia (00:00 UTC), também para 7 dias; todas são conferidas com candles fechados. Em direção, 50% equivale a cara ou coroa. É só medição: não muda decisões.','dock-note'));
  }
  async function loadTimeline(){loadReport();loadScorecard();
   const host=$('#pilotTimeline');$('#timelineStatus').textContent='Consultando a linha do tempo…';
@@ -287,12 +299,21 @@
  // ---------- tick ----------
  // Estados visuais ligados a fatos reais: lendo (pesquisa/risco), digitando (teste/execução) e aguardando
  // (próximo candle do piloto, estudo ou pesquisa em andamento no servidor).
+ /** Esperas reais que dependem do dono, a partir do estado recebido do servidor. */
+ function waitingForOwner(f){
+  if(f?.risk?.halted===true)return 'aguardando você (pausado)';
+  if(f?.autonomous?.stopReason)return 'aguardando você (piloto encerrado)';
+  if(f?.autonomous&&!f.autonomous.enabled&&f.autonomous.blockedReason)return 'aguardando liberação';
+  return null;
+ }
  function activity(){
   const auto=finance()?.autonomous,jobs=screens.state.readiness?.jobs,badges={};
   if(auto?.enabled&&!auto.stopReason){const next=OfficeScreens.nextDecision(Date.now(),auto);if(next.due)badges.nova='⏳ candle das '+hhmm(next.due-60000);}
   if(jobs?.historical?.busy)badges.euler='⏳ estudo em andamento';if(jobs?.research?.busy)badges.atlas='⏳ pesquisa em andamento';
+  // "Aguardando aprovação" só quando existe uma espera real pelo dono (a revisão de risco em si é instantânea).
+  const waiting=waitingForOwner(finance());if(waiting)badges.sentinel='✋ '+waiting;
   for(const [id,view] of agentViews){
-   const status=agents.get(id)?.status;view.button.dataset.activity=status==='RESEARCHING'||status==='REVIEWING_RISK'?'reading':status==='BACKTESTING'||status==='TRADING'?'typing':'idle';
+   const status=agents.get(id)?.status;view.button.dataset.activity=id==='sentinel'&&waiting?'waiting':status==='RESEARCHING'||status==='REVIEWING_RISK'?'reading':status==='BACKTESTING'||status==='TRADING'?'typing':'idle';
    let badge=view.button.querySelector?.('.state-badge');if(badges[id]){if(!badge){badge=el('span','','state-badge');badge.setAttribute('aria-hidden','true');view.button.append(badge);}badge.textContent=badges[id];}else badge?.remove();
   }
  }

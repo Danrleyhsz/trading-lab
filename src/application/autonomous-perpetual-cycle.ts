@@ -53,15 +53,18 @@ export class AutonomousPerpetualCycle {
    const hash=validatePerpetualDataset(data);const last=data.trade.at(-1)!;if(last.timestamp+3600000>this.now()||this.now()-last.timestamp>2*3600000)throw Error('signal history stale');if((this.book.status().autonomousCursor??0)>=last.timestamp)return;
    const direction=perpetualDirection(data.trade,configuration,current);
    // Persist the decision cursor before execution: restart never duplicates this candle.
-   await this.book.checkpoint(last.timestamp,this.save);const decision=event('AUTONOMOUS_DECISION',{accountId:account.id,studyId:study.id,studyDatasetHash:study.result!.datasetHash,signalDatasetHash:hash,signalDataset:data,candleTimestamp:last.timestamp,direction,configuration});this.bus.publish(decision);
+   await this.book.checkpoint(last.timestamp,this.save);const decision=event('AUTONOMOUS_DECISION',{accountId:account.id,studyId:study.id,studyDatasetHash:study.result!.datasetHash,signalDatasetHash:hash,signalDataset:data,candleTimestamp:last.timestamp,direction,currentQuantity:current,configuration});this.bus.publish(decision);
    this.memories.add({agentId:'nova',kind:'OBSERVATION',summary:'computed paper signal from closed USD-M candles',sourceEventId:decision.id,strategyId:study.id,metadata:{accountId:account.id,candleTimestamp:last.timestamp,signalDatasetHash:hash,direction}});
    try{this.onDecision?.({data,quote:this.book.market(),direction,currentQuantity:current,configuration,studyId:study.id,candleTimestamp:last.timestamp,decisionEventId:decision.id});}catch{/* Advisory briefing only; never blocks the decision. */}await this.persist();
    if(current&&Math.sign(current)!==direction)await this.book.propose(account.id,current>0?'SELL':'BUY',Math.abs(current),this.save,study.id);
    const fresh=this.book.list().find(a=>a.id===account.id)!;
    // Proteções do estudo (se houver): mesma regra do backtest; só impedem abrir, nunca fechar.
-   const closed=(this.book.performance(account.id)?.closedTrades??[]).map(t=>({closedAt:Date.parse(t.closedAt),netPnl:t.netPnl}));const guard=protectionsAllowEntry(configuration.protections,closed,this.now());
-   if(!fresh.portfolio.positions.length&&direction&&!guard.allowed)this.memories.add({agentId:'sentinel',kind:'DECISION',summary:'entrada bloqueada pela proteção '+guard.reason,sourceEventId:decision.id,strategyId:study.id,metadata:{accountId:account.id,candleTimestamp:last.timestamp,reason:guard.reason,direction}});
-   if(!fresh.portfolio.positions.length&&direction&&guard.allowed&&fresh.portfolio.equity>0){const quote=this.book.market();if(!quote)throw Error('market unavailable');await this.book.propose(account.id,direction>0?'BUY':'SELL',fresh.portfolio.equity*0.1/(direction>0?quote.ask:quote.bid),this.save,study.id);}
+   const closed=(this.book.performance(account.id)?.closedTrades??[]).map(t=>({closedAt:Date.parse(t.closedAt),netPnl:t.netPnl}));const guard=protectionsAllowEntry(configuration.protections,closed,this.now(),fresh.initialCash);
+   // Dados de reserva (outra corretora): o piloto pode fechar/reduzir, mas nunca abrir posição com eles.
+   const backupData=data.instrument!=='BINANCE_USDM:BTCUSDT';
+   if(!fresh.portfolio.positions.length&&direction&&backupData)this.memories.add({agentId:'sentinel',kind:'DECISION',summary:'entrada adiada: sinal calculado com dados de reserva ('+data.instrument+')',sourceEventId:decision.id,strategyId:study.id,metadata:{accountId:account.id,candleTimestamp:last.timestamp,reason:'BACKUP_DATA',direction,instrument:data.instrument}});
+   if(!fresh.portfolio.positions.length&&direction&&!backupData&&!guard.allowed)this.memories.add({agentId:'sentinel',kind:'DECISION',summary:'entrada bloqueada pela proteção '+guard.reason,sourceEventId:decision.id,strategyId:study.id,metadata:{accountId:account.id,candleTimestamp:last.timestamp,reason:guard.reason,direction}});
+   if(!fresh.portfolio.positions.length&&direction&&!backupData&&guard.allowed&&fresh.portfolio.equity>0){const quote=this.book.market();if(!quote)throw Error('market unavailable');await this.book.propose(account.id,direction>0?'BUY':'SELL',fresh.portfolio.equity*0.1/(direction>0?quote.ask:quote.bid),this.save,study.id);}
    this.succeeded();
   }catch(error){this.error=error instanceof Error?error.message:'autonomous evaluation unavailable';this.lastAttemptFailed=true;this.nextAttemptAt=this.now()+this.retryDelayMs;throw error;}finally{this.busy=false;}
  }

@@ -4,12 +4,14 @@ import type {Candle} from './backtest.js';
 import {RiskEngine} from './risk.js';
 import type {PortfolioSnapshot} from './portfolio.js';
 export interface FundingSettlement {timestamp:number;rate:number;markPrice:number}
-export interface PerpetualDataset {instrument:'BINANCE_USDM:BTCUSDT';trade:Candle[];mark:Candle[];funding:FundingSettlement[]}
+/** Binance USD-M é a fonte dos estudos e do piloto; Bybit linear só entra como reserva do piloto (nunca para abrir posição). */
+export type DatasetInstrument='BINANCE_USDM:BTCUSDT'|'BYBIT_LINEAR:BTCUSDT';
+export interface PerpetualDataset {instrument:DatasetInstrument;trade:Candle[];mark:Candle[];funding:FundingSettlement[]}
 export interface PerpetualConfig {strategy?:'SMA'|'BREAKOUT'|'MEAN_REVERSION';filters?:TeamFilters;protections?:Protections;initialCapital:number;feeRate:number;slippageBps:number;maintenanceRate:number;liquidationFeeRate:number;positionFraction:number;fastPeriod:number;slowPeriod:number}
 export interface SimulationEntry {kind:'PROPOSAL'|'FILL'|'FUNDING'|'LIQUIDATION';timestamp:number;quantity:number;price:number;cashDelta:number;approved?:boolean;reasons?:string[]}
 const hour=3600000;
 export function validatePerpetualDataset(data:PerpetualDataset){
- if(data.instrument!=='BINANCE_USDM:BTCUSDT'||data.trade.length<3||data.trade.length>10000||data.mark.length!==data.trade.length)throw new Error('invalid dataset');
+ if((data.instrument!=='BINANCE_USDM:BTCUSDT'&&data.instrument!=='BYBIT_LINEAR:BTCUSDT')||data.trade.length<3||data.trade.length>10000||data.mark.length!==data.trade.length)throw new Error('invalid dataset');
  for(const series of [data.trade,data.mark])for(let i=0;i<series.length;i++){
   const c=series[i];if(!Number.isSafeInteger(c.timestamp)||c.timestamp%hour!==0||![c.open,c.high,c.low,c.close,c.volume].every(Number.isFinite)||Math.min(c.open,c.low,c.close)<=0||c.volume<0||c.high<Math.max(c.open,c.close,c.low)||c.low>Math.min(c.open,c.close)|| (i>0&&c.timestamp!==series[i-1].timestamp+hour))throw new Error('invalid or discontinuous candles');
   if(c.timestamp!==data.trade[i].timestamp)throw new Error('unaligned mark candles');
@@ -45,7 +47,7 @@ export function backtestPerpetual(data:PerpetualDataset,cfg:PerpetualConfig){
   // Original timestamps remain in the audit. This ordering is a declared modeling assumption.
   const settle=(until:number)=>{while(fundingIndex<data.funding.length&&data.funding[fundingIndex].timestamp<until){const f=data.funding[fundingIndex++];const delta=-quantity*f.markPrice*f.rate;cash+=delta;funding+=delta;tradeNet+=delta;audit.push({kind:'FUNDING',timestamp:f.timestamp,quantity,price:f.markPrice,cashDelta:delta});record(f.timestamp,f.markPrice);}};
   settle(c.timestamp+1000);
-  if(i>=warmup){const direction=perpetualDirection(data.trade.slice(0,i),cfg,quantity);if(quantity&&Math.sign(quantity)!==direction)execute(-quantity,c.open,c.timestamp);if(!quantity&&direction&&cash>0&&protectionsAllowEntry(cfg.protections,closedTrades,c.timestamp).allowed)execute(direction*cash*cfg.positionFraction/c.open,c.open,c.timestamp);}
+  if(i>=warmup){const direction=perpetualDirection(data.trade.slice(0,i),cfg,quantity);if(quantity&&Math.sign(quantity)!==direction)execute(-quantity,c.open,c.timestamp);if(!quantity&&direction&&cash>0&&protectionsAllowEntry(cfg.protections,closedTrades,c.timestamp,cfg.initialCapital).allowed)execute(direction*cash*cfg.positionFraction/c.open,c.open,c.timestamp);}
   settle(c.timestamp+hour);
   // OHLC cannot reveal chronology. Funding precedes the worst mark stress; liquidation
   // fills at the adverse trade extreme, deliberately conservative and not exchange parity.
