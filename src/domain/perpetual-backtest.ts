@@ -4,12 +4,14 @@ import type {Candle} from './backtest.js';
 import {RiskEngine} from './risk.js';
 import type {PortfolioSnapshot} from './portfolio.js';
 export interface FundingSettlement {timestamp:number;rate:number;markPrice:number}
-export interface PerpetualDataset {instrument:'BINANCE_USDM:BTCUSDT';trade:Candle[];mark:Candle[];funding:FundingSettlement[]}
+/** Binance USD-M é a fonte dos estudos e do piloto; Bybit linear só entra como reserva do piloto (nunca para abrir posição). */
+export type DatasetInstrument='BINANCE_USDM:BTCUSDT'|'BYBIT_LINEAR:BTCUSDT';
+export interface PerpetualDataset {instrument:DatasetInstrument;trade:Candle[];mark:Candle[];funding:FundingSettlement[]}
 export interface PerpetualConfig {strategy?:'SMA'|'BREAKOUT'|'MEAN_REVERSION';filters?:TeamFilters;protections?:Protections;initialCapital:number;feeRate:number;slippageBps:number;maintenanceRate:number;liquidationFeeRate:number;positionFraction:number;fastPeriod:number;slowPeriod:number}
 export interface SimulationEntry {kind:'PROPOSAL'|'FILL'|'FUNDING'|'LIQUIDATION';timestamp:number;quantity:number;price:number;cashDelta:number;approved?:boolean;reasons?:string[]}
 const hour=3600000;
 export function validatePerpetualDataset(data:PerpetualDataset){
- if(data.instrument!=='BINANCE_USDM:BTCUSDT'||data.trade.length<3||data.trade.length>10000||data.mark.length!==data.trade.length)throw new Error('invalid dataset');
+ if((data.instrument!=='BINANCE_USDM:BTCUSDT'&&data.instrument!=='BYBIT_LINEAR:BTCUSDT')||data.trade.length<3||data.trade.length>10000||data.mark.length!==data.trade.length)throw new Error('invalid dataset');
  for(const series of [data.trade,data.mark])for(let i=0;i<series.length;i++){
   const c=series[i];if(!Number.isSafeInteger(c.timestamp)||c.timestamp%hour!==0||![c.open,c.high,c.low,c.close,c.volume].every(Number.isFinite)||Math.min(c.open,c.low,c.close)<=0||c.volume<0||c.high<Math.max(c.open,c.close,c.low)||c.low>Math.min(c.open,c.close)|| (i>0&&c.timestamp!==series[i-1].timestamp+hour))throw new Error('invalid or discontinuous candles');
   if(c.timestamp!==data.trade[i].timestamp)throw new Error('unaligned mark candles');
