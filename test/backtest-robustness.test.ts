@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {normalCdf,normalInverse,moments,deflatedSharpe,expectedMaxSharpe,probabilityOfBacktestOverfitting,hourlyReturns} from '../src/domain/backtest-robustness.js';
+import {normalCdf,normalInverse,moments,deflatedSharpe,expectedMaxSharpe,probabilityOfBacktestOverfitting,combinatorialPurgedCv,hourlyReturns} from '../src/domain/backtest-robustness.js';
 import {computeStudyRobustness} from '../src/application/study-robustness.js';
 import {studyCandidates} from '../src/application/perpetual-studies.js';
 
@@ -44,5 +44,27 @@ test('robustez de um estudo: usa só as horas de teste e conta as tentativas do 
  const r=computeStudyRobustness({dataset,candidates,folds,trials:[...candidates,...studyCandidates('MULTI_DAY_TREND_V1')]});
  assert.equal(r.outOfSample.hours,199,'só as horas de teste entram (o aquecimento fica de fora)');
  assert.equal(r.multipleTesting.trials,8);assert.equal(r.overfitting.combinations,252);
- assert.equal(r.policy.version,'ROBUSTNESS_SCREEN_V1');assert.equal(typeof r.eligible,'boolean');
+ assert.equal(r.policy.version,'ROBUSTNESS_SCREEN_V2');assert.equal(typeof r.eligible,'boolean');
+});
+
+test('CPCV: 45 divisões e 9 caminhos completos, sem hora repetida; vantagem real dá caminhos positivos, ruído não', ()=>{
+ const random=rng(29);
+ const strong=Array.from({length:3000},()=>[0.0015+0.01*gaussian(random),0.01*gaussian(random),0.01*gaussian(random)]);
+ const pure=Array.from({length:3000},()=>[0,1,2].map(()=>0.01*gaussian(random)));
+ const good=combinatorialPurgedCv(strong),bad=combinatorialPurgedCv(pure);
+ assert.equal(good.splits,45);assert.equal(good.paths.length,9);
+ assert.ok(good.paths.every(p=>p.hours===3000),'cada caminho cobre todas as horas exatamente uma vez');
+ assert.equal(good.embargo,30,'embargo de 1% das horas (mínimo 24)');
+ assert.ok(good.paths.every(p=>p.sharpe>0),'vantagem real: todos os caminhos positivos');assert.equal(good.selections[0],45,'o candidato bom é escolhido em toda divisão');
+ const positive=bad.paths.filter(p=>p.sharpe>0).length;assert.ok(positive<9,'ruído puro não passa em todos os caminhos ('+positive+'/9)');
+ assert.equal(combinatorialPurgedCv(strong.slice(0,100)).paths.length,0,'histórico curto: sem caminhos e com motivo');
+ assert.match(combinatorialPurgedCv(strong.slice(0,100)).reason!,/insuficientes/);
+});
+
+test('CPCV: o embargo tira do treino as horas coladas depois do teste (sem vazamento)', ()=>{
+ // Candidato 1 só é excelente nas 30 primeiras horas do grupo 1, logo depois do grupo 0. Quando o grupo 0 é teste
+ // e o grupo 1 é treino, sem embargo essas horas entram no treino e o candidato 1 é escolhido por vazamento.
+ const matrix=Array.from({length:2400},(_,t)=>[0.0001+0.002*(t%2?1:-1),t>=240&&t<270?0.05:-0.0002]);
+ const leak=combinatorialPurgedCv(matrix,{embargo:0}),guarded=combinatorialPurgedCv(matrix,{embargo:30});
+ assert.equal((leak.selections[1]??0)-(guarded.selections[1]??0),8,'as 8 divisões com grupo 0 em teste e grupo 1 em treino mudam de escolha');
 });

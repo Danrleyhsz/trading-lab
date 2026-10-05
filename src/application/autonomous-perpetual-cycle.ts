@@ -59,7 +59,7 @@ export class AutonomousPerpetualCycle {
    if(current&&Math.sign(current)!==direction)await this.book.propose(account.id,current>0?'SELL':'BUY',Math.abs(current),this.save,study.id);
    const fresh=this.book.list().find(a=>a.id===account.id)!;
    // Proteções do estudo (se houver): mesma regra do backtest; só impedem abrir, nunca fechar.
-   const closed=(this.book.performance(account.id)?.closedTrades??[]).map(t=>({closedAt:Date.parse(t.closedAt),netPnl:t.netPnl}));const guard=protectionsAllowEntry(configuration.protections,closed,this.now());
+   const closed=(this.book.performance(account.id)?.closedTrades??[]).map(t=>({closedAt:Date.parse(t.closedAt),netPnl:t.netPnl}));const guard=protectionsAllowEntry(configuration.protections,closed,this.now(),fresh.initialCash);
    if(!fresh.portfolio.positions.length&&direction&&!guard.allowed)this.memories.add({agentId:'sentinel',kind:'DECISION',summary:'entrada bloqueada pela proteção '+guard.reason,sourceEventId:decision.id,strategyId:study.id,metadata:{accountId:account.id,candleTimestamp:last.timestamp,reason:guard.reason,direction}});
    if(!fresh.portfolio.positions.length&&direction&&guard.allowed&&fresh.portfolio.equity>0){const quote=this.book.market();if(!quote)throw Error('market unavailable');await this.book.propose(account.id,direction>0?'BUY':'SELL',fresh.portfolio.equity*0.1/(direction>0?quote.ask:quote.bid),this.save,study.id);}
    this.succeeded();

@@ -1,14 +1,15 @@
 import {backtestPerpetual,type PerpetualConfig,type PerpetualDataset} from '../domain/perpetual-backtest.js';
-import {deflatedSharpe,hourlyReturns,moments,probabilityOfBacktestOverfitting} from '../domain/backtest-robustness.js';
+import {combinatorialPurgedCv,deflatedSharpe,hourlyReturns,moments,probabilityOfBacktestOverfitting} from '../domain/backtest-robustness.js';
 import {teamFilterWarmup} from '../domain/perpetual-signals.js';
 import {performanceMetrics} from '../domain/performance-metrics.js';
 
 /**
- * Triagem de robustez V1 (docs/ROBUSTEZ_DE_ESTUDOS.md), declarada em 05/10/2026.
+ * Triagem de robustez V2 (docs/ROBUSTEZ_DE_ESTUDOS.md), declarada em 05/10/2026: V1 + CPCV.
  * Vale para estudos usados em pilotos que começarem depois do piloto atual; o piloto em andamento
  * continua com INDEPENDENT_PAPER_SCREEN_V1, sem mudança de regra no meio.
  */
-export const ROBUSTNESS_POLICY=Object.freeze({version:'ROBUSTNESS_SCREEN_V1',declaredAt:'2026-10-05',minimumDeflatedSharpe:0.9,maximumPbo:0.5,minimumPositivePathShare:0.6,cscvBlocks:10});
+export const ROBUSTNESS_POLICY=Object.freeze({version:'ROBUSTNESS_SCREEN_V2',declaredAt:'2026-10-05',minimumDeflatedSharpe:0.9,maximumPbo:0.5,minimumPositivePathShare:0.6,cscvBlocks:10,
+ cpcvGroups:10,cpcvTestGroups:2,minimumCpcvPositivePathShare:0.6});
 export interface RobustnessInput {
  dataset:PerpetualDataset;
  /** Candidatos do próprio estudo (o conjunto pré-declarado). */
@@ -39,16 +40,25 @@ export function computeStudyRobustness(input:RobustnessInput){
  const columns=input.candidates.map(c=>fullReturns(input.dataset,c,skip));const length=Math.min(...columns.map(c=>c.length));
  const matrix=Array.from({length},(_,t)=>columns.map(c=>c[t]));
  const pbo=probabilityOfBacktestOverfitting(matrix,ROBUSTNESS_POLICY.cscvBlocks);
+ // 4) CPCV: 45 divisões (10 grupos, 2 de teste), purga de 1 h e embargo de 1% das horas (mínimo 24 h); 9 caminhos fora da amostra.
+ const cpcv=combinatorialPurgedCv(matrix,{groups:ROBUSTNESS_POLICY.cpcvGroups,testGroups:ROBUSTNESS_POLICY.cpcvTestGroups});
+ const cpcvSharpes=cpcv.paths.map(p=>p.sharpe).filter(Number.isFinite).sort((a,b)=>a-b);
+ const cpcvPositive=cpcvSharpes.length?cpcvSharpes.filter(s=>s>0).length/cpcvSharpes.length:null;
  const positiveShare=pbo.selectedOutOfSampleSharpes.length?pbo.selectedOutOfSampleSharpes.filter(s=>s>0).length/pbo.selectedOutOfSampleSharpes.length:null;
  const checks=[
   {id:'DEFLATED_SHARPE',ok:Number.isFinite(dsr.deflatedSharpe)&&dsr.deflatedSharpe>=ROBUSTNESS_POLICY.minimumDeflatedSharpe,value:dsr.deflatedSharpe},
   {id:'PROBABILITY_OF_OVERFITTING',ok:pbo.pbo===null?true:pbo.pbo<=ROBUSTNESS_POLICY.maximumPbo,value:pbo.pbo,note:pbo.reason},
-  {id:'POSITIVE_OUT_OF_SAMPLE_PATHS',ok:positiveShare===null?true:positiveShare>=ROBUSTNESS_POLICY.minimumPositivePathShare,value:positiveShare}
+  {id:'POSITIVE_OUT_OF_SAMPLE_PATHS',ok:positiveShare===null?true:positiveShare>=ROBUSTNESS_POLICY.minimumPositivePathShare,value:positiveShare},
+  // Sem caminhos CPCV (histórico curto), reprova: não há evidência para aprovar.
+  {id:'CPCV_POSITIVE_PATHS',ok:cpcvPositive!==null&&cpcvPositive>=ROBUSTNESS_POLICY.minimumCpcvPositivePathShare,value:cpcvPositive,note:cpcv.reason}
  ];
  return {policy:ROBUSTNESS_POLICY,
   outOfSample:{hours:oos.length,sharpePerHour:dsr.moments.sharpe,sharpeAnnualized:annualize(dsr.moments.sharpe),skewness:dsr.moments.skewness,kurtosis:dsr.moments.kurtosis},
   multipleTesting:{trials:trials.length,trialSharpeVariance:variance,benchmarkSharpeAnnualized:annualize(dsr.benchmarkSharpe),deflatedSharpe:dsr.deflatedSharpe},
   overfitting:{pbo:pbo.pbo,combinations:pbo.combinations,positivePathShare:positiveShare,note:pbo.reason},
+  cpcv:{splits:cpcv.splits,paths:cpcv.paths.length,purgeHours:cpcv.purge,embargoHours:cpcv.embargo,positivePathShare:cpcvPositive,
+   medianSharpeAnnualized:cpcvSharpes.length?annualize(cpcvSharpes[Math.floor(cpcvSharpes.length/2)]):null,worstSharpeAnnualized:cpcvSharpes.length?annualize(cpcvSharpes[0]):null,
+   pathReturns:cpcv.paths.map(p=>p.totalReturn),selections:Object.fromEntries(Object.entries(cpcv.selections).map(([i,n])=>[String(input.candidates[Number(i)]?.strategy??'SMA')+' '+input.candidates[Number(i)]?.fastPeriod+'/'+input.candidates[Number(i)]?.slowPeriod+'#'+i,n])),note:cpcv.reason},
   // Métricas fora da amostra (equity das janelas de teste e operações de cada janela).
   metrics:performanceMetrics(input.folds.flatMap(f=>(f.result.equitySeries??[]).filter(p=>p.timestamp>=f.testStart&&p.timestamp<f.testEnd+HOUR)),input.folds.flatMap(f=>(f.result.tradeOutcomes??[]).map(netPnl=>({netPnl})))),
   eligible:checks.every(c=>c.ok),checks};
