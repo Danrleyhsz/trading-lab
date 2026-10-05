@@ -1,0 +1,137 @@
+# Pacote modular de assets do escritório
+
+Objetivo: recriar o escritório em peças separadas (piso, paredes, janelas, móveis, eletrônicos, plantas, copa e a
+cidade atrás das janelas), mantendo o nível de detalhe da arte atual. Com peças separadas dá para:
+
+- rearrumar salas;
+- pôr a cidade ao vivo atrás de vidro de verdade;
+- animar telas;
+- trocar objetos sem refazer a cena inteira.
+
+## Por que gerar e não desenhar por código
+
+Em 05/10/2026 comparamos:
+
+- **Pacotes prontos** (LimeZu, Lennox Studio, Pixel Life, Pixel Salvaje, MetroCity): nenhum tem o nível de detalhe
+  da nossa arte na mesma vista 3/4.
+- **Amostra desenhada por código:** ficou limpa, mas bem mais simples
+  (`outputs/assets-pesquisa/comparacao-assets.png`).
+
+A arte atual foi feita com gerador de imagens (ChatGPT/Codex). As peças novas seguem o mesmo caminho: o dono gera
+as folhas com os textos abaixo, e a integração (recorte, catálogo, montagem e animação) é feita aqui.
+
+## Regras fixas de todas as folhas
+
+| Regra | Valor |
+|---|---|
+| Vista | 3/4 de cima, igual à referência: aparecem o tampo e a frente dos objetos |
+| Escala | uma pessoa em pé teria 175 px (o dobro da cena atual, para reduzir sem perder detalhe) |
+| Tamanho da folha | 1536 × 1024 px |
+| Fundo | 100% transparente (PNG com canal alfa), exceto texturas e cidade |
+| Proibido | texto, números, logotipos, pessoas e sombra no chão (a sombra é feita por código) |
+| Espaço | pelo menos 40 px vazios entre objetos, em linhas |
+| Telas | monitores e telões com a tela apagada e lisa (o conteúdo ao vivo é desenhado por cima) |
+| Vidro | janelas com o vidro totalmente transparente (a cidade fica atrás) |
+| Referência | anexar `public/office/office-reference-v2.png` em todo pedido, como referência de estilo |
+
+Paleta da arte atual:
+
+- madeira `#c07a3c` / `#8b5a2c`;
+- parede azul-ardósia `#2e3b60` / `#3f5080`;
+- tela `#0e2150` com brilho ciano;
+- metal grafite `#1b2133`;
+- plantas `#2c8a48` / `#62d07a`;
+- luz quente `#ffd27a`.
+
+## Bloco de estilo (vai no começo de todo texto)
+
+> Pixel art de alta qualidade, no mesmo estilo da imagem de referência anexada (escritório de trading em pixel art,
+> vista de cima em 3/4: vemos o tampo e a frente dos objetos). Contornos escuros finos, sombreamento suave em 3 a 4
+> tons, paleta da referência: madeira quente, paredes azul-ardósia, telas azul-marinho, metal grafite, plantas verdes,
+> luz quente de luminária. Fundo 100% transparente (PNG com canal alfa). Sem sombra no chão, sem texto, sem números,
+> sem logotipos, sem pessoas. Cada objeto separado dos outros por pelo menos 40 px de espaço vazio, organizados em
+> linhas, todos na mesma escala: uma pessoa em pé teria 175 px de altura. Imagem de 1536 × 1024.
+
+## Folhas e textos
+
+Cada texto abaixo vem depois do bloco de estilo. A lista entre colchetes é a ordem dos nomes para o recorte.
+
+1. **Estações de trabalho** `[mesa-3-monitores, mesa-2-monitores, mesa-simples, mesa-em-l, gaveteiro, lixeira]`
+   > Folha com 6 objetos: mesa de trabalho de madeira com 3 monitores (o do meio de frente e os dois laterais
+   > levemente virados para dentro), teclado, mouse e caneca; mesa com 2 monitores; mesa simples sem monitor; mesa em
+   > L; gaveteiro grafite com 3 gavetas; lixeira de escritório. Telas apagadas, azul-marinho lisas.
+2. **Cadeiras e assentos** `[cadeira-costas, cadeira-frente, cadeira-lado, cadeira-reuniao, poltrona, banqueta]`
+   > Folha com 6 objetos: cadeira de escritório azul-marinho vista de costas, a mesma de frente, a mesma de lado,
+   > cadeira de reunião, poltrona azul acolchoada e banqueta alta.
+3. **Telões e eletrônicos** `[telao, tv-parede, rack-servidor, impressora, notebook, painel-led]`
+   > Folha com 6 objetos: telão de parede grande com moldura fina (tela apagada lisa), TV de parede média, rack de
+   > servidores com LEDs verdes e azuis, impressora multifuncional, notebook aberto (tela apagada), painel de LED
+   > estreito de parede.
+4. **Plantas e decoração** `[costela-de-adao, palmeira, suculenta, planta-pendente, quadro, relogio, luminaria-chao, abajur, estante-livros, globo]`
+   > Folha com 10 objetos: costela-de-adão em vaso, palmeira em vaso alto, suculenta pequena, planta pendente,
+   > quadro de paisagem ao pôr do sol, relógio de parede redondo, luminária de chão com cúpula acesa, abajur de mesa
+   > aceso, estante de madeira com livros coloridos, globo terrestre de mesa.
+5. **Copa** `[cafeteira, bebedouro, geladeira, micro-ondas, bancada-pia, maquina-snacks]`
+   > Folha com 6 objetos: cafeteira expresso, bebedouro com galão azul, geladeira inox, micro-ondas, bancada de
+   > cozinha com pia e armário, máquina de snacks iluminada.
+6. **Estar e reunião** `[sofa, poltrona-estar, mesa-centro, mesa-reuniao, tapete, puff]`
+   > Folha com 6 objetos: sofá de 3 lugares laranja com almofadas creme, poltrona azul, mesa de centro redonda de
+   > madeira, mesa de reunião longa de madeira, tapete retangular azul com borda dourada (visto de cima), puff.
+7. **Janelas e paredes** `[janela, janela-coluna, janela-canto, porta, divisoria-vidro, rodape]`
+   > Folha com 6 peças de arquitetura: segmento de janela de piso a teto com caixilho azul-ardósia e VIDRO
+   > TOTALMENTE TRANSPARENTE (só caixilho, peitoril e dois reflexos discretos); janela com coluna; canto de janela;
+   > porta de vidro com moldura; divisória de vidro (vidro transparente); rodapé de madeira.
+8. **Texturas** (uma por pedido, sem fundo transparente; não precisa recortar)
+   > Textura quadrada contínua (seamless) de 512 × 512 em pixel art, vista de cima, para piso de escritório:
+   > tábuas de madeira quente. Repita trocando para: carpete azul-marinho; porcelanato cinza-claro; painel de parede
+   > azul-ardósia.
+9. **Cidade atrás das janelas** (três pedidos: dia, entardecer e noite; sem fundo transparente)
+   > Panorama largo de 3072 × 1024 em pixel art de uma cidade de arranha-céus vista de um escritório no 30º andar:
+   > prédios próximos cortados abaixo da linha de visão, prédios médios e uma silhueta distante, antenas com luz de
+   > aviso, céu ao [dia: azul com nuvens / entardecer: laranja e lilás / noite: azul-escuro com estrelas e janelas
+   > acesas]. Mesma composição nas três versões, para trocar uma pela outra sem pulo.
+
+## Como entregar
+
+- Salve cada folha como PNG em `outputs/assets-gerados/`, com o nome do item (por exemplo `estacoes.png`).
+- Antes de salvar, confira:
+  - fundo xadrez (transparente) nas folhas de objetos;
+  - objetos separados uns dos outros;
+  - nenhum texto na imagem.
+- Uma folha que vier com fundo opaco é recusada pela ferramenta, sem recortar errado.
+
+## Integração (feita aqui)
+
+- `scripts/assets/slice-sheet.ts` recorta cada folha em peças e grava `public/office/assets/catalog.json` com
+  tamanho e ponto de apoio no chão de cada peça.
+  - Modo `auto`: acha os objetos sozinho e junta pedaços soltos, como folhas de planta. Serve quando o gerador não
+    respeita uma grade exata.
+  - Modo grade: colunas × linhas fixas.
+  - Testes: `test/asset-slicer.test.ts`.
+- **Próximos passos com as peças em mãos:**
+  1. Montador de cena a partir do catálogo, com a mesma planta das 6 salas.
+  2. Sombras por código.
+  3. Cidade ao vivo atrás do vidro transparente, trocando dia, entardecer e noite pelo horário real, com luzes
+     piscando.
+  4. Os monitores ao vivo (`public/office/desk-screens.js`) passam a usar as telas lisas das peças novas.
+
+## Já no ar com a arte atual: monitores das mesas com dados reais
+
+`public/office/desk-screens.js` desenha nas 24 telas das 8 mesas (medidas na arte), só com dados recebidos.
+
+| Mesa | Tela da esquerda | Tela do centro | Tela da direita |
+|---|---|---|---|
+| Todas | BTC 1 h, últimas 48 h | (por agente, abaixo) | mensagens registradas do agente por hora, últimas 12 h |
+| Satoshi | | candles de 1 h das últimas 24 h | |
+| Oracle | | fechamentos de até 120 h | |
+| Vega | | variação absoluta por hora | |
+| Flux | | fluxo comprador menos vendedor, por minuto | |
+| Nova | | mark price da sessão | |
+| Sentinel | | checagens de risco: verde ok, vermelho falha | |
+| Atlas | | contratos em aberto (24 h) | |
+| Euler | | liquidações por hora | |
+
+Sem dado fresco, a tela fica apagada. A mesa sem agente no Trading Floor continua escura.
+
+A cidade ao vivo precisa da janela com vidro transparente (folha 7). Na arte atual, vidro e parede têm cores
+parecidas demais para separar com segurança: o teste de máscara automática vazou para as paredes.

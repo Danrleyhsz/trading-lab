@@ -159,3 +159,20 @@ test('cadeiras e destinos movidos no editor: cadeira, monitor e recorte andam ju
  // O piso padrão é refeito com as posições novas: a cadeira movida continua alcançando todo destino.
  const grid=OfficeMap.defaultGrid();for(const place of OfficeLife.places){const target=place.to??{x:place.x,y:OfficeLife.lanes[place.lane].y};assert.ok(OfficeMap.route({x:nova.x,y:nova.y},target,grid).length>=2,'nova → '+place.id);}
 });
+
+test('monitores das mesas: sem dado fresco ficam apagados; com candles reais desenham gráfico; 3 telas por mesa',()=>{
+ const used:string[]=[];
+ const ctx:any=new Proxy({},{get:(t:any,k)=>k in t?t[k]:(()=>{}),set:(t:any,k,v)=>{if((k==='fillStyle'||k==='strokeStyle')&&typeof v==='string')used.push(v);t[k]=v;return true;}});
+ const canvas={getContext:()=>ctx,setAttribute(){},id:'',width:0,height:0};
+ const office={prepend(){}};
+ const context=vm.createContext({document:{querySelector:(s:string)=>s==='#office'?office:null,createElement:()=>canvas},Date,Math,Object,Array,console});
+ vm.runInContext(readFileSync('public/office/desk-screens.js','utf8'),context);
+ const {OfficeDeskScreens}=context as any;
+ assert.deepEqual(Object.keys(OfficeDeskScreens.QUADS).sort(),['atlas','euler','flux','nova','oracle','satoshi','sentinel','vega']);
+ for(const q of Object.values(OfficeDeskScreens.QUADS) as any[])assert.deepEqual(Object.keys(q),['left','center','right']);
+ OfficeDeskScreens.paint({panorama:null,finance:null,marks:[],messages:[]});
+ assert.ok(!used.some(c=>['#22e39f','#ff6b6b','#5fb6ff','#ffd166'].includes(c)),'sem dados: nenhuma cor de gráfico, só telas apagadas');
+ used.length=0;const t0=Date.UTC(2026,9,5);
+ OfficeDeskScreens.paint({panorama:{candles:{BTCUSDT:Array.from({length:30},(_,i)=>({t:t0+i*3600000,o:100+i,h:102+i,l:99+i,c:i%2?101+i:99+i}))}},finance:null,marks:[],messages:[]});
+ assert.ok(used.includes('#22e39f')&&used.includes('#ff6b6b'),'candles reais aparecem em verde e vermelho');
+});
