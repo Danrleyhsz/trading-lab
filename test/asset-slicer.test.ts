@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {decodePng,encodePng} from '../scripts/assets/png.js';
+import {decodePng,encodePng,mirror} from '../scripts/assets/png.js';
 import {sliceSheet,findObjects,sliceAuto,cleanAlpha} from '../scripts/assets/slice-sheet.js';
 
 test('PNG: ida e volta sem perda, e lê os PNGs reais do escritório',()=>{
@@ -36,4 +36,9 @@ test('modo automático: acha objetos fora da grade, junta partes soltas e ordena
 test('limpeza de alfa: halo fraco some e o objeto fica 100% opaco (borda dura de pixel art)',()=>{
  const img={width:3,height:1,data:new Uint8Array([10,20,30,20, 200,100,50,180, 1,2,3,254])};
  const out=cleanAlpha(img);assert.deepEqual([...out.data],[0,0,0,0, 200,100,50,255, 1,2,3,255]);assert.equal(img.data[3],20,'não altera a original');
+});
+
+test('espelho: o lado esquerdo é o direito invertido na horizontal',()=>{
+ const img={width:2,height:1,data:new Uint8Array([1,2,3,255, 9,8,7,128])};
+ assert.deepEqual([...mirror(img).data],[9,8,7,128, 1,2,3,255]);
 });

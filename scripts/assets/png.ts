@@ -37,3 +37,7 @@ export function encodePng(img:Rgba):Buffer{
 export function crop(img:Rgba,x:number,y:number,w:number,h:number):Rgba{
  const data=new Uint8Array(w*h*4);for(let r=0;r<h;r++)data.set(img.data.subarray(((y+r)*img.width+x)*4,((y+r)*img.width+x+w)*4),r*w*4);return {width:w,height:h,data};
 }
+/** Espelha na horizontal (gera o lado esquerdo de uma peça desenhada virada para a direita). */
+export function mirror(img:Rgba):Rgba{
+ const data=new Uint8Array(img.data.length);for(let y=0;y<img.height;y++)for(let x=0;x<img.width;x++){const s=(y*img.width+x)*4,d=(y*img.width+(img.width-1-x))*4;data.set(img.data.subarray(s,s+4),d);}return {width:img.width,height:img.height,data};
+}

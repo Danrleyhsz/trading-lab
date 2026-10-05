@@ -4,7 +4,7 @@
 // apoio no chão (centro da base). Células vazias são puladas; células com fundo opaco são recusadas.
 import {readFileSync,writeFileSync,mkdirSync} from 'node:fs';
 import {join} from 'node:path';
-import {decodePng,encodePng,crop,type Rgba} from './png.js';
+import {decodePng,encodePng,crop,mirror,type Rgba} from './png.js';
 
 export interface SlicedAsset {id:string;file:string;width:number;height:number;anchor:{x:number;y:number};cell:{col:number;row:number};opaqueShare:number}
 const ALPHA_MIN=16;
@@ -67,6 +67,8 @@ if(process.argv[1]?.endsWith('slice-sheet.ts')){
  if(!file||!prefix||!cols||!rows||!list)throw Error('uso: slice-sheet.ts <folha.png> <prefixo> <colunas> <linhas> <nomes,separados> [pasta]');
  // colunas=auto: acha os objetos sozinho (linhas é ignorado).
  const sheet=cleanAlpha(decodePng(readFileSync(file))),pieces=cols==='auto'?sliceAuto(sheet,prefix,list.split(',')):sliceSheet(sheet,prefix,Number(cols),Number(rows),list.split(','));
+ // Peças '-lado' (viradas para a direita) ganham a versão '-lado-esq' espelhada.
+ for(const p of [...pieces])if(p.asset.id.endsWith('-lado')){const id=p.asset.id+'-esq';pieces.push({asset:{...p.asset,id,file:id+'.png'},png:encodePng(mirror(decodePng(p.png)))});}
  mkdirSync(dir,{recursive:true});for(const p of pieces)writeFileSync(join(dir,p.asset.file),p.png);
  const catalogFile=join(dir,'catalog.json');let catalog:Record<string,SlicedAsset>={};try{catalog=JSON.parse(readFileSync(catalogFile,'utf8'));}catch{}
  for(const p of pieces)catalog[p.asset.id]=p.asset;writeFileSync(catalogFile,JSON.stringify(catalog,null,1)+'\n');

@@ -149,3 +149,17 @@ parecidas demais para separar com segurança: o teste de máscara automática va
 - **Recorte:** 46 peças em modo automático. Todas as folhas deram exatamente o número de objetos pedido.
 - **Sala de teste:** o Trading Floor montado só com as peças novas, a textura de madeira, a parede e a cidade atrás do
   vidro. Prévia em `outputs/assets-pesquisa/sala-teste-pecas-novas.png`.
+
+## Segunda leva pedida (05/10/2026): folhas 10 a 13
+
+Depois da sala de teste, o dono notou que os assentos vieram numa direção só: as poltronas ficaram todas viradas para
+quem olha, e não para a mesa de centro. Os textos estão na mesma página das folhas 1 a 9.
+
+| Folha | Arquivo | Peças, na ordem |
+|---|---|---|
+| 10. Assentos em 3 vistas | `assentos.png` | poltrona, sofá de 2 lugares e cadeira de reunião, cada um de frente, de costas e de lado (virado para a direita) |
+| 11. Objetos pequenos de mesa | `objetos-mesa.png` | caneca, pilha de papéis, porta-lápis, planta de mesa, telefone, fone, calculadora, bloco, garrafa, porta-retrato, tablet, livros empilhados |
+| 12. Objetos que faltam | `faltantes.png` | quadro branco, arquivo de aço, prateleira de parede, arandela, mural de cortiça, cabideiro, extintor, coluna, aparador, planta em suporte, mapa-múndi, vaso com galhos |
+| 13. Paredes internas em 3/4 | `paredes-internas.png` | parede reta, canto, ponta, vão de porta, janela interna de vidro, parede curta |
+
+O lado esquerdo de cada assento não é pedido ao gerador: a ferramenta gera a peça `-lado-esq` espelhando a `-lado`.
