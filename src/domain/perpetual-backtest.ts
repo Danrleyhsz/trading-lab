@@ -1,11 +1,11 @@
-import {perpetualDirection} from './perpetual-signals.js';
+import {perpetualDirection,validTeamFilters,teamFilterWarmup,type TeamFilters} from './perpetual-signals.js';
 import {createHash} from 'node:crypto';
 import type {Candle} from './backtest.js';
 import {RiskEngine} from './risk.js';
 import type {PortfolioSnapshot} from './portfolio.js';
 export interface FundingSettlement {timestamp:number;rate:number;markPrice:number}
 export interface PerpetualDataset {instrument:'BINANCE_USDM:BTCUSDT';trade:Candle[];mark:Candle[];funding:FundingSettlement[]}
-export interface PerpetualConfig {strategy?:'SMA'|'BREAKOUT'|'MEAN_REVERSION';initialCapital:number;feeRate:number;slippageBps:number;maintenanceRate:number;liquidationFeeRate:number;positionFraction:number;fastPeriod:number;slowPeriod:number}
+export interface PerpetualConfig {strategy?:'SMA'|'BREAKOUT'|'MEAN_REVERSION';filters?:TeamFilters;initialCapital:number;feeRate:number;slippageBps:number;maintenanceRate:number;liquidationFeeRate:number;positionFraction:number;fastPeriod:number;slowPeriod:number}
 export interface SimulationEntry {kind:'PROPOSAL'|'FILL'|'FUNDING'|'LIQUIDATION';timestamp:number;quantity:number;price:number;cashDelta:number;approved?:boolean;reasons?:string[]}
 const hour=3600000;
 export function validatePerpetualDataset(data:PerpetualDataset){
@@ -23,7 +23,8 @@ export function validatePerpetualDataset(data:PerpetualDataset){
 /** Offline historical simulation only. Never emits broker events or writes account balances. */
 export function backtestPerpetual(data:PerpetualDataset,cfg:PerpetualConfig){
  const datasetHash=validatePerpetualDataset(data);if(cfg.strategy&&!['SMA','BREAKOUT','MEAN_REVERSION'].includes(cfg.strategy))throw Error('invalid strategy');
- if(!Object.entries(cfg).filter(([key])=>key!=='strategy').every(([,value])=>Number.isFinite(value))||cfg.initialCapital<=0||cfg.feeRate<0||cfg.feeRate>=1||cfg.slippageBps<0||cfg.slippageBps>=10000||cfg.maintenanceRate<=0||cfg.maintenanceRate>=1||cfg.liquidationFeeRate<0||cfg.liquidationFeeRate>=1||cfg.positionFraction<=0||cfg.positionFraction>0.2||!Number.isInteger(cfg.fastPeriod)||!Number.isInteger(cfg.slowPeriod)||cfg.fastPeriod<1||cfg.slowPeriod<=cfg.fastPeriod||data.trade.length<=cfg.slowPeriod)throw new Error('invalid configuration');
+ if(!validTeamFilters(cfg.filters)||teamFilterWarmup(cfg.filters)>=data.trade.length)throw Error('invalid team filters');const warmup=Math.max(cfg.slowPeriod,teamFilterWarmup(cfg.filters));
+ if(!Object.entries(cfg).filter(([key])=>key!=='strategy'&&key!=='filters').every(([,value])=>Number.isFinite(value))||cfg.initialCapital<=0||cfg.feeRate<0||cfg.feeRate>=1||cfg.slippageBps<0||cfg.slippageBps>=10000||cfg.maintenanceRate<=0||cfg.maintenanceRate>=1||cfg.liquidationFeeRate<0||cfg.liquidationFeeRate>=1||cfg.positionFraction<=0||cfg.positionFraction>0.2||!Number.isInteger(cfg.fastPeriod)||!Number.isInteger(cfg.slowPeriod)||cfg.fastPeriod<1||cfg.slowPeriod<=cfg.fastPeriod||data.trade.length<=cfg.slowPeriod)throw new Error('invalid configuration');
  const risk=new RiskEngine();const audit:SimulationEntry[]=[];const equitySeries:{timestamp:number;equity:number}[]=[];
  let cash=cfg.initialCapital,quantity=0,entry=0,fees=0,funding=0,liquidations=0,peak=cash,maxDrawdown=0,fundingIndex=0;
  const snapshot=(mark:number):PortfolioSnapshot=>({initialCash:cfg.initialCapital,cash,equity:cash+quantity*(mark-entry),realizedPnl:0,unrealizedPnl:quantity*(mark-entry),positions:quantity?[{symbol:'BTCUSDT',quantity,averageEntry:entry,realizedPnl:0}]:[]});
@@ -41,7 +42,7 @@ export function backtestPerpetual(data:PerpetualDataset,cfg:PerpetualConfig){
   // Original timestamps remain in the audit. This ordering is a declared modeling assumption.
   const settle=(until:number)=>{while(fundingIndex<data.funding.length&&data.funding[fundingIndex].timestamp<until){const f=data.funding[fundingIndex++];const delta=-quantity*f.markPrice*f.rate;cash+=delta;funding+=delta;audit.push({kind:'FUNDING',timestamp:f.timestamp,quantity,price:f.markPrice,cashDelta:delta});record(f.timestamp,f.markPrice);}};
   settle(c.timestamp+1000);
-  if(i>=cfg.slowPeriod){const direction=perpetualDirection(data.trade.slice(0,i),cfg,quantity);if(quantity&&Math.sign(quantity)!==direction)execute(-quantity,c.open,c.timestamp);if(!quantity&&direction&&cash>0)execute(direction*cash*cfg.positionFraction/c.open,c.open,c.timestamp);}
+  if(i>=warmup){const direction=perpetualDirection(data.trade.slice(0,i),cfg,quantity);if(quantity&&Math.sign(quantity)!==direction)execute(-quantity,c.open,c.timestamp);if(!quantity&&direction&&cash>0)execute(direction*cash*cfg.positionFraction/c.open,c.open,c.timestamp);}
   settle(c.timestamp+hour);
   // OHLC cannot reveal chronology. Funding precedes the worst mark stress; liquidation
   // fills at the adverse trade extreme, deliberately conservative and not exchange parity.

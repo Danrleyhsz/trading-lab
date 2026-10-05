@@ -69,3 +69,20 @@ Results on 2026-10-04 with study d674cb32's own dataset:
 | 125 days (2026-06-01 → 10-04) | 3 001 | 3 001 each | 7 (approved) | 7 | 374 | 0 |
 
 The drill's equity is **not performance evidence**: the replay overlaps the study's own training and test data. It proves the team pipeline, nothing about edge.
+
+## Release approval by backend fingerprint (added 2026-10-05)
+
+The pilot runs when **either** condition holds:
+- `CONTINUOUS_RELEASE_COMMIT` equals the deployed commit (unchanged);
+- `CONTINUOUS_RELEASE_BACKEND` equals the deployed backend fingerprint.
+
+The fingerprint is a SHA-256 over the compiled backend (`dist/src`) and `package-lock.json`, line-ending normalised. The office (`public/`) is excluded, so a visual-only release keeps the pilot running without a new pin. Any backend or dependency change produces a new fingerprint, and the pilot pauses with `RELEASE_NOT_APPROVED` until the owner pins it again.
+
+`/paper/perpetual/preflight` shows two fields:
+- `release.backendFingerprint`: copy this value into `CONTINUOUS_RELEASE_BACKEND` with "Save only";
+- `release.approvedBy`: `COMMIT` or `BACKEND_FINGERPRINT`.
+
+## Owner alerts and report
+
+- **Alerts:** `.github/workflows/pilot-alerts.yml` runs every 15 minutes with the GET-only token. It opens a GitHub issue (labels `pilot-event` and `pilot-verdict`) for each new pilot fill or stop and for the final verdict. GitHub then notifies the owner by e-mail and in the mobile app.
+- **Report:** `GET /paper/perpetual/pilot/report` applies docs/PILOT_EVALUATION_PROTOCOL.md.

@@ -1,3 +1,4 @@
+import {validTeamFilters,teamFilterWarmup} from '../domain/perpetual-signals.js';
 import {validatePerpetualDataset, type PerpetualConfig} from '../domain/perpetual-backtest.js';
 import type {PerpetualStudy} from './perpetual-studies.js';
 
@@ -10,7 +11,8 @@ function validConfiguration(c:PerpetualConfig|undefined, trainBars:number) {
         finite(c.initialCapital)&&c.initialCapital>0 && c.feeRate===PAPER_SCREEN_POLICY.feeRate &&
         c.slippageBps===PAPER_SCREEN_POLICY.slippageBps && c.positionFraction===PAPER_SCREEN_POLICY.positionFraction &&
         c.maintenanceRate===0.01 && c.liquidationFeeRate===0.005 &&
-        Number.isSafeInteger(c.fastPeriod)&&c.fastPeriod>=1 && Number.isSafeInteger(c.slowPeriod)&&c.slowPeriod>c.fastPeriod&&c.slowPeriod<trainBars;
+        Number.isSafeInteger(c.fastPeriod)&&c.fastPeriod>=1 && Number.isSafeInteger(c.slowPeriod)&&c.slowPeriod>c.fastPeriod&&c.slowPeriod<trainBars &&
+        validTeamFilters(c.filters) && teamFilterWarmup(c.filters)<trainBars;
 }
 /** Read-only eligibility, shared by diagnostics and the actual cycle. Never promotes a study. */
 export function screenPerpetualStudy(study:PerpetualStudy|undefined, now=Date.now()) {

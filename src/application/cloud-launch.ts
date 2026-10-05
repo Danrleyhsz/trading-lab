@@ -39,7 +39,8 @@ export function checkCloudConfiguration(env: NodeJS.ProcessEnv): LaunchCheck[] {
     } else add('PERPETUAL_PAPER_ENABLED_MUST_BE_FALSE', env.PERPETUAL_PAPER_ENABLED === 'false');
     if (pilot) {
         add('EXPLICIT_PILOT_STUDY', /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(env.AUTONOMOUS_STUDY_ID ?? ''));
-        add('PINNED_RELEASE_COMMIT', /^[0-9a-f]{40}$/.test(env.CONTINUOUS_RELEASE_COMMIT ?? ''));
+        // Either an exact commit or an exact backend fingerprint (visual-only releases keep the fingerprint).
+        add('PINNED_RELEASE_COMMIT', /^[0-9a-f]{40}$/.test(env.CONTINUOUS_RELEASE_COMMIT ?? '') || /^[0-9a-f]{64}$/.test(env.CONTINUOUS_RELEASE_BACKEND ?? ''));
         const loss = env.PILOT_MAX_LOSS === undefined ? 0.03 : Number(env.PILOT_MAX_LOSS);
         add('VALID_PILOT_LOSS_LIMIT', Number.isFinite(loss) && loss > 0 && loss < 0.1);
     } else add('NO_AUTONOMOUS_STUDY', !env.AUTONOMOUS_STUDY_ID);

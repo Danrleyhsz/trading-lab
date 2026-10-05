@@ -1113,7 +1113,6 @@ dialog::backdrop{background:#02081291;backdrop-filter:blur(2px)}
 .last-words{display:grid;gap:1px;max-width:9cqw}.last-words span{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .last-words small{display:block!important;position:static!important;transform:none!important;border:0!important;background:none!important;padding:0!important;color:#4f6585!important;font-size:.85em!important;max-width:none!important}
 .agent[data-seated="true"] .last-words{bottom:calc(100% + 1.6cqw)}
-.agent[data-station-scale="true"]:hover{z-index:9}
 .live-screen{position:absolute;z-index:4;display:flex;flex-direction:column;gap:.1cqw;padding:.25cqw .4cqw;overflow:hidden;pointer-events:none;background:linear-gradient(#071a33f2,#04101ff2);box-shadow:inset 0 0 .6cqw #35c9ff33;color:#cfe3ff;font-size:clamp(5px,.5cqw,11px);line-height:1.15;font-family:ui-monospace,Consolas,monospace}
 .live-screen .screen-head{color:#7fb6e8;font-size:.9em;letter-spacing:.04em;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .live-screen b{font-size:1.9em;line-height:1.05;font-weight:800}

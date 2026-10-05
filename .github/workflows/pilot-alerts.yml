@@ -1,0 +1,52 @@
+# Owner alerts for the paper pilot: each new pilot fill or stop, and the final verdict, opens a GitHub issue.
+# GitHub then notifies the owner by e-mail and in the GitHub mobile app. GET-only monitor token; the only write
+# is the issue in this repository.
+name: Pilot alerts
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+  issues: write
+concurrency:
+  group: pilot-alerts
+  cancel-in-progress: false
+jobs:
+  alerts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Read pilot timeline and report, open one issue per new event
+        env:
+          TOKEN: ${{ secrets.READ_ONLY_ACCESS_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          ORIGIN: https://trading-lab-x0yh.onrender.com
+        run: |
+          set -euo pipefail
+          test -n "$TOKEN" || { echo "::error::READ_ONLY_ACCESS_TOKEN secret is missing"; exit 1; }
+          get(){ printf 'header = "Authorization: Bearer %s"\n' "$TOKEN" | curl -fsS --retry 3 --retry-delay 10 --max-time 30 -K - "$ORIGIN$1"; }
+          get /paper/perpetual/pilot/timeline > timeline.json
+          get /paper/perpetual/pilot/report > report.json
+          gh label create pilot-event --color FFD166 --description "Paper pilot fill or stop" --force >/dev/null
+          gh label create pilot-verdict --color 35C9FF --description "Paper pilot final verdict" --force >/dev/null
+          since=$(date -u -d '-3 hours' +%s)
+          # Fills and stops from the last three hours (older ones were alerted by earlier runs or predate this job).
+          jq -c --argjson since "$since" '[(.fills[]|{id:.eventId,at,title:("Piloto · Nova "+(if .side=="BUY" then "comprou " else "vendeu " end)+(.quantity|tostring)+" BTC a "+(.price|tostring)),body:("Fill paper registrado em "+.at+"\nLado: "+.side+" · quantidade: "+(.quantity|tostring)+" BTC · preço: "+(.price|tostring)+" · taxa: "+(.fee|tostring)+" USDT")}),(.stops[]|{id:.eventId,at,title:("Piloto encerrado · "+(.reason//"motivo não registrado")),body:("O ciclo registrou AUTONOMOUS_PILOT_STOPPED em "+.at)})]|map(select((.at|sub("\.[0-9]+Z$";"Z")|fromdateiso8601)>=$since))|.[]' timeline.json > events.jsonl || true
+          while IFS= read -r event; do
+            id=$(jq -r .id <<<"$event"); short=${id:0:8}
+            if gh issue list --label pilot-event --state all --search "$short in:title" --json number --jq 'length' | grep -qv '^0$'; then continue; fi
+            gh issue create --label pilot-event --title "$(jq -r .title <<<"$event") [$short]" --body "$(jq -r .body <<<"$event")
+
+          Evento original: \`$id\` · abrir em $ORIGIN/office/index.html (Relatórios). Somente paper; nenhum dinheiro real."
+            echo "opened issue for $id" >> "$GITHUB_STEP_SUMMARY"
+          done < events.jsonl
+          verdict=$(jq -r '.verdict // "NO_DECISIONS"' report.json)
+          echo "verdict: $verdict (provisional $(jq -r '.provisionalVerdict // "-"' report.json))" >> "$GITHUB_STEP_SUMMARY"
+          if [ "$verdict" != "IN_PROGRESS" ] && [ "$verdict" != "NO_DECISIONS" ]; then
+            started=$(jq -r .startedAt report.json)
+            if [ "$(gh issue list --label pilot-verdict --state all --search "$started in:body" --json number --jq length)" = "0" ]; then
+              gh issue create --label pilot-verdict --title "Piloto paper · veredito: $verdict" --body "$(jq -r '"Protocolo: \(.protocol.version) · início \(.startedAt) · \(.hours) h\nDecisões: \(.decisions.total) (long \(.decisions.long), short \(.decisions.short), flat \(.decisions.flat)) · fills \(.fills) · operações fechadas \(.closedTrades)\nP&L do piloto: \(.pnl) USDT · BTC no período: \(.benchmarks.btcReturn) · buy and hold com a mesma exposição: \(.benchmarks.buyAndHoldSameExposure) USDT\n\nPróximo passo pré-declarado: \(.nextStep)"' report.json)"
+            fi
+          fi
