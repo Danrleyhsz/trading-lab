@@ -135,3 +135,17 @@ Sem dado fresco, a tela fica apagada. A mesa sem agente no Trading Floor continu
 
 A cidade ao vivo precisa da janela com vidro transparente (folha 7). Na arte atual, vidro e parede têm cores
 parecidas demais para separar com segurança: o teste de máscara automática vazou para as paredes.
+
+## Primeira leva gerada (05/10/2026)
+
+- **Chegaram 14 imagens:** 7 folhas de objetos, 4 texturas e a cidade em 3 horários.
+- **Fundo das folhas:** transparente de verdade (cerca de 65% dos pixels com alfa 0). O vidro das janelas também é
+  transparente.
+- **Problemas do gerador, corrigidos na ferramenta:**
+  - Os objetos vêm quase opacos (alfa até 254), com um halo fraco em volta (alfa abaixo de 32, em 4 a 6% dos pixels).
+    O recorte agora aplica `cleanAlpha`: abaixo de 96 vira transparente, acima vira 100% opaco, como pede pixel art.
+  - O gerador não respeita uma escala comum: a cadeira saiu mais alta que a mesa. Por isso
+    `public/office/assets/escala.json` define o tamanho de cada peça na cena, medido na arte atual (pessoa em pé = 87 px).
+- **Recorte:** 46 peças em modo automático. Todas as folhas deram exatamente o número de objetos pedido.
+- **Sala de teste:** o Trading Floor montado só com as peças novas, a textura de madeira, a parede e a cidade atrás do
+  vidro. Prévia em `outputs/assets-pesquisa/sala-teste-pecas-novas.png`.

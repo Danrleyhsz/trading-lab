@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {decodePng,encodePng} from '../scripts/assets/png.js';
-import {sliceSheet,findObjects,sliceAuto} from '../scripts/assets/slice-sheet.js';
+import {sliceSheet,findObjects,sliceAuto,cleanAlpha} from '../scripts/assets/slice-sheet.js';
 
 test('PNG: ida e volta sem perda, e lê os PNGs reais do escritório',()=>{
  const img={width:3,height:2,data:new Uint8Array([255,0,0,255, 0,255,0,128, 0,0,255,0, 10,20,30,40, 50,60,70,80, 90,100,110,120])};
@@ -31,4 +31,9 @@ test('modo automático: acha objetos fora da grade, junta partes soltas e ordena
  assert.deepEqual(found.map((b:any)=>b.x),[10,120,60],'linha de cima da esquerda para a direita, depois a de baixo');
  assert.throws(()=>sliceAuto({width:w,height:h,data},'p',['a','b']),/encontrei 3 objetos/);
  assert.deepEqual(sliceAuto({width:w,height:h,data},'p',['planta','quadro','sofa']).map((p:any)=>p.asset.id),['p-planta','p-quadro','p-sofa']);
+});
+
+test('limpeza de alfa: halo fraco some e o objeto fica 100% opaco (borda dura de pixel art)',()=>{
+ const img={width:3,height:1,data:new Uint8Array([10,20,30,20, 200,100,50,180, 1,2,3,254])};
+ const out=cleanAlpha(img);assert.deepEqual([...out.data],[0,0,0,0, 200,100,50,255, 1,2,3,255]);assert.equal(img.data[3],20,'não altera a original');
 });

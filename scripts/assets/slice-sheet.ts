@@ -8,6 +8,14 @@ import {decodePng,encodePng,crop,type Rgba} from './png.js';
 
 export interface SlicedAsset {id:string;file:string;width:number;height:number;anchor:{x:number;y:number};cell:{col:number;row:number};opaqueShare:number}
 const ALPHA_MIN=16;
+/**
+ * Borda dura de pixel art: o gerador deixa um halo fraco (alfa baixo) em volta dos objetos e o próprio objeto quase
+ * opaco (até 254). Abaixo do limiar vira transparente (e sem cor); acima vira 100% opaco. Devolve uma cópia.
+ */
+export function cleanAlpha(img:Rgba,threshold=96):Rgba{
+ const data=img.data.slice();for(let i=3;i<data.length;i+=4){if(data[i]<threshold){data[i-3]=data[i-2]=data[i-1]=data[i]=0;}else data[i]=255;}
+ return {width:img.width,height:img.height,data};
+}
 /** Caixa do conteúdo visível (alfa ≥ 16) dentro de uma região, ou null se vazia. */
 export function contentBox(img:Rgba,x0:number,y0:number,w:number,h:number){
  let minX=Infinity,minY=Infinity,maxX=-1,maxY=-1,count=0;
@@ -58,7 +66,7 @@ if(process.argv[1]?.endsWith('slice-sheet.ts')){
  const [file,prefix,cols,rows,list,dir='public/office/assets']=process.argv.slice(2);
  if(!file||!prefix||!cols||!rows||!list)throw Error('uso: slice-sheet.ts <folha.png> <prefixo> <colunas> <linhas> <nomes,separados> [pasta]');
  // colunas=auto: acha os objetos sozinho (linhas é ignorado).
- const sheet=decodePng(readFileSync(file)),pieces=cols==='auto'?sliceAuto(sheet,prefix,list.split(',')):sliceSheet(sheet,prefix,Number(cols),Number(rows),list.split(','));
+ const sheet=cleanAlpha(decodePng(readFileSync(file))),pieces=cols==='auto'?sliceAuto(sheet,prefix,list.split(',')):sliceSheet(sheet,prefix,Number(cols),Number(rows),list.split(','));
  mkdirSync(dir,{recursive:true});for(const p of pieces)writeFileSync(join(dir,p.asset.file),p.png);
  const catalogFile=join(dir,'catalog.json');let catalog:Record<string,SlicedAsset>={};try{catalog=JSON.parse(readFileSync(catalogFile,'utf8'));}catch{}
  for(const p of pieces)catalog[p.asset.id]=p.asset;writeFileSync(catalogFile,JSON.stringify(catalog,null,1)+'\n');
