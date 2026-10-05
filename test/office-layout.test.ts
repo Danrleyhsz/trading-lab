@@ -48,3 +48,15 @@ test('telas das moedas: telão só com candles e o clique abre o gráfico ao viv
  assert.equal(C.timeLabel(new Date(2026,9,5,0,0).getTime(),'1h'),'05/10','meia-noite no gráfico de 1 h mostra a data');
  assert.equal(C.timeLabel(new Date(2026,9,5,14,7).getTime(),'1m'),'14:07');
 });
+
+test('barra lateral: cada painel ganha um resumo visual que só lê dados recebidos e agrupa equity por hora',()=>{
+ const source=readFileSync('public/office/panels.js','utf8');
+ assert.doesNotMatch(source,/fetch\(|method:|\/orders|\/jobs|POST/,'os resumos não buscam nem enviam nada: usam o que a página já recebeu');
+ const ctx=vm.createContext({document:{querySelector:()=>null,querySelectorAll:()=>[]},setInterval:()=>0});vm.runInContext(source,ctx);const P=(ctx as any).OfficePanels;
+ for(const id of Object.keys(P.HEROES))assert.ok(ids.has(id),id+' existe no layout');
+ assert.equal(Object.keys(P.HEROES).length,8,'os 8 painéis da barra lateral');
+ const t0=Date.UTC(2026,9,5,10);
+ assert.equal(JSON.stringify(P.hourly([{timestamp:t0,equity:1000},{timestamp:t0+600000,equity:1004},{timestamp:t0+1200000,equity:998},{timestamp:new Date(t0+3600000).toISOString(),equity:1001},{timestamp:t0+3700000,equity:NaN}])),
+  JSON.stringify([{t:t0,o:1000,h:1004,l:998,c:998},{t:t0+3600000,o:1001,h:1001,l:1001,c:1001}]));
+ for(const id of ['configDisplay','lightingMode','configNotifications','configMapEditor','rendererMode','configMeasure','rendererStatus','notificationStatus'])assert.ok(ids.has(id),id+' continua no Config');
+});

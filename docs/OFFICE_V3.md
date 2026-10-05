@@ -47,6 +47,23 @@ Clicar numa tela de moeda (BTC/USDT, BTC PERP ou ETH/USDT) abre a janela do grá
 - "Ao vivo" só aparece quando chegou dado nos últimos 90 s. Sem isso, a janela mostra "Sem dado novo" ou "Indisponível" e nunca inventa candles;
 - no perpétuo, a variação, a máxima e a mínima de 24 h vêm das 24 últimas velas de 1 hora e só aparecem quando as 24 existem.
 
+## Barra lateral: resumo visual
+
+Cada painel da barra lateral abre com um resumo visual no topo (`public/office/panels.js`). São números grandes, gráficos e ícones; os textos explicativos ficam recolhidos em "ⓘ Como ler" e as tabelas longas em "Ver detalhes":
+
+| Painel | Resumo |
+|---|---|
+| Equipe | anel de agentes trabalhando, salas ocupadas, mensagens por agente nas últimas 12 h |
+| Portfólio | capital, P&L, posições abertas, pior drawdown, taxas e funding; equity do piloto em candles por hora com a linha do capital inicial; um card por conta (clique abre a auditoria) |
+| Operações | fills, compras × vendas, volume, taxas, funding e linha do tempo de 7 dias |
+| Mercado | BTC/USDT, BTC PERP e ETH/USDT com candles (clique abre o gráfico ao vivo), funding por corretora, open interest, liquidações, livro e mapa de calor das moedas |
+| Estratégias | estudos, lucro × prejuízo, pesquisas aprovadas/rejeitadas/falhas e P&L histórico por estudo (clique abre o estudo) |
+| Memória | agentes como filtros clicáveis e memórias por tipo |
+| Relatórios | veredito do piloto, P&L, operações fechadas contra o mínimo, decisões long/short/fora e acerto das previsões |
+| Config | semáforo do serviço (banco, mercado, exposição, autonomia, IA) e preferências em cards |
+
+O resumo só usa o que a página já recebeu (contas, mensagens, panorama, registros, placar e diagnóstico). Sem dado, o bloco mostra um traço, nunca um número inventado.
+
 **Use:** the panorama is screen context only (`scope: PUBLIC_MARKET_CONTEXT_ONLY`). It never feeds signals, risk or execution.
 
 **Liquidations:** totals are observed lower bounds. Binance streams at most one liquidation per symbol per second, and coverage starts at the last restart. The screen shows "desde HH:MM" until 24 h are covered.
