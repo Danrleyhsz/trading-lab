@@ -193,8 +193,6 @@
   try{const r=await renderer.measure();$('#rendererStatus').textContent=(r.mode==='canvas'?'Canvas':'Elementos da página')+': '+r.fps.toFixed(0)+' quadros/s, 95% dos quadros em até '+r.p95.toFixed(1)+' ms, '+r.longFrames+' quadro(s) acima de 50 ms'+(r.drawMs!==null?', desenho médio '+r.drawMs.toFixed(2)+' ms':'')+(r.animating?'.':' (animações paradas: compare com elas ligadas).');}
   finally{b.disabled=false;}
  };
- // Cenário: arte atual ou peças novas (beta). Trocar recarrega a página.
- if(globalThis.OfficeCenario&&$('#cenarioMode')){$('#cenarioMode').value=OfficeCenario.mode;$('#cenarioMode').onchange=()=>OfficeCenario.set($('#cenarioMode').value);}
  $('#configMapEditor').onclick=()=>{$('#workspaceDialog').close();globalThis.OfficeMapEditor?.open();};
  $('#configDisplay').onclick=()=>{$('#workspaceDialog').close();$('#displayDialog').showModal();};
 

@@ -1,6 +1,6 @@
 // Original Trading Lab browser geometry. No market, agent-work or persistence capability.
 (() => {
- const scene=Object.freeze({width:1852,height:849,asset:'/office/office-reference-v2.png'});
+ const scene=Object.freeze({width:1852,height:849,asset:'/office/cenario-modular.png'});
  const layout=Object.freeze({
   'Research Lab':{x:2,y:10,w:30,h:28,floorY:94},'Trading Floor':{x:34,y:10,w:33,h:28,floorY:94},'Risk Desk':{x:69,y:10,w:29,h:28,floorY:94},
   'Quant Lab':{x:2,y:38,w:30,h:29,floorY:98},Lounge:{x:34,y:38,w:33,h:29,floorY:98},'Meeting Room':{x:69,y:38,w:29,h:29,floorY:98}

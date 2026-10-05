@@ -217,3 +217,27 @@ O teste de rotas já pegou três plantas em cima da rota de cima, corrigidas ant
 - monitores ao vivo encaixados nas telas novas;
 - telões da War Room com equity, posições e drawdown;
 - cidade de dia atrás do vidro.
+
+## Cenário oficial (05/10/2026)
+
+O dono aprovou o escritório montado com as peças.
+
+**O que mudou**
+- O cenário novo é o único: a opção em Config saiu, e a arte antiga foi removida do escritório
+  (`office-reference-v2.png`, `office-day.png`, `office-scene.png` e `research-stations.png`, cerca de 12 MB).
+- Uma cópia da arte antiga fica fora do repositório, em `outputs/assets-gerados/arte-antiga-referencia.png`.
+- Para gerar folhas novas, a referência de estilo passa a ser o próprio cenário novo,
+  `public/office/cenario-modular.png`.
+
+**Áreas clicáveis no formato das telas** (`public/office/scene-quads.js`)
+- **Monitores das mesas:** as 3 telas de cada uma das 8 mesas e as da mesa vazia do Trading Floor usam os 4 cantos
+  medidos da tela.
+- **Telões:** War Room, Análise, Meeting Room, Risk Desk e o monitor do Data Center usam os retângulos exatos de
+  `screens.js`.
+- **Como funciona:** a caixa do botão envolve a tela, e só o polígono da tela recebe o clique e mostra o contorno
+  ciano. As telas inclinadas são seguidas pela borda.
+
+**Correções**
+- O telão do meio da War Room e o telão de canto da Análise voltaram a ser clicáveis. A regra que escondia as antigas
+  placas das salas também os escondia.
+- A área do Data Center agora é só o monitor, e não os racks.

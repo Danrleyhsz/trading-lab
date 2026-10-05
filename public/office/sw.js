@@ -1,7 +1,7 @@
 // Installable office. Caches only static /office/ files so the app opens fast and offline; account, market and
 // event data always come from the network and are never cached here.
-const CACHE='trading-lab-office-v1';
-self.addEventListener('install',event=>{self.skipWaiting();event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(['/office/index.html','/office/style.css','/office/v3.css','/office/app.js','/office/dashboard.js','/office/office-reference-v2.png'])).catch(()=>{}));});
+const CACHE='trading-lab-office-v2';
+self.addEventListener('install',event=>{self.skipWaiting();event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(['/office/index.html','/office/style.css','/office/v3.css','/office/app.js','/office/dashboard.js','/office/cenario-modular.png','/office/cidade-faixa-noite.png'])).catch(()=>{}));});
 self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));});
 self.addEventListener('fetch',event=>{
  const url=new URL(event.request.url);
