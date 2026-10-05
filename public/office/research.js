@@ -93,6 +93,21 @@ q('#researchDialog').addEventListener('close', () => {
   else q('#navResearch').focus();
   researchOpener = null; render();
 });
+// Robustez (Deflated Sharpe e PBO): calculada no servidor numa thread separada; enquanto calcula, tenta de novo.
+async function loadRobustness(id,host,attempt){
+  if(!q('#studyDialog').open)return;
+  try{
+    const response=await fetch('/backtests/v2/studies/'+encodeURIComponent(id)+'/robustness',{cache:'no-store'});const entry=await response.json();
+    if(entry.status==='COMPUTING'||entry.status==='BUSY'){host.replaceChildren(node('p','Calculando robustez (vários backtests)… '+(attempt?'('+attempt*4+' s)':'')));if(attempt<30)setTimeout(()=>loadRobustness(id,host,attempt+1),4000);return;}
+    if(entry.status!=='READY')throw Error('indisponível');
+    const r=entry.result,pct=v=>v===null||v===undefined||!Number.isFinite(v)?'—':(v*100).toFixed(1).replace('.',',')+'%',num=v=>Number.isFinite(v)?v.toFixed(2).replace('.',','):'—';
+    const labels={DEFLATED_SHARPE:'Deflated Sharpe ≥ '+pct(r.policy.minimumDeflatedSharpe),PROBABILITY_OF_OVERFITTING:'Probabilidade de overfitting (PBO) ≤ '+pct(r.policy.maximumPbo),POSITIVE_OUT_OF_SAMPLE_PATHS:'Caminhos fora da amostra positivos ≥ '+pct(r.policy.minimumPositivePathShare)};
+    host.replaceChildren(node('p',r.eligible?'Passa na triagem de robustez.':'Não passa na triagem de robustez.'),
+      node('p','Sharpe anual fora da amostra: '+num(r.outOfSample.sharpeAnnualized)+' em '+r.outOfSample.hours+' h · esperado só por sorte com '+r.multipleTesting.trials+' tentativas: '+num(r.multipleTesting.benchmarkSharpeAnnualized)),
+      node('p','Deflated Sharpe: '+pct(r.multipleTesting.deflatedSharpe)+' · PBO: '+pct(r.overfitting.pbo)+(r.overfitting.note?' ('+r.overfitting.note+')':'')+' · caminhos positivos: '+pct(r.overfitting.positivePathShare)));
+    const list=node('ul','');for(const c of r.checks)list.append(node('li',(c.ok?'✓ ':'✗ ')+(labels[c.id]||c.id)+' · valor '+(c.id==='DEFLATED_SHARPE'||c.id==='PROBABILITY_OF_OVERFITTING'||c.id==='POSITIVE_OUT_OF_SAMPLE_PATHS'?pct(c.value):c.value)));host.append(list,node('small','Vale para pilotos que começarem depois do atual. O piloto em andamento segue as regras declaradas antes do início.'));
+  }catch{host.replaceChildren(node('p','Robustez indisponível. Confira o acesso e reabra o estudo.'));}
+}
 async function studyDetails(id) {
   q('#studyDialog').showModal();q('#studyDetails').textContent = 'Carregando…';
   try {
@@ -103,6 +118,7 @@ async function studyDetails(id) {
       host.append(node('p', 'P&L simulado fora da amostra: ' + money(study.result.netPnl)), node('p', 'Evidência: ' + study.result.datasetHash), node('p', 'Resultados históricos não aprovam operações do fundo. Cada janela começa e termina sem posições. Candles finais não usados: ' + study.result.excludedTailBars));
       for (const fold of study.result.folds) host.append(node('p', `${date(fold.testStart)} → ${date(fold.testEnd)} · ${fold.configuration?.strategy || 'SMA'} · ${fold.result.trades ?? 'indisponível'} operações históricas · P&L ${money(fold.result.netPnl)} · taxas ${money(fold.result.feesPaid)} · funding ${money(fold.result.fundingCashDelta)} · drawdown ${(fold.result.maxDrawdown * 100).toFixed(2)}% · ${fold.result.liquidations} liquidações modeladas`));
       host.append(node('p', 'Liquidação usa premissas conservadoras configuradas; as regras completas da exchange não estão modeladas.'));
+      const robust=node('section','');robust.className='robustness';host.append(node('h3','Robustez · ROBUSTNESS_SCREEN_V1'),robust);loadRobustness(id,robust,0);
     }
   } catch { q('#studyDetails').textContent = 'Estudo indisponível. Entre se o acesso for exigido.'; }
 }

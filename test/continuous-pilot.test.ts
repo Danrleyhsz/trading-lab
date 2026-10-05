@@ -81,7 +81,9 @@ test('team briefing publishes advisory researcher findings, Nova plan and Sentin
  const data=dataset();const o=teamObservations({data,quote:quote(199),direction:1,currentQuantity:0,configuration:eligibleStudyFixture(start).result!.folds[0].configuration,studyId:'controlled-study',candleTimestamp:data.trade.at(-1)!.timestamp,decisionEventId:'TEST_ONLY'});
  assert.ok(o.satoshi.change24h!>0);assert.equal(o.oracle.regime,'UNKNOWN','fewer than 240 bars');assert.ok(o.flux.spreadBps!>0);
  const plan=team.brief({data,quote:quote(199),direction:1,currentQuantity:0,configuration:{...eligibleStudyFixture(start).result!.folds[0].configuration,strategy:'BREAKOUT',slowPeriod:480},studyId:'d674cb32-2ba0',candleTimestamp:data.trade.at(-1)!.timestamp,decisionEventId:'TEST_ONLY'});
- const sent=messages.list();assert.deepEqual(sent.map(m=>m.from),['satoshi','vega','flux','oracle','nova']);
+ const sent=messages.list();assert.deepEqual(sent.map(m=>m.from),['satoshi','vega','flux','oracle','atlas','nova']);
+ const debate=sent.find(m=>m.kind==='DEBATE')!;assert.equal(debate.context.policy,'DEBATE_V1');assert.match(debate.summary,/a decisão segue o estudo/i);
+ assert.deepEqual(debate.context.stances,{satoshi:'A_FAVOR',oracle:'NEUTRO',flux:'NEUTRO',vega:'NEUTRO'},'sinal long: momentum de alta a favor; regime indefinido e funding neutro');
  assert.ok(sent.every(m=>m.context.advisoryOnly===true));assert.match(plan.summary,/be long \(BREAKOUT 480/);
  const review=team.riskReview(false,{order:{side:'BUY',quantity:2,proposalId:'p'},decision:{reasons:['DRAWDOWN_LIMIT']},accountId:'evaluation:nova:usdm'});
  assert.equal(review.from,'sentinel');assert.match(review.summary,/Rejected BUY 2 BTC: DRAWDOWN_LIMIT/);

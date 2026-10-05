@@ -418,7 +418,7 @@ q('#workspaceDialog').addEventListener('close', () => {
 
 let inspectedRoom=null,communicationVersion=0,communicationBusy=false,communicationReady=false;
 let communications=[],seenCommunications=new Set(),selectedHandoff=null,handoffProfileFocus=null;
-const messageKinds={HYPOTHESIS:'Hipótese',BACKTEST_RESULT:'Resultado de teste',RISK_REVIEW:'Revisão de risco',EXECUTION_PLAN:'Plano de execução',PORTFOLIO_DECISION:'Decisão de portfólio',RESEARCH_FINDING:'Achado de pesquisa'};
+const messageKinds={HYPOTHESIS:'Hipótese',BACKTEST_RESULT:'Resultado de teste',RISK_REVIEW:'Revisão de risco',EXECUTION_PLAN:'Plano de execução',PORTFOLIO_DECISION:'Decisão de portfólio',RESEARCH_FINDING:'Achado de pesquisa',DEBATE:'Debate da equipe'};
 const roomInfo={
  'Research Lab':{description:'Biblioteca e coordenação de hipóteses. Consulte evidências e pesquisas registradas.',action:'Abrir pesquisas',panel:'researchPanel',nav:'navResearch'},
  'Quant Lab':{description:'Bancada de testes históricos. Resultados positivos, negativos e falhas ficam preservados.',action:'Abrir estudos históricos',panel:'researchPanel',nav:'navResearch'},

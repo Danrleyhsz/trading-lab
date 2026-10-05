@@ -10,6 +10,7 @@ import {EventBus} from './application/event-bus.js';
 import {PilotTeamBriefing} from './application/pilot-team-briefing.js';
 import {AgentMessageBus} from './domain/agent-messages.js';
 import {MemoryStore} from './domain/memory.js';
+import {TeamPredictions,scorecard} from './application/team-predictions.js';
 import type {PerpetualStudy,PerpetualStudies} from './application/perpetual-studies.js';
 import type {PerpetualDataset} from './domain/perpetual-backtest.js';
 
@@ -19,7 +20,7 @@ const full=study.dataset!,hours=Number(process.env.HOURS??336);
 if(!full||!study.result||!(hours>0&&hours<full.trade.length-500))throw Error('STUDY_FILE must be a full study record with dataset and result; HOURS must leave 500 bars of history');
 const startIndex=full.trade.length-hours;
 let clock=full.trade[startIndex-1].timestamp+hour+60000;const now=()=>clock;
-const bus=new EventBus(),messages=new AgentMessageBus(),team=new PilotTeamBriefing(messages),events:{type:string;payload:any;at:number}[]=[];
+const teamMemories=new MemoryStore(),bus=new EventBus(),messages=new AgentMessageBus(),team=new PilotTeamBriefing(messages,new TeamPredictions(teamMemories)),events:{type:string;payload:any;at:number}[]=[];
 bus.subscribe(e=>{events.push({type:e.type,payload:e.payload,at:clock});if(e.type==='RISK_APPROVED'||e.type==='RISK_REJECTED')team.riskReview(e.type==='RISK_APPROVED',e.payload as never);});
 const book=new PerpetualPaperBook(bus,undefined,now);book.ensureEvaluation('nova',1000);
 const save=async()=>{};
@@ -45,6 +46,8 @@ const report={scope:'TEST_ONLY_ACCELERATED_TEAM_DRILL',studyId:study.id,replayed
  pilotStops:events.filter(e=>e.type==='AUTONOMOUS_PILOT_STOPPED').map(e=>e.payload.reason),finalEquity:nova.portfolio.equity,openPositions:nova.portfolio.positions,failures,
  firstDecisionConversation:sent.filter(m=>m.context?.decisionEventId===events.find(e=>e.type==='AUTONOMOUS_DECISION')?.payload&&true).slice(0,0),
  sampleConversation:sent.slice(0,7).map(m=>({from:m.from,to:m.to,kind:m.kind,summary:m.summary})),
+ // Placar das previsões da equipe no replay (TEST_ONLY: os dados se sobrepõem ao treino do estudo).
+ teamScorecard:scorecard(teamMemories.query()).map(s=>({agentId:s.agentId,settled:s.settled,hits:s.hits,hitRate:s.hitRate})),
  tradeConversations:sent.filter(m=>m.from==='sentinel').slice(0,6).map(m=>({from:m.from,summary:m.summary}))};
 delete (report as Record<string,unknown>).firstDecisionConversation;
 if(process.env.REPORT_PATH)await writeFile(process.env.REPORT_PATH,JSON.stringify(report,null,2));

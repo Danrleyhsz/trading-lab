@@ -22,6 +22,8 @@ export const STUDY_CANDIDATE_SETS={
  TEAM_VEGA_VOLATILITY_V1:[{...base,strategy:'BREAKOUT',slowPeriod:480,filters:{volatility:true}}],
  TEAM_SATOSHI_MOMENTUM_V1:[{...base,strategy:'BREAKOUT',slowPeriod:480,filters:{momentum:true}}],
  TEAM_COMBINED_V1:[{...base,strategy:'BREAKOUT',slowPeriod:480,filters:{regime:true,volatility:true,momentum:true}}],
+ // Proteções pré-declaradas (docs/ROBUSTEZ_DE_ESTUDOS.md): 24 h de pausa após cada operação e 72 h após 2 perdas seguidas.
+ BREAKOUT_480_PROTECTED_V1:[{...base,strategy:'BREAKOUT',slowPeriod:480,protections:{cooldownHours:24,maxConsecutiveLosses:2,lossPauseHours:72}}],
 } satisfies Record<string,PerpetualConfig[]>;
 export type StudyCandidateSet=keyof typeof STUDY_CANDIDATE_SETS;
 export const studyCandidates=(set:StudyCandidateSet='SHORT_HORIZON_V1')=>structuredClone(STUDY_CANDIDATE_SETS[set]);

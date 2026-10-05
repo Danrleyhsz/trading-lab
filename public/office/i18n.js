@@ -19,7 +19,7 @@
   [/^Regime (\w+) \((.*) from the 240h average\)$/,(m)=>'Regime '+m[1]+' ('+m[2]+' vs média de 240h)'],
   [/^Signal says (.*) \((.*) from study (\w+)\); researcher notes are context only$/,(m)=>'Sinal: '+({'stay flat':'ficar fora','be long':'ficar comprada','be short':'ficar vendida','close any position':'fechar a posição'}[m[1]]||m[1])+' ('+m[2]+', estudo '+m[3]+'); notas da equipe são só contexto']
  ];
- const kinds={OBSERVATION:'Observação',DECISION:'Decisão',FAILURE:'Falha',LESSON:'Lição',EVALUATION:'Avaliação',HYPOTHESIS:'Hipótese'};
+ const kinds={PREDICTION:'Previsão',OBSERVATION:'Observação',DECISION:'Decisão',FAILURE:'Falha',LESSON:'Lição',EVALUATION:'Avaliação',HYPOTHESIS:'Hipótese'};
  function text(value){const s=String(value??'');if(Object.hasOwn(exact,s))return exact[s];for(const [re,fn] of patterns){const m=s.match(re);if(m)return fn(m);}return s;}
  globalThis.OfficeI18n=Object.freeze({text,kind:k=>kinds[k]||k});
 })();
