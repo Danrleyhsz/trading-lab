@@ -1,0 +1,61 @@
+<!doctype html><meta charset="utf-8"><title>Compositor</title><body style="margin:0;background:#111">
+<script src="/office/navigation.js"></script><script src="/office/workstations.js"></script><script src="/office/life.js"></script>
+<script>
+// Compositor do cenário modular: lê cenario-modular.json + catálogo + escala e desenha o escritório inteiro.
+// Saídas: cenario-modular.png (vidro transparente), cidade-faixa-<fase>.png, prévias e as telas das 8 mesas.
+const load=src=>new Promise((ok,err)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=()=>err(src);i.src=src;});
+const save=(name,cv)=>fetch('/save?name='+name,{method:'POST',body:cv.toDataURL('image/png')});
+(async()=>{
+ const L=await (await fetch('/office/assets/cenario-modular.json',{cache:'no-store'})).json();
+ const cat=await (await fetch('/office/assets/catalog.json',{cache:'no-store'})).json(),esc=await (await fetch('/office/assets/escala.json',{cache:'no-store'})).json();
+ const img={};for(const id of Object.keys(cat))img[id]=await load('/office/assets/'+cat[id].file);
+ const tex={};for(const t of ['madeira','parede','carpete','porcelanato'])tex[t]=await load('/gerados/textura-'+t+'.png');
+ const city={};for(const t of ['dia','entardecer','noite'])city[t]=await load('/gerados/cidade-'+t+'.png');
+ const {width:W,height:H}=L.scene,size=id=>{const c=cat[id],e=esc[id];const s=e.w?e.w/c.width:e.h/c.height;return {w:c.width*s,h:c.height*s,s};};
+ const cv=document.createElement('canvas');cv.width=W;cv.height=H;const g=cv.getContext('2d');g.imageSmoothingEnabled=true;g.imageSmoothingQuality='high';
+ const pattern=(t,s)=>{const p=g.createPattern(tex[t],'repeat');p.setTransform(new DOMMatrix().scale(s));return p;};
+ // 1) pisos
+ for(const f of L.pisos){const [x,y,w,h]=f.rect;g.fillStyle=pattern(f.textura,f.textura==='madeira'?0.13:0.1);g.fillRect(x,y,w,h);if(f.escurecer){g.fillStyle='rgba(8,12,30,'+f.escurecer+')';g.fillRect(x,y,w,h);}}
+ // 2) faces de parede (com rodapé) e sombra de contato no chão
+ const jw=size('arquitetura-janela'),winBottom=L.janelas.y-2+jw.h;
+ for(const p of L.paredes){const [x,y,w,h]=p.face;g.fillStyle=pattern('parede',0.12);g.fillRect(x,y,w,h);
+  const rd=size('arquitetura-rodape');g.save();g.beginPath();g.rect(x,y,w,h+4);g.clip();for(let rx=x;rx<x+w;rx+=rd.w-2)g.drawImage(img['arquitetura-rodape'],rx,y+h-rd.h*0.55,rd.w,rd.h);g.restore();
+  const s=g.createLinearGradient(0,y+h,0,y+h+12);s.addColorStop(0,'rgba(10,5,2,.42)');s.addColorStop(1,'rgba(10,5,2,0)');g.fillStyle=s;g.fillRect(x,y+h,w,12);}
+ for(const [x,y,w,h] of L.topos){g.fillStyle='#34446f';g.fillRect(x,y,w,h);g.fillStyle='#5468a0';g.fillRect(x,y,w,2);g.fillStyle='#1b2340';g.fillRect(x,y+h-1,w,1);}
+ // 3) janelas (só o caixilho; o vidro continua transparente)
+ for(const [a,b] of L.janelas.trechos){g.save();g.beginPath();g.rect(a,0,b-a,winBottom+2);g.clip();for(let x=a-4;x<b;x+=jw.w-4)g.drawImage(img['arquitetura-janela'],x,L.janelas.y-2,jw.w,jw.h);g.restore();}
+ // 4) moldura externa e divisórias verticais (vistas de cima: só o topo da parede)
+ const m=L.moldura;g.fillStyle='#141a33';g.fillRect(0,0,W,m.topo);g.fillRect(0,0,m.esquerda,H);g.fillRect(m.direita,0,W-m.direita,H);g.fillRect(0,m.base,W,H-m.base);
+ g.fillStyle='#2b3760';g.fillRect(m.esquerda-6,m.topo,6,m.base-m.topo);g.fillRect(m.direita,m.topo,6,m.base-m.topo);g.fillRect(m.esquerda,m.base,m.direita-m.esquerda,6);
+ for(const d of L.divisorias){g.fillStyle='#2b3760';g.fillRect(d.x,d.y0,12,d.y1-d.y0);g.fillStyle='#5468a0';g.fillRect(d.x,d.y0,2,d.y1-d.y0);g.fillStyle='#1b2340';g.fillRect(d.x+10,d.y0,2,d.y1-d.y0);}
+ // 5) objetos: mesas das 8 estações + lista do layout; peças de chão primeiro, depois pela base
+ const stations=OfficeWorkstations.catalog.filter(s=>L.estacoes.ids.includes(s.id));
+ const items=[...stations.flatMap(s=>{const base=s.y-L.estacoes.recuo;return [{id:L.estacoes.mesa,x:s.x,base,station:s.id},...(L.estacoes.tampo||[]).map(t=>({id:t.id,x:s.x+t.dx,base:base+t.dy,z:base+1}))];}),...L.objetos];
+ const zOf=o=>o.z??(o.fit?o.fit[1]+o.fit[3]:o.base);
+ items.sort((a,b)=>((b.chao?1:0)-(a.chao?1:0))||((b.parede?1:0)-(a.parede?1:0))||zOf(a)-zOf(b));
+ const screens={};
+ for(const o of items){const c=cat[o.id];if(!c)throw Error('peça desconhecida '+o.id);
+  if(o.fit){const [fx,fy,fw,fh]=o.fit,[ix,iy,iw,ih]=L.telas[o.id].inner,sx=fw/iw,sy=fh/ih;g.drawImage(img[o.id],fx-ix*sx,fy-iy*sy,c.width*sx,c.height*sy);continue;}
+  const s=size(o.id),x=o.x-s.w/2,y=o.base-s.h;
+  if(!o.chao&&!o.parede&&o.z===undefined){g.fillStyle='rgba(15,8,3,.32)';g.beginPath();g.ellipse(o.x,o.base-1,s.w*0.42,Math.max(2,s.w*0.07),0,0,Math.PI*2);g.fill();}
+  g.drawImage(img[o.id],x,y,s.w,s.h);
+  if(o.station&&L.telas[o.id]){screens[o.station]={};for(const [side,q] of Object.entries(L.telas[o.id])){if(side==='inner')continue;screens[o.station][side]=q.map(([qx,qy])=>[Math.round(x+qx*s.s),Math.round(y+qy*s.s)]);}}
+ }
+ await save('cenario-modular',cv);
+ // 6) faixas da cidade (mesma fatia do panorama para os três horários)
+ const bandH=winBottom-L.janelas.y,cs=W*1.15/city.noite.width;
+ for(const [fase,c] of Object.entries(city)){const b=document.createElement('canvas');b.width=W;b.height=bandH;const k=b.getContext('2d');k.imageSmoothingQuality='high';k.drawImage(c,0,c.height*(L.cidade?.inicio??0.22),c.width,bandH/cs,-20,0,c.width*cs,bandH);await save('cidade-faixa-'+fase,b);}
+ // 7) prévias: cidade atrás + cenário; e conferência com cadeiras, corredores, telas e telões
+ for(const fase of ['noite','dia']){const pv=document.createElement('canvas');pv.width=W;pv.height=H;const p=pv.getContext('2d');p.fillStyle='#0b1220';p.fillRect(0,0,W,H);
+  const band=await load('/out/cidade-faixa-'+fase+'.png?'+Date.now());p.drawImage(band,0,L.janelas.y);p.drawImage(cv,0,0);await save('previa-'+fase,pv);
+  if(fase==='noite'){p.lineWidth=2;
+   for(const lane of Object.values(OfficeLife.lanes)){p.strokeStyle='rgba(53,201,255,.8)';p.beginPath();p.moveTo(lane.from,lane.y);p.lineTo(lane.to,lane.y);p.stroke();}
+   for(const ps of OfficeLife.passages){p.strokeStyle='rgba(53,201,255,.8)';p.beginPath();p.moveTo(ps.x,OfficeLife.lanes[ps.a].y);p.lineTo(ps.x,OfficeLife.lanes[ps.b].y);p.stroke();}
+   for(const s of stations){p.fillStyle='#ffb547';p.beginPath();p.arc(s.x,s.y,5,0,7);p.fill();}
+   for(const pl of OfficeLife.places){const t=pl.to??{x:pl.x,y:OfficeLife.lanes[pl.lane].y};p.fillStyle='#ff4fd8';p.beginPath();p.arc(t.x,t.y,4,0,7);p.fill();}
+   p.strokeStyle='#22e39f';for(const q of Object.values(screens))for(const qq of Object.values(q)){p.beginPath();qq.forEach(([x,y],i)=>i?p.lineTo(x,y):p.moveTo(x,y));p.closePath();p.stroke();}
+   await save('previa-conferencia',pv);}
+ }
+ window.__screens=screens;document.title='pronto';
+})().catch(e=>{document.title='erro '+e;console.error(e);});
+</script>

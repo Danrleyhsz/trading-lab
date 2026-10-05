@@ -253,3 +253,10 @@ body.v3 .agent[data-activity="waiting"] .state-badge{background:#2b0f16f0;border
 #agentList .agent-card .agent-doing{color:#cfe0f0;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 /* Monitores das mesas com dados reais: acima da arte e da luz ambiente, abaixo dos personagens e das cadeiras. */
 #deskScreens{position:absolute;inset:0;width:100%;height:100%;z-index:2;pointer-events:none}
+/* Cenário modular (beta, escolhido em Config): arte montada com as peças geradas, vidro transparente e a cidade
+   numa faixa atrás das janelas (y 10–92 da cena), trocando de dia, entardecer e noite pela luz do escritório.
+   Posição vertical da faixa: 10/849 da cena, convertido para a regra de % do background-position (1,304%). */
+body[data-cenario="modular"] #office{background-image:url('/office/cenario-modular.png'),url('/office/cidade-faixa-noite.png')!important;background-size:100% 100%,100% 9.658%!important;background-position:0 0,0 1.304%!important;background-repeat:no-repeat!important;background-color:#0b1220!important}
+body[data-cenario="modular"] #office[data-lighting="day"]{background-image:url('/office/cenario-modular.png'),url('/office/cidade-faixa-dia.png')!important}
+body[data-cenario="modular"] #office[data-lighting="dusk"]{background-image:url('/office/cenario-modular.png'),url('/office/cidade-faixa-entardecer.png')!important}
+body[data-cenario="modular"] .station-chair,body[data-cenario="modular"] #office[data-lighting] .station-chair{background-image:url('/office/assets/cadeira-costas.png')!important;background-size:100% 100%!important;background-position:0 0!important;clip-path:none!important}

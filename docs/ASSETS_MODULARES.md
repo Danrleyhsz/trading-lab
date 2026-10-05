@@ -175,3 +175,45 @@ O lado esquerdo de cada assento não é pedido ao gerador: a ferramenta gera a p
   - Os objetos pequenos ficam no tampo das mesas e são desenhados depois da mesa: a posição vem do tampo, a ordem
     de desenho vem da mesa.
 - **Prévias:** `outputs/assets-pesquisa/sala-teste-pecas-novas-v2.png` e `sala-zoom-janela-parede.png`.
+
+## Escritório remontado com as peças (beta, 05/10/2026)
+
+Em Config → "Cenário do escritório" → "Peças novas (beta)". A escolha fica no navegador e o padrão continua sendo
+a arte atual. Trocar recarrega a página.
+
+**O que muda**
+- **Fundo:** `public/office/cenario-modular.png`, montado com 108 peças posicionadas em
+  `public/office/assets/cenario-modular.json`. O vidro das janelas é transparente.
+- **Cidade:** uma faixa atrás das janelas (`cidade-faixa-dia|entardecer|noite.png`) que troca com a luz do escritório
+  (dia, entardecer, noite).
+- **Cadeiras:** as dos 8 agentes passam a ser a peça `cadeira-costas`, apoiada no ponto de cada agente, e não um
+  recorte do fundo. O encosto cobre as costas do personagem sentado e a cabeça fica por cima.
+- **Monitores ao vivo:** usam as telas medidas na peça da mesa (`QUADS_MODULAR` em `desk-screens.js`).
+
+**O que não muda**
+- Posições das cadeiras dos agentes, corredores (y 300, 544 e 812), passagens (x 632, 1267, 475 e 1320) e destinos
+  dos passeios.
+- Telões nos mesmos retângulos de `screens.js` (War Room, Análise, Meeting Room, Risk Desk e Data Center) e áreas
+  clicáveis de `app.js`.
+- O mapa de piso, o editor e o desenho em canvas continuam valendo.
+
+**Como refazer o fundo depois de mudar o layout**
+1. `node scripts/assets/servidor-compositor.cjs public/office ../assets-gerados`
+2. Abrir `http://127.0.0.1:3031/compor-cenario.html` e esperar o título virar "pronto".
+3. Copiar `scripts/assets/out/cenario-modular.png` e `cidade-faixa-*.png` para `public/office/`.
+
+O compositor também gera `previa-conferencia.png`, com rotas, cadeiras, destinos e telas marcados.
+
+**Testes:** `test/office-life.test.ts` confere que:
+- o cenário é opcional;
+- toda peça do layout existe e tem escala;
+- nenhum móvel do layout cruza as rotas ou as passagens;
+- os arquivos novos são liberados pelo servidor.
+
+O teste de rotas já pegou três plantas em cima da rota de cima, corrigidas antes do PR.
+
+**Conferido no preview:**
+- personagens sentados com o encosto por cima;
+- monitores ao vivo encaixados nas telas novas;
+- telões da War Room com equity, posições e drawdown;
+- cidade de dia atrás do vidro.

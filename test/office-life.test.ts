@@ -176,3 +176,25 @@ test('monitores das mesas: sem dado fresco ficam apagados; com candles reais des
  OfficeDeskScreens.paint({panorama:{candles:{BTCUSDT:Array.from({length:30},(_,i)=>({t:t0+i*3600000,o:100+i,h:102+i,l:99+i,c:i%2?101+i:99+i}))}},finance:null,marks:[],messages:[]});
  assert.ok(used.includes('#22e39f')&&used.includes('#ff6b6b'),'candles reais aparecem em verde e vermelho');
 });
+
+test('cenário modular: opcional (padrão é a arte atual), peças existentes e nenhum móvel em cima das rotas',()=>{
+ const store=new Map<string,string>();
+ const run=()=>{const context=vm.createContext({document:{body:{dataset:{} as Record<string,string>}},localStorage:{getItem:(k:string)=>store.get(k)??null,setItem:(k:string,v:string)=>store.set(k,v)},location:{reload(){}}});vm.runInContext(readFileSync('public/office/cenario.js','utf8'),context);return context as any;};
+ let c=run();assert.equal(c.OfficeCenario.mode,'atual');assert.equal(c.document.body.dataset.cenario,undefined);
+ store.set('trading-lab.cenario.v1','modular');c=run();assert.equal(c.OfficeCenario.modular,true);assert.equal(c.document.body.dataset.cenario,'modular');
+ assert.deepEqual({...c.OfficeCenario.chairRect({x:174,y:299})},{x:150,y:243,w:48,h:64},'cadeira apoiada no ponto do agente');
+ // Layout: toda peça existe no catálogo e tem escala.
+ const L=JSON.parse(readFileSync('public/office/assets/cenario-modular.json','utf8')),cat=JSON.parse(readFileSync('public/office/assets/catalog.json','utf8')),esc=JSON.parse(readFileSync('public/office/assets/escala.json','utf8'));
+ for(const o of L.objetos)assert.ok(cat[o.id]&&esc[o.id],'peça sem catálogo ou escala: '+o.id);
+ // Nenhum móvel no chão cruza as rotas dos personagens (corredores horizontais e passagens verticais).
+ const ctx=vm.createContext({document:{createElement:()=>new Element(),activeElement:null},setTimeout,clearTimeout,console});
+ for(const name of ['navigation','workstations','life'])vm.runInContext(readFileSync('public/office/'+name+'.js','utf8'),ctx);
+ const {OfficeLife}=ctx as any;
+ const size=(id:string)=>{const e=esc[id],p=cat[id];const s=e.w?e.w/p.width:e.h/p.height;return {w:p.width*s,h:p.height*s};};
+ for(const o of L.objetos){if(o.chao||o.parede||o.fit||o.z!==undefined)continue;const s=size(o.id),x0=o.x-s.w/2,x1=o.x+s.w/2,foot0=o.base-10;
+  for(const [id,lane] of Object.entries(OfficeLife.lanes) as [string,any][])if(lane.y>foot0&&lane.y<o.base+2&&x1>lane.from&&x0<lane.to)assert.fail(o.id+' em x '+o.x+' cruza a rota '+id);
+  for(const p of OfficeLife.passages){const ya=OfficeLife.lanes[p.a].y,yb=OfficeLife.lanes[p.b].y;if(p.x>x0&&p.x<x1&&o.base>Math.min(ya,yb)&&foot0<Math.max(ya,yb))assert.fail(o.id+' bloqueia a passagem x '+p.x);}
+ }
+ const css=readFileSync('public/office/v3.css','utf8');assert.match(css,/body\[data-cenario="modular"\] #office\{background-image:url\('\/office\/cenario-modular\.png'\)/);
+ const assets=readFileSync('src/application/office-assets.ts','utf8');for(const f of ['cenario.js','cenario-modular.png','cidade-faixa-dia.png','cidade-faixa-entardecer.png','cidade-faixa-noite.png','assets/cadeira-costas.png'])assert.ok(assets.includes("'"+f+"'"),'arquivo liberado: '+f);
+});

@@ -37,6 +37,8 @@
  }
  function drawChair(chair,origin,scene){
   const r=chair.getBoundingClientRect();if(r.width<1)return;
+  // Cenário modular: a cadeira é uma peça própria, desenhada inteira no retângulo do elemento.
+  if(D.body?.dataset?.cenario==='modular'){const piece=image(globalThis.OfficeCenario?.CHAIR.src??'/office/assets/cadeira-costas.png');if(!ready(piece))return;const ratio=canvas.width/origin.width;ctx.drawImage(piece,(r.left-origin.left)*ratio,(r.top-origin.top)*ratio,r.width*ratio,r.height*ratio);return;}
   const ratio=canvas.width/origin.width,scale=scene.naturalWidth/origin.width;
   const x=(r.left-origin.left)*ratio,y=(r.top-origin.top)*ratio,w=r.width*ratio,h=r.height*ratio;
   ctx.save();ctx.beginPath();
