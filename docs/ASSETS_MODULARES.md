@@ -163,3 +163,15 @@ quem olha, e não para a mesa de centro. Os textos estão na mesma página das f
 | 13. Paredes internas em 3/4 | `paredes-internas.png` | parede reta, canto, ponta, vão de porta, janela interna de vidro, parede curta |
 
 O lado esquerdo de cada assento não é pedido ao gerador: a ferramenta gera a peça `-lado-esq` espelhando a `-lado`.
+
+## Segunda leva recebida (05/10/2026)
+
+- **Folhas 10 a 13:** transparência limpa, sem halo. Deram exatamente as 42 peças pedidas, incluindo 3 assentos
+  espelhados para o lado esquerdo. O catálogo tem agora 88 peças, todas com escala.
+- **Correções na sala de teste:**
+  - A parede começa onde a peça da janela termina e a cidade é desenhada só na altura do vidro. Antes sobrava uma
+    faixa de cidade entre o peitoril e a parede.
+  - As poltronas ficaram de lado, viradas para a mesa de centro, com o sofá de frente atrás dela.
+  - Os objetos pequenos ficam no tampo das mesas e são desenhados depois da mesa: a posição vem do tampo, a ordem
+    de desenho vem da mesa.
+- **Prévias:** `outputs/assets-pesquisa/sala-teste-pecas-novas-v2.png` e `sala-zoom-janela-parede.png`.

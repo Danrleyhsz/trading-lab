@@ -688,5 +688,635 @@
    "row": 0
   },
   "opaqueShare": 0.991
+ },
+ "assento-poltrona-frente": {
+  "id": "assento-poltrona-frente",
+  "file": "assento-poltrona-frente.png",
+  "width": 101,
+  "height": 102,
+  "anchor": {
+   "x": 51,
+   "y": 102
+  },
+  "cell": {
+   "col": 0,
+   "row": 0
+  },
+  "opaqueShare": 0.81
+ },
+ "assento-poltrona-costas": {
+  "id": "assento-poltrona-costas",
+  "file": "assento-poltrona-costas.png",
+  "width": 105,
+  "height": 89,
+  "anchor": {
+   "x": 53,
+   "y": 89
+  },
+  "cell": {
+   "col": 1,
+   "row": 0
+  },
+  "opaqueShare": 0.81
+ },
+ "assento-poltrona-lado": {
+  "id": "assento-poltrona-lado",
+  "file": "assento-poltrona-lado.png",
+  "width": 88,
+  "height": 102,
+  "anchor": {
+   "x": 44,
+   "y": 102
+  },
+  "cell": {
+   "col": 2,
+   "row": 0
+  },
+  "opaqueShare": 0.694
+ },
+ "assento-sofa-frente": {
+  "id": "assento-sofa-frente",
+  "file": "assento-sofa-frente.png",
+  "width": 190,
+  "height": 95,
+  "anchor": {
+   "x": 95,
+   "y": 95
+  },
+  "cell": {
+   "col": 3,
+   "row": 0
+  },
+  "opaqueShare": 0.827
+ },
+ "assento-sofa-costas": {
+  "id": "assento-sofa-costas",
+  "file": "assento-sofa-costas.png",
+  "width": 201,
+  "height": 90,
+  "anchor": {
+   "x": 101,
+   "y": 90
+  },
+  "cell": {
+   "col": 4,
+   "row": 0
+  },
+  "opaqueShare": 0.822
+ },
+ "assento-sofa-lado": {
+  "id": "assento-sofa-lado",
+  "file": "assento-sofa-lado.png",
+  "width": 98,
+  "height": 107,
+  "anchor": {
+   "x": 49,
+   "y": 107
+  },
+  "cell": {
+   "col": 5,
+   "row": 0
+  },
+  "opaqueShare": 0.732
+ },
+ "assento-reuniao-frente": {
+  "id": "assento-reuniao-frente",
+  "file": "assento-reuniao-frente.png",
+  "width": 78,
+  "height": 98,
+  "anchor": {
+   "x": 39,
+   "y": 98
+  },
+  "cell": {
+   "col": 6,
+   "row": 0
+  },
+  "opaqueShare": 0.703
+ },
+ "assento-reuniao-costas": {
+  "id": "assento-reuniao-costas",
+  "file": "assento-reuniao-costas.png",
+  "width": 79,
+  "height": 93,
+  "anchor": {
+   "x": 40,
+   "y": 93
+  },
+  "cell": {
+   "col": 7,
+   "row": 0
+  },
+  "opaqueShare": 0.718
+ },
+ "assento-reuniao-lado": {
+  "id": "assento-reuniao-lado",
+  "file": "assento-reuniao-lado.png",
+  "width": 82,
+  "height": 105,
+  "anchor": {
+   "x": 41,
+   "y": 105
+  },
+  "cell": {
+   "col": 8,
+   "row": 0
+  },
+  "opaqueShare": 0.42
+ },
+ "assento-poltrona-lado-esq": {
+  "id": "assento-poltrona-lado-esq",
+  "file": "assento-poltrona-lado-esq.png",
+  "width": 88,
+  "height": 102,
+  "anchor": {
+   "x": 44,
+   "y": 102
+  },
+  "cell": {
+   "col": 2,
+   "row": 0
+  },
+  "opaqueShare": 0.694
+ },
+ "assento-sofa-lado-esq": {
+  "id": "assento-sofa-lado-esq",
+  "file": "assento-sofa-lado-esq.png",
+  "width": 98,
+  "height": 107,
+  "anchor": {
+   "x": 49,
+   "y": 107
+  },
+  "cell": {
+   "col": 5,
+   "row": 0
+  },
+  "opaqueShare": 0.732
+ },
+ "assento-reuniao-lado-esq": {
+  "id": "assento-reuniao-lado-esq",
+  "file": "assento-reuniao-lado-esq.png",
+  "width": 82,
+  "height": 105,
+  "anchor": {
+   "x": 41,
+   "y": 105
+  },
+  "cell": {
+   "col": 8,
+   "row": 0
+  },
+  "opaqueShare": 0.42
+ },
+ "mesa-caneca": {
+  "id": "mesa-caneca",
+  "file": "mesa-caneca.png",
+  "width": 77,
+  "height": 117,
+  "anchor": {
+   "x": 39,
+   "y": 117
+  },
+  "cell": {
+   "col": 0,
+   "row": 0
+  },
+  "opaqueShare": 0.502
+ },
+ "mesa-pilha-papeis": {
+  "id": "mesa-pilha-papeis",
+  "file": "mesa-pilha-papeis.png",
+  "width": 121,
+  "height": 88,
+  "anchor": {
+   "x": 61,
+   "y": 88
+  },
+  "cell": {
+   "col": 1,
+   "row": 0
+  },
+  "opaqueShare": 0.656
+ },
+ "mesa-porta-lapis": {
+  "id": "mesa-porta-lapis",
+  "file": "mesa-porta-lapis.png",
+  "width": 60,
+  "height": 107,
+  "anchor": {
+   "x": 30,
+   "y": 107
+  },
+  "cell": {
+   "col": 2,
+   "row": 0
+  },
+  "opaqueShare": 0.799
+ },
+ "mesa-planta-mesa": {
+  "id": "mesa-planta-mesa",
+  "file": "mesa-planta-mesa.png",
+  "width": 116,
+  "height": 119,
+  "anchor": {
+   "x": 58,
+   "y": 119
+  },
+  "cell": {
+   "col": 3,
+   "row": 0
+  },
+  "opaqueShare": 0.585
+ },
+ "mesa-telefone": {
+  "id": "mesa-telefone",
+  "file": "mesa-telefone.png",
+  "width": 146,
+  "height": 107,
+  "anchor": {
+   "x": 73,
+   "y": 107
+  },
+  "cell": {
+   "col": 4,
+   "row": 0
+  },
+  "opaqueShare": 0.728
+ },
+ "mesa-fone-ouvido": {
+  "id": "mesa-fone-ouvido",
+  "file": "mesa-fone-ouvido.png",
+  "width": 119,
+  "height": 102,
+  "anchor": {
+   "x": 60,
+   "y": 102
+  },
+  "cell": {
+   "col": 5,
+   "row": 0
+  },
+  "opaqueShare": 0.568
+ },
+ "mesa-calculadora": {
+  "id": "mesa-calculadora",
+  "file": "mesa-calculadora.png",
+  "width": 106,
+  "height": 101,
+  "anchor": {
+   "x": 53,
+   "y": 101
+  },
+  "cell": {
+   "col": 6,
+   "row": 0
+  },
+  "opaqueShare": 0.753
+ },
+ "mesa-bloco-notas": {
+  "id": "mesa-bloco-notas",
+  "file": "mesa-bloco-notas.png",
+  "width": 116,
+  "height": 113,
+  "anchor": {
+   "x": 58,
+   "y": 113
+  },
+  "cell": {
+   "col": 7,
+   "row": 0
+  },
+  "opaqueShare": 0.663
+ },
+ "mesa-garrafa-agua": {
+  "id": "mesa-garrafa-agua",
+  "file": "mesa-garrafa-agua.png",
+  "width": 49,
+  "height": 125,
+  "anchor": {
+   "x": 25,
+   "y": 125
+  },
+  "cell": {
+   "col": 8,
+   "row": 0
+  },
+  "opaqueShare": 0.883
+ },
+ "mesa-porta-retrato": {
+  "id": "mesa-porta-retrato",
+  "file": "mesa-porta-retrato.png",
+  "width": 115,
+  "height": 99,
+  "anchor": {
+   "x": 58,
+   "y": 99
+  },
+  "cell": {
+   "col": 9,
+   "row": 0
+  },
+  "opaqueShare": 0.799
+ },
+ "mesa-tablet": {
+  "id": "mesa-tablet",
+  "file": "mesa-tablet.png",
+  "width": 153,
+  "height": 94,
+  "anchor": {
+   "x": 77,
+   "y": 94
+  },
+  "cell": {
+   "col": 10,
+   "row": 0
+  },
+  "opaqueShare": 0.784
+ },
+ "mesa-livros-empilhados": {
+  "id": "mesa-livros-empilhados",
+  "file": "mesa-livros-empilhados.png",
+  "width": 143,
+  "height": 110,
+  "anchor": {
+   "x": 72,
+   "y": 110
+  },
+  "cell": {
+   "col": 11,
+   "row": 0
+  },
+  "opaqueShare": 0.753
+ },
+ "item-quadro-branco": {
+  "id": "item-quadro-branco",
+  "file": "item-quadro-branco.png",
+  "width": 227,
+  "height": 175,
+  "anchor": {
+   "x": 114,
+   "y": 175
+  },
+  "cell": {
+   "col": 0,
+   "row": 0
+  },
+  "opaqueShare": 0.694
+ },
+ "item-arquivo-aco": {
+  "id": "item-arquivo-aco",
+  "file": "item-arquivo-aco.png",
+  "width": 64,
+  "height": 130,
+  "anchor": {
+   "x": 32,
+   "y": 130
+  },
+  "cell": {
+   "col": 1,
+   "row": 0
+  },
+  "opaqueShare": 0.956
+ },
+ "item-prateleira-parede": {
+  "id": "item-prateleira-parede",
+  "file": "item-prateleira-parede.png",
+  "width": 140,
+  "height": 58,
+  "anchor": {
+   "x": 70,
+   "y": 58
+  },
+  "cell": {
+   "col": 2,
+   "row": 0
+  },
+  "opaqueShare": 0.593
+ },
+ "item-arandela": {
+  "id": "item-arandela",
+  "file": "item-arandela.png",
+  "width": 26,
+  "height": 40,
+  "anchor": {
+   "x": 13,
+   "y": 40
+  },
+  "cell": {
+   "col": 3,
+   "row": 0
+  },
+  "opaqueShare": 0.761
+ },
+ "item-mural-cortica": {
+  "id": "item-mural-cortica",
+  "file": "item-mural-cortica.png",
+  "width": 120,
+  "height": 81,
+  "anchor": {
+   "x": 60,
+   "y": 81
+  },
+  "cell": {
+   "col": 4,
+   "row": 0
+  },
+  "opaqueShare": 0.999
+ },
+ "item-cabideiro": {
+  "id": "item-cabideiro",
+  "file": "item-cabideiro.png",
+  "width": 59,
+  "height": 175,
+  "anchor": {
+   "x": 30,
+   "y": 175
+  },
+  "cell": {
+   "col": 5,
+   "row": 0
+  },
+  "opaqueShare": 0.357
+ },
+ "item-extintor": {
+  "id": "item-extintor",
+  "file": "item-extintor.png",
+  "width": 31,
+  "height": 55,
+  "anchor": {
+   "x": 16,
+   "y": 55
+  },
+  "cell": {
+   "col": 6,
+   "row": 0
+  },
+  "opaqueShare": 0.657
+ },
+ "item-coluna": {
+  "id": "item-coluna",
+  "file": "item-coluna.png",
+  "width": 91,
+  "height": 280,
+  "anchor": {
+   "x": 46,
+   "y": 280
+  },
+  "cell": {
+   "col": 7,
+   "row": 0
+  },
+  "opaqueShare": 0.881
+ },
+ "item-aparador": {
+  "id": "item-aparador",
+  "file": "item-aparador.png",
+  "width": 150,
+  "height": 69,
+  "anchor": {
+   "x": 75,
+   "y": 69
+  },
+  "cell": {
+   "col": 8,
+   "row": 0
+  },
+  "opaqueShare": 0.845
+ },
+ "item-planta-suporte": {
+  "id": "item-planta-suporte",
+  "file": "item-planta-suporte.png",
+  "width": 92,
+  "height": 150,
+  "anchor": {
+   "x": 46,
+   "y": 150
+  },
+  "cell": {
+   "col": 9,
+   "row": 0
+  },
+  "opaqueShare": 0.482
+ },
+ "item-mapa-mundi": {
+  "id": "item-mapa-mundi",
+  "file": "item-mapa-mundi.png",
+  "width": 120,
+  "height": 77,
+  "anchor": {
+   "x": 60,
+   "y": 77
+  },
+  "cell": {
+   "col": 10,
+   "row": 0
+  },
+  "opaqueShare": 0.999
+ },
+ "item-vaso-galhos": {
+  "id": "item-vaso-galhos",
+  "file": "item-vaso-galhos.png",
+  "width": 76,
+  "height": 150,
+  "anchor": {
+   "x": 38,
+   "y": 150
+  },
+  "cell": {
+   "col": 11,
+   "row": 0
+  },
+  "opaqueShare": 0.36
+ },
+ "parede-reta": {
+  "id": "parede-reta",
+  "file": "parede-reta.png",
+  "width": 709,
+  "height": 233,
+  "anchor": {
+   "x": 355,
+   "y": 233
+  },
+  "cell": {
+   "col": 0,
+   "row": 0
+  },
+  "opaqueShare": 0.982
+ },
+ "parede-canto": {
+  "id": "parede-canto",
+  "file": "parede-canto.png",
+  "width": 507,
+  "height": 379,
+  "anchor": {
+   "x": 254,
+   "y": 379
+  },
+  "cell": {
+   "col": 1,
+   "row": 0
+  },
+  "opaqueShare": 0.678
+ },
+ "parede-fim": {
+  "id": "parede-fim",
+  "file": "parede-fim.png",
+  "width": 69,
+  "height": 233,
+  "anchor": {
+   "x": 35,
+   "y": 233
+  },
+  "cell": {
+   "col": 2,
+   "row": 0
+  },
+  "opaqueShare": 0.894
+ },
+ "parede-vao-porta": {
+  "id": "parede-vao-porta",
+  "file": "parede-vao-porta.png",
+  "width": 631,
+  "height": 233,
+  "anchor": {
+   "x": 316,
+   "y": 233
+  },
+  "cell": {
+   "col": 3,
+   "row": 0
+  },
+  "opaqueShare": 0.843
+ },
+ "parede-janela-interna": {
+  "id": "parede-janela-interna",
+  "file": "parede-janela-interna.png",
+  "width": 572,
+  "height": 233,
+  "anchor": {
+   "x": 286,
+   "y": 233
+  },
+  "cell": {
+   "col": 4,
+   "row": 0
+  },
+  "opaqueShare": 0.757
+ },
+ "parede-curta": {
+  "id": "parede-curta",
+  "file": "parede-curta.png",
+  "width": 207,
+  "height": 233,
+  "anchor": {
+   "x": 104,
+   "y": 233
+  },
+  "cell": {
+   "col": 5,
+   "row": 0
+  },
+  "opaqueShare": 0.975
  }
 }
