@@ -62,7 +62,7 @@ test('worker timeout retains durable input evidence and failure, with no complet
 });
 
 test('pre-declared candidate sets are recorded, fixed and pass the shared cost/signal screen shape',async()=>{
- assert.deepEqual(Object.keys(STUDY_CANDIDATE_SETS),['SHORT_HORIZON_V1','MULTI_DAY_TREND_V1']);
+ assert.deepEqual(Object.keys(STUDY_CANDIDATE_SETS),['SHORT_HORIZON_V1','MULTI_DAY_TREND_V1','BREAKOUT_480_CONTROL_V1','TEAM_ORACLE_REGIME_V1','TEAM_VEGA_VOLATILITY_V1','TEAM_SATOSHI_MOMENTUM_V1','TEAM_COMBINED_V1']);
  assert.equal(studyCandidates().length,5);assert.deepEqual(studyCandidates(),studyCandidates('SHORT_HORIZON_V1'));
  assert.deepEqual(studyCandidates('MULTI_DAY_TREND_V1').map(c=>[c.strategy??'SMA',c.fastPeriod,c.slowPeriod]),[['SMA',48,240],['SMA',72,480],['BREAKOUT',10,480]]);
  const copy=studyCandidates('MULTI_DAY_TREND_V1');copy[0].slowPeriod=1;assert.equal(studyCandidates('MULTI_DAY_TREND_V1')[0].slowPeriod,240);

@@ -5,7 +5,7 @@ import {PAPER_SCREEN_POLICY} from './perpetual-study-screen.js';
 
 type Diagnosis=ReturnType<RuntimeReadiness['snapshot']>;
 /** No save, source retrieval, environment mutation, strategy selection or execution capability. */
-export interface PilotRelease {phase:string;releasePinned:boolean;deployedCommit:string|null}
+export interface PilotRelease {phase:string;releasePinned:boolean;deployedCommit:string|null;approvedBy?:'COMMIT'|'BACKEND_FINGERPRINT'|null;backendFingerprint?:string}
 export function continuousPaperPreflight(studies:PerpetualStudies,diagnosis:Diagnosis,now=Date.now(),release:PilotRelease={phase:'FIRST_PUBLICATION',releasePinned:false,deployedCommit:null}) {
     const selectedId=diagnosis.paper.autonomousStudyId;
     const recent=studies.summaries().map(s=>s.id);

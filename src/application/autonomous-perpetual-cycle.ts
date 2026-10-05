@@ -1,4 +1,4 @@
-import {perpetualDirection} from '../domain/perpetual-signals.js';
+import {perpetualDirection,teamFilterWarmup} from '../domain/perpetual-signals.js';
 import {validatePerpetualDataset,type PerpetualDataset} from '../domain/perpetual-backtest.js';
 import type {PerpetualStudies,PerpetualStudy} from './perpetual-studies.js';
 import type {PerpetualPaperBook,PerpetualBookState} from './perpetual-paper-book.js';
@@ -48,7 +48,7 @@ export class AutonomousPerpetualCycle {
    if(stopReason){await this.stop(stopReason,account,current);this.succeeded();return;}
    if(this.book.status().halted)return;
    const hour=Math.floor(this.now()/3600000)*3600000;if((this.book.status().autonomousCursor??0)>=hour-3600000)return;
-   const study=this.studies.get(this.studyId)!;const configuration=study.result!.folds.at(-1)!.configuration;const data=await this.source.load(Math.max(100,configuration.slowPeriod+2));
+   const study=this.studies.get(this.studyId)!;const configuration=study.result!.folds.at(-1)!.configuration;const data=await this.source.load(Math.max(100,configuration.slowPeriod+2,teamFilterWarmup(configuration.filters)+2));
    if(!this.sourcesReady()||this.book.status().halted||!this.studies.screen(this.studyId,this.now()).eligible)return;
    const hash=validatePerpetualDataset(data);const last=data.trade.at(-1)!;if(last.timestamp+3600000>this.now()||this.now()-last.timestamp>2*3600000)throw Error('signal history stale');if((this.book.status().autonomousCursor??0)>=last.timestamp)return;
    const direction=perpetualDirection(data.trade,configuration,current);

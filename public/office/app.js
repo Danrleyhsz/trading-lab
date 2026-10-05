@@ -432,6 +432,10 @@ refresh();
 setInterval(() => { renderStations();if(selected)renderState();refresh(); if (selected) details(); }, 5000);
 connect();
 
+// Equity series are heavy: fetch them once a minute and reuse them between the light polls.
+let financeCalls=0;const financeSeries=new Map();
+const financeUrl=()=>financeCalls++%12===0?'/finance':'/finance?series=none';
+function withSeries(data){for(const account of data?.perpetualAccounts||[]){if(account.seriesOmitted){const cached=financeSeries.get(account.id);if(cached){account.samples=cached.samples;account.hourly=cached.hourly;}}else financeSeries.set(account.id,{samples:account.samples,hourly:account.hourly});}return data;}
 let onlineBusy = false, onlineVersion = 0, halted = null, runtimeObservedAt = 0, preflightObservedAt = 0;
 function showPerpetualMarket(market) {
   const quote = market.quote;
@@ -472,9 +476,9 @@ function preflightUnavailable(){preflightObservedAt=0;q('#preflightStatus').text
 function renderPreflight(data){
   const observed=Date.parse(data?.observedAt), checks=Object.keys(screenCheckLabels);
   const validStudy=s=>s&&typeof s.studyId==='string'&&s.studyId.length>0&&typeof s.eligible==='boolean'&&typeof s.configured==='boolean'&&s.configured===(s.studyId===data.configuredStudyId)&&s.evidence&&(s.evidence.netPnl===null||Number.isFinite(s.evidence.netPnl))&&Array.isArray(s.checks)&&s.checks.length===checks.length&&s.checks.every(c=>c&&checks.includes(c.id)&&typeof c.ok==='boolean')&&new Set(s.checks.map(c=>c.id)).size===checks.length&&s.eligible===s.checks.every(c=>c.ok);
-  if(data?.scope!=='READ_ONLY_CONTINUOUS_PREFLIGHT'||!Number.isFinite(observed)||Date.now()-observed>15000||observed>Date.now()+5000||data.activationReady!==false||typeof data.cycleEnabled!=='boolean'||!(data.configuredStudyId===null||typeof data.configuredStudyId==='string')||!Array.isArray(data.studies)||data.studies.length>21||data.studies.some(s=>!validStudy(s))||new Set(data.studies.map(s=>s.studyId)).size!==data.studies.length||!Array.isArray(data.unverified)||!data.runtimePrerequisites||typeof data.runtimePrerequisites.ready!=='boolean'||!Array.isArray(data.runtimePrerequisites.reasons)) {preflightUnavailable();return;}
+  if(data?.scope!=='READ_ONLY_CONTINUOUS_PREFLIGHT'||!Number.isFinite(observed)||Date.now()-observed>15000||observed>Date.now()+5000||typeof data.activationReady!=="boolean"||(data.activationReady&&!(data.cycleEnabled===true&&data.runtimePrerequisites?.ready===true&&typeof data.configuredStudyId==="string"))||typeof data.cycleEnabled!=='boolean'||!(data.configuredStudyId===null||typeof data.configuredStudyId==='string')||!Array.isArray(data.studies)||data.studies.length>21||data.studies.some(s=>!validStudy(s))||new Set(data.studies.map(s=>s.studyId)).size!==data.studies.length||!Array.isArray(data.unverified)||!data.runtimePrerequisites||typeof data.runtimePrerequisites.ready!=='boolean'||!Array.isArray(data.runtimePrerequisites.reasons)) {preflightUnavailable();return;}
   preflightObservedAt=observed;const host=q('#continuousPreflight'), focusedStudy=document.activeElement?.dataset?.preflightStudy;host.replaceChildren();
-  q('#preflightStatus').textContent='Ciclo '+(data.cycleEnabled?'configurado como habilitado':'desligado')+' · '+(data.configuredStudyId?'estudo explicitamente configurado':'nenhum estudo selecionado')+' · ativação exige aceitação operacional externa.';
+  q('#preflightStatus').textContent='Ciclo '+(data.cycleEnabled?'configurado como habilitado':'desligado')+' · '+(data.configuredStudyId?'estudo explicitamente configurado':'nenhum estudo selecionado')+(data.activationReady?' · piloto ativo, release aprovada'+(data.release?.approvedBy==='BACKEND_FINGERPRINT'?' pela impressão do backend':' pelo commit')+(data.release?.backendFingerprint?' · backend '+String(data.release.backendFingerprint).slice(0,12):'')+'.':' · ativação exige aceitação operacional externa.');
   const blockers={EXPLICIT_STUDY_REQUIRED:'Escolher explicitamente um estudo elegível',CONFIGURED_STUDY_NOT_ELIGIBLE:'O estudo configurado não passa na triagem',NEW_EXPOSURE_HALTED:'Novas exposições pausadas',PERPETUAL_EXECUTION_DISABLED:'Execução paper desligada',HISTORICAL_PERSISTENCE_FAILED:'Gravação de estudo falhou',PERPETUAL_SOURCE_UNAVAILABLE:'Fonte de mercado indisponível',FUNDING_RECONCILIATION_PENDING:'Funding aguardando conciliação'};
   for(const reason of data.runtimePrerequisites.reasons)host.append(node('p',blockers[reason]||'Bloqueio operacional: '+reason));
   const external={AUTOMATIC_OFF_PROVIDER_BACKUP:'Backup automático fora do provedor',EXTERNAL_FAILURE_ALERTS:'Alertas externos de falhas',CONTINUOUS_RELEASE_REVIEW:'Revisão da release contínua'};
@@ -507,11 +511,11 @@ function renderRuntime(data) {
 async function refreshOnline() {
   if (onlineBusy) return;onlineBusy = true;const version = onlineVersion;
   try {
-    const results = await Promise.allSettled([get('/market/v3'), get('/finance'), get('/backtests/v2/studies'), get('/paper/perpetual/status'), get('/runtime/readiness'), get('/research/jobs'),get('/paper/perpetual/preflight')]);
+    const results = await Promise.allSettled([get('/market/v3'), get(financeUrl()), get('/backtests/v2/studies'), get('/paper/perpetual/status'), get('/runtime/readiness'), get('/research/jobs'),get('/paper/perpetual/preflight')]);
     if (results[0].status === 'fulfilled' && version === onlineVersion) showPerpetualMarket(results[0].value);
     else if (results[0].status === 'rejected') marketUnavailable('Dados USD-M indisponíveis · preços podem estar desatualizados');
     if (results[1].status === 'fulfilled') {
-      const data = results[1].value, host = q('#finance');host.replaceChildren();renderFinancialOverview(data);screens.update({finance:data,names:agentNames()});
+      const data = withSeries(results[1].value), host = q('#finance');host.replaceChildren();renderFinancialOverview(data);screens.update({finance:data,names:agentNames()});
       for (const account of [...(data.legacyAccounts || []), ...(data.perpetualAccounts || [])]) {
         const card = node('article', '');const net = account.portfolio.equity - account.initialCash;
         card.append(node('h3', account.kind === 'FUND' ? 'Fundo · portfólio paper separado' : 'Avaliação · ' + account.ownerAgentId), node('p', account.instrument), node('p', 'Patrimônio: ' + money(account.portfolio.equity)), node('p', 'P&L líquido: ' + money(net)), node('p', 'Taxas: ' + money(account.feesPaid)), node('p', 'Funding: ' + money(account.fundingCashDelta)), node('p', 'Drawdown máximo observado: ' + (Number.isFinite(account.maxDrawdown) ? (account.maxDrawdown * 100).toFixed(2) + '%' : 'indisponível')));

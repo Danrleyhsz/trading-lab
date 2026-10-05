@@ -15,10 +15,17 @@ export const STUDY_CANDIDATE_SETS={
  SHORT_HORIZON_V1:[base,{...base,fastPeriod:20,slowPeriod:60},{...base,fastPeriod:5,slowPeriod:20},{...base,strategy:'BREAKOUT'},{...base,strategy:'MEAN_REVERSION'}],
  // Multi-day trend with low turnover; see docs/RESEARCH_PROTOCOL_MULTI_DAY_TREND.md.
  MULTI_DAY_TREND_V1:[{...base,fastPeriod:48,slowPeriod:240},{...base,fastPeriod:72,slowPeriod:480},{...base,strategy:'BREAKOUT',slowPeriod:480}],
+ // One researcher hypothesis per set, each a single pre-declared candidate, plus the unfiltered control;
+ // see docs/RESEARCH_PROTOCOL_TEAM_FILTERS.md.
+ BREAKOUT_480_CONTROL_V1:[{...base,strategy:'BREAKOUT',slowPeriod:480}],
+ TEAM_ORACLE_REGIME_V1:[{...base,strategy:'BREAKOUT',slowPeriod:480,filters:{regime:true}}],
+ TEAM_VEGA_VOLATILITY_V1:[{...base,strategy:'BREAKOUT',slowPeriod:480,filters:{volatility:true}}],
+ TEAM_SATOSHI_MOMENTUM_V1:[{...base,strategy:'BREAKOUT',slowPeriod:480,filters:{momentum:true}}],
+ TEAM_COMBINED_V1:[{...base,strategy:'BREAKOUT',slowPeriod:480,filters:{regime:true,volatility:true,momentum:true}}],
 } satisfies Record<string,PerpetualConfig[]>;
 export type StudyCandidateSet=keyof typeof STUDY_CANDIDATE_SETS;
 export const studyCandidates=(set:StudyCandidateSet='SHORT_HORIZON_V1')=>structuredClone(STUDY_CANDIDATE_SETS[set]);
-const schema=z.object({bars:z.number().int().min(300).max(5000).default(1000),trainBars:z.number().int().min(100).max(3000).default(400),testBars:z.number().int().min(50).max(1000).default(100),candidateSet:z.enum(['SHORT_HORIZON_V1','MULTI_DAY_TREND_V1']).optional()}).strict().refine(v=>v.bars>=v.trainBars+v.testBars,'insufficient study windows').refine(v=>studyCandidates(v.candidateSet).every(c=>c.slowPeriod<v.trainBars),'training window shorter than candidate warmup');
+const schema=z.object({bars:z.number().int().min(300).max(5000).default(1000),trainBars:z.number().int().min(100).max(3000).default(400),testBars:z.number().int().min(50).max(1000).default(100),candidateSet:z.enum(Object.keys(STUDY_CANDIDATE_SETS) as [StudyCandidateSet,...StudyCandidateSet[]]).optional()}).strict().refine(v=>v.bars>=v.trainBars+v.testBars,'insufficient study windows').refine(v=>studyCandidates(v.candidateSet).every(c=>c.slowPeriod<v.trainBars),'training window shorter than candidate warmup');
 export interface PerpetualStudy {id:string;status:'QUEUED'|'RUNNING'|'COMPLETED'|'FAILED'|'INTERRUPTED';createdAt:string;request:z.infer<typeof schema>;dataset?:PerpetualDataset;datasetHash?:string;result?:ReturnType<typeof walkForwardPerpetual>;error?:string;completedAt?:string}
 export class PerpetualStudies {
  private screens=new WeakMap<PerpetualStudy,ReturnType<typeof screenPerpetualStudy>>();

@@ -2,6 +2,8 @@ import {bootstrapEvaluationWallets} from './application/evaluation-wallet-bootst
 import {registerContinuousPaperPreflight} from './application/continuous-paper-preflight.js';
 import {EventAudit,registerEventAudit} from './application/event-audit.js';
 import {registerPilotTimeline} from './application/pilot-timeline.js';
+import {registerPilotReport} from './application/pilot-report.js';
+import {backendFingerprint,releaseApproval} from './application/release-fingerprint.js';
 import {BinanceMarketPanorama} from './infrastructure/binance-market-panorama.js';
 import {ResearchJobs,registerResearchJobs} from './application/research-jobs.js';
 import type {StoredState} from './domain/storage.js';
@@ -76,13 +78,16 @@ bus.subscribe(e=>{const payload=e.payload as any;if(!payload?.accountId?.endsWit
 const autonomousEnabled=process.env.AUTONOMOUS_PERPETUAL_ENABLED==='true';if(autonomousEnabled&&(!perpetualEnabled||!process.env.AUTONOMOUS_STUDY_ID))throw Error('autonomous perpetual evaluation requires enabled accounts and explicit study ID');
 // The pilot runs only on the exact release the owner approved (Render exposes the deployed commit as RENDER_GIT_COMMIT).
 const pilotTeam=new PilotTeamBriefing(messages);
+// A pinned backend fingerprint also approves releases that change only the office (public/) files.
 const pilotPhase=process.env.CLOUD_LAUNCH_PHASE==='CONTINUOUS_PAPER_PILOT',deployedCommit=process.env.RENDER_GIT_COMMIT??'';
-const releasePinned=pilotPhase&&/^[0-9a-f]{40}$/.test(deployedCommit)&&process.env.CONTINUOUS_RELEASE_COMMIT===deployedCommit;
+const release=releaseApproval(process.env,backendFingerprint().fingerprint);
+const releasePinned=pilotPhase&&release.approved;
 const cycle=new AutonomousPerpetualCycle(autonomousEnabled,process.env.AUTONOMOUS_STUDY_ID??'',studies,book,perpetualHistory,persist,memories,bus,()=>persist(),Date.now,()=>runtime.control().ready,{blockedReason:autonomousEnabled&&production&&!releasePinned?'RELEASE_NOT_APPROVED':null,maxLossFraction:process.env.PILOT_MAX_LOSS===undefined?0.03:Number(process.env.PILOT_MAX_LOSS),onDecision:context=>pilotTeam.brief(context)});
 // Sentinel records every risk decision on the pilot account as a team message.
 bus.subscribe(e=>{if((e.type==='RISK_APPROVED'||e.type==='RISK_REJECTED')&&(e.payload as {accountId?:string})?.accountId==='evaluation:nova:usdm'&&autonomousEnabled)pilotTeam.riskReview(e.type==='RISK_APPROVED',e.payload as never);});
 registerAgentProfiles(app,agents,memories,messages,activity,accounts,book);
 const eventAudit=new EventAudit(()=>durableSnapshot);registerEventAudit(app,eventAudit);
+registerPilotReport(app,()=>{const status=cycle.status(),id=status.accountId??null,account=book.list().find(a=>a.id===id);let events:ReturnType<typeof eventAudit.list>=[];try{events=eventAudit.list();}catch{}const quote=perpetualMarket.snapshot().quote;return {accountId:id,events,ledger:id?book.ledger(id)??[]:[],equity:account?.portfolio.equity??null,initialCash:account?.initialCash??null,maxDrawdown:account?.maxDrawdown??null,equityPoints:[...(account?.hourly??[]),...(account?.samples??[])].sort((a,b)=>a.timestamp-b.timestamp),closedTrades:id?book.performance(id)?.closedTrades??[]:[],autonomous:{enabled:status.enabled,eligible:status.eligible,stopReason:status.stopReason,studyId:status.studyId},mark:quote&&Date.now()-quote.markTime<=15000?quote.markPrice:null,now:Date.now()};});
 registerPilotTimeline(app,days=>{const id=cycle.status().accountId??null,account=book.list().find(a=>a.id===id);let events:ReturnType<typeof eventAudit.list>=[];try{events=eventAudit.list();}catch{}return {accountId:id,events,ledger:id?book.ledger(id)??[]:[],hourly:account?.hourly??[],initialCash:account?.initialCash??null,now:Date.now(),days};});registerEncryptedBackup(app,()=>durableSnapshot?{state:durableSnapshot,persistedAt:durablePersistedAt}:null,BACKUP_PUBLIC_KEY_PEM);
 const research=new ResearchEngine({snapshot:symbol=>derivatives.snapshot(symbol),candles:(symbol,interval,limit)=>history.candles(symbol,interval,limit)},coordinator,collaboration,messages,memories,strategies,strategyLab,backtester,researchRuns,bus);
 const researchJobs=new ResearchJobs(research,bus,()=>persist(),domainEvents,()=>studies.status().busy||agents.get('euler')?.status==='BACKTESTING');
@@ -95,7 +100,7 @@ registerAiStatus(app,aiAnalysis);
 const runtimeInputs=()=>({spot:latest,perpetual:perpetualMarket.snapshot(),book:book.status(),autonomous:cycle.status(),research:researchJobs.status(),historical:studies.status(),ai:aiAnalysis.status(),legacyExecutionEnabled:process.env.LEGACY_PAPER_EXECUTION_ENABLED==='true',evaluationEnabled,perpetualEnabled});
 const readiness=()=>runtime.snapshot(runtimeInputs());
 registerRuntimeReadiness(app,runtime,runtimeInputs);
-registerContinuousPaperPreflight(app,studies,readiness,Date.now,()=>({phase:process.env.CLOUD_LAUNCH_PHASE??'FIRST_PUBLICATION',releasePinned,deployedCommit:deployedCommit||null}));
+registerContinuousPaperPreflight(app,studies,readiness,Date.now,()=>({phase:process.env.CLOUD_LAUNCH_PHASE??'FIRST_PUBLICATION',releasePinned,deployedCommit:deployedCommit||null,approvedBy:release.by,backendFingerprint:release.backendFingerprint}));
 registerOfficeAssets(app);
 app.get('/health',async(_req,reply)=>reply.code(persistenceError||(store instanceof PostgresStateStore&&!store.available())?503:200).send({ok:!persistenceError&&(!(store instanceof PostgresStateStore)||store.available()),mode:'PAPER_TRADING',storage:store instanceof PostgresStateStore?'POSTGRESQL':'JSON_DEVELOPMENT',marketStatus:perpetualMarket.snapshot().status}));
 app.get('/agents',async()=>agents.list());app.get('/agent-messages',async(req)=>messages.list((req.query as any).agentId));app.get('/strategies',async()=>strategies.list());
@@ -107,7 +112,8 @@ const legacyBacktestRequest=z.object({symbol:z.literal('BTCUSDT').default('BTCUS
 app.post('/backtests/sma',async(req,reply)=>{const parsed=legacyBacktestRequest.safeParse(req.body??{});if(!parsed.success)return reply.code(400).send({error:'invalid legacy backtest request'});const cfg=parsed.data;return backtester.run(await history.candles(cfg.symbol,cfg.interval,cfg.limit),cfg);});
 app.post('/strategies',async(_req,reply)=>reply.code(410).send({error:'use server-owned research hypotheses'}));
 app.get('/portfolio',async()=>accounts.snapshot('fund')!.portfolio);
-app.get('/finance',async()=>({legacyAccounts:accounts.list().map(a=>({...a,instrument:'LEGACY_PAPER_V1',netPnl:a.portfolio.equity-a.initialCash,winRate:null,maxDrawdown:null})),perpetualAccounts:book.list(),fundAccountId:'fund',evaluationCapitalIncludedInFund:false,risk:book.status(),autonomous:cycle.status()}));
+// ?series=none omits the minute/hourly equity series (about 0.6 MB) for frequent polling.
+app.get('/finance',async(req)=>({legacyAccounts:accounts.list().map(a=>({...a,instrument:'LEGACY_PAPER_V1',netPnl:a.portfolio.equity-a.initialCash,winRate:null,maxDrawdown:null})),perpetualAccounts:(req.query as {series?:string}).series==='none'?book.list().map(({samples:_samples,hourly:_hourly,...account})=>({...account,seriesOmitted:true})):book.list(),fundAccountId:'fund',evaluationCapitalIncludedInFund:false,risk:book.status(),autonomous:cycle.status()}));
 app.get('/events',{websocket:true},socket=>{const unsubscribe=bus.subscribe(e=>{if(socket.readyState===1)try{socket.send(JSON.stringify(e));}catch(error){app.log.warn({error},'office delivery failed');}});socket.on('close',unsubscribe);});
 // No restored visual task is treated as still running in the new process.
 for(const agent of agents.list())if(agent.status!=='IDLE')coordinator.move(agent.id,'IDLE',agent.room,'runtime restarted; unfinished task outcome was not inferred');
