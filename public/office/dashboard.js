@@ -260,7 +260,8 @@
  async function loadScorecard(){try{const s=await get('/agents/scorecard');if(s?.policy?.version)state.scorecard=s;}catch{}renderScorecard();}
  function renderScorecard(){
   const host=$('#teamScorecard');if(!host)return;const s=state.scorecard;if(!s){host.replaceChildren(el('p','Placar indisponível.','dock-note'));return;}
-  host.replaceChildren(table(['Pesquisador','Conferidas','Acertos','Taxa','Aguardando'],s.scorecard.map(c=>({cells:[name(c.agentId),String(c.settled),String(c.hits),c.hitRate===null?'—':Math.round(c.hitRate*100)+'%',String(c.pending)]}))),el('p',s.policy.version+' · cada observação do briefing vira uma previsão para 24 h e é conferida com candles fechados. Em direção, 50% equivale a cara ou coroa. É só medição: não muda decisões.','dock-note'));
+  const rate=v=>v===null||v===undefined?'—':Math.round(v*100)+'%';
+  host.replaceChildren(table(['Pesquisador','24 h: conferidas','Acertos','Taxa','Aguardando','7 dias: taxa (conferidas)'],s.scorecard.map(c=>({cells:[name(c.agentId),String(c.settled),String(c.hits),rate(c.hitRate),String(c.pending),c.weekly?rate(c.weekly.hitRate)+' ('+c.weekly.settled+(c.weekly.pending?', '+c.weekly.pending+' aguardando':'')+')':'—']}))),el('p',s.policy.version+' · cada observação do briefing vira uma previsão para 24 h e, uma vez por dia (00:00 UTC), também para 7 dias; todas são conferidas com candles fechados. Em direção, 50% equivale a cara ou coroa. É só medição: não muda decisões.','dock-note'));
  }
  async function loadTimeline(){loadReport();loadScorecard();
   const host=$('#pilotTimeline');$('#timelineStatus').textContent='Consultando a linha do tempo…';
