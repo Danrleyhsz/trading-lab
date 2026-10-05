@@ -143,8 +143,9 @@
      const a=offset(path[i-1]),b=offset(path[i]),dx=b.x-a.x,dy=b.y-a.y;
      view.button.dataset.facing=Math.abs(dx)>=Math.abs(dy)?(dx<0?'left':'right'):(dy<0?'up':'down');
      const animation=view.button.animate([{translate:a.x+'px '+a.y+'px'},{translate:b.x+'px '+b.y+'px'}],{duration:Math.max(120,Math.hypot(path[i].x-path[i-1].x,path[i].y-path[i-1].y)/speed*1000),easing:'linear',fill:'forwards'});
-     const previous=view.lifeAnimation;view.lifeAnimation=animation;
-     animation.onfinish=()=>{if(generation!==view.lifeGeneration)return;previous?.cancel();step(i+1);};
+     // Guarda todas as animações do passeio: cada trecho mantém a posição final até o próximo começar.
+     (view.lifeAnimations??=[]).push(animation);view.lifeAnimation=animation;
+     animation.onfinish=()=>{if(generation!==view.lifeGeneration)return;for(const old of view.lifeAnimations.splice(0,view.lifeAnimations.length-1))old.cancel();step(i+1);};
     };
     step(1);
    };
@@ -160,12 +161,14 @@
   }
   finish(view,generation){
    if(generation!==view.lifeGeneration)return;
-   this.release(view);view.lifeAnimation?.cancel();view.lifeAnimation=undefined;view.life=undefined;
+   this.release(view);this.cancelWalk(view);view.life=undefined;
    delete view.button.dataset.life;delete view.button.dataset.lifeKind;view.button.dataset.pose='seated';view.button.dataset.facing='up';
    view.lifeNext=this.now()+25000+Math.floor(this.random()*45000);
   }
   /** Ends an idle outing early: walk back if standing at the destination, otherwise return at once. */
   recall(view){if(view.life?.phase==='there'){if(view.lifeTimer!==undefined)this.cancel(view.lifeTimer);view.lifeTimer=undefined;view.life.back();}else if(view.life?.phase==='out')this.stop(view);}
+  /** Cancela todos os trechos do passeio, para o personagem voltar exatamente para a cadeira. */
+  cancelWalk(view){for(const animation of view.lifeAnimations??[])animation.cancel();view.lifeAnimations=[];view.lifeAnimation?.cancel();view.lifeAnimation=undefined;}
   release(view){for(const [id,owner] of this.reserved)if(owner===view)this.reserved.delete(id);}
   pose(view){view.button.dataset.pose=view.life.phase==='there'?'rest':'walk';}
   say(view,words,kind,title,duration){
@@ -177,7 +180,7 @@
   /** Immediate return to the seat (modal, focus, reduced motion, real state change). */
   stop(view){
    view.lifeGeneration=(view.lifeGeneration||0)+1;if(view.lifeTimer!==undefined)this.cancel(view.lifeTimer);view.lifeTimer=undefined;
-   view.lifeAnimation?.cancel();view.lifeAnimation=undefined;this.release(view);this.hush(view);
+   this.cancelWalk(view);this.release(view);this.hush(view);
    if(view.life){view.life=undefined;delete view.button.dataset.life;delete view.button.dataset.lifeKind;if(view.station){view.button.dataset.pose='seated';view.button.dataset.facing='up';}}
   }
   stopAll(){for(const view of this.views.values())this.stop(view);}

@@ -31,7 +31,7 @@ body.v3 .nav:hover{color:#fff;background:#ffffff0d}
 
 /* ---------- stage: wall + scene ---------- */
 body.v3 .stage{position:relative;min-height:0;border:1px solid var(--v3-line);border-radius:6px;background:#060b18;overflow:hidden}
-body.v3 .wall{position:relative;display:grid;grid-template-columns:.9fr 1.5fr 1.5fr 2.6fr 1.35fr 1.05fr;gap:.55%;padding:.55% 1.6% .45%;background:linear-gradient(#141f38,#0f1830 70%,#2a2016 70.5%,#3a2a18 74%,#141d34 74.5%);border-bottom:3px solid #4a3620;container-type:inline-size}
+body.v3 .wall{position:relative;display:grid;grid-template-columns:.7fr 1.35fr 1.35fr 1.35fr 2.5fr 1.2fr 1fr;gap:.55%;padding:.55% 1.6% .45%;background:linear-gradient(#141f38,#0f1830 70%,#2a2016 70.5%,#3a2a18 74%,#141d34 74.5%);border-bottom:3px solid #4a3620;container-type:inline-size}
 body.v3 .wall-art{display:grid;place-items:center;border:3px solid #6b4a24;background:radial-gradient(circle at 50% 45%,#ffb23f 0 30%,#8a4b12 31% 34%,#1b1206 35%);box-shadow:inset 0 0 1.2cqw #000a}
 body.v3 .wall-art span{font-size:3.4cqw;font-weight:900;color:#2a1704;text-shadow:0 0 .4cqw #ffd27a}
 body.v3 .wall-screen{position:relative;min-width:0;padding:.5cqw .7cqw;border:.25cqw solid #2c3a55;border-radius:.3cqw;background:linear-gradient(#071530,#04102a);box-shadow:inset 0 0 1.2cqw #35c9ff22,0 .2cqw .4cqw #000a;color:#dfe9ff;font-size:.82cqw;line-height:1.2;overflow:hidden;display:flex;flex-direction:column}
@@ -61,15 +61,21 @@ body.v3 .scene-tools:hover{opacity:1}
 body.v3 .stage-status{position:absolute;z-index:12;left:8px;bottom:6px;display:flex;gap:12px;font-size:10px;color:#9fb5d6;background:#070d1ccc;padding:2px 8px;border-radius:4px}
 body.v3 .scene-note,body.v3 footer{display:none}
 
-/* Room plates and control-zone plates like the reference. */
-body.v3 .room h2{background:#0b1730f0!important;border:1px solid #9fb6d8!important;border-radius:2px;box-shadow:0 .15cqw .3cqw #000b!important;text-shadow:none!important;padding:0!important}
+/* Sem placas de área: o pedido do dono é deixar só os objetos interativos. Os nomes das salas continuam acessíveis por teclado e leitor de tela (aparecem ao receber foco). */
+body.v3 .room h2{position:absolute!important;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0!important;background:none!important;box-shadow:none!important;padding:0!important;margin:0}
+body.v3 .room h2:focus-within{width:auto;height:auto;overflow:visible;clip-path:none;background:#0b1730f0!important;border:1px solid #9fb6d8!important}
 body.v3 .room-hotspot{color:#fff;font-size:clamp(6px,.72cqw,14px)!important;padding:.25cqw .9cqw!important;min-height:0!important;letter-spacing:.06em}
-body.v3 .control-zone:not(.scene-screen){background:#0b1730f0;border:1px solid #9fb6d8;color:#fff;font-size:clamp(6px,.72cqw,14px);padding:.25cqw .9cqw;letter-spacing:.06em;top:66.2%}
-body.v3 #sceneDataCenter{left:15%}body.v3 #sceneWarRoom{left:49%}body.v3 #sceneMarketAnalysis{left:83%}
+body.v3 .control-zone:not(.scene-screen){width:1px;height:1px;padding:0;overflow:hidden;clip-path:inset(50%);border:0;background:none;font-size:clamp(6px,.72cqw,14px)}
+body.v3 .control-zone:not(.scene-screen):focus-visible{width:auto;height:auto;clip-path:none;overflow:visible;padding:.25cqw .9cqw;background:#0b1730f0;border:1px solid #9fb6d8;color:#fff}
+/* O Data Center vira uma área clicável invisível sobre os servidores e o monitor (como os telões). */
+body.v3 #sceneDataCenter{left:4.2%;top:69.5%;width:18.5%;height:17%;transform:none;clip-path:none;overflow:visible;font-size:0;color:transparent}
+body.v3 #sceneDataCenter:hover,body.v3 #sceneDataCenter:focus-visible{outline:2px solid #35c9ff;outline-offset:-2px;background:#35c9ff14;font-size:0}
 
 /* Name plates above every character, bubbles above the plate. */
-body.v3 .agent b{opacity:1!important;top:auto!important;bottom:calc(100% + .25cqw)!important;font-size:clamp(6px,.62cqw,12px)!important;background:#0b1730f2!important;border:1px solid #6f8db8!important;border-radius:2px!important;padding:.05cqw .45cqw!important;color:#fff!important;font-weight:800}
+body.v3 .agent b{opacity:0!important;top:auto!important;bottom:calc(100% + .25cqw)!important;font-size:clamp(6px,.62cqw,12px)!important;background:#0b1730f2!important;border:1px solid #6f8db8!important;border-radius:2px!important;padding:.05cqw .45cqw!important;color:#fff!important;font-weight:800}
 body.v3 .agent[data-seated="true"] b{bottom:calc(100% + 1.45cqw)!important}
+/* Nome só ao passar o mouse, com foco ou quando o personagem está andando. */
+body.v3 .agent:hover b,body.v3 .agent:focus-visible b,body.v3 .agent[data-life="away"] b{opacity:1!important}
 body.v3 .agent[data-seated="true"] .last-words,body.v3 .agent[data-seated="true"] .life-bubble{bottom:calc(100% + 2.75cqw)}
 body.v3 .agent[data-life="away"] .last-words,body.v3 .agent[data-life="away"] .life-bubble,body.v3 .agent:not([data-seated="true"]) .last-words{bottom:calc(100% + 1.6cqw)}
 body.v3 .agent[data-alert="trade"] .sprite{filter:drop-shadow(0 0 .5cqw #ffd166) drop-shadow(0 0 .2cqw #ffd166)}
@@ -217,3 +223,6 @@ body.v3 .list-screen li{font-size:.6cqw}
 #studySet{display:block;margin:8px 0;width:100%;max-width:520px}
 .replay-bar{left:8px;transform:none;white-space:nowrap}
 body.v3 .toasts{top:calc(var(--wall-h,0px) + 52px)}
+body.v3 .coin.perp{background:#0b2a4a;color:#35c9ff;border:1px solid #35c9ff}
+body.v3 .wall-screen .delta{font-size:.85cqw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+body.v3 .wall-head b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}

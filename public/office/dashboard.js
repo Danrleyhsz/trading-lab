@@ -72,7 +72,11 @@
   }
   const qt=quote();field('funding','value').textContent=qt?fmt(qt.fundingRate*100,4)+'%':'—';
   field('funding','sub').textContent=qt?'próx. liquidação em '+span(qt.nextFundingTime-Date.now()):'sem cotação';
-  spark(field('funding','chart'),traces.mark.map(x=>x.price).slice(-60));
+  // Telão do perpétuo USD-M: mark price e o traçado recebido nesta sessão (o mesmo que a Nova usa).
+  field('BTCPERP','price').textContent=qt?fmt(qt.markPrice,2):'—';
+  const perpSub=field('BTCPERP','sub');perpSub.textContent=qt?'mark price · sessão':'sem cotação';perpSub.className='delta';
+  spark(field('BTCPERP','chart'),traces.mark.map(x=>x.price).slice(-90),'#35c9ff');
+  field('funding','chart').replaceChildren();
   const oi=p?.openInterest;field('oi','value').textContent=oi?big(oi.usd):'—';const sub=field('oi','sub');sub.textContent=oi&&Number.isFinite(oi.change24h)?pct(oi.change24h)+' 24h':'';sub.className='delta '+tone(oi?.change24h);
   spark(field('oi','chart'),(oi?.history||[]).map(h=>h.usd),'#7ad7ff');
   const l=p?.liquidations;field('liquidations','value').textContent=l?big(l.longs+l.shorts):'—';

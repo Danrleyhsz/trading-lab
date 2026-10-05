@@ -105,3 +105,15 @@ test('scene screens derive equity, drawdown, positions, risk checks and the next
  const brief=OfficeScreens.briefingLines([{from:'satoshi',kind:'RESEARCH_FINDING',context:{...ctx,change24h:0.02}},{from:'nova',kind:'EXECUTION_PLAN',createdAt:'2026-10-04T23:07:29Z',context:{...ctx,direction:0,currentQuantity:0}}],{satoshi:'Satoshi',nova:'Nova'});
  assert.deepEqual(brief.lines,['Satoshi: 24h +2,00%','Nova: ficar flat']);assert.equal(OfficeScreens.briefingLines([],{}),null);
 });
+
+test('interromper um passeio no meio cancela todos os trechos e o personagem volta exatamente para a cadeira',()=>{
+ const context=load(),{life,views,advance}=director(context);
+ advance(30000);life.tick();
+ const view=[...views.values()].find(v=>v.button.dataset.life==='away');assert.ok(view);
+ // Termina só o primeiro trecho: o segundo começa e o primeiro ainda segura a posição.
+ const first=view.button.animations[0];first.done=true;first.onfinish();
+ assert.ok(view.button.animations.length>=2);
+ life.stop(view);
+ assert.ok(view.button.animations.every((a:any)=>a.cancelled),'nenhum trecho fica preso fora da cadeira');
+ assert.equal(view.button.dataset.pose,'seated');assert.equal(view.button.dataset.life,undefined);
+});

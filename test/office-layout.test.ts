@@ -20,7 +20,7 @@ test('the reference layout has the concept regions: header metrics, nine-item ra
  for(const id of ['capitalTotal','dailyPnl','activeAgents','openPositionCount','clockTime','marketStatus','lightingToggle','wall','office','agentCard','recentActivity','positions','performance','screenDialog','pilotTimeline','operationsList','memoryList'])assert.ok(ids.has(id),id);
  const rail=[...html.matchAll(/<button id="(nav\w+)" class="nav/g)].map(m=>m[1]);
  assert.deepEqual(rail,['navOffice','navAgents','navFinance','navOperations','navMarket','navResearch','navMemory','navHistory','navAccess']);
- for(const wall of ['BTCUSDT','ETHUSDT','funding','oi','liquidations','sessions','alts'])assert.match(html,new RegExp('data-wall="'+wall+'"'));
+ for(const wall of ['BTCUSDT','BTCPERP','ETHUSDT','funding','oi','liquidations','sessions','alts'])assert.match(html,new RegExp('data-wall="'+wall+'"'));
  assert.match(html,/Capital Virtual Total/);assert.match(html,/PnL Diário/);assert.match(html,/Atividades Recentes/);assert.match(html,/Performance dos Agentes/);
 });
 
