@@ -154,6 +154,8 @@ const transitions=new OfficeTransitions.Director(motionAllowed,view=>presence.st
 const screens=new OfficeScreens.Screens(q('#office'));
 const life=new OfficeLife.Director({allowed:motionAllowed,bounds:()=>q('#office').getBoundingClientRect?.()});
 function stopPresence(){q('#office').dataset.presence='off';for(const view of agentViews.values()){life.stop(view);transitions.stop(view);presence.stop(view);}}
+/** Mensagem registrada mais recente do agente na última hora (mesma regra do contador "Agentes Ativos"). */
+function recentWork(agent){if(!communicationReady)return null;const now=Date.now();return communications.filter(m=>m.from===agent.id&&now-Date.parse(m.createdAt)<=65*60000&&Date.parse(m.createdAt)<=now+60000).sort((a,b)=>Date.parse(b.createdAt)-Date.parse(a.createdAt))[0]??null;}
 function render(movingEvent){
  const focusedAgent=document.activeElement?.dataset?.agentId,slots=new Map(),placements=new Map();q('#agentList').replaceChildren();
  for(const agent of agents.values()){const slot=slots.get(agent.room)||0;slots.set(agent.room,slot+1);placements.set(agent.id,slot);}
@@ -184,13 +186,16 @@ function render(movingEvent){
   }
   transitions.update(view,agent,slot,{from:wasTraveling?null:from,event:movingEvent?.payload?.id===agent.id?movingEvent:undefined,bounds,occupied,startPoint});
   if(agent.id===focusedAgent)button.focus?.({preventScroll:true});
-  const row=node('button',''),portrait=node('span',''),copy=node('span','');row.className='agent-card';portrait.className='sprite roster-portrait';portrait.setAttribute('aria-hidden','true');sprite(portrait,agent.id);const image=node('img','');image.setAttribute('src','/office/agent-sprites.png');image.setAttribute('alt','');portrait.append(image);copy.append(node('b',agent.name),node('small',roleLabels[agent.id]||agent.role),node('span',statusLabels[agent.status]||agent.status),node('small',agent.room));row.append(portrait,copy);row.setAttribute('aria-label',agent.name+' · '+agent.room+' · '+(statusLabels[agent.status]||agent.status));row.onclick=()=>profile(agent.id);q('#agentList').append(row);
+  const row=node('button',''),portrait=node('span',''),copy=node('span','');row.className='agent-card';portrait.className='sprite roster-portrait';portrait.setAttribute('aria-hidden','true');sprite(portrait,agent.id);const image=node('img','');image.setAttribute('src','/office/agent-sprites.png');image.setAttribute('alt','');portrait.append(image);const work=recentWork(agent),state=agent.status!=='IDLE'?statusLabels[agent.status]||agent.status:work?'Ativo · '+ago(work.createdAt):statusLabels[agent.status]||agent.status;
+  const doing=work?node('small','Último trabalho: '+((globalThis.OfficeLife?.text(work))||work.summary).slice(0,90)):node('small','Sem trabalho registrado na última hora');doing.className='agent-doing';if(work)doing.title=(globalThis.OfficeLife?.text(work))||work.summary;
+  const stateNode=node('span',state);stateNode.dataset.active=String(agent.status!=='IDLE'||!!work);
+  copy.append(node('b',agent.name),node('small',roleLabels[agent.id]||agent.role),stateNode,doing,node('small',agent.room));row.append(portrait,copy);row.setAttribute('aria-label',agent.name+' · '+agent.room+' · '+state+(work?' · '+work.summary:''));row.onclick=()=>profile(agent.id);q('#agentList').append(row);
  }
  q('#office').dataset.presence=motionAllowed()?'on':'off';
  q('#togglePresence').textContent=systemReducesMotion()?'Ativar animações':selectedHandoff?'Presença pausada':presenceEnabled?'Pausar animações':'Animar escritório';q('#togglePresence').disabled=!!selectedHandoff;q('#togglePresence').setAttribute('aria-pressed',String(presenceEnabled&&!selectedHandoff&&!systemReducesMotion()));
  q('#togglePresence').setAttribute('title',systemReducesMotion()?'Seu sistema pede movimento reduzido. Clique para animar o escritório mesmo assim.':'Animações são apenas visuais; não alteram trabalho nem resultados.');if(document.body)document.body.dataset.motion=motionChoice;
  renderLastWords();
- q('#activeAgents').textContent=[...agents.values()].filter(agent=>agent.status!=='IDLE'||(communicationReady&&communications.some(m=>m.from===agent.id&&Date.now()-Date.parse(m.createdAt)<=65*60000&&Date.parse(m.createdAt)<=Date.now()+60000))).length+' / '+agents.size;
+ q('#activeAgents').textContent=[...agents.values()].filter(agent=>agent.status!=='IDLE'||recentWork(agent)).length+' / '+agents.size;
  renderStations();if(selected)renderState();if(inspectedRoom&&q('#roomDialog').open)renderRoom();renderHandoffs();
 }
 function renderState() {
