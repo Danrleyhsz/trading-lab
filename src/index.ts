@@ -38,6 +38,7 @@ import {AutonomousPerpetualCycle} from './application/autonomous-perpetual-cycle
 import {PilotTeamBriefing} from './application/pilot-team-briefing.js';
 import {TeamPredictions,scorecard,rankMemories,PREDICTION_POLICY} from './application/team-predictions.js';
 import {MarketTriggers,readingFrom,TRIGGER_POLICY} from './application/market-triggers.js';
+import {CrossVenueMarket} from './infrastructure/cross-venue-market.js';
 import {registerPerpetualPaperRoutes} from './application/perpetual-paper-routes.js';
 import {registerAccessControl} from './application/access-control.js';
 import {registerEncryptedBackup} from './application/encrypted-backup.js';
@@ -116,7 +117,10 @@ app.get('/agents/scorecard',async()=>{const all=memories.query();return {policy:
 app.get('/memories',async(req)=>memories.query(req.query as any));app.get('/market/latest',async()=>latest??{status:'waiting'});app.get('/market/:symbol/snapshot',async(req)=>derivatives.snapshot((req.params as {symbol:string}).symbol));app.get('/market/v3',async()=>perpetualMarket.snapshot());
 const panorama=new BinanceMarketPanorama();app.get('/market/panorama',async()=>panorama.snapshot());
 // Gatilhos fora do normal (P5/P95): só mensagens e memórias para a equipe; nunca sinal, risco ou execução.
-const triggers=new MarketTriggers(()=>readingFrom(panorama.snapshot(),perpetualMarket.snapshot().quote?.fundingRate??null),messages,memories);
+// Outras corretoras (Bybit, OKX, Hyperliquid): só leitura, para comparar funding e conferir o preço da Binance.
+const venues=new CrossVenueMarket(()=>{const q=perpetualMarket.snapshot().quote;return q?{markPrice:q.markPrice,fundingRate:q.fundingRate,markTime:q.markTime}:null;});venues.start();
+app.get('/market/venues',async()=>venues.snapshot());
+const triggers=new MarketTriggers(()=>readingFrom(panorama.snapshot(),perpetualMarket.snapshot().quote?.fundingRate??null,venues.snapshot()),messages,memories);
 const triggerTimer=setInterval(()=>{try{triggers.sample();}catch{/* amostra perdida não afeta nada */}},TRIGGER_POLICY.sampleMinutes*60000);
 app.get('/market/triggers',async()=>triggers.status());
 const legacyBacktestRequest=z.object({symbol:z.literal('BTCUSDT').default('BTCUSDT'),interval:z.literal('1h').default('1h'),limit:z.number().int().min(100).max(1000).default(500),initialCapital:z.number().finite().positive().default(10000),feeRate:z.number().finite().min(0).max(0.1).default(0.00055),slippageBps:z.number().finite().min(0).max(100).default(1),fastPeriod:z.number().int().min(1).max(100).default(10),slowPeriod:z.number().int().min(2).max(200).default(30)}).strict().refine(v=>v.slowPeriod>v.fastPeriod&&v.limit>v.slowPeriod);
@@ -133,7 +137,7 @@ await persist();const legacyMarket=new BinancePublicMarketData(process.env.MARKE
 void panorama.start().catch(()=>{});
 await perpetualMarket.start(async quote=>{if(runtime.isDraining())return;const settlements=quote.markTime>book.cursor()&&book.fundingDue(quote.markTime)?await perpetualMarket.funding(book.cursor()+1,quote.markTime):[];await book.synchronize(quote,settlements,persist);bus.publish(event('PERPETUAL_MARKET_UPDATED',quote));if(!runtime.isDraining())await cycle.onMarket().catch(error=>app.log.warn({error},'autonomous pilot attempt failed; retry deferred'));},error=>{app.log.warn({error},'USD-M reconciliation unavailable');bus.publish(event('MARKET_DATA_FAILED',{instrument:'BINANCE_USDM:BTCUSDT',error:error.message}));});
 app.addHook('preClose',async()=>{runtime.draining();researchJobs.stopAccepting();research.stopAccepting();studies.stopAccepting();});
-app.addHook('onClose',async()=>{await researchJobs.drain();await perpetualMarket.stop();await panorama.stop();clearInterval(triggerTimer);await legacyMarket.disconnect();await studies.drain();await writes;if(store instanceof PostgresStateStore)await store.close();runtime.stopped();});
+app.addHook('onClose',async()=>{await researchJobs.drain();await perpetualMarket.stop();await panorama.stop();clearInterval(triggerTimer);venues.stop();await legacyMarket.disconnect();await studies.drain();await writes;if(store instanceof PostgresStateStore)await store.close();runtime.stopped();});
 let closing=false;
 for(const signal of ['SIGTERM','SIGINT'] as const)process.once(signal,()=>{if(closing)return;closing=true;runtime.draining();const deadline=setTimeout(()=>{app.log.error('shutdown grace expired; incomplete durable studies restore as interrupted');process.exit(1);},30000);void app.close().then(()=>{clearTimeout(deadline);process.exit(0);}).catch(error=>{clearTimeout(deadline);app.log.error({error},'shutdown failed');process.exit(1);});});
 await app.listen({port:Number(process.env.PORT||3000),host:'0.0.0.0'});runtime.serving();

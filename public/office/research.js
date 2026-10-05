@@ -105,7 +105,7 @@ async function loadRobustness(id,host,attempt){
     host.replaceChildren(node('p',r.eligible?'Passa na triagem de robustez.':'Não passa na triagem de robustez.'),
       node('p','Sharpe anual fora da amostra: '+num(r.outOfSample.sharpeAnnualized)+' em '+r.outOfSample.hours+' h · esperado só por sorte com '+r.multipleTesting.trials+' tentativas: '+num(r.multipleTesting.benchmarkSharpeAnnualized)),
       node('p','Deflated Sharpe: '+pct(r.multipleTesting.deflatedSharpe)+' · PBO: '+pct(r.overfitting.pbo)+(r.overfitting.note?' ('+r.overfitting.note+')':'')+' · caminhos positivos: '+pct(r.overfitting.positivePathShare)));
-    const list=node('ul','');for(const c of r.checks)list.append(node('li',(c.ok?'✓ ':'✗ ')+(labels[c.id]||c.id)+' · valor '+(c.id==='DEFLATED_SHARPE'||c.id==='PROBABILITY_OF_OVERFITTING'||c.id==='POSITIVE_OUT_OF_SAMPLE_PATHS'?pct(c.value):c.value)));host.append(list,node('small','Vale para pilotos que começarem depois do atual. O piloto em andamento segue as regras declaradas antes do início.'));
+    const list=node('ul','');for(const c of r.checks)list.append(node('li',(c.ok?'✓ ':'✗ ')+(labels[c.id]||c.id)+' · valor '+(c.id==='DEFLATED_SHARPE'||c.id==='PROBABILITY_OF_OVERFITTING'||c.id==='POSITIVE_OUT_OF_SAMPLE_PATHS'?pct(c.value):c.value)));host.append(list,node('h4','Métricas fora da amostra'),metricsView(r.metrics),node('small','Vale para pilotos que começarem depois do atual. O piloto em andamento segue as regras declaradas antes do início.'));
   }catch{host.replaceChildren(node('p','Robustez indisponível. Confira o acesso e reabra o estudo.'));}
 }
 async function studyDetails(id) {

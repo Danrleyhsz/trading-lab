@@ -45,7 +45,12 @@
  }
  const dedupe=path=>path.filter((p,i)=>i===0||!same(p,path[i-1]));
  /** Full walk from a seat to a place (with an optional final step off the lane). */
- function walk(home,place){const path=route(home,{x:place.x,y:lanes[place.lane].y});if(place.to)path.push({...place.to});return dedupe(path);}
+ function walk(home,place){
+  // Com o mapa de piso (office-map.js), o caminho vem do A* sobre as células andáveis; sem ele, dos corredores.
+  const target=place.to?{...place.to}:{x:place.x,y:lanes[place.lane].y},viaMap=globalThis.OfficeMap?.route(home,target);
+  if(viaMap&&viaMap.length>=2)return viaMap;
+  const path=route(home,{x:place.x,y:lanes[place.lane].y});if(place.to)path.push({...place.to});return dedupe(path);
+ }
  const hash=id=>[...String(id)].reduce((n,c)=>(n*31+c.charCodeAt(0))>>>0,7);
  const pct=(v,digits=2)=>Number.isFinite(v)?(v>=0?'+':'')+(v*100).toFixed(digits).replace('.',',')+'%':'n/d';
  const regimes={TRENDING_UP:'tendência de alta',TRENDING_DOWN:'tendência de baixa',RANGE:'lateral',UNKNOWN:'indefinido'};

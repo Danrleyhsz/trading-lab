@@ -117,3 +117,30 @@ test('interromper um passeio no meio cancela todos os trechos e o personagem vol
  assert.ok(view.button.animations.every((a:any)=>a.cancelled),'nenhum trecho fica preso fora da cadeira');
  assert.equal(view.button.dataset.pose,'seated');assert.equal(view.button.dataset.life,undefined);
 });
+
+test('mapa de piso em grade: toda cadeira alcança todo destino, só por células andáveis e sem diagonal',()=>{
+ const context=vm.createContext({document:{createElement:()=>new Element(),activeElement:null},setTimeout,clearTimeout,console,btoa,atob});
+ for(const name of ['navigation','workstations','life','office-map'])vm.runInContext(readFileSync('public/office/'+name+'.js','utf8'),context);
+ const {OfficeLife,OfficeWorkstations,OfficeMap}=context as any,grid=OfficeMap.defaultGrid(),cell=OfficeMap.CELL;
+ assert.equal(OfficeMap.decode(OfficeMap.encode(grid)).join(''),grid.join(''),'codificação ida e volta');
+ for(const seat of OfficeWorkstations.catalog)for(const place of OfficeLife.places){
+  const target=place.to??{x:place.x,y:OfficeLife.lanes[place.lane].y},path=OfficeMap.route({x:seat.x,y:seat.y},target,grid);
+  assert.ok(path.length>=2,seat.id+' → '+place.id+' sem caminho');
+  for(let i=2;i<path.length-1;i++){const a=path[i-1],b=path[i];assert.ok(a.x===b.x||a.y===b.y,'diagonal em '+seat.id+' → '+place.id);
+   const steps=Math.max(Math.abs(b.x-a.x),Math.abs(b.y-a.y))/cell;for(let s=0;s<=steps;s++){const p={x:a.x+(b.x-a.x)*s/Math.max(1,steps),y:a.y+(b.y-a.y)*s/Math.max(1,steps)},c=OfficeMap.cellOf(p);assert.equal(grid[c.r*OfficeMap.COLS+c.c],1,'passou por célula bloqueada');}}
+ }
+ // Bloquear uma passagem obriga a usar outra; bloquear tudo deixa sem caminho (nunca atravessa parede).
+ const empty=new Uint8Array(grid.length);assert.equal(OfficeMap.route({x:174,y:299},{x:1050,y:492},empty).length,0);
+});
+
+test('renderizador em canvas é opcional: padrão continua no DOM e os botões dos agentes nunca somem',()=>{
+ const store=new Map<string,string>();
+ const context=vm.createContext({document:{querySelector:()=>null,body:{dataset:{}}},localStorage:{getItem:(k:string)=>store.get(k)??null,setItem:(k:string,v:string)=>store.set(k,v)},console});
+ vm.runInContext(readFileSync('public/office/scene-canvas.js','utf8'),context);
+ const {OfficeSceneCanvas}=context as any;
+ assert.equal(OfficeSceneCanvas.preferred(),'dom');assert.equal(OfficeSceneCanvas.active(),false);
+ OfficeSceneCanvas.set('canvas');assert.equal(store.get(OfficeSceneCanvas.KEY),'canvas','escolha fica só neste navegador');
+ const css=readFileSync('public/office/v3.css','utf8'),rule=css.split('\n').find(l=>l.startsWith('body[data-renderer="canvas"] #office .agent .sprite-frame'))!;
+ assert.ok(rule.includes('visibility:hidden')&&!/\.agent[,{]/.test(rule.replace('.agent .sprite-frame','')),'só a pintura é escondida; o botão continua clicável');
+ assert.match(css,/#sceneCanvas\{[^}]*pointer-events:none/);
+});

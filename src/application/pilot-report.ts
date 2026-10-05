@@ -1,5 +1,6 @@
 import type {FastifyInstance} from 'fastify';
 import type {DomainEvent} from '../domain/events.js';
+import {performanceMetrics} from '../domain/performance-metrics.js';
 
 /**
  * Pre-declared pilot evaluation (docs/PILOT_EVALUATION_PROTOCOL.md), declared 2026-10-05 before any pilot trade.
@@ -50,6 +51,8 @@ export function pilotReport(input:PilotReportInput){
   fills:fills.length,closedTrades:closed.length,wins:closed.filter(t=>t.netPnl>0).length,
   pnl,startEquity,equity:input.equity,fees,funding,maxDrawdownObserved:input.maxDrawdown,
   benchmarks:{flat:0,btcReturn,buyAndHoldSameExposure:sameExposure,buyAndHoldFullEquity:btcReturn!==null&&startEquity!==null?startEquity*btcReturn:null,startPrice,mark:input.mark},
+  // Métricas no estilo quantstats só com a equity e as operações do período do piloto.
+  metrics:performanceMetrics(input.equityPoints.filter(p=>p.timestamp>=(before?.timestamp??startedAt)),closed.map(t=>({netPnl:t.netPnl})),{inMarketHours:closed.reduce((s,t)=>s+Math.max(0,Date.parse(t.closedAt)-Date.parse(t.openedAt))/3600000,0)}),
   verdict,provisionalVerdict:verdict==='IN_PROGRESS'?provisional:verdict,nextStep:PILOT_NEXT_STEP[verdict==='IN_PROGRESS'?provisional:verdict]};
 }
 export function registerPilotReport(app:FastifyInstance,input:()=>PilotReportInput){app.get('/paper/perpetual/pilot/report',async()=>pilotReport(input()));}

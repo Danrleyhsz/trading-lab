@@ -148,7 +148,7 @@ const reducedMotion=globalThis.matchMedia?.('(prefers-reduced-motion: reduce)');
 // The owner may explicitly animate the office even when the operating system asks for reduced motion.
 let motionChoice=(()=>{try{return globalThis.localStorage?.getItem('trading-lab.motion.v1')==='on'?'on':'system';}catch{return 'system';}})();
 const systemReducesMotion=()=>!!reducedMotion?.matches&&motionChoice!=='on';
-const motionAllowed=()=>presenceEnabled&&!selectedHandoff&&!systemReducesMotion()&&!document.hidden&&!['#profile','#workspaceDialog','#roomDialog','#auditDialog','#studyDialog','#researchDialog','#screenDialog'].some(id=>q(id).open);
+const motionAllowed=()=>document.body?.dataset?.editing!=="on"&&presenceEnabled&&!selectedHandoff&&!systemReducesMotion()&&!document.hidden&&!['#profile','#workspaceDialog','#roomDialog','#auditDialog','#studyDialog','#researchDialog','#screenDialog'].some(id=>q(id).open);
 const presence=new OfficePresence.Director(motionAllowed);
 const transitions=new OfficeTransitions.Director(motionAllowed,view=>presence.stop(view),view=>presence.update(view,view.agent,view.slot,view.host));
 const screens=new OfficeScreens.Screens(q('#office'));
