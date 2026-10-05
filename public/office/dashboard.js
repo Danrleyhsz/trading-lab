@@ -317,7 +317,9 @@
    let badge=view.button.querySelector?.('.state-badge');if(badges[id]){if(!badge){badge=el('span','','state-badge');badge.setAttribute('aria-hidden','true');view.button.append(badge);}badge.textContent=badges[id];}else badge?.remove();
   }
  }
- function paint(){activity();header();wall();if(!state.cardReady&&agents.has(state.selected)){state.cardReady=true;$('#agentCard').hidden=false;selectAgent(state.selected);}card();renderActivity();lighting();watchPositions();if(openGroup)fillLarge();}
+ function paint(){activity();header();wall();
+  // Monitores das mesas: só dados recebidos (panorama público, cotação da sessão, conta do piloto, mensagens registradas).
+  globalThis.OfficeDeskScreens?.paint({panorama:state.panorama,finance:finance(),marks:traces.mark.map(x=>x.price),messages:communicationReady?communications:[]});if(!state.cardReady&&agents.has(state.selected)){state.cardReady=true;$('#agentCard').hidden=false;selectAgent(state.selected);}card();renderActivity();lighting();watchPositions();if(openGroup)fillLarge();}
  for(const b of D.querySelectorAll('.dock-tabs button'))b.onclick=()=>{state.tab=b.dataset.tab;card();};
  $('#closeCard').onclick=()=>{$('#agentCard').hidden=true;};
  $('#cardProfile').onclick=()=>profile(state.selected);

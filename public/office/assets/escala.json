@@ -1,0 +1,267 @@
+{
+ "_regra": "Tamanho de cada peça na cena (px da cena de 1852 × 849), medido na arte atual: pessoa em pé = 87 px. w = largura, h = altura; a outra medida segue a proporção da peça.",
+ "estacao-mesa-3-monitores": {
+  "w": 165
+ },
+ "estacao-mesa-2-monitores": {
+  "w": 140
+ },
+ "estacao-mesa-simples": {
+  "w": 140
+ },
+ "estacao-mesa-em-l": {
+  "w": 190
+ },
+ "estacao-gaveteiro": {
+  "h": 50
+ },
+ "estacao-lixeira": {
+  "h": 30
+ },
+ "cadeira-costas": {
+  "h": 64
+ },
+ "cadeira-frente": {
+  "h": 64
+ },
+ "cadeira-lado": {
+  "h": 64
+ },
+ "cadeira-reuniao": {
+  "h": 56
+ },
+ "cadeira-poltrona": {
+  "w": 62
+ },
+ "cadeira-banqueta": {
+  "h": 56
+ },
+ "eletronico-telao": {
+  "w": 250
+ },
+ "eletronico-tv-parede": {
+  "w": 110
+ },
+ "eletronico-rack-servidor": {
+  "h": 110
+ },
+ "eletronico-impressora": {
+  "w": 60
+ },
+ "eletronico-notebook": {
+  "w": 34
+ },
+ "eletronico-painel-led": {
+  "w": 120
+ },
+ "decoracao-costela-de-adao": {
+  "h": 66
+ },
+ "decoracao-palmeira": {
+  "h": 84
+ },
+ "decoracao-suculenta": {
+  "h": 20
+ },
+ "decoracao-planta-pendente": {
+  "h": 72
+ },
+ "decoracao-quadro": {
+  "w": 52
+ },
+ "decoracao-relogio": {
+  "w": 26
+ },
+ "decoracao-luminaria-chao": {
+  "h": 80
+ },
+ "decoracao-abajur": {
+  "h": 30
+ },
+ "decoracao-estante-livros": {
+  "h": 88
+ },
+ "decoracao-globo": {
+  "h": 30
+ },
+ "copa-cafeteira": {
+  "w": 34
+ },
+ "copa-bebedouro": {
+  "h": 72
+ },
+ "copa-geladeira": {
+  "h": 92
+ },
+ "copa-micro-ondas": {
+  "w": 40
+ },
+ "copa-bancada-pia": {
+  "w": 112
+ },
+ "copa-maquina-snacks": {
+  "h": 92
+ },
+ "estar-sofa": {
+  "w": 160
+ },
+ "estar-poltrona": {
+  "w": 58
+ },
+ "estar-mesa-centro": {
+  "w": 76
+ },
+ "estar-mesa-reuniao": {
+  "w": 200
+ },
+ "estar-tapete": {
+  "w": 170
+ },
+ "estar-puff": {
+  "w": 28
+ },
+ "arquitetura-janela": {
+  "h": 84
+ },
+ "arquitetura-janela-coluna": {
+  "h": 92
+ },
+ "arquitetura-janela-canto": {
+  "h": 92
+ },
+ "arquitetura-porta": {
+  "h": 100
+ },
+ "arquitetura-divisoria-vidro": {
+  "w": 110
+ },
+ "arquitetura-rodape": {
+  "w": 110
+ },
+ "assento-poltrona-frente": {
+  "w": 56
+ },
+ "assento-poltrona-costas": {
+  "w": 56
+ },
+ "assento-poltrona-lado": {
+  "h": 56
+ },
+ "assento-poltrona-lado-esq": {
+  "h": 56
+ },
+ "assento-sofa-frente": {
+  "w": 110
+ },
+ "assento-sofa-costas": {
+  "w": 110
+ },
+ "assento-sofa-lado": {
+  "h": 56
+ },
+ "assento-sofa-lado-esq": {
+  "h": 56
+ },
+ "assento-reuniao-frente": {
+  "h": 52
+ },
+ "assento-reuniao-costas": {
+  "h": 52
+ },
+ "assento-reuniao-lado": {
+  "h": 52
+ },
+ "assento-reuniao-lado-esq": {
+  "h": 52
+ },
+ "mesa-caneca": {
+  "h": 9
+ },
+ "mesa-pilha-papeis": {
+  "w": 14
+ },
+ "mesa-porta-lapis": {
+  "h": 12
+ },
+ "mesa-planta-mesa": {
+  "h": 14
+ },
+ "mesa-telefone": {
+  "w": 16
+ },
+ "mesa-fone-ouvido": {
+  "w": 13
+ },
+ "mesa-calculadora": {
+  "w": 11
+ },
+ "mesa-bloco-notas": {
+  "w": 12
+ },
+ "mesa-garrafa-agua": {
+  "h": 13
+ },
+ "mesa-porta-retrato": {
+  "w": 12
+ },
+ "mesa-tablet": {
+  "w": 16
+ },
+ "mesa-livros-empilhados": {
+  "w": 15
+ },
+ "item-quadro-branco": {
+  "w": 70
+ },
+ "item-arquivo-aco": {
+  "h": 50
+ },
+ "item-prateleira-parede": {
+  "w": 46
+ },
+ "item-arandela": {
+  "h": 14
+ },
+ "item-mural-cortica": {
+  "w": 40
+ },
+ "item-cabideiro": {
+  "h": 70
+ },
+ "item-extintor": {
+  "h": 18
+ },
+ "item-coluna": {
+  "h": 120
+ },
+ "item-aparador": {
+  "w": 60
+ },
+ "item-planta-suporte": {
+  "h": 52
+ },
+ "item-mapa-mundi": {
+  "w": 48
+ },
+ "item-vaso-galhos": {
+  "h": 50
+ },
+ "parede-reta": {
+  "h": 60
+ },
+ "parede-canto": {
+  "h": 98
+ },
+ "parede-fim": {
+  "h": 60
+ },
+ "parede-vao-porta": {
+  "h": 60
+ },
+ "parede-janela-interna": {
+  "h": 60
+ },
+ "parede-curta": {
+  "h": 60
+ }
+}
