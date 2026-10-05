@@ -48,6 +48,7 @@ import {BinancePublicMarketData} from './infrastructure/binance-market-data.js';
 import {BinanceHistoricalData} from './infrastructure/binance-history.js';
 import {BinanceDerivativesData} from './infrastructure/binance-derivatives.js';
 import {BinancePerpetualHistory} from './infrastructure/binance-perpetual-history.js';
+import {BybitPerpetualHistory,ResilientPerpetualHistory} from './infrastructure/bybit-perpetual-history.js';
 import {BinancePerpetualMarket} from './infrastructure/binance-perpetual-market.js';
 import {JsonStateStore} from './infrastructure/json-state-store.js';
 import {PostgresStateStore} from './infrastructure/postgres-state-store.js';
@@ -87,7 +88,10 @@ const pilotTeam=new PilotTeamBriefing(messages,new TeamPredictions(memories));
 const pilotPhase=process.env.CLOUD_LAUNCH_PHASE==='CONTINUOUS_PAPER_PILOT',deployedCommit=process.env.RENDER_GIT_COMMIT??'';
 const release=releaseApproval(process.env,backendFingerprint().fingerprint);
 const releasePinned=pilotPhase&&release.approved;
-const cycle=new AutonomousPerpetualCycle(autonomousEnabled,process.env.AUTONOMOUS_STUDY_ID??'',studies,book,perpetualHistory,persist,memories,bus,()=>persist(),Date.now,()=>runtime.control().ready,{blockedReason:autonomousEnabled&&production&&!releasePinned?'RELEASE_NOT_APPROVED':null,maxLossFraction:process.env.PILOT_MAX_LOSS===undefined?0.03:Number(process.env.PILOT_MAX_LOSS),onDecision:context=>pilotTeam.brief(context)});
+// Plano B do piloto (desligado por padrão): Bybit quando a Binance falhar; os estudos continuam só com a Binance.
+const pilotHistory=new ResilientPerpetualHistory(perpetualHistory,new BybitPerpetualHistory(),process.env.PERPETUAL_HISTORY_FALLBACK==='bybit');
+app.get('/paper/perpetual/history-source',async()=>pilotHistory.status());
+const cycle=new AutonomousPerpetualCycle(autonomousEnabled,process.env.AUTONOMOUS_STUDY_ID??'',studies,book,pilotHistory,persist,memories,bus,()=>persist(),Date.now,()=>runtime.control().ready,{blockedReason:autonomousEnabled&&production&&!releasePinned?'RELEASE_NOT_APPROVED':null,maxLossFraction:process.env.PILOT_MAX_LOSS===undefined?0.03:Number(process.env.PILOT_MAX_LOSS),onDecision:context=>pilotTeam.brief(context)});
 // Sentinel records every risk decision on the pilot account as a team message.
 bus.subscribe(e=>{if((e.type==='RISK_APPROVED'||e.type==='RISK_REJECTED')&&(e.payload as {accountId?:string})?.accountId==='evaluation:nova:usdm'&&autonomousEnabled)pilotTeam.riskReview(e.type==='RISK_APPROVED',e.payload as never);});
 registerAgentProfiles(app,agents,memories,messages,activity,accounts,book);
