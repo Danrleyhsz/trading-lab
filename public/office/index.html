@@ -93,6 +93,14 @@
   <button id="closeScreen" class="close" aria-label="Fechar telões ampliados">×</button><h2 id="screenTitle">Telões</h2><p id="screenNote"></p>
   <div id="screenGrid" class="screen-grid"></div><button id="screenDetails">Abrir painel detalhado ↗</button>
 </dialog>
+<dialog id="chartDialog" class="chart-dialog" aria-labelledby="chartTitle">
+  <header class="chart-head"><span id="chartCoin" class="coin btc" aria-hidden="true">₿</span><div class="chart-id"><h2 id="chartTitle">BTC/USDT</h2><small id="chartSource"></small></div>
+  <strong id="chartPrice" class="chart-price">—</strong><span id="chartChange" class="chart-change"></span><span id="chartLive" class="chart-live" data-live="false" role="status"></span>
+  <div class="chart-intervals" role="group" aria-label="Intervalo dos candles"><button type="button" data-interval="1m" aria-pressed="true">1m</button><button type="button" data-interval="1h" aria-pressed="false">1h</button></div>
+  <button id="closeChart" class="close" aria-label="Fechar gráfico">×</button></header>
+  <div id="chartStats" class="chart-stats"></div>
+  <div class="chart-plot"><div id="chartCanvas" class="chart-canvas" role="img" aria-label="Candles ao vivo"></div><div id="chartTip" class="chart-tip" hidden></div></div>
+</dialog>
 <dialog id="workspaceDialog" aria-labelledby="workspaceTitle">
   <button id="closeWorkspace" class="close" aria-label="Fechar painel">×</button><h2 id="workspaceTitle">Laboratório</h2>
   <section id="agentsPanel" class="workspace-panel" hidden><p>Funções definidas; atividade e experiência vêm do backend.</p><div id="agentList"></div></section>
@@ -122,5 +130,5 @@
 <dialog id="auditDialog" aria-labelledby="auditTitle"><button id="closeAudit" class="close" aria-label="Fechar auditoria">×</button><h2 id="auditTitle">Auditoria</h2><p id="auditStatus" role="status"></p><button id="auditBack" hidden>Voltar às operações da conta</button><div id="auditContent"></div><button id="auditOlder" hidden>Ver operações anteriores</button></dialog>
 <dialog id="roomDialog" aria-labelledby="roomTitle"><button id="closeRoom" class="close" aria-label="Fechar sala">×</button><h2 id="roomTitle"></h2><p id="roomDescription"></p><div id="roomPeople" class="room-people"></div><div id="roomActions" class="room-actions"></div><h3>Objetos e funções da sala</h3><div id="roomObjects" class="room-objects"></div><h3>Comunicação entre agentes</h3><p id="roomMessageStatus" role="status"></p><ol id="roomMessages"></ol></dialog>
 <script src="/office/core.js"></script><script src="/office/collaboration.js"></script><script src="/office/navigation.js"></script><script src="/office/office-layout.js"></script><script src="/office/workstations.js"></script><script src="/office/scene-quads.js"></script><script src="/office/presence.js"></script><script src="/office/transitions.js"></script><script src="/office/life.js"></script><script src="/office/office-map.js"></script><script src="/office/screens.js"></script><script src="/office/character-frames.js"></script><script src="/office/sprites.js"></script>
-<script src="/office/i18n.js"></script><script src="/office/research.js"></script><script src="/office/audit.js"></script><script src="/office/app.js"></script><script src="/office/dashboard.js"></script><script src="/office/replay.js"></script><script src="/office/map-editor.js"></script><script src="/office/display.js"></script><script src="/office/scene-canvas.js"></script><script src="/office/desk-screens.js"></script>
+<script src="/office/i18n.js"></script><script src="/office/research.js"></script><script src="/office/audit.js"></script><script src="/office/app.js"></script><script src="/office/dashboard.js"></script><script src="/office/replay.js"></script><script src="/office/map-editor.js"></script><script src="/office/display.js"></script><script src="/office/scene-canvas.js"></script><script src="/office/desk-screens.js"></script><script src="/office/coin-chart.js"></script>
 </body></html>

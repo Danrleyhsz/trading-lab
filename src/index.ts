@@ -122,6 +122,8 @@ for(const path of ['/agent-messages/hypothesis','/agent-messages/backtest','/age
 app.get('/agents/scorecard',async()=>{const all=memories.query();return {policy:PREDICTION_POLICY,scorecard:scorecard(all),highlights:Object.fromEntries(['atlas','satoshi','oracle','nova','flux','sentinel','euler','vega'].map(id=>[id,rankMemories(all.filter(m=>m.agentId===id),Date.now()).map(r=>({...r.memory,score:Number(r.score.toFixed(3))}))]))};});
 app.get('/memories',async(req)=>memories.query(req.query as any));app.get('/market/latest',async()=>latest??{status:'waiting'});app.get('/market/:symbol/snapshot',async(req)=>derivatives.snapshot((req.params as {symbol:string}).symbol));app.get('/market/v3',async()=>perpetualMarket.snapshot());
 const panorama=new BinanceMarketPanorama();app.get('/market/panorama',async()=>panorama.snapshot());
+// Gráfico ao vivo das telas das moedas (BTCUSDT, ETHUSDT, BTCPERP; 1m ou 1h): só leitura do que o panorama já recebe.
+app.get('/market/chart',async(req,reply)=>{const {symbol,interval}=req.query as {symbol?:string;interval?:string};return panorama.chart(String(symbol),String(interval))??reply.code(400).send({error:'unsupported chart'});});
 // Gatilhos fora do normal (P5/P95): só mensagens e memórias para a equipe; nunca sinal, risco ou execução.
 // Outras corretoras (Bybit, OKX, Hyperliquid): só leitura, para comparar funding e conferir o preço da Binance.
 const venues=new CrossVenueMarket(()=>{const q=perpetualMarket.snapshot().quote;return q?{markPrice:q.markPrice,fundingRate:q.fundingRate,markTime:q.markTime}:null;});venues.start();
