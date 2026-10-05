@@ -91,7 +91,7 @@ const releasePinned=pilotPhase&&release.approved;
 // Plano B do piloto (desligado por padrão): Bybit quando a Binance falhar; os estudos continuam só com a Binance.
 const pilotHistory=new ResilientPerpetualHistory(perpetualHistory,new BybitPerpetualHistory(),process.env.PERPETUAL_HISTORY_FALLBACK==='bybit');
 app.get('/paper/perpetual/history-source',async()=>pilotHistory.status());
-const cycle=new AutonomousPerpetualCycle(autonomousEnabled,process.env.AUTONOMOUS_STUDY_ID??'',studies,book,pilotHistory,persist,memories,bus,()=>persist(),Date.now,()=>runtime.control().ready,{blockedReason:autonomousEnabled&&production&&!releasePinned?'RELEASE_NOT_APPROVED':null,maxLossFraction:process.env.PILOT_MAX_LOSS===undefined?0.03:Number(process.env.PILOT_MAX_LOSS),onDecision:context=>pilotTeam.brief(context)});
+const cycle=new AutonomousPerpetualCycle(autonomousEnabled,process.env.AUTONOMOUS_STUDY_ID??'',studies,book,pilotHistory,persist,memories,bus,()=>persist(),Date.now,()=>runtime.control().ready,{blockedReason:autonomousEnabled&&production&&!releasePinned?'RELEASE_NOT_APPROVED':null,maxLossFraction:process.env.PILOT_MAX_LOSS===undefined?0.03:Number(process.env.PILOT_MAX_LOSS),settleMs:Number(process.env.CONTINUOUS_SIGNAL_SETTLE_SECONDS??0)*1000,onDecision:context=>pilotTeam.brief(context)});
 // Sentinel records every risk decision on the pilot account as a team message.
 bus.subscribe(e=>{if((e.type==='RISK_APPROVED'||e.type==='RISK_REJECTED')&&(e.payload as {accountId?:string})?.accountId==='evaluation:nova:usdm'&&autonomousEnabled)pilotTeam.riskReview(e.type==='RISK_APPROVED',e.payload as never);});
 registerAgentProfiles(app,agents,memories,messages,activity,accounts,book);

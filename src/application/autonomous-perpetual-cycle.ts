@@ -17,18 +17,21 @@ export interface PilotOptions {
  maxLossFraction?:number;
  /** Back-off after a failed attempt so an outage never turns into a request loop. */
  retryDelayMs?:number;
+ /** Espera depois da virada da hora antes de ler o candle (paridade: a Binance ainda ajusta o último candle por alguns segundos). 0 = desligado. */
+ settleMs?:number;
  /** Team briefing hook; it never affects the decision and its failures are contained. */
  onDecision?:(context:PilotDecisionContext)=>void;
 }
 export class AutonomousPerpetualCycle {
  private busy=false;private error:string|null=null;private nextAttemptAt=0;private stopReason:string|null=null;private lastAttemptFailed=false;
- private readonly blockedReason:string|null;private readonly maxLossFraction:number;private readonly retryDelayMs:number;private readonly onDecision?:(context:PilotDecisionContext)=>void;
+ private readonly blockedReason:string|null;private readonly maxLossFraction:number;private readonly retryDelayMs:number;private readonly settleMs:number;private readonly onDecision?:(context:PilotDecisionContext)=>void;
  constructor(private enabled:boolean,private studyId:string,private studies:PerpetualStudies,private book:PerpetualPaperBook,private source:{load(count:number):Promise<PerpetualDataset>},private save:(state:PerpetualBookState)=>Promise<void>,private memories:MemoryStore,private bus:EventBus,private persist:()=>Promise<void>,private now:()=>number=Date.now,private canContinue:()=>boolean=()=>true,options:PilotOptions={}){
-  this.blockedReason=options.blockedReason??null;this.maxLossFraction=options.maxLossFraction??0.03;this.retryDelayMs=options.retryDelayMs??300000;this.onDecision=options.onDecision;
+  this.blockedReason=options.blockedReason??null;this.maxLossFraction=options.maxLossFraction??0.03;this.retryDelayMs=options.retryDelayMs??300000;this.settleMs=options.settleMs??0;
+  if(!(Number.isInteger(this.settleMs)&&this.settleMs>=0&&this.settleMs<=300000))throw Error('settle delay must be an integer from 0 to 300 seconds');this.onDecision=options.onDecision;
   if(!(this.maxLossFraction>0&&this.maxLossFraction<0.1))throw Error('pilot loss limit must be between 0 and the 10% risk drawdown limit');
  }
  private active(){return this.enabled&&!this.blockedReason;}
- status(){const {eligible,reason}=this.studies.screen(this.studyId,this.now());return {enabled:this.active(),studyId:this.studyId||null,busy:this.busy,error:this.error,eligible,reason,accountId:'evaluation:nova:usdm',lastProcessedCandle:this.book.status().autonomousCursor,blockedReason:this.blockedReason,stopReason:this.stopReason,maxLossFraction:this.maxLossFraction,lastAttemptFailed:this.lastAttemptFailed,nextAttemptAt:this.nextAttemptAt>this.now()?this.nextAttemptAt:null};}
+ status(){const {eligible,reason}=this.studies.screen(this.studyId,this.now());return {enabled:this.active(),studyId:this.studyId||null,busy:this.busy,error:this.error,eligible,reason,accountId:'evaluation:nova:usdm',lastProcessedCandle:this.book.status().autonomousCursor,blockedReason:this.blockedReason,stopReason:this.stopReason,maxLossFraction:this.maxLossFraction,settleSeconds:this.settleMs/1000,lastAttemptFailed:this.lastAttemptFailed,nextAttemptAt:this.nextAttemptAt>this.now()?this.nextAttemptAt:null};}
  private sourcesReady(){const status=this.book.status();return this.canContinue()&&!status.persistenceFailed&&status.marketReady&&status.fundingReady;}
  /** Pilot exit: an expired/ineligible study or the loss limit closes any open position through normal risk (reductions are allowed while halted). */
  private async stop(reason:string,account:ReturnType<PerpetualPaperBook['list']>[number],current:number){
@@ -48,6 +51,8 @@ export class AutonomousPerpetualCycle {
    if(stopReason){await this.stop(stopReason,account,current);this.succeeded();return;}
    if(this.book.status().halted)return;
    const hour=Math.floor(this.now()/3600000)*3600000;if((this.book.status().autonomousCursor??0)>=hour-3600000)return;
+   // Espera o último candle assentar (declarado para o próximo piloto; 0 mantém o comportamento do piloto atual).
+   if(this.now()-hour<this.settleMs)return;
    const study=this.studies.get(this.studyId)!;const configuration=study.result!.folds.at(-1)!.configuration;const data=await this.source.load(Math.max(100,configuration.slowPeriod+2,teamFilterWarmup(configuration.filters)+2));
    if(!this.sourcesReady()||this.book.status().halted||!this.studies.screen(this.studyId,this.now()).eligible)return;
    const hash=validatePerpetualDataset(data);const last=data.trade.at(-1)!;if(last.timestamp+3600000>this.now()||this.now()-last.timestamp>2*3600000)throw Error('signal history stale');if((this.book.status().autonomousCursor??0)>=last.timestamp)return;
