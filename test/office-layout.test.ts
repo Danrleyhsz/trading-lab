@@ -1,12 +1,13 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
+import vm from 'node:vm';
 
 const html=readFileSync('public/office/index.html','utf8');
 const ids=new Set([...html.matchAll(/\sid="([^"]+)"/g)].map(m=>m[1]));
 
 test('every element the office scripts address exists in the reference layout',()=>{
- for(const file of ['core.js','research.js','audit.js','app.js','dashboard.js','display.js','replay.js']){
+ for(const file of ['core.js','research.js','audit.js','app.js','dashboard.js','display.js','replay.js','coin-chart.js']){
   const source=readFileSync('public/office/'+file,'utf8');
   const used=new Set([...source.matchAll(/(?:q|\$)\('#([A-Za-z][\w-]*)'\)/g)].map(m=>m[1]));
   // Created at runtime by the scripts themselves.
@@ -29,4 +30,21 @@ test('the layout loads only allowlisted office assets',async()=>{
  const assets=[...html.matchAll(/(?:src|href)="\/office\/([^"]+)"/g)].map(m=>m[1]).filter(name=>name!=='index.html'&&!name.startsWith('#'));
  for(const name of assets){const r=await app.inject('/office/'+name);assert.equal(r.statusCode,200,name);}
  await app.close();
+});
+
+test('telas das moedas: telão só com candles e o clique abre o gráfico ao vivo, que apenas lê /market/chart',()=>{
+ const dash=readFileSync('public/office/dashboard.js','utf8'),chart=readFileSync('public/office/coin-chart.js','utf8');
+ assert.doesNotMatch(dash,/function spark/,'a linha azul saiu do telão');
+ assert.match(dash,/candles\(field\('BTCPERP','chart'\),perp\)/);assert.match(dash,/candles\(field\('oi','chart'\),oi\?\.candles\)/);
+ assert.match(chart,/get\('\/market\/chart\?symbol='/);assert.doesNotMatch(chart,/fetch\(|POST|\/orders|\/jobs/,'a janela só lê dados públicos');
+ for(const id of ['chartDialog','chartCanvas','chartTip','chartLive','closeChart'])assert.ok(ids.has(id),id);
+ assert.match(html,/data-interval="1m"[^>]*aria-pressed="true"/);assert.match(html,/data-interval="1h"/);
+ const ctx=vm.createContext({document:{querySelector:()=>null,querySelectorAll:()=>[]}});vm.runInContext(chart,ctx);const C=(ctx as any).OfficeCoinChart;
+ assert.equal(Object.keys(C.COINS).join(),'BTCUSDT,BTCPERP,ETHUSDT');
+ // Marcas redondas do eixo de preço: passo 50 no BTC, 1 no ETH, 0,25 com duas casas.
+ let t=C.niceTicks(85500,85760,6);assert.equal(t.ticks.join(),'85500,85550,85600,85650,85700,85750');assert.equal(t.decimals,0);
+ t=C.niceTicks(2707.6,2712.4,6);assert.equal(t.ticks.join(),'2708,2709,2710,2711,2712');
+ t=C.niceTicks(0,1,4);assert.equal(t.ticks.join(),'0,0.25,0.5,0.75,1');assert.equal(t.decimals,2);
+ assert.equal(C.timeLabel(new Date(2026,9,5,0,0).getTime(),'1h'),'05/10','meia-noite no gráfico de 1 h mostra a data');
+ assert.equal(C.timeLabel(new Date(2026,9,5,14,7).getTime(),'1m'),'14:07');
 });

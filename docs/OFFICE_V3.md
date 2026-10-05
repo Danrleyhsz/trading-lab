@@ -12,7 +12,7 @@ On 2026-10-04 the owner declared the concept image (`Imagem do ChatGPT 2 de out.
 | Header: Operações Abertas, Modo | Open positions across accounts; PAPER TRADING | `/finance` |
 | Header: sun, date/time, Mercado | Lighting toggle, live clock, "Aberto 24/7" only while the USD-M quote is fresh | browser clock, quote |
 | Left rail (9 items) | Escritório, Agentes, Portfólio, **Operações** (new), Mercado, Estratégias (studies), **Memória** (new), Relatórios (pilot timeline and history), Config (lighting, notifications, display, access) | existing read panels plus new ones |
-| Wall screens | BTC/USDT and ETH/USDT (price, 24h change, 1h candles); funding rate; open interest (24h change and curve); 24h liquidations (longs/shorts); world map lighting the open sessions (Asia, Europe, US); BNB/SOL/XRP/DOGE/ADA/AVAX 24h change | `GET /market/panorama` (new) |
+| Wall screens | BTC/USDT, BTC PERP and ETH/USDT (price, 24h change, 1h candles; clicking opens the live chart below); funding rate; open interest (24h change and hourly candles); 24h liquidations (longs/shorts); world map lighting the open sessions (Asia, Europe, US); BNB/SOL/XRP/DOGE/ADA/AVAX 24h change | `GET /market/panorama` (new) |
 | Name plates and speech bubbles | Every character has a plate. Bubbles show the latest recorded message (≤ 2 h) or a cosmetic outing | `docs/OFFICE_LIFE.md` |
 | Risk Desk checklist | Five live checks | `/finance` risk |
 | Meeting Room screen | Last team briefing and next decision countdown | messages |
@@ -25,17 +25,27 @@ On 2026-10-04 the owner declared the concept image (`Imagem do ChatGPT 2 de out.
 ## Market panorama (`src/infrastructure/binance-market-panorama.ts`)
 
 **Sources:** public Binance data only. Three WebSockets:
-- spot miniTicker for 8 symbols plus 1h klines for BTC and ETH;
-- USD-M `btcusdt@kline_1m` and `!forceOrder@arr` on `/market`;
+- spot miniTicker for 8 symbols plus 1m and 1h klines for BTC and ETH;
+- USD-M `btcusdt@kline_1m`, `btcusdt@kline_1h` and `!forceOrder@arr` on `/market`;
 - `btcusdt@depth20@500ms` on `/public`.
 
 REST is slow and sequential:
-- 48 1h klines per coin every 30 min;
-- 60 1m klines once at start;
-- open interest and its 24h history every 5 min;
+- every 30 min, in order: 48 1h klines for BTC, ETH and the BTC perpetual, and 90 1m klines for BTC, ETH and the perpetual (the 1m perpetual call also feeds the taker flow);
+- open interest and 300 5-minute history points every 5 min (the full hours keep the hourly history used by the triggers; each hour becomes one open-interest candle);
 - 96 15m klines for the volume profile every 15 min.
 
 **Rate limits:** 418/429 responses honour Retry-After (at least 1 min, at most 1 h) for all panorama REST calls.
+
+## Candles e gráfico ao vivo das moedas
+
+Todas as tendências do telão e dos monitores das mesas são candles (verde sobe, vermelho cai): BTC/USDT, BTC PERP e ETH/USDT em velas de 1 hora e o open interest em velas de 1 hora montadas com os pontos de 5 minutos (abertura, máxima, mínima e fechamento observados naquela hora). A linha azul do traçado de sessão saiu do telão.
+
+Clicar numa tela de moeda (BTC/USDT, BTC PERP ou ETH/USDT) abre a janela do gráfico ao vivo (`public/office/coin-chart.js`):
+- candles de **1m** (90 velas) ou **1h** (48 velas), com volume, último preço, máxima e mínima de 24 h e, no spot, volume de 24 h;
+- passar o mouse mostra abertura, máxima, mínima, fechamento e variação do candle;
+- a janela lê `GET /market/chart?symbol=BTCUSDT|ETHUSDT|BTCPERP&interval=1m|1h` a cada 2 s, só enquanto está aberta. O servidor responde com o que já recebe dos streams públicos; nenhuma chamada nova à Binance é feita por clique;
+- "Ao vivo" só aparece quando chegou dado nos últimos 90 s. Sem isso, a janela mostra "Sem dado novo" ou "Indisponível" e nunca inventa candles;
+- no perpétuo, a variação, a máxima e a mínima de 24 h vêm das 24 últimas velas de 1 hora e só aparecem quando as 24 existem.
 
 **Use:** the panorama is screen context only (`scope: PUBLIC_MARKET_CONTEXT_ONLY`). It never feeds signals, risk or execution.
 

@@ -267,3 +267,39 @@ body.v3 .agent[data-activity="waiting"] .state-badge{background:#2b0f16f0;border
 #office .quad-hit:hover .quad-shape polygon,#office .quad-hit:focus-visible .quad-shape polygon{fill:#35c9ff1f;stroke:#59e1ff}
 #office .quad-hit:hover .quad-shape,#office .quad-hit:focus-visible .quad-shape{filter:drop-shadow(0 0 4px #35c9ff)}
 #office .quad-hit:after{font-size:clamp(9px,.7cqw,13px)}
+
+/* ---------- telas das moedas: clique abre o gráfico ao vivo ---------- */
+body.v3 .coin-screen{cursor:pointer;transition:border-color .15s,box-shadow .15s}
+body.v3 .coin-screen:hover,body.v3 .coin-screen:focus-visible{border-color:#35c9ff;box-shadow:inset 0 0 1.2cqw #35c9ff44,0 0 .8cqw #35c9ff88;outline:none}
+body.v3 .coin-screen::after{content:'⤢';position:absolute;top:.3cqw;right:.45cqw;font-size:.95cqw;color:#59e1ff;opacity:.35;transition:opacity .15s}
+body.v3 .coin-screen:hover::after,body.v3 .coin-screen:focus-visible::after{opacity:1}
+.chart-dialog{width:min(1180px,calc(100vw - 48px));max-height:calc(100dvh - 48px);padding:16px 18px 14px;overflow:hidden}
+.chart-dialog[open]{display:flex;flex-direction:column;gap:10px}
+.chart-head{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+body.v3 .chart-dialog .coin,.chart-dialog .coin{display:inline-grid;place-items:center;width:36px;height:36px;border-radius:50%;font-weight:900;font-size:20px;color:#fff;flex:none}
+.chart-id{display:grid;line-height:1.15}.chart-id h2{margin:0;font-size:18px;letter-spacing:.02em}.chart-id small{color:#7f93b5;font-size:11px}
+.chart-price{font-size:30px;font-weight:800;font-variant-numeric:tabular-nums;color:#f2f7ff}
+.chart-change{padding:4px 10px;border-radius:999px;font-weight:800;font-size:14px;background:#16253d;color:#9fb3d1;font-variant-numeric:tabular-nums}
+.chart-change.up{color:#22e39f;background:#22e39f1f}.chart-change.down{color:#ff5577;background:#ff55771f}
+.chart-live{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:#7f93b5}
+.chart-live::before{content:'';width:9px;height:9px;border-radius:50%;background:#4a5a77}
+.chart-live[data-live="true"]{color:#22e39f}.chart-live[data-live="true"]::before{background:#22e39f;animation:chart-pulse 1.6s infinite}
+@keyframes chart-pulse{0%{box-shadow:0 0 0 0 #22e39f99}70%{box-shadow:0 0 0 8px #22e39f00}100%{box-shadow:0 0 0 0 #22e39f00}}
+.chart-intervals{margin-left:auto;display:inline-flex;border:1px solid #2c4466;border-radius:8px;overflow:hidden}
+.chart-intervals button{background:transparent;border:0;border-radius:0;padding:6px 16px;min-height:0;color:#9fb3d1;font-weight:800;cursor:pointer}
+.chart-intervals button[aria-pressed="true"]{background:#35c9ff;color:#04101f}
+.chart-head .close{float:none}
+.chart-stats{display:flex;gap:8px;flex-wrap:wrap}.chart-stats:empty{display:none}
+.chart-stats span{display:inline-flex;gap:8px;align-items:baseline;padding:4px 10px;border-radius:6px;background:#0c182c;border:1px solid #1b2e4b;font-size:11px;color:#7f93b5;text-transform:uppercase;letter-spacing:.04em}
+.chart-stats b{color:#e6efff;font-size:13px;text-transform:none;letter-spacing:0;font-variant-numeric:tabular-nums}
+.chart-plot{position:relative;height:min(60vh,560px);min-height:260px;border-radius:8px;background:#050d1d;border:1px solid #16263f;overflow:hidden}
+.chart-canvas{position:absolute;inset:0}.chart-canvas svg{display:block;width:100%;height:100%}
+.chart-canvas .empty{display:grid;place-items:center;height:100%;margin:0;color:#7f93b5;font-size:14px}
+.chart-canvas text{font:11px system-ui,sans-serif;fill:#7f93b5;font-variant-numeric:tabular-nums}
+.chart-canvas text.last{fill:#04101f;font-weight:800}
+.chart-canvas .hit{cursor:crosshair}
+.chart-tip{position:absolute;top:10px;display:grid;grid-template-columns:auto auto;gap:2px 12px;padding:8px 10px;border-radius:6px;background:#0b1730ee;border:1px solid #2c4466;pointer-events:none;font-size:12px;box-shadow:0 6px 18px #0008}
+.chart-tip[hidden]{display:none}
+.chart-tip small{grid-column:1/-1;color:#9fb3d1;font-size:11px}
+.chart-tip span{display:contents;color:#7f93b5}.chart-tip b{color:#e6efff;text-align:right;font-variant-numeric:tabular-nums}
+.chart-tip b.up{color:#22e39f}.chart-tip b.down{color:#ff5577}

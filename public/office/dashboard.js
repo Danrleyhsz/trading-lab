@@ -57,11 +57,6 @@
   data.forEach((c,i)=>{const up=c.c>=c.o,x=i*w+w/2,color=up?'#22e39f':'#ff5577';s.append(shape('line',{x1:x,x2:x,y1:y(c.h),y2:y(c.l),stroke:color,'stroke-width':1.2}));s.append(shape('rect',{x:x-w*0.32,y:Math.min(y(c.o),y(c.c)),width:w*0.64,height:Math.max(1.5,Math.abs(y(c.o)-y(c.c))),fill:color}));});
   host.append(s);
  }
- function spark(host,values,color='#35c9ff'){
-  host.replaceChildren();const s=svg(200,60);if(!s||values.length<2)return;
-  const low=Math.min(...values),high=Math.max(...values),pts=values.map((v,i)=>(i/(values.length-1)*200).toFixed(1)+','+(56-(v-low)/(high-low||1)*52).toFixed(1)).join(' ');
-  s.append(shape('polyline',{points:pts,fill:'none',stroke:color,'stroke-width':2,'vector-effect':'non-scaling-stroke'}));host.append(s);
- }
  const coinIcons={BNBUSDT:['B','bnb'],SOLUSDT:['S','sol'],XRPUSDT:['✕','xrp'],DOGEUSDT:['Ð','doge'],ADAUSDT:['₳','ada'],AVAXUSDT:['▲','avax']};
  function wall(){
   const p=state.panorama,field=(scope,f)=>$('[data-wall="'+scope+'"] [data-field="'+f+'"]');
@@ -73,13 +68,16 @@
   const qt=quote();field('funding','value').textContent=qt?fmt(qt.fundingRate*100,4)+'%':'—';
   // Diferença de funding entre corretoras (Binance, Bybit, OKX, Hyperliquid), quando disponível.
   field('funding','sub').textContent=state.venues?.fundingSpread8h!=null?'entre corretoras: '+fmt(state.venues.fundingSpread8h*100,4)+'%':qt?'próx. liquidação em '+span(qt.nextFundingTime-Date.now()):'sem cotação';
-  // Telão do perpétuo USD-M: mark price e o traçado recebido nesta sessão (o mesmo que a Nova usa).
+  // Telão do perpétuo USD-M: mark price (o mesmo que a Nova usa) e candles de 1 hora do perpétuo; a variação de 24 h
+  // só aparece quando as 24 velas existem.
   field('BTCPERP','price').textContent=qt?fmt(qt.markPrice,2):'—';
-  const perpSub=field('BTCPERP','sub');perpSub.textContent=qt?'mark price · sessão':'sem cotação';perpSub.className='delta';
-  spark(field('BTCPERP','chart'),traces.mark.map(x=>x.price).slice(-90),'#35c9ff');
+  const perp=p?.candles?.BTCPERP??[],day=perp.slice(-24),perpChange=day.length===24?day.at(-1).c/day[0].o-1:NaN;
+  const perpSub=field('BTCPERP','sub');perpSub.textContent=Number.isFinite(perpChange)?pct(perpChange):qt?'mark price':'sem cotação';perpSub.className='delta '+tone(perpChange);
+  if(p)candles(field('BTCPERP','chart'),perp);
   field('funding','chart').replaceChildren();
   const oi=p?.openInterest;field('oi','value').textContent=oi?big(oi.usd):'—';const sub=field('oi','sub');sub.textContent=oi&&Number.isFinite(oi.change24h)?pct(oi.change24h)+' 24h':'';sub.className='delta '+tone(oi?.change24h);
-  spark(field('oi','chart'),(oi?.history||[]).map(h=>h.usd),'#7ad7ff');
+  // Um candle por hora, montado com os pontos de 5 minutos do open interest (US$).
+  if(p)candles(field('oi','chart'),oi?.candles);
   const l=p?.liquidations;field('liquidations','value').textContent=l?big(l.longs+l.shorts):'—';
   field('liquidations','longs').textContent=l?'Longs: '+big(l.longs):'';field('liquidations','shorts').textContent=l?'Shorts: '+big(l.shorts)+(l.coverageHours<23.9?' · desde '+hhmm(Date.parse(l.since)):''):'';
   const map=field('sessions','map');worldMap(map);const open=paintSessions(map);field('sessions','label').textContent=open.length?'Abertas: '+open.join(' · '):'Sessões fechadas';
@@ -319,7 +317,7 @@
  }
  function paint(){activity();header();wall();
   // Monitores das mesas: só dados recebidos (panorama público, cotação da sessão, conta do piloto, mensagens registradas).
-  globalThis.OfficeDeskScreens?.paint({panorama:state.panorama,finance:finance(),marks:traces.mark.map(x=>x.price),messages:communicationReady?communications:[]});if(!state.cardReady&&agents.has(state.selected)){state.cardReady=true;$('#agentCard').hidden=false;selectAgent(state.selected);}card();renderActivity();lighting();watchPositions();if(openGroup)fillLarge();}
+  globalThis.OfficeDeskScreens?.paint({panorama:state.panorama,finance:finance(),messages:communicationReady?communications:[]});if(!state.cardReady&&agents.has(state.selected)){state.cardReady=true;$('#agentCard').hidden=false;selectAgent(state.selected);}card();renderActivity();lighting();watchPositions();if(openGroup)fillLarge();}
  for(const b of D.querySelectorAll('.dock-tabs button'))b.onclick=()=>{state.tab=b.dataset.tab;card();};
  $('#closeCard').onclick=()=>{$('#agentCard').hidden=true;};
  $('#cardProfile').onclick=()=>profile(state.selected);
