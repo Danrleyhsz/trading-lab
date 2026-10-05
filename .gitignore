@@ -15,3 +15,6 @@ coverage/
 __pycache__/
 .pytest_cache/
 .venv/
+
+# Runtime state belongs on a durable cloud volume, never in source control.
+/data/

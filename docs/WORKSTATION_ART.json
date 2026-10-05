@@ -1,0 +1,11 @@
+{
+  "tool": "built-in imagegen",
+  "use_case": "precise-object-edit",
+  "reference": "public/office/office-scene.png",
+  "source": "exec-ab35b0ca-d3cc-4635-ada1-9896674f7031.png",
+  "asset": "public/office/research-stations.png",
+  "sha256": "54e6ba002604f06ef2ce6a294908a8978126ba50c0a42ac909b55ec637696799",
+  "bytes": 2705227,
+  "prompt": "Use case: precise-object-edit. Edit target: the attached original 1536x1024 pixel-art office game background. Change ONLY the Research Lab furniture in the upper LEFT room inside x=75..447, y=252..431. Replace its TWO computer desks with THREE narrower side-by-side complete wooden computer desks and THREE empty blue office chairs, all facing toward the top of the image, matching exactly the overhead camera and pixel-art style. Chair centers approximately x=143,263,384 at y=373. Each desk has a dark blank readable monitor, keyboard and blue chair. Fit all three desks within the same original carpet footprint, retaining free floor below them and the right-hand corridor. Preserve the original carpet, wooden floor, room walls, shelves, lighting and every pixel OUTSIDE the edited rectangle as faithfully as possible. Keep the entire six-room layout, camera and exact 1536x1024 dimensions unchanged. Do NOT draw people, characters, UI, labels, logos, charts, text or activity. Screens must remain dark blank. This is production background art, not a mockup. Return the full scene with only that one furniture change.",
+  "runtime_clip": "Only x 4.88..30.66%, y 24.5..43.4% is displayed over the unchanged original; chair foreground reads corresponding source rectangles. PNG copied unchanged; no external API."
+}

@@ -1,0 +1,41 @@
+{
+  "previews": { "generation": "off" },
+  "services": [{
+    "type": "web",
+    "name": "trading-lab",
+    "runtime": "docker",
+    "region": "frankfurt",
+    "plan": "1c-2g",
+    "numInstances": 1,
+    "autoDeployTrigger": "off",
+    "dockerfilePath": "./Dockerfile",
+    "dockerContext": ".",
+    "dockerCommand": "node dist/src/launch-cloud.js",
+    "healthCheckPath": "/health/ready",
+    "maxShutdownDelaySeconds": 45,
+    "disk": { "name": "single-writer-deployment", "mountPath": "/app/storage", "sizeGB": 1 },
+    "envVars": [
+      { "key": "NODE_ENV", "value": "production" },
+      { "key": "PAPER_TRADING_ONLY", "value": "true" },
+      { "key": "MARKET_SYMBOL", "value": "btcusdt" },
+      { "key": "INITIAL_PAPER_CAPITAL", "value": "10000" },
+      { "key": "PAPER_EVALUATION_ENABLED", "value": "false" },
+      { "key": "PERPETUAL_PAPER_ENABLED", "value": "false" },
+      { "key": "AUTONOMOUS_PERPETUAL_ENABLED", "value": "false" },
+      { "key": "LEGACY_PAPER_EXECUTION_ENABLED", "value": "false" },
+      { "key": "DATABASE_URL", "sync": false },
+      { "key": "APP_ACCESS_TOKEN", "sync": false },
+      { "key": "PUBLIC_ORIGIN", "sync": false }
+    ]
+  }],
+  "databases": [{
+    "name": "trading-lab-db",
+    "region": "frankfurt",
+    "plan": "0.5c-1g",
+    "postgresMajorVersion": "16",
+    "diskSizeGB": 5,
+    "storageAutoscalingEnabled": false,
+    "connectionPool": "none",
+    "ipAllowList": []
+  }]
+}

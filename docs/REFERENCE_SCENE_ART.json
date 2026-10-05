@@ -1,0 +1,30 @@
+{
+  "asset": "public/office/office-reference-v2.png",
+  "kind": "original_generated_environment",
+  "tool": "image_gen.imagegen (built-in)",
+  "generationDate": "2026-10-03",
+  "requestedSize": {
+    "width": 1536,
+    "height": 704
+  },
+  "actualSize": {
+    "width": 1852,
+    "height": 849
+  },
+  "bytes": 2709574,
+  "sha256": "3365c280485378d4e03e64d6d5f3bf1ed0225b220e32c88a0486f919710d89c2",
+  "references": [
+    {
+      "role": "user-approved concept: composition, material, lighting; illustrative figures and names excluded",
+      "file": "Imagem do ChatGPT 2 de out. de 2026, 22_35_01.png"
+    },
+    {
+      "role": "existing original environment continuity",
+      "file": "public/office/office-scene.png"
+    }
+  ],
+  "generationPrompt": "Use case: stylized-concept / game environment. Asset type: original production pixel-art OFFICE BACKGROUND, not a dashboard screenshot. Input image 1 (user's AI Trading Lab concept) is the primary composition/style reference; input image 2 is the existing game background to retain familiar furniture/colors. Create a NEW original panoramic empty investment office, as faithful as possible to the ROOM/FURNITURE composition, camera, crisp small pixel texture and dark navy/warm wood palette of image 1. Output a wide 1536 x 704 canvas if possible: office floor only, no header/sidebar/UI/financial panels from the reference. Dense shallow rooms, NOT the tall spacious rooms of image 2. Layout three columns and THREE rows: top row Research Lab with THREE compact computer desks/chairs across left (three real residents), Trading Floor with three computer desks across center, Risk Desk with one desk and a blank risk-board at right. Middle row Quant Lab with two desks across left, Lounge at center with compact sofas/coffee machine and round table, Meeting Room with rectangular table and blank wall screen at right. Bottom row three shallow auxiliary control areas: Data Center with server racks/one unoccupied terminal left, War Room with wide blank three-monitor wall and empty desks center, Market Analysis with four blank instrument screens right. Match reference room partitions, floor tiles, bookshelves, plants, windows with night city, monitor-wall architecture, desk scale and chair orientation. Top two rows together occupy approximately y=0..470, bottom row y=470..704. Keep thin traversable corridors/door gaps between rooms. All computer chairs are empty and face their monitors toward the top. Crisp authored pixel-game art, straight overhead slight front-face wall projection like reference, no glossy 3D/toy render or excessive neon bloom. Critical invariants: NO characters, people, silhouettes, avatar art, lettering, labels, logos, numbers, charts, trading candles, prices, P&L, work status, chatter, symbols or watermark. Screens are blank dark blue rectangles where actual HTML data will be projected. Do not copy any illustrative statistics or characters from the reference. No dark letterbox margin; fill the wide canvas with the office. This is ORIGINAL environment art for a functioning paper-only game interface; runtime text/agents are separate real-state overlays.",
+  "correctionPrompt": "Use case: precise-object-edit. Edit target: this generated EMPTY panoramic office background, exactly 1852x849. Change ONLY the small framed picture in the top-left room above its rightmost desk and the small framed picture in the middle-left room above the desks: replace their graph/diagram-like contents with simple abstract mountain-and-sunset pixel landscapes WITHOUT axes, candles, lines of market data, symbols, lettering or numbers. Keep each existing frame at exactly its original size/position. Preserve ALL other pixels as faithfully as possible: exact canvas dimensions, six primary rooms/three auxiliary control areas, every desk/chair/monitor/window/shelf/plant/wall/door/floor/corridor, camera and palette. All screens stay dark blank. No characters, text, numbers, charts, indicators, logos, watermark, new furniture or geometry changes. This is a narrow decoration correction; do not recompose or resize the scene.",
+  "processing": "Final generated RGB PNG copied unchanged; no raster edits, resized derivative, third-party sprites or paid external API.",
+  "scope": "Nine visual zones, no embedded people, text or financial charts. Existing eight original sprite sheets/portraits retained. No third-party code/art incorporated."
+}
