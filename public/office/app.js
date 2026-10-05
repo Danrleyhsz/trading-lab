@@ -526,7 +526,7 @@ refreshCommunications();setInterval(refreshCommunications,5000);
 
 const furnitureActions={
  library:{panel:'researchPanel',title:'Biblioteca · pesquisas registradas',nav:'navResearch'},
- terminal:{panel:'marketPanel',title:'Terminal · mercado observado',nav:'navMarket'},
+ terminal:{panel:'marketPanel',title:'Relógio · mercado observado',nav:'navMarket'},
  'risk-board':{panel:'researchPanel',title:'Quadro · controles de risco',nav:'navResearch'},
  'quant-servers':{panel:'researchPanel',title:'Bancada · estudos históricos',nav:'navResearch'}
 };
@@ -538,7 +538,11 @@ function openFurniture(id){
 }
 for(const feature of OfficeNavigation.features){
  const room=[...document.querySelectorAll('.room[data-room]')].find(element=>element.dataset.room===feature.room);if(!room)continue;
- const button=node('button',''),icon=node('span',feature.icon),label=node('span',feature.label);button.className='furniture-hit';button.dataset.furniture=feature.id;button.setAttribute('aria-label',feature.label);button.setAttribute('style','left:'+feature.x+'%;top:'+feature.y+'%');icon.setAttribute('aria-hidden','true');label.className='furniture-label';button.append(icon,label);button.onclick=()=>openFurniture(feature.id);room.append(button);
+ // No cenário oficial o objeto vira uma área no formato da peça (estante, relógio, rack, cafeteira, mesa); o quadro de
+ // risco já é clicável como telão. Sem o módulo, fica o ponto antigo dentro da sala.
+ const Q=globalThis.OfficeSceneQuads,office=q('#office');if(Q&&office&&Q.SCREEN_FEATURES.includes(feature.id))continue;
+ const button=node('button',''),icon=node('span',feature.icon),label=node('span',feature.label);button.className='furniture-hit';button.dataset.furniture=feature.id;button.setAttribute('aria-label',feature.label);button.setAttribute('style','left:'+feature.x+'%;top:'+feature.y+'%');icon.setAttribute('aria-hidden','true');label.className='furniture-label';button.append(icon,label);button.onclick=()=>openFurniture(feature.id);
+ const shape=Q?.feature(feature.id);if(shape&&office&&Q.place(button,shape))office.append(button);else room.append(button);
 }
 q('#workspaceDialog').addEventListener('close',()=>{if(furnitureReturn){document.querySelector('button[data-furniture="'+furnitureReturn+'"]')?.focus?.({preventScroll:true});furnitureReturn=null;}});
 globalThis.addEventListener?.('resize',()=>{stopPresence();render();});

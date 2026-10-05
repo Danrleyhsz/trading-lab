@@ -7,7 +7,7 @@
  });
  const features=[
   {id:'library',room:'Research Lab',label:'Biblioteca de pesquisas',icon:'▤',x:14,y:20,approach:{x:22,y:94}},
-  {id:'terminal',room:'Trading Floor',label:'Terminal de mercado',icon:'↗',x:50,y:35,approach:{x:52,y:94}},
+  {id:'terminal',room:'Trading Floor',label:'Relógio do mercado',icon:'◷',x:50,y:35,approach:{x:52,y:94}},
   {id:'risk-board',room:'Risk Desk',label:'Quadro de risco',icon:'✓',x:67,y:26,approach:{x:70,y:94}},
   {id:'quant-servers',room:'Quant Lab',label:'Bancada de estudos históricos',icon:'⚗',x:64,y:23,approach:{x:70,y:98}},
   {id:'coffee',room:'Lounge',label:'Café e convivência',icon:'☕',x:86,y:28,approach:{x:90,y:98}},

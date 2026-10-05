@@ -30,7 +30,7 @@
   * que recebe o clique (e o destaque) é o polígono da própria tela, desenhado num SVG dentro do botão.
   */
  function place(button,quad){
-  if(!button||!Array.isArray(quad)||quad.length!==4)return false;
+  if(!button||!Array.isArray(quad)||quad.length<3)return false;
   const xs=quad.map(p=>p[0]),ys=quad.map(p=>p[1]),x0=Math.min(...xs),y0=Math.min(...ys),w=Math.max(1,Math.max(...xs)-x0),h=Math.max(1,Math.max(...ys)-y0);
   button.classList?.add('quad-hit');
   button.setAttribute('style','left:'+x0/W*100+'%;top:'+y0/H*100+'%;width:'+w/W*100+'%;height:'+h/H*100+'%');
@@ -40,5 +40,18 @@
   svg.setAttribute('viewBox','0 0 '+w+' '+h);svg.firstChild.setAttribute('points',quad.map(([x,y])=>(x-x0)+','+(y-y0)).join(' '));
   return true;
  }
- globalThis.OfficeSceneQuads=Object.freeze({DESK,desk,rect,place,CHAIR,chairRect});
+ // Objetos clicáveis (OfficeNavigation.features) sobre a peça do cenário oficial: [x,y,w,h] da peça em
+ // cenario-modular.json (x no centro, base embaixo) com o tamanho de escala.json, ou o contorno medido da peça. O quadro de risco não ganha outra
+ // área: ele já é o telão risk-wall.
+ const FEATURE=Object.freeze({
+  library:[30,122,56,88],             // decoracao-estante-livros x58 base210 (Research Lab)
+  terminal:[934,101,26,27],           // decoracao-relogio x947 base128 (Trading Floor): relógio do mercado
+  'quant-servers':[532,330,57,110],   // eletronico-rack-servidor x560 base440 (Quant Lab)
+  coffee:[1013,386,34,36],            // copa-cafeteira x1030 base422 (Lounge)
+  // estar-mesa-reuniao x1565 base488 (Meeting Room): tampo em trapézio e pés.
+  'meeting-table':[[1478,423],[1655,423],[1664,447],[1664,488],[1467,488],[1467,447]]
+ });
+ const SCREEN_FEATURES=Object.freeze(['risk-board']);
+ const feature=id=>{const f=FEATURE[id];return !f?null:Array.isArray(f[0])?f:rect(f);};
+ globalThis.OfficeSceneQuads=Object.freeze({DESK,desk,rect,place,CHAIR,chairRect,FEATURE,SCREEN_FEATURES,feature});
 })();

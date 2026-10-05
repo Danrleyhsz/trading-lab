@@ -1083,7 +1083,7 @@ dialog::backdrop{background:#02081291;backdrop-filter:blur(2px)}
 .station-monitor:after,.control-zone:after{content:attr(aria-label);display:none;position:absolute;left:50%;bottom:calc(100% + 8px);transform:translateX(-50%);width:max-content;max-width:240px;background:#071727ed;border:1px solid #35c9ff77;border-radius:4px;padding:7px 10px;color:#d7f6ff;font-size:11px;line-height:1.4;pointer-events:none}
 .station-monitor:hover:after,.station-monitor:focus-visible:after,.control-zone:hover:after,.control-zone:focus-visible:after{display:block}
 #sceneDataCenter{left:13.2%;top:83.3%;width:3.2%;height:4.2%;transform:translate(-50%,-50%)}#sceneWarRoom{left:49.3%;top:74.2%;width:7.2%;height:8%;transform:translate(-50%,-50%)}#sceneMarketAnalysis{left:80.7%;top:72%;width:7.5%;height:5.5%;transform:translate(-50%,-50%)}
-.furniture-hit[data-furniture="coffee"]{left:76.8%!important;top:23.5%!important;width:5.5%;height:14%;transform:translate(-50%,-50%);border-radius:3px}
+.furniture-hit[data-furniture="coffee"]:not(.quad-hit){left:76.8%!important;top:23.5%!important;width:5.5%;height:14%;transform:translate(-50%,-50%);border-radius:3px}
 .furniture-hit[data-furniture="coffee"]>span:first-child{display:none}
 .room h2,body[data-view="fit"] .room h2{top:1%;background:transparent;border:0;box-shadow:none;max-width:95%;font-size:clamp(6px,.65cqw,11px);text-shadow:0 0 6px #35c9ff99}
 .room-hotspot,body[data-view="fit"] .room-hotspot{min-height:0;padding:2px 6px;color:#9adff0;background:#06121bbb;letter-spacing:.08em;border:1px solid #37667855;border-radius:3px}

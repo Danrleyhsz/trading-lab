@@ -202,3 +202,22 @@ test('cenário oficial: cadeira apoiada no agente, áreas clicáveis no formato 
  const css=readFileSync('public/office/v3.css','utf8');assert.match(css,/#office\{background-image:url\('\/office\/cenario-modular\.png'\)/);assert.doesNotMatch(css+readFileSync('public/office/style.css','utf8'),/office-reference-v2|office-day\.png|data-cenario/,'arte antiga removida');
  const assets=readFileSync('src/application/office-assets.ts','utf8');for(const f of ['scene-quads.js','cenario-modular.png','cidade-faixa-dia.png','cidade-faixa-entardecer.png','cidade-faixa-noite.png','assets/cadeira-costas.png'])assert.ok(assets.includes("'"+f+"'"),'arquivo liberado: '+f);
 });
+
+test('objetos clicáveis no cenário oficial ficam sobre a própria peça (estante, relógio, rack, cafeteira e mesa)',()=>{
+ const qctx=vm.createContext({});vm.runInContext(readFileSync('public/office/scene-quads.js','utf8'),qctx);const Q=(qctx as any).OfficeSceneQuads;
+ const layout=JSON.parse(readFileSync('public/office/assets/cenario-modular.json','utf8')),scale=JSON.parse(readFileSync('public/office/assets/escala.json','utf8')),catalog=JSON.parse(readFileSync('public/office/assets/catalog.json','utf8'));
+ const pieces=catalog.pecas??catalog.pieces??catalog,piece=(id:string)=>Array.isArray(pieces)?pieces.find((p:any)=>p.id===id):pieces[id];
+ // Caixa da peça no cenário: x no centro, base embaixo, tamanho de escala.json mantendo a proporção do recorte.
+ const box=(o:any)=>{const p=piece(o.id),s=scale[o.id],w=s.w??s.h*p.width/p.height,h=s.h??s.w*p.height/p.width;return [o.x-w/2,o.base-h,w,h];};
+ const expected:Record<string,[string,number]>={library:['decoracao-estante-livros',58],terminal:['decoracao-relogio',947],'quant-servers':['eletronico-rack-servidor',560],coffee:['copa-cafeteira',1030],'meeting-table':['estar-mesa-reuniao',1565]};
+ const nav=vm.createContext({});vm.runInContext(readFileSync('public/office/navigation.js','utf8'),nav);const features=(nav as any).OfficeNavigation.features.map((f:any)=>f.id);
+ assert.equal([...Object.keys(Q.FEATURE),...Q.SCREEN_FEATURES].sort().join(),[...features].sort().join(),'todo objeto da navegação tem área no cenário (ou já é um telão)');
+ for(const [id,[pieceId,x]] of Object.entries(expected)){
+  const o=layout.objetos.find((item:any)=>item.id===pieceId&&item.x===x);assert.ok(o,pieceId+' x'+x+' existe no cenário');
+  const [bx,by,bw,bh]=box(o),points=Q.feature(id),xs=points.map((p:number[])=>p[0]),ys=points.map((p:number[])=>p[1]);
+  assert.ok(Math.min(...xs)>=bx-1.5&&Math.max(...xs)<=bx+bw+1.5&&Math.min(...ys)>=by-1.5&&Math.max(...ys)<=by+bh+1.5,id+' fica dentro da peça');
+  assert.ok((Math.max(...xs)-Math.min(...xs))*(Math.max(...ys)-Math.min(...ys))>=bw*bh*0.6,id+' cobre a peça, não só um ponto');
+ }
+ assert.equal(Q.feature('risk-board'),null,'o quadro de risco já é o telão risk-wall');
+ assert.match(readFileSync('public/office/navigation.js','utf8'),/id:'terminal',room:'Trading Floor',label:'Relógio do mercado'/);
+});
