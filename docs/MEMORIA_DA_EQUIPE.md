@@ -2,7 +2,7 @@
 
 Declarado em 05/10/2026. Tudo aqui é medição e contexto: nada muda sinal, risco ou execução.
 
-## Previsões verificáveis (`TEAM_PREDICTIONS_V1`)
+## Previsões verificáveis (`TEAM_PREDICTIONS_V2`)
 
 Inspirado no TradingAgents (acertar as contas quando o prazo passa), no FinMem e no FinCon (lições) e no Generative Agents (destaques).
 
@@ -16,6 +16,8 @@ A cada decisão do piloto, cada observação do briefing vira uma previsão para
 | Flux | Funding ≥ 0,01% é sinal contrário (queda); funding negativo, alta | O retorno das próximas 24 h tem o sinal esperado |
 
 Depois de 24 h, a conferência com candles fechados grava uma memória `EVALUATION` (acertei ou errei, com o retorno real). Uma previsão nunca é avaliada duas vezes. A cada 10 avaliações, o pesquisador grava uma **lição** com a taxa de acerto recente.
+
+**Prazo de 7 dias (V2, 05/10/2026).** Uma vez por dia, na decisão do candle das 00:00 UTC, as mesmas regras geram também uma previsão para 7 dias (168 h), com a etiqueta `7d`. A conferência espera os 168 candles fechados. O placar de 7 dias fica separado do de 24 h (campo `weekly` em `/agents/scorecard`, coluna própria em Relatórios), e as lições contam cada prazo à parte. Uma previsão por dia evita encher a memória com 168 previsões semanais sobrepostas.
 
 `GET /agents/scorecard` devolve o placar por pesquisador e as memórias em destaque de cada agente: recência com meia-vida de 72 h, importância por tipo (lição e erro pesam mais) e relevância por etiqueta. O placar aparece no card do agente e em Relatórios.
 

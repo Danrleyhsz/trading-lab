@@ -28,13 +28,13 @@ test('memória grava previsões, confere quando vencem e faz uma reflexão a cad
  // 10 horas de previsões do Satoshi (alta), depois 34 horas de preço subindo: todas devem ser acertos.
  const series=Array.from({length:60},(_,i)=>100+i*0.2);
  for(let h=0;h<10;h++)team.record({...obs(),oracle:{regime:'UNKNOWN'},vega:{dailyVolatility7d:null,volatilityExpanding:null},flux:{fundingRate:null}} as never,candles(series.slice(0,h+1)),'d'+h);
- assert.equal(team.pending().length,10);
+ assert.equal(team.pending().length,11,'10 de 24 h + 1 de 7 dias (o primeiro candle é das 00:00 UTC)');
  team.settleDue(candles(series));
  const ev=memories.query({kind:'EVALUATION'});assert.equal(ev.length,10);assert.ok(ev.every(e=>e.metadata?.hit===true));
  const lesson=memories.query({kind:'LESSON'});assert.equal(lesson.length,1);assert.match(lesson[0].summary,/acertei 10 de 10/);
  team.settleDue(candles(series));assert.equal(memories.query({kind:'EVALUATION'}).length,10,'nunca avalia duas vezes');
  const card=scorecard(memories.query()).find(s=>s.agentId==='satoshi')!;assert.equal(card.hitRate,1);assert.equal(card.settled,10);assert.equal(card.pending,0);
- assert.equal(PREDICTION_POLICY.version,'TEAM_PREDICTIONS_V1');
+ assert.equal(PREDICTION_POLICY.version,'TEAM_PREDICTIONS_V2');
 });
 
 test('destaques ordenam por recência, importância e relevância sem alterar nada',()=>{
@@ -42,4 +42,19 @@ test('destaques ordenam por recência, importância e relevância sem alterar na
  const m=(id:string,kind:string,hoursAgo:number,tags:string[]=[])=>({id,agentId:'vega',kind,summary:id,createdAt:new Date(now-hoursAgo*H).toISOString(),tags}) as never;
  const ranked=rankMemories([m('velha-licao','LESSON',500),m('obs-agora','OBSERVATION',0),m('licao-recente','LESSON',2),m('pred','PREDICTION',1,['funding'])],now,'funding',3).map(r=>r.memory.id);
  assert.equal(ranked[0],'licao-recente');assert.ok(ranked.includes('pred'),'etiqueta pedida sobe');assert.ok(!ranked.includes('velha-licao'));
+});
+
+test('previsão de 7 dias: só uma por dia (00:00 UTC), conferida depois de 168 h e com placar separado',()=>{
+ const memories=new MemoryStore(),team=new TeamPredictions(memories);
+ const series=Array.from({length:200},(_,i)=>100+i*0.1);
+ const only={...obs(),oracle:{regime:'UNKNOWN'},vega:{dailyVolatility7d:null,volatilityExpanding:null},flux:{fundingRate:null}} as never;
+ team.record(only,candles(series.slice(0,1)),'meia-noite');team.record(only,candles(series.slice(0,2)),'uma-hora');
+ const weekly=memories.query({kind:'PREDICTION'}).filter(m=>m.metadata?.horizonHours===168);
+ assert.equal(weekly.length,1,'só o candle das 00:00 gera previsão de 7 dias');assert.match(weekly[0].summary,/7 dias/);
+ team.settleDue(candles(series.slice(0,100)));
+ assert.equal(memories.query({kind:'EVALUATION'}).filter(e=>e.metadata?.horizonHours===168).length,0,'antes de 168 h não confere');
+ team.settleDue(candles(series));
+ const ev=memories.query({kind:'EVALUATION'}).filter(e=>e.metadata?.horizonHours===168);assert.equal(ev.length,1);assert.equal(ev[0].metadata?.hit,true);assert.match(ev[0].summary,/em 7 dias/);
+ const card=scorecard(memories.query()).find(s=>s.agentId==='satoshi')!;
+ assert.equal(card.settled,2,'placar de 24 h conta só as de 24 h');assert.equal(card.weekly.settled,1);assert.equal(card.weekly.hitRate,1);
 });

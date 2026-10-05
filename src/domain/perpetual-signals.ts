@@ -44,19 +44,34 @@ function baseDirection(closed:Candle[],config:PerpetualConfig,currentQuantity:nu
  * fechar continua sempre permitido. A mesma função vale no backtest e no piloto ao vivo.
  * - cooldownHours: pausa depois de encerrar uma operação;
  * - maxConsecutiveLosses + lossPauseHours: após N perdas seguidas, pausa de entradas por X horas.
+ * - maxDrawdownPercent + drawdownLookbackHours + drawdownPauseHours: se as operações encerradas nas últimas
+ *   `drawdownLookbackHours` (contadas até a última operação) caíram do topo ao fundo `maxDrawdownPercent`% do capital
+ *   ou mais, pausa de entradas por `drawdownPauseHours` depois da última operação (ideia do MaxDrawdown do Freqtrade).
  */
-export interface Protections {cooldownHours?:number;maxConsecutiveLosses?:number;lossPauseHours?:number}
+export interface Protections {cooldownHours?:number;maxConsecutiveLosses?:number;lossPauseHours?:number;maxDrawdownPercent?:number;drawdownLookbackHours?:number;drawdownPauseHours?:number}
+const DRAWDOWN_KEYS=['maxDrawdownPercent','drawdownLookbackHours','drawdownPauseHours'] as const;
 export function validProtections(p:unknown):p is Protections|undefined{
  if(p===undefined)return true;if(!p||typeof p!=='object'||Array.isArray(p))return false;
- const v=p as Record<string,unknown>,keys=Object.keys(v);if(!keys.length||keys.some(k=>!['cooldownHours','maxConsecutiveLosses','lossPauseHours'].includes(k)))return false;
+ const v=p as Record<string,unknown>,keys=Object.keys(v);if(!keys.length||keys.some(k=>!['cooldownHours','maxConsecutiveLosses','lossPauseHours',...DRAWDOWN_KEYS].includes(k)))return false;
  const int=(x:unknown,min:number,max:number)=>x===undefined||(Number.isInteger(x)&&(x as number)>=min&&(x as number)<=max);
  if(!int(v.cooldownHours,1,720)||!int(v.maxConsecutiveLosses,1,20)||!int(v.lossPauseHours,1,720))return false;
+ if(!int(v.maxDrawdownPercent,1,50)||!int(v.drawdownLookbackHours,1,2160)||!int(v.drawdownPauseHours,1,720))return false;
+ // Pausa por drawdown exige as três chaves juntas.
+ const drawdownKeys=DRAWDOWN_KEYS.filter(k=>v[k]!==undefined).length;if(drawdownKeys!==0&&drawdownKeys!==3)return false;
  return (v.maxConsecutiveLosses===undefined)===(v.lossPauseHours===undefined);
 }
-export function protectionsAllowEntry(p:Protections|undefined,closed:{closedAt:number;netPnl:number}[],now:number):{allowed:boolean;reason:'COOLDOWN'|'LOSS_STREAK_PAUSE'|null}{
+/** Maior queda (topo ao fundo) do resultado acumulado das operações, em fração do capital. */
+export function closedTradesDrawdown(trades:{netPnl:number}[],capital:number){let cum=0,peak=0,worst=0;for(const t of trades){cum+=t.netPnl;peak=Math.max(peak,cum);worst=Math.max(worst,peak-cum);}return capital>0?worst/capital:Infinity;}
+export function protectionsAllowEntry(p:Protections|undefined,closed:{closedAt:number;netPnl:number}[],now:number,capital=NaN):{allowed:boolean;reason:'COOLDOWN'|'LOSS_STREAK_PAUSE'|'DRAWDOWN_PAUSE'|null}{
  if(!p||!closed.length)return {allowed:true,reason:null};
  const ordered=[...closed].sort((a,b)=>a.closedAt-b.closedAt),last=ordered.at(-1)!;
  if(p.cooldownHours&&now-last.closedAt<p.cooldownHours*3600000)return {allowed:false,reason:'COOLDOWN'};
  if(p.maxConsecutiveLosses&&p.lossPauseHours&&ordered.length>=p.maxConsecutiveLosses&&ordered.slice(-p.maxConsecutiveLosses).every(t=>t.netPnl<0)&&now-last.closedAt<p.lossPauseHours*3600000)return {allowed:false,reason:'LOSS_STREAK_PAUSE'};
+ if(p.maxDrawdownPercent&&p.drawdownLookbackHours&&p.drawdownPauseHours&&now-last.closedAt<p.drawdownPauseHours*3600000){
+  // Sem capital conhecido não dá para medir: bloqueia (nunca abre posição sem conseguir conferir a proteção).
+  if(!(capital>0))return {allowed:false,reason:'DRAWDOWN_PAUSE'};
+  const recent=ordered.filter(t=>t.closedAt>=last.closedAt-p.drawdownLookbackHours!*3600000);
+  if(closedTradesDrawdown(recent,capital)>=p.maxDrawdownPercent/100)return {allowed:false,reason:'DRAWDOWN_PAUSE'};
+ }
  return {allowed:true,reason:null};
 }

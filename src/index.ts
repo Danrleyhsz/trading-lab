@@ -2,6 +2,7 @@ import {bootstrapEvaluationWallets} from './application/evaluation-wallet-bootst
 import {registerContinuousPaperPreflight} from './application/continuous-paper-preflight.js';
 import {EventAudit,registerEventAudit} from './application/event-audit.js';
 import {registerPilotTimeline} from './application/pilot-timeline.js';
+import {registerPilotParity} from './application/pilot-parity.js';
 import {registerPilotReport} from './application/pilot-report.js';
 import {StudyRobustnessRunner,registerStudyRobustness} from './application/study-robustness-runner.js';
 import {backendFingerprint,releaseApproval} from './application/release-fingerprint.js';
@@ -96,6 +97,7 @@ bus.subscribe(e=>{if((e.type==='RISK_APPROVED'||e.type==='RISK_REJECTED')&&(e.pa
 registerAgentProfiles(app,agents,memories,messages,activity,accounts,book);
 const eventAudit=new EventAudit(()=>durableSnapshot);registerEventAudit(app,eventAudit);
 registerPilotReport(app,()=>{const status=cycle.status(),id=status.accountId??null,account=book.list().find(a=>a.id===id);let events:ReturnType<typeof eventAudit.list>=[];try{events=eventAudit.list();}catch{}const quote=perpetualMarket.snapshot().quote;return {accountId:id,events,ledger:id?book.ledger(id)??[]:[],equity:account?.portfolio.equity??null,initialCash:account?.initialCash??null,maxDrawdown:account?.maxDrawdown??null,equityPoints:[...(account?.hourly??[]),...(account?.samples??[])].sort((a,b)=>a.timestamp-b.timestamp),closedTrades:id?book.performance(id)?.closedTrades??[]:[],autonomous:{enabled:status.enabled,eligible:status.eligible,stopReason:status.stopReason,studyId:status.studyId},mark:quote&&Date.now()-quote.markTime<=15000?quote.markPrice:null,now:Date.now()};});
+registerPilotParity(app,()=>{const id=cycle.status().accountId??null;let events:ReturnType<typeof eventAudit.list>=[];try{events=eventAudit.list();}catch{}return {accountId:id,events,ledger:id?book.ledger(id)??[]:[],now:Date.now()};},perpetualHistory);
 registerPilotTimeline(app,days=>{const id=cycle.status().accountId??null,account=book.list().find(a=>a.id===id);let events:ReturnType<typeof eventAudit.list>=[];try{events=eventAudit.list();}catch{}return {accountId:id,events,ledger:id?book.ledger(id)??[]:[],hourly:account?.hourly??[],initialCash:account?.initialCash??null,now:Date.now(),days};});registerEncryptedBackup(app,()=>durableSnapshot?{state:durableSnapshot,persistedAt:durablePersistedAt}:null,BACKUP_PUBLIC_KEY_PEM);
 const research=new ResearchEngine({snapshot:symbol=>derivatives.snapshot(symbol),candles:(symbol,interval,limit)=>history.candles(symbol,interval,limit)},coordinator,collaboration,messages,memories,strategies,strategyLab,backtester,researchRuns,bus);
 const researchJobs=new ResearchJobs(research,bus,()=>persist(),domainEvents,()=>studies.status().busy||agents.get('euler')?.status==='BACKTESTING');

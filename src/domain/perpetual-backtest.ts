@@ -47,7 +47,7 @@ export function backtestPerpetual(data:PerpetualDataset,cfg:PerpetualConfig){
   // Original timestamps remain in the audit. This ordering is a declared modeling assumption.
   const settle=(until:number)=>{while(fundingIndex<data.funding.length&&data.funding[fundingIndex].timestamp<until){const f=data.funding[fundingIndex++];const delta=-quantity*f.markPrice*f.rate;cash+=delta;funding+=delta;tradeNet+=delta;audit.push({kind:'FUNDING',timestamp:f.timestamp,quantity,price:f.markPrice,cashDelta:delta});record(f.timestamp,f.markPrice);}};
   settle(c.timestamp+1000);
-  if(i>=warmup){const direction=perpetualDirection(data.trade.slice(0,i),cfg,quantity);if(quantity&&Math.sign(quantity)!==direction)execute(-quantity,c.open,c.timestamp);if(!quantity&&direction&&cash>0&&protectionsAllowEntry(cfg.protections,closedTrades,c.timestamp).allowed)execute(direction*cash*cfg.positionFraction/c.open,c.open,c.timestamp);}
+  if(i>=warmup){const direction=perpetualDirection(data.trade.slice(0,i),cfg,quantity);if(quantity&&Math.sign(quantity)!==direction)execute(-quantity,c.open,c.timestamp);if(!quantity&&direction&&cash>0&&protectionsAllowEntry(cfg.protections,closedTrades,c.timestamp,cfg.initialCapital).allowed)execute(direction*cash*cfg.positionFraction/c.open,c.open,c.timestamp);}
   settle(c.timestamp+hour);
   // OHLC cannot reveal chronology. Funding precedes the worst mark stress; liquidation
   // fills at the adverse trade extreme, deliberately conservative and not exchange parity.

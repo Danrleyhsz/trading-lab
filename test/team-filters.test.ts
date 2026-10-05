@@ -50,3 +50,17 @@ test('proteções: pausa após encerrar e após perdas seguidas; só bloqueiam a
  const plain=backtestPerpetual(data,{...base,slowPeriod:30}),guarded=backtestPerpetual(data,{...base,slowPeriod:30,protections:p});
  assert.ok(guarded.trades<plain.trades,'proteção reduz entradas: '+guarded.trades+' vs '+plain.trades);
 });
+
+test('proteção por drawdown: queda do topo ao fundo das operações recentes pausa novas entradas', async()=>{
+ const {protectionsAllowEntry,validProtections,closedTradesDrawdown}=await import('../src/domain/perpetual-signals.js');
+ const H=3600000,p={maxDrawdownPercent:5,drawdownLookbackHours:168,drawdownPauseHours:48};
+ assert.equal(validProtections(p),true);assert.equal(validProtections({maxDrawdownPercent:5}),false,'exige as três chaves');assert.equal(validProtections({...p,maxDrawdownPercent:80}),false);
+ // Ganho de 30, depois perdas de 40 e 20: topo 30, fundo -30 → queda de 60 = 6% de 1000.
+ const trades=[{closedAt:0,netPnl:30},{closedAt:10*H,netPnl:-40},{closedAt:20*H,netPnl:-20}];
+ assert.equal(closedTradesDrawdown(trades,1000),0.06);
+ assert.equal(protectionsAllowEntry(p,trades,30*H,1000).reason,'DRAWDOWN_PAUSE');
+ assert.equal(protectionsAllowEntry(p,trades,69*H,1000).allowed,true,'pausa termina 48 h depois da última operação');
+ assert.equal(protectionsAllowEntry(p,trades,30*H,2000).allowed,true,'3% de 2000 fica abaixo do limite');
+ assert.equal(protectionsAllowEntry({...p,drawdownLookbackHours:5},trades,30*H,1000).allowed,true,'só conta operações dentro da janela');
+ assert.equal(protectionsAllowEntry(p,trades,30*H).reason,'DRAWDOWN_PAUSE','sem capital conhecido, não abre');
+});
