@@ -67,10 +67,6 @@ function renderEquitySamples(card,account) {
   const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.setAttribute('viewBox','0 0 300 80');svg.setAttribute('role','img');svg.setAttribute('aria-label','Equity observada de '+account.id+' de '+date(start)+' até '+date(end));svg.setAttribute('class','equity-trace');
   const line=document.createElementNS('http://www.w3.org/2000/svg','polyline');line.setAttribute('points',samples.map(s=>((s.timestamp-start)/(end-start||1)*300).toFixed(1)+','+(74-(s.equity-low)/(high-low||1)*66).toFixed(1)).join(' '));line.setAttribute('stroke','#35c9ff');line.setAttribute('stroke-width','2');line.setAttribute('fill','none');svg.append(line);card.append(svg);
 }
-const fmtBr=(v,d=2)=>Number.isFinite(v)?v.toLocaleString('pt-BR',{minimumFractionDigits:d,maximumFractionDigits:d}):'—';
-const pctBr=v=>Number.isFinite(v)?(v>=0?'+':'')+fmtBr(v*100)+'%':'—';
-function cell(text,className){const element=node('td',text);if(className)element.className=className;return element;}
-function tableOf(headers,rows){const table=node('table','');table.className='data-table';const head=node('thead',''),line=node('tr','');for(const h of headers)line.append(node('th',h));head.append(line);const body=node('tbody','');body.append(...rows);table.append(head,body);return table;}
 function renderFinancialOverview(data) {
   const all = [...(data.legacyAccounts || []), ...(data.perpetualAccounts || [])];
   const positions = q('#positions'), performance = q('#performance');positions.replaceChildren();performance.replaceChildren();
@@ -111,21 +107,8 @@ function openPanel(panel, title, navId) { stopPresence();terminalOpener=document
   }
   q('#workspaceDialog').showModal();
 }
-const q = selector => document.querySelector(selector);
 const agents = new Map(), events = [];
 let selected, profileOpener, profileVersion = 0, busy = false, stateVersion = 0, marketVersion = 0;
-const money = value => Number.isFinite(value) ? value.toFixed(2) + ' USDT' : '—';
-const date = value => new Date(value).toLocaleString();
-function node(tag, text) {
-  const element = document.createElement(tag);
-  element.textContent = text;
-  return element;
-}
-async function get(url) {
-  const response = await fetch(url, {cache: 'no-store', signal: typeof AbortSignal!=='undefined' && AbortSignal.timeout ? AbortSignal.timeout(10000) : undefined});
-  if (!response.ok) { const error=Error(url);error.status=response.status;throw error; }
-  return response.json();
-}
 const spriteIds = ['atlas', 'euler', 'nova', 'sentinel', 'satoshi', 'flux', 'vega', 'oracle'];
 const statusLabels = {IDLE:'Disponível', RESEARCHING:'Pesquisando', BACKTESTING:'Testando hipóteses', TRADING:'Execução paper', REVIEWING_RISK:'Avaliando risco', MEETING:'Em reunião'};
 const roleLabels = {atlas:'Coordenação de pesquisa', euler:'Pesquisa quantitativa', nova:'Trader paper', sentinel:'Gestão de risco', satoshi:'Pesquisa de Bitcoin', flux:'Microestrutura de mercado', vega:'Pesquisa de volatilidade', oracle:'Regimes de mercado'};
@@ -247,7 +230,7 @@ async function details() {
     q('#coverage').textContent = `${evidence.recordedTransitions} transições no histórico preservado. ${coverage.legacyTransitionsWithoutHistory} transições antigas não têm histórico detalhado. Histórico desde: ${coverage.activitySince ? date(coverage.activitySince) : 'nenhuma transição registrada'}.`;
     records('#memories', result.memories, memory => {
       const row = node('li', '');
-      row.append(node('b', memory.kind), node('p', memory.summary), node('small', date(memory.createdAt)));
+      row.append(node('b', globalThis.OfficeI18n?OfficeI18n.kind(memory.kind):memory.kind), node('p', globalThis.OfficeI18n?OfficeI18n.text(memory.summary):memory.summary), node('small', date(memory.createdAt)));
       const strategyId = memory.strategyId || memory.metadata?.strategyId;
       if (strategyId) row.append(node('p', 'Estratégia: ' + strategyId));
       if (memory.tags?.length) row.append(node('p', memory.tags.join(' · ')));
@@ -272,99 +255,6 @@ async function details() {
 }
 q('#closeProfile').onclick = () => q('#profile').close();
 q('#profile').addEventListener('close', () => { selected = undefined; profileVersion++; });
-q('#runResearch').onclick = async () => {
-  const button = q('#runResearch');
-  button.disabled = true;
-  q('#researchActionStatus').textContent = 'Pesquisa solicitada…';
-  try {
-    const response = await fetch('/research/jobs', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({symbol: 'BTCUSDT'})});
-    const run = await response.json();
-    q('#researchActionStatus').textContent = response.status === 202 ? 'Solicitação registrada: ' + run.id + '. Consulte o estado e o resultado abaixo.' : 'Solicitação recusada ou indisponível. Consulte as tarefas registradas antes de tentar novamente.';
-    await refreshOnline();
-    refresh();
-    if (selected) details();
-  } catch {
-    q('#researchActionStatus').textContent = 'Confirmação indisponível. Consulte as tarefas antes de solicitar novamente; a solicitação pode ter sido registrada.';
-  } finally { button.disabled = false; }
-};
-function renderResearchJobs(jobs) {
-  const focusedJob=document.activeElement?.dataset?.researchJobId;
-  const host=q('#researchJobs');host.replaceChildren();
-  const labels={QUEUED:'Solicitação registrada',RUNNING:'Em execução · estado registrado',COMPLETED:'Concluída',FAILED:'Falhou',INTERRUPTED:'Interrompida por reinício'};
-  const validId=id=>typeof id==='string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
-  if(!Array.isArray(jobs)||jobs.length>20||jobs.some(j=>!j||!validId(j.id)||!Object.hasOwn(labels,j.status)||!Number.isInteger(j.limit)||j.limit<100||j.limit>1000||!Number.isFinite(Date.parse(j.updatedAt))||j.runId&&!validId(j.runId))){host.append(node('li','Tarefas indisponíveis · consulte novamente após restabelecer o acesso.'));return;}
-  if(!jobs.length){host.append(node('li','Nenhuma tarefa de pesquisa registrada.'));return;}
-  for(const job of jobs){const card=node('li','');card.className='research-job';card.dataset.status=job.status;
-    card.append(node('b',labels[job.status]),node('small','Tarefa '+job.id),node('p',job.limit+' candles solicitados · '+date(job.updatedAt)));
-    if(job.reason)card.append(node('p',job.reason==='RUNTIME_RESTARTED'?'Sem retomada automática. Revise a evidência antes de uma nova solicitação.':'Falha registrada. Nenhum resultado positivo é presumido.'));
-    if(job.runId){const button=node('button','Abrir resultado original');button.dataset.researchJobId=job.id;button.onclick=()=>researchDetails(job.runId);card.append(button);host.append(card);if(focusedJob===job.id)button.focus();}else host.append(card);
-  }
-}
-function renderResearch(runs) {
-  records('#researchRuns', [...runs].reverse(), run => {
-    const row = node('li', '');
-    row.append(node('b', run.status === 'SCREEN_PASSED' ? 'Filtro histórico aprovado' : run.status === 'REJECTED' ? 'Hipótese rejeitada' : 'Pesquisa falhou'), node('p', date(run.completedAt)));
-    if (run.datasetHash) row.append(node('small', 'Evidência: ' + run.datasetHash));
-    if (run.backtest) {
-      row.append(node('p', `${run.backtest.trades} operações históricas · P&L do backtest simulado ${money(run.backtest.netPnl)}`));
-      row.append(node('small',run.backtest.model==='SPOT_SMA_NEXT_OPEN_V2'?'Modelo registrado: sinal fechado → abertura seguinte · taxas de entrada e saída incluídas':'Simulação anterior: modelo e custos não versionados neste registro'));
-      if(Number.isFinite(run.backtest.feesPaid))row.append(node('small','Taxas históricas registradas: '+money(run.backtest.feesPaid)));
-    }
-    const button = node('button', 'Abrir pesquisa e evidências');
-    button.dataset.researchId = run.id;
-    button.onclick = () => researchDetails(run.id);
-    row.append(button);
-    return row;
-  });
-}
-let researchDetailVersion = 0, researchOpener = null;
-async function researchDetails(id) {
-  stopPresence();
-  const version = ++researchDetailVersion, dialog = q('#researchDialog');
-  if (!dialog.open) { researchOpener = document.activeElement; dialog.showModal(); }
-  q('#researchDetails').replaceChildren();
-  q('#researchDetailStatus').textContent = 'Consultando pesquisa registrada…';
-  try {
-    const run = await get('/research/runs/' + encodeURIComponent(id));
-    if (version !== researchDetailVersion || !dialog.open) return;
-    if (run?.id !== id || !['SCREEN_PASSED','REJECTED','FAILED'].includes(run.status) || !Array.isArray(run.findings) || run.findings.length > 8 || !Array.isArray(run.events) || run.events.length > 100 || !Number.isFinite(Date.parse(run.startedAt)) || !Number.isFinite(Date.parse(run.completedAt))) throw Error('invalid research evidence');
-    const host = q('#researchDetails');
-    host.append(node('p', 'ID: ' + run.id), node('p', 'Resultado registrado: ' + run.status), node('p', 'Execução: ' + date(run.startedAt) + ' → ' + date(run.completedAt)), node('p', 'Pesquisa histórica concluída; não representa tarefa atual, ordem paper ou P&L das contas.'));
-    if (run.error) host.append(node('p', 'Falha registrada: ' + String(run.error).slice(0,1000)));
-    if (run.dataset) {
-      const d = run.dataset;
-      if (d.symbol !== 'BTCUSDT' || d.interval !== '1h' || d.historyMarket !== 'BINANCE_SPOT' || d.snapshotMarket !== 'BINANCE_USDM' || !/^[a-f0-9]{64}$/.test(d.hash) || !Array.isArray(d.candles) || d.candles.length < 64 || d.candles.length > 1000 || !Number.isFinite(Date.parse(d.retrievedAt))) throw Error('invalid dataset evidence');
-      host.append(node('h3', 'Fontes registradas'), node('p', 'Candles: BINANCE_SPOT · contexto: BINANCE_USDM · BTCUSDT · 1h'), node('p', 'Coleta: ' + date(d.retrievedAt)), node('p', d.candles.length + ' candles fechados · ' + date(d.candles[0].timestamp) + ' → ' + date(d.candles.at(-1).timestamp)), node('p', 'SHA-256 registrado: ' + d.hash));
-    } else host.append(node('p', 'Dataset não disponível neste registro; não inferimos evidências.'));
-    host.append(node('h3', 'Observações dos especialistas'));
-    for (const finding of run.findings) {
-      host.append(node('p', String(finding.agentId) + ' · ' + String(finding.metric)), node('p', String(finding.summary)), node('pre', JSON.stringify(finding.values,null,2)));
-    }
-    if (!run.findings.length) host.append(node('p', 'Nenhuma observação registrada.'));
-    if (run.backtest) {
-      host.append(node('h3', 'Backtest histórico'), node('p', 'Resultado in-sample: não é validação fora da amostra nem autorização de operação.'), node('p', run.backtest.model || 'Modelo antigo não versionado'), node('pre', JSON.stringify(run.backtest,null,2)));
-    }
-    if (run.strategyId) host.append(node('p', 'Estratégia registrada: ' + run.strategyId));
-    host.append(node('h3', 'Eventos de origem'));
-    for (const record of run.events) {
-      if (typeof record?.id !== 'string' || typeof record?.type !== 'string') throw Error('invalid event evidence');
-      host.append(node('p', record.type + ' · ' + record.id), sourceButton(record.id));
-    }
-    q('#researchDetailStatus').textContent = 'Registro retornado pela API. Eventos podem ser consultados separadamente no histórico gravado.';
-  } catch {
-    if (version !== researchDetailVersion || !dialog.open) return;
-    q('#researchDetails').replaceChildren();
-    q('#researchDetailStatus').textContent = 'Pesquisa indisponível ou evidência inválida. Confira o acesso e tente novamente.';
-  }
-}
-q('#closeResearch').onclick = () => q('#researchDialog').close();
-q('#researchDialog').addEventListener('close', () => {
-  researchDetailVersion++; q('#researchDetails').replaceChildren();
-  if (researchOpener?.isConnected) researchOpener.focus();
-  else if(q('#workspaceDialog').open) q('#closeWorkspace').focus();
-  else q('#navResearch').focus();
-  researchOpener = null; render();
-});
 function renderAccounts(items) {
   const host = q('#accounts');
   host.replaceChildren();
@@ -451,44 +341,11 @@ function showPerpetualMarket(market) {
   } else marketUnavailable('USD-M indisponível · ordens bloqueadas');
   q('#marketV3').textContent = quote ? `BTCUSDT perpetual · bid ${money(quote.bid)} · ask ${money(quote.ask)} · mark ${money(quote.markPrice)} · funding cotado ${(quote.fundingRate * 100).toFixed(4)}% · ${market.status}. Atualizado em ${date(quote.markTime)}` : 'USD-M indisponível · ordens paper bloqueadas';
 }
-async function studyDetails(id) {
-  q('#studyDialog').showModal();q('#studyDetails').textContent = 'Carregando…';
-  try {
-    const study = await get('/backtests/v2/studies/' + encodeURIComponent(id));
-    const host = q('#studyDetails');host.replaceChildren();host.append(node('p', 'Estado registrado: ' + study.status));
-    if (study.error) host.append(node('p', study.error));
-    if (study.result) {
-      host.append(node('p', 'P&L simulado fora da amostra: ' + money(study.result.netPnl)), node('p', 'Evidência: ' + study.result.datasetHash), node('p', 'Resultados históricos não aprovam operações do fundo. Cada janela começa e termina sem posições. Candles finais não usados: ' + study.result.excludedTailBars));
-      for (const fold of study.result.folds) host.append(node('p', `${date(fold.testStart)} → ${date(fold.testEnd)} · ${fold.configuration?.strategy || 'SMA'} · ${fold.result.trades ?? 'indisponível'} operações históricas · P&L ${money(fold.result.netPnl)} · taxas ${money(fold.result.feesPaid)} · funding ${money(fold.result.fundingCashDelta)} · drawdown ${(fold.result.maxDrawdown * 100).toFixed(2)}% · ${fold.result.liquidations} liquidações modeladas`));
-      host.append(node('p', 'Liquidação usa premissas conservadoras configuradas; as regras completas da exchange não estão modeladas.'));
-    }
-  } catch { q('#studyDetails').textContent = 'Estudo indisponível. Entre se o acesso for exigido.'; }
-}
-q('#closeStudy').onclick = () => q('#studyDialog').close();
 function runtimeUnavailable() {
   runtimeObservedAt = 0;
   q('#runtimeStatus').textContent = 'Diagnóstico indisponível ou desatualizado · entre se o acesso for exigido';
   q('#runtimeDetails').replaceChildren();
   preflightUnavailable();
-}
-const screenCheckLabels={COMPLETED_V2_STUDY:'Estudo V2 concluído, com data válida',RECORDED_USDM_EVIDENCE:'Dataset USD-M e hashes conferidos',NONOVERLAPPING_TEST_WINDOWS:'Janelas fora da amostra sem sobreposição',MINIMUM_TEST_FOLDS:'Pelo menos 3 janelas de teste',MINIMUM_CLOSED_TRADES:'Pelo menos 10 operações históricas encerradas',POSITIVE_RECONCILED_OOS_PNL:'P&L fora da amostra positivo e reconciliado',NO_MODELED_LIQUIDATIONS:'Nenhuma liquidação modelada',BOUNDED_TEST_DRAWDOWN:'Drawdown por janela entre 0 e 15%',COMPATIBLE_SIGNAL_AND_COSTS:'Sinal e custos compatíveis com o paper',RECENT_CLOSED_EVIDENCE:'Evidência fechada com até 7 dias'};
-function preflightUnavailable(){preflightObservedAt=0;q('#preflightStatus').textContent='Diagnóstico do ciclo indisponível ou desatualizado.';q('#continuousPreflight').replaceChildren();}
-function renderPreflight(data){
-  const observed=Date.parse(data?.observedAt), checks=Object.keys(screenCheckLabels);
-  const validStudy=s=>s&&typeof s.studyId==='string'&&s.studyId.length>0&&typeof s.eligible==='boolean'&&typeof s.configured==='boolean'&&s.configured===(s.studyId===data.configuredStudyId)&&s.evidence&&(s.evidence.netPnl===null||Number.isFinite(s.evidence.netPnl))&&Array.isArray(s.checks)&&s.checks.length===checks.length&&s.checks.every(c=>c&&checks.includes(c.id)&&typeof c.ok==='boolean')&&new Set(s.checks.map(c=>c.id)).size===checks.length&&s.eligible===s.checks.every(c=>c.ok);
-  if(data?.scope!=='READ_ONLY_CONTINUOUS_PREFLIGHT'||!Number.isFinite(observed)||Date.now()-observed>15000||observed>Date.now()+5000||typeof data.activationReady!=="boolean"||(data.activationReady&&!(data.cycleEnabled===true&&data.runtimePrerequisites?.ready===true&&typeof data.configuredStudyId==="string"))||typeof data.cycleEnabled!=='boolean'||!(data.configuredStudyId===null||typeof data.configuredStudyId==='string')||!Array.isArray(data.studies)||data.studies.length>21||data.studies.some(s=>!validStudy(s))||new Set(data.studies.map(s=>s.studyId)).size!==data.studies.length||!Array.isArray(data.unverified)||!data.runtimePrerequisites||typeof data.runtimePrerequisites.ready!=='boolean'||!Array.isArray(data.runtimePrerequisites.reasons)) {preflightUnavailable();return;}
-  preflightObservedAt=observed;const host=q('#continuousPreflight'), focusedStudy=document.activeElement?.dataset?.preflightStudy;host.replaceChildren();
-  q('#preflightStatus').textContent='Ciclo '+(data.cycleEnabled?'configurado como habilitado':'desligado')+' · '+(data.configuredStudyId?'estudo explicitamente configurado':'nenhum estudo selecionado')+(data.activationReady?' · piloto ativo, release aprovada'+(data.release?.approvedBy==='BACKEND_FINGERPRINT'?' pela impressão do backend':' pelo commit')+(data.release?.backendFingerprint?' · backend '+String(data.release.backendFingerprint).slice(0,12):'')+'.':' · ativação exige aceitação operacional externa.');
-  const blockers={EXPLICIT_STUDY_REQUIRED:'Escolher explicitamente um estudo elegível',CONFIGURED_STUDY_NOT_ELIGIBLE:'O estudo configurado não passa na triagem',NEW_EXPOSURE_HALTED:'Novas exposições pausadas',PERPETUAL_EXECUTION_DISABLED:'Execução paper desligada',HISTORICAL_PERSISTENCE_FAILED:'Gravação de estudo falhou',PERPETUAL_SOURCE_UNAVAILABLE:'Fonte de mercado indisponível',FUNDING_RECONCILIATION_PENDING:'Funding aguardando conciliação'};
-  for(const reason of data.runtimePrerequisites.reasons)host.append(node('p',blockers[reason]||'Bloqueio operacional: '+reason));
-  const external={AUTOMATIC_OFF_PROVIDER_BACKUP:'Backup automático fora do provedor',EXTERNAL_FAILURE_ALERTS:'Alertas externos de falhas',CONTINUOUS_RELEASE_REVIEW:'Revisão da release contínua'};
-  for(const item of data.unverified)host.append(node('p','Aceitação externa pendente: '+(external[item]||item)));
-  if(!data.studies.length)host.append(node('p','Nenhum estudo registrado para triagem.'));
-  for(const study of data.studies){
-    const card=node('article','');card.className='lab-card';card.append(node('h4',study.eligible?'Elegível para avaliação paper, sujeito aos demais controles':'Não elegível para ciclo contínuo'),node('small',study.studyId+(study.configured?' · configurado':'')),node('p','P&L histórico fora da amostra: '+money(study.evidence.netPnl)));
-    const criteria=node('details',''),list=node('ul','');criteria.append(node('summary','Conferir critérios · '+study.checks.filter(c=>!c.ok).length+' pendentes'));for(const check of study.checks)list.append(node('li',(check.ok?'✓ ':'Pendente: ')+screenCheckLabels[check.id]));criteria.append(list);card.append(criteria);
-    const detail=node('button','Abrir evidência original');detail.dataset.preflightStudy=study.studyId;detail.onclick=()=>studyDetails(study.studyId);card.append(detail);host.append(card);if(focusedStudy===study.studyId)detail.focus();
-  }
 }
 function renderRuntime(data) {
   const observed = Date.parse(data?.observedAt), phases = {STARTING:'Inicializando',SERVING:'Em serviço',DRAINING:'Encerrando',STOPPED:'Encerrado'};
@@ -533,11 +390,6 @@ async function refreshOnline() {
     if(results[6].status==='fulfilled'&&version===onlineVersion)renderPreflight(results[6].value);else preflightUnavailable();
   } finally { onlineBusy = false; }
 }
-q('#runStudy').onclick = async () => {
-  const button = q('#runStudy');button.disabled = true;
-  try { const response = await fetch('/backtests/v2/studies', {method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});const result = await response.json();q('#studyActionStatus').textContent = response.ok ? 'Estudo histórico registrado: ' + result.id : result.error || 'Estudo indisponível';await refreshOnline(); }
-  catch { q('#studyActionStatus').textContent = 'Não foi possível acessar o laboratório'; } finally { button.disabled = false; }
-};
 q('#haltPaper').onclick = async () => {
   if (typeof halted !== 'boolean') return;q('#haltPaper').disabled = true;
   try { const response = await fetch('/paper/perpetual/halt', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({halted:!halted})});if (!response.ok) throw Error();await refreshOnline(); }
@@ -563,53 +415,6 @@ q('#closeWorkspace').onclick = () => q('#workspaceDialog').close();
 q('#workspaceDialog').addEventListener('close', () => {
   for (const id of ['navOffice','navAgents','navFinance','navMarket','navResearch','navHistory','navAccess']) {q('#'+id).className = 'nav' + (id === 'navOffice' ? ' active' : '');q('#'+id).setAttribute('aria-current',id === 'navOffice' ? 'page' : 'false');}
 });
-const eventLabels={AGENT_STATE_CHANGED:'Estado do agente',TRADE_PROPOSED:'Proposta paper',RISK_APPROVED:'Risco aprovado',RISK_REJECTED:'Risco rejeitado',PAPER_ORDER_SUBMITTED:'Ordem paper enviada',PAPER_FILL:'Fill paper',POSITION_CLOSED:'Posição encerrada',MEMORY_CREATED:'Memória registrada',RESEARCH_STARTED:'Pesquisa iniciada',RESEARCH_COMPLETED:'Pesquisa concluída',RESEARCH_FAILED:'Falha na pesquisa',BACKTEST_STARTED:'Estudo iniciado',BACKTEST_COMPLETED:'Estudo concluído',BACKTEST_FAILED:'Falha no estudo',FUNDING_SETTLED:'Funding liquidado',PAPER_LIQUIDATION:'Liquidação paper',PAPER_CONTROL_CHANGED:'Controle paper alterado',AUTONOMOUS_DECISION:'Decisão autônoma',MARKET_DATA_FAILED:'Fonte indisponível'};
-let auditVersion=0,historyVersion=0,historyCursor=null,auditCursor=null,auditAccount=null,auditReturn=null,auditOpener=null;
-function eventLabel(record){const p=record.payload||{};return (eventLabels[record.type]||record.type)+(record.type==='AGENT_STATE_CHANGED'?' · '+(p.name||p.id||'')+' · '+(statusLabels[p.status]||p.status||'')+' · '+(p.room||''):'');}
-function sourceButton(id,received){const button=node('button','Abrir evento de origem · '+id);button.className='source-link';button.dataset.eventId=id;button.onclick=()=>showEvent(id,received);return button;}
-function renderSessionEvents(){const focus=document.activeElement?.dataset?.eventId,buttons=[];q('#events').replaceChildren(...events.map(record=>{const li=node('li',''),button=node('button',date(record.occurredAt)+' · '+eventLabel(record));button.className='event-button';button.dataset.eventId=record.id;button.onclick=()=>showEvent(record.id,record);li.append(button);buttons.push(button);return li;}));buttons.find(button=>button.dataset.eventId===focus)?.focus?.({preventScroll:true});}
-function outcomeCard(trade){const row=node('article','');row.className='trade-outcome';row.append(node('b',trade.symbol+' '+trade.direction+' · '+money(trade.netPnl)),node('p',date(trade.openedAt)+' → '+date(trade.closedAt)),node('small','P&L bruto '+money(trade.grossPnl)+' · taxas '+money(trade.feesPaid)+' · funding '+money(trade.fundingCashDelta)));for(const id of trade.fillEventIds||[])row.append(sourceButton(id));for(const id of trade.fundingEventIds||[]){row.append(node('small','Funding registrado'));row.append(sourceButton(id));}return row;}
-function openAudit(){stopPresence();const dialog=q('#auditDialog');if(!dialog.open){auditOpener=document.activeElement;dialog.showModal();}}
-function resetAudit(title,status){q('#auditTitle').textContent=title;q('#auditStatus').textContent=status;q('#auditContent').replaceChildren();q('#auditOlder').hidden=true;q('#auditOlder').disabled=true;q('#auditBack').hidden=true;}
-function eventAccount(record){const p=record.payload||{};return p.accountId||p.order?.accountId||p.fill?.accountId;}
-function renderEvent(record,durable){
- const host=q('#auditContent');host.replaceChildren();host.append(node('h3',eventLabel(record)),node('p','Registrado em: '+date(record.occurredAt)),node('p','ID original: '+record.id),node('small','Tipo original: '+record.type));
- const p=record.payload||{},account=eventAccount(record);if(account)host.append(node('p','Conta: '+account));if(typeof p.decision?.approved==='boolean')host.append(node('p','Decisão registrada: '+(p.decision.approved?'aprovada':'rejeitada')));if(Array.isArray(p.decision?.reasons)&&p.decision.reasons.length)host.append(node('p','Motivos registrados: '+p.decision.reasons.join(', ')));if(p.error)host.append(node('p','Falha registrada: '+p.error));
- const details=node('details',''),summary=node('summary','Dados originais do evento'),payload=node('pre',JSON.stringify(record.payload,null,2));details.append(summary,payload);host.append(details);
- q('#auditStatus').textContent=durable?'Evento confirmado no histórico gravado. Dados originais; consulta sem alterar o sistema.':'Recebido nesta sessão. Ainda não confirmado no histórico gravado; pode ser temporário.';
- configureAuditBack();
-}
-async function showEvent(id,received){
- const back=auditReturn;const version=++auditVersion;resetAudit('Evento de origem','Consultando histórico gravado…');auditReturn=back;configureAuditBack();openAudit();
- try{const result=await get('/audit/events/'+encodeURIComponent(id));if(version!==auditVersion)return;if(result.source!=='DURABLE_SNAPSHOT'||!result.event||result.event.id!==id)throw Error('invalid audit response');renderEvent(result.event,true);}
- catch(error){if(version!==auditVersion)return;if(error.status===404&&received?.id===id)renderEvent(received,false);else{q('#auditStatus').textContent=error.status===404?'Evento não encontrado no histórico gravado.':'Histórico indisponível. Confira o acesso e tente novamente.';}}
-}
-function performancePath(account){return (account.instrument==='BINANCE_USDM:BTCUSDT'?'/paper/perpetual/accounts/':'/paper/accounts/')+encodeURIComponent(account.accountId||account.id)+'/performance';}
-function renderAccountAudit(result,account){
- resetAudit('Operações · '+(account.accountId||account.id),'');q('#auditStatus').textContent='Conta '+(account.accountId||account.id)+' · '+account.instrument+' · fundo e avaliação permanecem separados.';
- const host=q('#auditContent');host.append(node('p',outcomeLabel(result)),node('small','Operações abertas ficam fora da taxa de acerto. Cada evento consulta seu registro gravado.'));
- if(!result.available){host.append(node('p',result.reason||'Evidências de operações indisponíveis'));return;}
- host.append(node('p','Resultado líquido encerrado: '+money(result.summary.closedNetPnl)));
- if(!result.closedTrades.length)host.append(node('p','Nenhuma operação completa registrada nesta página.'));
- for(const trade of result.closedTrades)host.append(outcomeCard(trade));
- auditCursor=result.nextCursor||null;auditAccount=account;q('#auditOlder').hidden=!auditCursor;q('#auditOlder').disabled=!auditCursor;
- auditReturn=()=>renderAccountAudit(result,account);
-}
-async function openAccountAudit(account,before){
- const version=++auditVersion;auditReturn=null;auditAccount=account;resetAudit('Operações da conta','Consultando operações registradas…');openAudit();
- try{const result=await get(performancePath(account)+'?limit=25'+(before?'&before='+encodeURIComponent(before):''));if(version!==auditVersion)return;if(result.coverage!=='RECORDED_LEDGER_ONLY'||!Array.isArray(result.closedTrades)||!result.summary||typeof result.available!=='boolean')throw Error('invalid performance response');renderAccountAudit(result,account);}
- catch{if(version===auditVersion)q('#auditStatus').textContent='Operações indisponíveis. Confira o acesso e reabra a conta.';}
-}
-async function loadEventHistory(before){
- const version=++historyVersion,type=q('#eventType').value||'';historyCursor=null;q('#olderEvents').disabled=true;q('#historyList').replaceChildren();q('#historyStatus').textContent='Consultando histórico gravado…';
- try{const result=await get('/audit/events?limit=25'+(type?'&type='+encodeURIComponent(type):'')+(before?'&before='+encodeURIComponent(before):''));if(version!==historyVersion)return;if(result.source!=='DURABLE_SNAPSHOT'||!Array.isArray(result.events))throw Error('invalid audit response');const rows=result.events.map(record=>{const li=node('li',''),button=node('button',date(record.occurredAt)+' · '+eventLabel(record));button.className='event-button';button.onclick=()=>{auditReturn=null;showEvent(record.id);};li.append(button);return li;});q('#historyList').replaceChildren(...rows);q('#historyStatus').textContent=result.events.length?result.events.length+' eventos nesta página. Ordenação pela data original; IDs preservados.':'Nenhum evento gravado para este filtro.';historyCursor=result.nextCursor||null;q('#olderEvents').disabled=!historyCursor;}
- catch{if(version===historyVersion)q('#historyStatus').textContent='Histórico gravado indisponível. Confira o acesso e atualize.';}
-}
-q('#navHistory').onclick=()=>{openPanel('historyPanel','Relatórios · piloto e histórico gravado','navHistory');loadEventHistory();};
-q('#reloadEvents').onclick=()=>loadEventHistory();q('#eventType').onchange=()=>loadEventHistory();q('#olderEvents').onclick=()=>{if(historyCursor)loadEventHistory(historyCursor);};
-q('#auditOlder').onclick=()=>{if(auditCursor&&auditAccount)openAccountAudit(auditAccount,auditCursor);};
-function configureAuditBack(){if(auditReturn){q('#auditBack').hidden=false;q('#auditBack').onclick=()=>{auditVersion++;auditReturn();};}}
-q('#closeAudit').onclick=()=>q('#auditDialog').close();q('#auditDialog').addEventListener('close',()=>{auditVersion++;auditReturn=null;auditAccount=null;auditCursor=null;if(auditOpener?.isConnected)auditOpener.focus?.({preventScroll:true});else if(q('#profile').open)q('#closeProfile').focus?.();else if(q('#workspaceDialog').open)q('#closeWorkspace').focus?.();else (document.querySelector('.nav.active')||q('#navOffice')).focus?.();auditOpener=null;});
 
 let inspectedRoom=null,communicationVersion=0,communicationBusy=false,communicationReady=false;
 let communications=[],seenCommunications=new Set(),selectedHandoff=null,handoffProfileFocus=null;

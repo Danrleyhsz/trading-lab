@@ -85,6 +85,15 @@
   tick(){
    if(!this.allowed()){for(const view of this.views.values())this.stop(view);return;}
    const away=[...this.views.values()].filter(v=>v.life?.kind==='idle').length;let started=0;
+   const eligible=v=>!v.life&&v.station&&v.agent?.status==='IDLE'&&v.button!==document.activeElement&&this.now()>=v.lifeNext&&!(v.lifeHold>this.now());
+   // Now and then two idle agents take a break together in the lounge (cosmetic; no conversation is claimed).
+   const free=[...this.views.values()].filter(eligible);
+   if(away+2<=this.maxIdle&&free.length>=2&&!this.reserved.has('lounge-left')&&!this.reserved.has('lounge-right')&&this.random()<0.3){
+    const [a,b]=free.slice(0,2),left=places.find(p=>p.id==='lounge-left'),right=places.find(p=>p.id==='lounge-right');
+    const name=v=>v.agent.name||v.agent.id;
+    if(this.trip(a,{kind:'idle',place:{...left,facing:'right'},text:'Pausa no lounge com '+name(b),dwell:12000,speed:62}))started++;
+    if(this.trip(b,{kind:'idle',place:{...right,facing:'left'},text:'Pausa no lounge com '+name(a),dwell:12000,speed:62}))started++;
+   }
    for(const view of this.views.values()){
     if(away+started>=this.maxIdle)break;
     if(view.life||!view.station||view.agent?.status!=='IDLE'||view.button===document.activeElement||!(this.now()>=view.lifeNext)||view.lifeHold>this.now())continue;

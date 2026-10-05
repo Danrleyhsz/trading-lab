@@ -115,7 +115,7 @@
    if(!ids.length&&!(id==='nova'&&auto?.studyId))body.append(el('p','Nenhuma estratégia registrada para este agente.','dock-note'));
   } else {
    const mem=(state.profiles.get(id)?.memories||[]).slice(-6).reverse();if(!mem.length)body.append(el('p','Nenhuma memória registrada.','dock-note'));
-   for(const m of mem){const r=el('div','','dock-row');r.append(el('b',m.kind),el('span',m.summary),el('small',new Date(m.createdAt).toLocaleString('pt-BR')));body.append(r);}
+   for(const m of mem){const r=el('div','','dock-row');r.append(el('b',OfficeI18n.kind(m.kind)),el('span',OfficeI18n.text(m.summary)),el('small',new Date(m.createdAt).toLocaleString('pt-BR')));body.append(r);}
   }
  }
 
@@ -211,13 +211,25 @@
   $('#memoryStatus').textContent='Consultando memórias…';
   try{const rows=await get('/memories'+(select.value?'?agentId='+encodeURIComponent(select.value):''));if(!Array.isArray(rows))throw Error('invalid');const recent=rows.slice(-60).reverse();
    $('#memoryStatus').textContent=rows.length+' memórias registradas'+(rows.length>60?' · mostrando as 60 mais recentes':'');
-   $('#memoryList').replaceChildren(...recent.map(m=>{const li=el('li');const who=el('b',name(m.agentId));who.style.color=agentColors[m.agentId]||'';li.append(who,el('span',' · '+m.kind),el('p',m.summary),el('small',new Date(m.createdAt).toLocaleString('pt-BR')));if(m.sourceEventId)li.append(sourceButton(m.sourceEventId));return li;}));}
+   $('#memoryList').replaceChildren(...recent.map(m=>{const li=el('li');const who=el('b',name(m.agentId));who.style.color=agentColors[m.agentId]||'';li.append(who,el('span',' · '+OfficeI18n.kind(m.kind)),el('p',OfficeI18n.text(m.summary)),el('small',new Date(m.createdAt).toLocaleString('pt-BR')));if(m.sourceEventId)li.append(sourceButton(m.sourceEventId));return li;}));}
   catch{$('#memoryStatus').textContent='Memórias indisponíveis. Confira o acesso.';}
  }
  $('#memoryAgent').onchange=loadMemory;
  function table(headers,rows){const t=el('table','','data-table'),head=el('tr');for(const h of headers)head.append(el('th',h));const thead=el('thead');thead.append(head);const body=el('tbody');for(const r of rows){const tr=el('tr');for(const c of r.cells){const td=el('td');if(c&&typeof c==='object'&&c.nodeType)td.append(c);else td.textContent=c;tr.append(td);}if(r.open){tr.tabIndex=0;tr.onclick=r.open;tr.onkeydown=e=>{if(e.key==='Enter')r.open();};}body.append(tr);}t.append(thead,body);return t;}
  globalThis.OfficeTable=table;
- async function loadTimeline(){
+ const verdictLabels={IN_PROGRESS:'Em andamento',STOPPED_BY_LOSS_LIMIT:'Encerrado pelo limite de perda',INSUFFICIENT_EVIDENCE:'Evidência insuficiente',OUTPERFORMED:'Superou as referências',POSITIVE_BELOW_BENCHMARK:'Positivo, abaixo do buy and hold',UNDERPERFORMED:'Abaixo do esperado'};
+ async function loadReport(){
+  const host=$('#pilotReport');$('#reportStatus').textContent='Consultando avaliação…';
+  try{const r=await get('/paper/perpetual/pilot/report');if(r?.scope!=='PILOT_EVALUATION')throw Error('invalid');
+   if(r.status==='NO_DECISIONS'){$('#reportStatus').textContent='Nenhuma decisão do piloto registrada ainda.';host.replaceChildren();return;}
+   $('#reportStatus').textContent=r.protocol.version+' · declarado em '+r.protocol.declaredAt+' · '+r.hours+' h desde '+new Date(r.startedAt).toLocaleString('pt-BR');
+   const head=el('div','','report-verdict');head.dataset.verdict=r.verdict;head.append(el('small',r.verdict==='IN_PROGRESS'?'Veredito (em andamento)':'Veredito final'),el('b',verdictLabels[r.verdict]||r.verdict));
+   if(r.verdict==='IN_PROGRESS')head.append(el('span','Se terminasse agora: '+(verdictLabels[r.provisionalVerdict]||r.provisionalVerdict)));
+   const grid=el('div','','dock-grid report-grid');for(const [label,value,cls] of [['P&L do piloto',signedUsd(r.pnl),tone(r.pnl)],['Decisões',r.decisions.total+' ('+r.decisions.long+' long · '+r.decisions.short+' short · '+r.decisions.flat+' flat)'],['Operações fechadas',r.closedTrades+' de '+r.protocol.minimumClosedTrades+' mínimas'],['Fills · taxas · funding',r.fills+' · '+usd(r.fees,4)+' · '+usd(r.funding,4)],['BTC no período',pct(r.benchmarks.btcReturn),tone(r.benchmarks.btcReturn)],['Buy and hold (mesma exposição)',signedUsd(r.benchmarks.buyAndHoldSameExposure),tone(r.benchmarks.buyAndHoldSameExposure)]]){const c=el('div');c.append(el('small',label),el('b',value,cls||''));grid.append(c);}
+   host.replaceChildren(head,grid,el('p','Próximo passo pré-declarado: '+r.nextStep,'dock-note'));}
+  catch{$('#reportStatus').textContent='Avaliação indisponível. Confira o acesso.';host.replaceChildren();}
+ }
+ async function loadTimeline(){loadReport();
   const host=$('#pilotTimeline');$('#timelineStatus').textContent='Consultando a linha do tempo…';
   try{const t=await get('/paper/perpetual/pilot/timeline?days=7');if(t?.scope!=='RECORDED_PILOT_HISTORY')throw Error('invalid');state.timeline=t;drawTimeline(host,t);}
   catch{$('#timelineStatus').textContent='Linha do tempo indisponível. Confira o acesso.';host.replaceChildren();}
@@ -225,7 +237,7 @@
  function drawTimeline(host,t){
   const from=Date.parse(t.from),to=Date.parse(t.to),x=v=>(v-from)/(to-from)*1000;host.replaceChildren();
   const longs=t.decisions.filter(d=>d.direction>0).length,shorts=t.decisions.filter(d=>d.direction<0).length;
-  $('#timelineStatus').textContent=t.decisions.length+' decisões ('+longs+' long · '+shorts+' short · '+(t.decisions.length-longs-shorts)+' flat) · '+t.fills.length+' fills · '+t.funding.length+' liquidações de funding'+(t.stops.length?' · piloto encerrado: '+t.stops.map(s=>s.reason).join(', '):'');
+  $('#timelineStatus').textContent=t.decisions.length+' decisões ('+longs+' long · '+shorts+' short · '+(t.decisions.length-longs-shorts)+' flat) · '+(()=>{const start=t.decisions[0]?Date.parse(t.decisions[0].at):Infinity,before=t.fills.filter(f=>Date.parse(f.at)<start).length;return (t.fills.length-before)+' fills do piloto'+(before?' (+'+before+' antes do início, do teste de aceitação)':'');})()+' · '+t.funding.length+' liquidações de funding'+(t.stops.length?' · piloto encerrado: '+t.stops.map(s=>s.reason).join(', '):'');
   const s=svg(1000,220);if(!s)return;s.setAttribute('role','img');s.setAttribute('aria-label','Linha do tempo do piloto nos últimos 7 dias');
   for(let d=0;d<=7;d++){const at=from+d*86400000;s.append(shape('line',{x1:x(at),x2:x(at),y1:0,y2:220,stroke:'#1d3150','stroke-width':1}));}
   const eq=t.equity.map(p=>p.equity);if(eq.length>1){const base=t.initialCash??eq[0],pad=Math.max((Math.max(...eq,base)-Math.min(...eq,base))*0.1,base*0.002),lo=Math.min(...eq,base)-pad,hi=Math.max(...eq,base)+pad,y=v=>150-(v-lo)/(hi-lo||1)*130;
@@ -250,6 +262,7 @@
  $('#cardProfile').onclick=()=>profile(state.selected);
  globalThis.OfficeDashboard={selectAgent,paint,eventLine,isActive,toast,notifyEvent,state};
  notifySettings();lighting();
+ if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('/office/sw.js',{scope:'/office/'}).catch(()=>{});
  setInterval(header,1000);setInterval(paint,3000);setInterval(loadPanorama,5000);setInterval(loadActivity,20000);
  setTimeout(paint,800);
  loadPanorama();loadActivity();

@@ -198,3 +198,22 @@ body.v3[data-view="fit"] .workspace>.bottom-panels{grid-column:1!important;grid-
 body.v3 .triple strong{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 body.v3 .list-screen ol{grid-template-rows:repeat(6,minmax(0,1fr));overflow:hidden}
 body.v3 .list-screen li{font-size:.6cqw}
+/* Daytime art (generated from the night scene by tools/dayart.ps1); the tint layer only adds warmth. */
+#office[data-lighting="day"]{background-image:url('/office/office-day.png')!important}
+#office[data-lighting="day"] .station-chair{background-image:url('/office/office-day.png')}
+#lighting[data-phase="day"]:before{opacity:0}#lighting[data-phase="day"]:after{opacity:.18}
+/* Real tasks show as typing at the desk; idle agents never type. */
+@keyframes typing{0%,100%{transform:translateY(0)}50%{transform:translateY(-.08cqw)}}
+#office[data-presence="on"] .agent[data-seated="true"]:not([data-status="IDLE"]):not([data-life]) .sprite{animation:typing .45s steps(2,end) infinite}
+/* Replay bar */
+.replay-bar{position:absolute;z-index:14;left:50%;top:8px;transform:translateX(-50%);display:flex;align-items:center;gap:10px;padding:6px 10px;border:1px solid #ffd166;border-radius:6px;background:#0b1730f2;color:#ffe7a8;font-size:12px;box-shadow:0 6px 18px #000a}
+.replay-bar button{min-height:26px;padding:2px 10px;font-size:11px}
+.replay-progress{display:block;width:120px;height:6px;border-radius:3px;background:linear-gradient(90deg,#ffd166 calc(var(--done,0)*1%),#1a2a46 0)}
+/* Pilot report */
+.report-verdict{display:grid;gap:2px;padding:12px 14px;margin:8px 0;border:1px solid #35c9ff;border-radius:8px;background:#0b1630}
+.report-verdict b{font-size:20px}.report-verdict[data-verdict="OUTPERFORMED"]{border-color:#22e39f}.report-verdict[data-verdict="UNDERPERFORMED"],.report-verdict[data-verdict="STOPPED_BY_LOSS_LIMIT"]{border-color:#ff5577}.report-verdict[data-verdict="INSUFFICIENT_EVIDENCE"]{border-color:#ffd166}
+.report-grid{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))!important}
+.report-grid .up{color:#22e39f}.report-grid .down{color:#ff5577}
+#studySet{display:block;margin:8px 0;width:100%;max-width:520px}
+.replay-bar{left:8px;transform:none;white-space:nowrap}
+body.v3 .toasts{top:calc(var(--wall-h,0px) + 52px)}

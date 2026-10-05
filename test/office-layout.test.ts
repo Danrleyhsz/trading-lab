@@ -6,11 +6,11 @@ const html=readFileSync('public/office/index.html','utf8');
 const ids=new Set([...html.matchAll(/\sid="([^"]+)"/g)].map(m=>m[1]));
 
 test('every element the office scripts address exists in the reference layout',()=>{
- for(const file of ['app.js','dashboard.js','display.js']){
+ for(const file of ['core.js','research.js','audit.js','app.js','dashboard.js','display.js','replay.js']){
   const source=readFileSync('public/office/'+file,'utf8');
   const used=new Set([...source.matchAll(/(?:q|\$)\('#([A-Za-z][\w-]*)'\)/g)].map(m=>m[1]));
   // Created at runtime by the scripts themselves.
-  for(const runtime of ['handoffMap'])used.delete(runtime);
+  for(const runtime of ['handoffMap','replayBar'])used.delete(runtime);
   const missing=[...used].filter(id=>!ids.has(id));
   assert.deepEqual(missing,[],file+' references missing ids');
  }

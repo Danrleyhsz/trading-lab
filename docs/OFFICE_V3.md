@@ -67,3 +67,18 @@ It returns the pilot account's recorded decisions, fills, funding and stop event
 ## Art
 
 No new pixel art was required. `office-reference-v2.png` was generated from this same concept. The concept's extra elements (wall screens, plates, bubbles, cards, tables) are DOM layers drawn over or around it, so they show live data instead of baked-in numbers.
+
+## Second round (2026-10-05)
+
+- **Pilot evaluation in Relatórios.** It shows the verdict under `PILOT_EVALUATION_V1`: "Em andamento" plus "se terminasse agora". It also shows decisions, closed trades against the minimum, costs, BTC over the period, same-exposure buy and hold, and the pre-declared next step. See docs/PILOT_EVALUATION_PROTOCOL.md.
+- **Team hypotheses in Estratégias.** A selector runs any pre-declared set with the pilot study's request (5 000 h, 1 500 train, 500 test). Running a study remains an owner action. See docs/RESEARCH_PROTOCOL_TEAM_FILTERS.md.
+- **"Replay do dia".** It replays the last 24 h of recorded messages and events, one moment every 9 s, with the original time on screen. Walks and bubbles come from the same records; nothing is written.
+- **Daytime art.** `office-day.png` is generated from the night scene by `tools/dayart.ps1`: window glass becomes sky and skyline in daylight, and the room gets a mild warm lift. The day phase uses it; dusk and night keep the original.
+- **More life, still truthful:**
+  - Two idle agents sometimes take a break together in the lounge; the bubble names the place and the colleague, never a conversation.
+  - Seated agents with a real non-idle status type at their desk; idle agents never do.
+- **Portuguese view of recorded English texts.** `i18n.js` translates the display only (memories, briefing summaries). Records stay unchanged.
+- **Installable app (PWA).**
+  - `manifest.webmanifest`, `icon-192.png` and `icon-512.png`.
+  - `sw.js` caches only static `/office/` files: code network-first, images cache-first. Account, market and event data always come from the network.
+- **Smaller `app.js`.** Shared helpers moved to `core.js`, research, studies and preflight to `research.js`, and history and audit to `audit.js`. Load order is core → … → research → audit → app.
