@@ -15,7 +15,7 @@
  const svg=(w,h)=>{if(!D.createElementNS)return null;const s=D.createElementNS(svgNS,'svg');s.setAttribute('viewBox','0 0 '+w+' '+h);s.setAttribute('preserveAspectRatio','none');s.setAttribute('aria-hidden','true');return s;};
  const shape=(name,attrs)=>{const s=D.createElementNS(svgNS,name);for(const [k,v] of Object.entries(attrs))s.setAttribute(k,String(v));return s;};
  const store={get:(key,fallback)=>{try{return globalThis.localStorage?.getItem(key)??fallback;}catch{return fallback;}},set:(key,value)=>{try{globalThis.localStorage?.setItem(key,value);}catch{}}};
- const state={scorecard:null,panorama:null,activity:[],seenEvents:new Set(),eventsReady:false,selected:'nova',tab:'status',profiles:new Map(),ledgers:new Map(),timeline:null,positionKey:null};
+ const state={venues:null,scorecard:null,panorama:null,activity:[],seenEvents:new Set(),eventsReady:false,selected:'nova',tab:'status',profiles:new Map(),ledgers:new Map(),timeline:null,positionKey:null};
  const finance=()=>screens.state.finance,quote=()=>{const q=screens.state.quote;return q&&Date.now()-q.markTime<=15000?q:null;};
  const name=id=>agents.get(id)?.name||id;
  const accountOf=id=>finance()?.perpetualAccounts?.find(a=>a.ownerAgentId===id);
@@ -71,7 +71,8 @@
    if(p)candles(field(symbol,'chart'),p.candles?.[symbol]);
   }
   const qt=quote();field('funding','value').textContent=qt?fmt(qt.fundingRate*100,4)+'%':'—';
-  field('funding','sub').textContent=qt?'próx. liquidação em '+span(qt.nextFundingTime-Date.now()):'sem cotação';
+  // Diferença de funding entre corretoras (Binance, Bybit, OKX, Hyperliquid), quando disponível.
+  field('funding','sub').textContent=state.venues?.fundingSpread8h!=null?'entre corretoras: '+fmt(state.venues.fundingSpread8h*100,4)+'%':qt?'próx. liquidação em '+span(qt.nextFundingTime-Date.now()):'sem cotação';
   // Telão do perpétuo USD-M: mark price e o traçado recebido nesta sessão (o mesmo que a Nova usa).
   field('BTCPERP','price').textContent=qt?fmt(qt.markPrice,2):'—';
   const perpSub=field('BTCPERP','sub');perpSub.textContent=qt?'mark price · sessão':'sem cotação';perpSub.className='delta';
@@ -184,6 +185,15 @@
   const permission=Notification.permission==='granted'?'granted':await Notification.requestPermission();store.set('trading-lab.notify.v1',permission==='granted'?'on':'off');notifySettings();
  };
  function notifySettings(){const on=store.get('trading-lab.notify.v1','off')==='on';$('#configNotifications').textContent=on?'Desativar notificações do navegador':'Ativar notificações do navegador';$('#notificationStatus').textContent=on?'Avisos de operações e paradas do piloto chegam mesmo com a aba em segundo plano.':'Avisos aparecem só dentro da página.';}
+ // Renderizador experimental em canvas: escolha salva só neste navegador, com medição de quadros para comparar.
+ const renderer=globalThis.OfficeSceneCanvas;
+ if(renderer){$('#rendererMode').value=renderer.preferred();$('#rendererMode').onchange=()=>{renderer.set($('#rendererMode').value);$('#rendererStatus').textContent=$('#rendererMode').value==='canvas'?'Personagens e cadeiras desenhados em um canvas. Cliques e leitura de tela continuam iguais.':'Personagens desenhados como elementos da página (padrão).';};}
+ $('#configMeasure').onclick=async()=>{
+  if(!renderer)return;const b=$('#configMeasure');b.disabled=true;$('#rendererStatus').textContent='Medindo por 3 segundos… deixe a janela visível.';
+  try{const r=await renderer.measure();$('#rendererStatus').textContent=(r.mode==='canvas'?'Canvas':'Elementos da página')+': '+r.fps.toFixed(0)+' quadros/s, 95% dos quadros em até '+r.p95.toFixed(1)+' ms, '+r.longFrames+' quadro(s) acima de 50 ms'+(r.drawMs!==null?', desenho médio '+r.drawMs.toFixed(2)+' ms':'')+(r.animating?'.':' (animações paradas: compare com elas ligadas).');}
+  finally{b.disabled=false;}
+ };
+ $('#configMapEditor').onclick=()=>{$('#workspaceDialog').close();globalThis.OfficeMapEditor?.open();};
  $('#configDisplay').onclick=()=>{$('#workspaceDialog').close();$('#displayDialog').showModal();};
 
  // ---------- enlarged screens ----------
@@ -233,7 +243,7 @@
    const head=el('div','','report-verdict');head.dataset.verdict=r.verdict;head.append(el('small',r.verdict==='IN_PROGRESS'?'Veredito (em andamento)':'Veredito final'),el('b',verdictLabels[r.verdict]||r.verdict));
    if(r.verdict==='IN_PROGRESS')head.append(el('span','Se terminasse agora: '+(verdictLabels[r.provisionalVerdict]||r.provisionalVerdict)));
    const grid=el('div','','dock-grid report-grid');for(const [label,value,cls] of [['P&L do piloto',signedUsd(r.pnl),tone(r.pnl)],['Decisões',r.decisions.total+' ('+r.decisions.long+' long · '+r.decisions.short+' short · '+r.decisions.flat+' flat)'],['Operações fechadas',r.closedTrades+' de '+r.protocol.minimumClosedTrades+' mínimas'],['Fills · taxas · funding',r.fills+' · '+usd(r.fees,4)+' · '+usd(r.funding,4)],['BTC no período',pct(r.benchmarks.btcReturn),tone(r.benchmarks.btcReturn)],['Buy and hold (mesma exposição)',signedUsd(r.benchmarks.buyAndHoldSameExposure),tone(r.benchmarks.buyAndHoldSameExposure)]]){const c=el('div');c.append(el('small',label),el('b',value,cls||''));grid.append(c);}
-   host.replaceChildren(head,grid,el('p','Próximo passo pré-declarado: '+r.nextStep,'dock-note'));}
+   host.replaceChildren(head,grid,el('p','Próximo passo pré-declarado: '+r.nextStep,'dock-note'),el('h4','Métricas do período do piloto'),metricsView(r.metrics));}
   catch{$('#reportStatus').textContent='Avaliação indisponível. Confira o acesso.';host.replaceChildren();}
  }
  async function loadScorecard(){try{const s=await get('/agents/scorecard');if(s?.policy?.version)state.scorecard=s;}catch{}renderScorecard();}
@@ -261,21 +271,39 @@
  }
 
  // ---------- market panel details ----------
+ async function loadVenues(){try{const v=await get('/market/venues');if(v?.scope==='PUBLIC_CROSS_VENUE_CONTEXT_ONLY')state.venues=v;}catch{state.venues=null;}marketDetails();}
+ function venuesTable(){
+  const v=state.venues;if(!v)return el('p','Outras corretoras indisponíveis.','dock-note');
+  const names={binance:'Binance (usada pelo piloto)',bybit:'Bybit',okx:'OKX',hyperliquid:'Hyperliquid'};
+  const t=table(['Corretora','Mark price','Funding (8 h)','Open interest','Distância do consenso'],v.venues.map(x=>({cells:[names[x.venue]||x.venue,x.quote?fmt(x.quote.markPrice):'—',x.quote?fmt(x.quote.fundingRate8h*100,4)+'%'+(x.quote.fundingIntervalHours===1?' (horário x 8)':''):(x.error||'—'),x.quote?.openInterestUsd?big(x.quote.openInterestUsd):'—',x.quote&&v.consensusMark?fmt((x.quote.markPrice/v.consensusMark-1)*10000,1)+' bps':'—']})));
+  const wrap=el('div');wrap.append(t,el('p','Diferença de funding: '+(v.fundingSpread8h==null?'—':fmt(v.fundingSpread8h*100,4)+'% por 8 h ('+pct(v.fundingSpreadAnnualized,1)+' ao ano, teórico)')+' · Binance vs consenso: '+(v.binanceDivergenceBps==null?'—':fmt(v.binanceDivergenceBps,1)+' bps')+'. '+v.note+' Só contexto: o piloto usa apenas a Binance.','dock-note'));return wrap;
+ }
  function marketDetails(){
   const host=$('#panoramaDetails'),p=state.panorama;if(!host)return;if(!p){host.replaceChildren(el('p','Contexto público indisponível.'));return;}
-  host.replaceChildren(table(['Ativo','Preço','24h','Máx.','Mín.','Volume (USDT)'],Object.entries(p.tickers).map(([s,t])=>({cells:[s.replace('USDT','/USDT'),fmt(t.price,t.price<10?4:2),pct(t.change24h),fmt(t.high,t.high<10?4:2),fmt(t.low,t.low<10?4:2),big(t.quoteVolume)]}))),
+  host.replaceChildren(el('h4','Funding e preço em outras corretoras'),venuesTable(),el('h4','Moedas'),table(['Ativo','Preço','24h','Máx.','Mín.','Volume (USDT)'],Object.entries(p.tickers).map(([s,t])=>({cells:[s.replace('USDT','/USDT'),fmt(t.price,t.price<10?4:2),pct(t.change24h),fmt(t.high,t.high<10?4:2),fmt(t.low,t.low<10?4:2),big(t.quoteVolume)]}))),
    el('p','Open interest BTC: '+(p.openInterest?fmt(p.openInterest.btc,0)+' BTC · '+big(p.openInterest.usd):'—')+' · Liquidações observadas: '+big((p.liquidations?.longs||0)+(p.liquidations?.shorts||0))+' ('+p.liquidations?.note+')'));
  }
 
  // ---------- tick ----------
- function paint(){header();wall();if(!state.cardReady&&agents.has(state.selected)){state.cardReady=true;$('#agentCard').hidden=false;selectAgent(state.selected);}card();renderActivity();lighting();watchPositions();if(openGroup)fillLarge();}
+ // Estados visuais ligados a fatos reais: lendo (pesquisa/risco), digitando (teste/execução) e aguardando
+ // (próximo candle do piloto, estudo ou pesquisa em andamento no servidor).
+ function activity(){
+  const auto=finance()?.autonomous,jobs=screens.state.readiness?.jobs,badges={};
+  if(auto?.enabled&&!auto.stopReason){const next=OfficeScreens.nextDecision(Date.now(),auto);if(next.due)badges.nova='⏳ candle das '+hhmm(next.due-60000);}
+  if(jobs?.historical?.busy)badges.euler='⏳ estudo em andamento';if(jobs?.research?.busy)badges.atlas='⏳ pesquisa em andamento';
+  for(const [id,view] of agentViews){
+   const status=agents.get(id)?.status;view.button.dataset.activity=status==='RESEARCHING'||status==='REVIEWING_RISK'?'reading':status==='BACKTESTING'||status==='TRADING'?'typing':'idle';
+   let badge=view.button.querySelector?.('.state-badge');if(badges[id]){if(!badge){badge=el('span','','state-badge');badge.setAttribute('aria-hidden','true');view.button.append(badge);}badge.textContent=badges[id];}else badge?.remove();
+  }
+ }
+ function paint(){activity();header();wall();if(!state.cardReady&&agents.has(state.selected)){state.cardReady=true;$('#agentCard').hidden=false;selectAgent(state.selected);}card();renderActivity();lighting();watchPositions();if(openGroup)fillLarge();}
  for(const b of D.querySelectorAll('.dock-tabs button'))b.onclick=()=>{state.tab=b.dataset.tab;card();};
  $('#closeCard').onclick=()=>{$('#agentCard').hidden=true;};
  $('#cardProfile').onclick=()=>profile(state.selected);
  globalThis.OfficeDashboard={selectAgent,paint,eventLine,isActive,toast,notifyEvent,state};
  notifySettings();lighting();
  if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('/office/sw.js',{scope:'/office/'}).catch(()=>{});
- setInterval(header,1000);setInterval(paint,3000);setInterval(loadPanorama,5000);setInterval(loadActivity,20000);setInterval(loadScorecard,60000);loadScorecard();
+ setInterval(header,1000);setInterval(paint,3000);setInterval(loadPanorama,5000);setInterval(loadActivity,20000);setInterval(loadScorecard,60000);loadScorecard();setInterval(loadVenues,60000);loadVenues();
  setTimeout(paint,800);
  loadPanorama();loadActivity();
 })();

@@ -226,3 +226,19 @@ body.v3 .toasts{top:calc(var(--wall-h,0px) + 52px)}
 body.v3 .coin.perp{background:#0b2a4a;color:#35c9ff;border:1px solid #35c9ff}
 body.v3 .wall-screen .delta{font-size:.85cqw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 body.v3 .wall-head b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* Grade de métricas (Relatórios e detalhes do estudo) */
+.metrics-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;background:#1f3150;border:1px solid #1f3150;border-radius:6px;overflow:hidden;margin:6px 0 10px}
+.metrics-grid>div{background:#0b1630;padding:7px 9px;display:grid;gap:2px}.metrics-grid small{font-size:10.5px}.metrics-grid b{font-size:14px;font-variant-numeric:tabular-nums}
+.metrics-grid>p{grid-column:1/-1;margin:0;padding:6px 9px;background:#0b1630;font-size:11.5px;color:#a6b8d6}
+/* Estados visuais (fatos reais) */
+body.v3 .state-badge{position:absolute;left:calc(50% + 1.6cqw);top:-.2cqw;z-index:8;white-space:nowrap;padding:.08cqw .35cqw;border-radius:.6cqw;background:#2a2108f0;border:1px solid #ffd166;color:#ffe7a8;font-size:clamp(6px,.5cqw,11px);pointer-events:none}
+@keyframes reading{0%,100%{transform:rotate(0)}50%{transform:rotate(-1.2deg) translateY(-.04cqw)}}
+#office[data-presence="on"] .agent[data-seated="true"][data-activity="reading"]:not([data-life]) .sprite{animation:reading 2.4s ease-in-out infinite!important}
+/* Editor do mapa de piso */
+#mapEditorCanvas{position:absolute;inset:0;width:100%;height:100%;z-index:30;cursor:crosshair;touch-action:none}
+.map-editor-bar{position:absolute;z-index:31;left:8px;right:8px;top:calc(var(--wall-h,0px) + 6px);display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:6px 8px;background:#0b1730f2;border:1px solid #35c9ff;border-radius:6px}
+.map-editor-bar button{min-height:30px;padding:3px 10px;font-size:12px}.map-editor-bar span{font-size:12px;color:#cfe3ff}
+/* Renderizador experimental em canvas: o canvas pinta personagens e cadeiras; os botões continuam no DOM para clique e foco. */
+#sceneCanvas{position:absolute;inset:0;width:100%;height:100%;z-index:4;pointer-events:none;image-rendering:pixelated}
+body[data-renderer="canvas"] #office .agent .sprite-frame,body[data-renderer="canvas"] #office .station-chair{visibility:hidden}
+body[data-renderer="canvas"] #office .agent,body[data-renderer="canvas"] #office .agent:hover{filter:none}

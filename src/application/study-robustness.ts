@@ -1,6 +1,7 @@
 import {backtestPerpetual,type PerpetualConfig,type PerpetualDataset} from '../domain/perpetual-backtest.js';
 import {deflatedSharpe,hourlyReturns,moments,probabilityOfBacktestOverfitting} from '../domain/backtest-robustness.js';
 import {teamFilterWarmup} from '../domain/perpetual-signals.js';
+import {performanceMetrics} from '../domain/performance-metrics.js';
 
 /**
  * Triagem de robustez V1 (docs/ROBUSTEZ_DE_ESTUDOS.md), declarada em 05/10/2026.
@@ -13,7 +14,7 @@ export interface RobustnessInput {
  /** Candidatos do próprio estudo (o conjunto pré-declarado). */
  candidates:PerpetualConfig[];
  /** Janelas fora da amostra do estudo, com a série de equity do candidato escolhido em cada uma. */
- folds:{testStart:number;testEnd:number;result:{equitySeries?:{timestamp:number;equity:number}[]}}[];
+ folds:{testStart:number;testEnd:number;result:{equitySeries?:{timestamp:number;equity:number}[];tradeOutcomes?:number[]}}[];
  /** Todas as configurações diferentes já testadas no registro (para o desconto de múltiplas tentativas). */
  trials:PerpetualConfig[];
 }
@@ -48,5 +49,7 @@ export function computeStudyRobustness(input:RobustnessInput){
   outOfSample:{hours:oos.length,sharpePerHour:dsr.moments.sharpe,sharpeAnnualized:annualize(dsr.moments.sharpe),skewness:dsr.moments.skewness,kurtosis:dsr.moments.kurtosis},
   multipleTesting:{trials:trials.length,trialSharpeVariance:variance,benchmarkSharpeAnnualized:annualize(dsr.benchmarkSharpe),deflatedSharpe:dsr.deflatedSharpe},
   overfitting:{pbo:pbo.pbo,combinations:pbo.combinations,positivePathShare:positiveShare,note:pbo.reason},
+  // Métricas fora da amostra (equity das janelas de teste e operações de cada janela).
+  metrics:performanceMetrics(input.folds.flatMap(f=>(f.result.equitySeries??[]).filter(p=>p.timestamp>=f.testStart&&p.timestamp<f.testEnd+HOUR)),input.folds.flatMap(f=>(f.result.tradeOutcomes??[]).map(netPnl=>({netPnl})))),
   eligible:checks.every(c=>c.ok),checks};
 }
