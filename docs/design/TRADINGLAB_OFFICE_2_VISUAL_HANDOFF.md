@@ -382,3 +382,14 @@ Store the approved source reference under:
 `docs/design/references/tradinglab-office-2-approved-reference.jpg`
 
 Claude must use that repository file as the visual source of truth together with this document. If the binary reference is not yet present in the branch when Claude reads this, do not substitute another image: report it as a blocker and continue only with the audit/inventory tasks that do not require visual inspection.
+
+
+### Local handoff note — approved reference image
+
+The approved reference image has been downloaded to the user's Windows notebook Downloads folder with filename:
+`tradinglab-office-2-approved-reference.jpg`
+
+Before visual inspection/implementation, Claude must locate that exact file in the current user's Downloads folder, verify it is the approved isometric Office 2.0 reference, then copy it into the repository at:
+`docs/design/references/tradinglab-office-2-approved-reference.jpg`
+
+Do not rename/substitute/regenerate the reference. After copying it, verify the repository file opens correctly and include it in the same working branch before completing the visual audit and asset manifest.
