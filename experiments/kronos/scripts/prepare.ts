@@ -3,7 +3,7 @@
 // Uso (na raiz do repositório): npx tsx experiments/kronos/scripts/prepare.ts
 import {readFileSync,writeFileSync,mkdirSync} from 'node:fs';
 import type {Candle} from '../../../src/domain/backtest.js';
-import {HOUR,aggregateFourHour,breakoutEntryBars,dailyGridOrigins,originFor,sha256} from '../lib.ts';
+import {HOUR,aggregateFourHour,breakoutEntryBars,dailyGridOrigins,originFor,sha256} from '../lib.js';
 
 const cfg=JSON.parse(readFileSync('experiments/kronos/configs/kronos_ab_v1.json','utf8'));
 const first=Date.parse(cfg.dataset.firstBar),last=Date.parse(cfg.dataset.lastBar),from=Date.parse(cfg.window.firstEntryBar);

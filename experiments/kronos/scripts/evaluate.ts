@@ -2,7 +2,7 @@
 // Uso (na raiz do repositório), depois de prepare.ts e forecast.py: npx tsx experiments/kronos/scripts/evaluate.ts
 import {readFileSync,writeFileSync,existsSync} from 'node:fs';
 import type {PerpetualConfig,PerpetualDataset} from '../../../src/domain/perpetual-backtest.js';
-import {HOUR,dailyGridOrigins,entryFilter,forecastQuality,runArm,sha256,tradingMetrics,type ForecastRecord,type TradingMetrics} from '../lib.ts';
+import {HOUR,dailyGridOrigins,entryFilter,forecastQuality,runArm,sha256,tradingMetrics,type ForecastRecord,type TradingMetrics} from '../lib.js';
 
 const cfg=JSON.parse(readFileSync('experiments/kronos/configs/kronos_ab_v1.json','utf8'));
 const from=Date.parse(cfg.window.firstEntryBar),last=Date.parse(cfg.window.lastBar),quarters=cfg.window.quarters.map((q:string)=>Date.parse(q));

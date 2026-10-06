@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync,readdirSync} from 'node:fs';
 import {backtestPerpetual,type PerpetualConfig,type PerpetualDataset} from '../src/domain/perpetual-backtest.js';
-import {HOUR,FOUR,aggregateFourHour,breakoutEntryBars,dailyGridOrigins,entryFilter,forecastQuality,originFor,type ForecastRecord} from '../experiments/kronos/lib.ts';
+import {HOUR,FOUR,aggregateFourHour,breakoutEntryBars,dailyGridOrigins,entryFilter,forecastQuality,originFor,type ForecastRecord} from '../experiments/kronos/lib.js';
 
 const T0=Date.UTC(2026,0,1);
 const cfg:PerpetualConfig={strategy:'BREAKOUT',fastPeriod:10,slowPeriod:48,feeRate:0.00055,slippageBps:1,initialCapital:10000,maintenanceRate:0.01,liquidationFeeRate:0.005,positionFraction:0.1};
@@ -62,7 +62,7 @@ test('qualidade da previsão: acerto, p-valor binomial e referências',()=>{
 });
 
 test('isolamento: o código do experimento não importa corretora, contas, ordens nem credenciais',()=>{
- const files=['experiments/kronos/lib.ts',...readdirSync('experiments/kronos/scripts').map(f=>'experiments/kronos/scripts/'+f)];
+ const files=['experiments/kronos/lib.js',...readdirSync('experiments/kronos/scripts').map(f=>'experiments/kronos/scripts/'+f)];
  for(const f of files){const s=readFileSync(f,'utf8');
   assert.doesNotMatch(s,/paper-broker|perpetual-paper-book|paper-accounts|binance-futures-demo|trading-service|BINANCE_DEMO_API|apiKey|fapi\/v1\/order|signature=/i,f);}
 });
