@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TradingLab · Escritório 2.0</title>
+<link rel="icon" href="/office/icon-192.png">
+<link rel="stylesheet" href="/office2/style.css">
+</head>
+<body>
+<header class="topbar">
+ <a class="logo" href="/office2/" data-truth="STATIC"><span class="logo-mark" aria-hidden="true"></span>TRADINGLAB</a>
+ <nav aria-label="Zonas do escritório">
+  <button type="button" data-room="">Início</button>
+  <button type="button" data-room="horizon">Horizon</button>
+  <button type="button" data-room="nexus">Nexus</button>
+  <button type="button" data-room="ring">Ring</button>
+  <button type="button" data-room="stress-lab">Stress Lab</button>
+  <button type="button" data-room="risk">Risk</button>
+  <label class="more"><span class="sr-only">Mais zonas</span>
+   <select id="moreZones">
+    <option value="">Mais…</option>
+    <option value="auditoria">Auditoria</option>
+    <option value="diagnostico">Diagnóstico</option>
+    <option value="backtest">Backtest</option>
+    <option value="convivencia">Convivência</option>
+    <option value="recepcao">Recepção</option>
+   </select>
+  </label>
+ </nav>
+ <div class="status">
+  <span class="chip" id="market" data-truth="UNKNOWN">mercado: …</span>
+  <span class="chip" id="session" data-truth="UNKNOWN">sessão: …</span>
+  <span class="chip dev" data-truth="STATIC" title="Móveis e cidade desenhados por código até a arte do manifesto chegar">arte provisória · F1</span>
+  <div class="clock" data-truth="REAL"><span id="clockDate"></span><b id="clockTime"></b></div>
+  <a class="chip link" href="/office/">escritório atual</a>
+ </div>
+</header>
+<main class="layout">
+ <div class="viewport" id="viewport">
+  <canvas id="scene" aria-label="Escritório TradingLab no 30º andar, visão isométrica; clique numa zona para ampliar"></canvas>
+  <div class="labels" id="labels"></div>
+  <div class="floor-card" data-truth="STATIC"><span class="tower" aria-hidden="true"></span><div><b>30º andar</b><span>TradingLab HQ</span><span>São Paulo · SP</span></div></div>
+  <p class="banner" id="agentsStatus" hidden data-truth="UNKNOWN">Agentes: sem dado (sem acesso ou rota indisponível). Nenhum agente é desenhado sem dado.</p>
+  <ul class="legend" aria-label="Legenda">
+   <li data-truth="REAL">real</li><li data-truth="STATIC">decoração</li><li data-truth="SIMULATION">simulação</li><li data-truth="UNKNOWN">sem dado</li>
+  </ul>
+ </div>
+ <aside class="panel" id="panel" hidden aria-live="polite"></aside>
+</main>
+<script src="/office/character-frames.js"></script>
+<script src="/office2/iso.js"></script>
+<script src="/office2/scene.js"></script>
+<script src="/office2/app.js"></script>
+</body>
+</html>

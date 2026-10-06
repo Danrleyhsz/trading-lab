@@ -2,6 +2,7 @@ import {bootstrapEvaluationWallets} from './application/evaluation-wallet-bootst
 import {registerContinuousPaperPreflight} from './application/continuous-paper-preflight.js';
 import {EventAudit,registerEventAudit} from './application/event-audit.js';
 import {registerPilotTimeline} from './application/pilot-timeline.js';
+import {registerDecisionReceipts} from './application/decision-receipt.js';
 import {registerPilotParity} from './application/pilot-parity.js';
 import {registerPilotReport} from './application/pilot-report.js';
 import {StudyRobustnessRunner,registerStudyRobustness} from './application/study-robustness-runner.js';
@@ -68,7 +69,9 @@ const bus=new EventBus(),agents=new AgentRegistry(),coordinator=new AgentCoordin
 if(restored){agents.hydrate(restored.agents);memories.hydrate(restored.memories);messages.hydrate(restored.agentMessages??[]);activity.hydrate(restored.agentActivity??[]);researchRuns.hydrate(restored.researchRuns??[]);strategies.hydrate(restored.strategies??[]);}
 const collaboration=new AgentCollaboration(messages,coordinator,memories),strategyLab=new StrategyLab(strategies,coordinator,memories),backtester=new HistoricalBacktester(),history=new BinanceHistoricalData(),derivatives=new BinanceDerivativesData();
 const accounts=new PaperAccounts(bus,Number(process.env.INITIAL_PAPER_CAPITAL||10000),restored?.paperAccounts??[]);
-const book=new PerpetualPaperBook(bus,restored?.perpetualBook),perpetualHistory=new BinancePerpetualHistory(),perpetualMarket=new BinancePerpetualMarket(),studies=new PerpetualStudies(perpetualHistory,restored?.perpetualStudies??[]);
+const book=new PerpetualPaperBook(bus,restored?.perpetualBook),perpetualHistory=new BinancePerpetualHistory(),perpetualMarket=new BinancePerpetualMarket(),backend=backendFingerprint(),renderCommit=process.env.RENDER_GIT_COMMIT??'';
+// Cada estudo novo grava o commit e a impressão digital do backend que o rodou (proveniência, item 3 da auditoria).
+const studies=new PerpetualStudies(perpetualHistory,restored?.perpetualStudies??[],undefined,{codeCommit:/^[0-9a-f]{40}$/.test(renderCommit)?renderCommit:null,backendFingerprint:backend.fingerprint});
 const evaluationEnabled=process.env.PAPER_EVALUATION_ENABLED==='true',perpetualEnabled=process.env.PERPETUAL_PAPER_ENABLED==='true';
 bootstrapEvaluationWallets(process.env,book);
 if(evaluationEnabled||perpetualEnabled){const capital=Number(process.env.EVALUATION_PAPER_CAPITAL);if(!Number.isFinite(capital)||capital<=0)throw Error('positive EVALUATION_PAPER_CAPITAL required');for(const agent of agents.list()){if(evaluationEnabled)accounts.ensureEvaluation(agent.id,capital);if(perpetualEnabled)book.ensureEvaluation(agent.id,capital);}}
@@ -87,7 +90,7 @@ const autonomousEnabled=process.env.AUTONOMOUS_PERPETUAL_ENABLED==='true';if(aut
 const pilotTeam=new PilotTeamBriefing(messages,new TeamPredictions(memories));
 // A pinned backend fingerprint also approves releases that change only the office (public/) files.
 const pilotPhase=process.env.CLOUD_LAUNCH_PHASE==='CONTINUOUS_PAPER_PILOT',deployedCommit=process.env.RENDER_GIT_COMMIT??'';
-const release=releaseApproval(process.env,backendFingerprint().fingerprint);
+const release=releaseApproval(process.env,backend.fingerprint);
 const releasePinned=pilotPhase&&release.approved;
 // Plano B do piloto (desligado por padrão): Bybit quando a Binance falhar; os estudos continuam só com a Binance.
 const pilotHistory=new ResilientPerpetualHistory(perpetualHistory,new BybitPerpetualHistory(),process.env.PERPETUAL_HISTORY_FALLBACK==='bybit');
@@ -99,6 +102,7 @@ registerAgentProfiles(app,agents,memories,messages,activity,accounts,book);
 const eventAudit=new EventAudit(()=>durableSnapshot);registerEventAudit(app,eventAudit);
 registerPilotReport(app,()=>{const status=cycle.status(),id=status.accountId??null,account=book.list().find(a=>a.id===id);let events:ReturnType<typeof eventAudit.list>=[];try{events=eventAudit.list();}catch{}const quote=perpetualMarket.snapshot().quote;return {accountId:id,events,ledger:id?book.ledger(id)??[]:[],equity:account?.portfolio.equity??null,initialCash:account?.initialCash??null,maxDrawdown:account?.maxDrawdown??null,equityPoints:[...(account?.hourly??[]),...(account?.samples??[])].sort((a,b)=>a.timestamp-b.timestamp),closedTrades:id?book.performance(id)?.closedTrades??[]:[],autonomous:{enabled:status.enabled,eligible:status.eligible,stopReason:status.stopReason,studyId:status.studyId},mark:quote&&Date.now()-quote.markTime<=15000?quote.markPrice:null,now:Date.now()};});
 registerPilotParity(app,()=>{const id=cycle.status().accountId??null;let events:ReturnType<typeof eventAudit.list>=[];try{events=eventAudit.list();}catch{}return {accountId:id,events,ledger:id?book.ledger(id)??[]:[],now:Date.now()};},perpetualHistory);
+registerDecisionReceipts(app,()=>{const id=cycle.status().accountId??null;let events:ReturnType<typeof eventAudit.list>=[];try{events=eventAudit.list();}catch{}return {accountId:id,events,ledger:id?book.ledger(id)??[]:[],memories:memories.query(),messages:messages.list(),now:Date.now()};});
 registerPilotTimeline(app,days=>{const id=cycle.status().accountId??null,account=book.list().find(a=>a.id===id);let events:ReturnType<typeof eventAudit.list>=[];try{events=eventAudit.list();}catch{}return {accountId:id,events,ledger:id?book.ledger(id)??[]:[],hourly:account?.hourly??[],initialCash:account?.initialCash??null,now:Date.now(),days};});registerEncryptedBackup(app,()=>durableSnapshot?{state:durableSnapshot,persistedAt:durablePersistedAt}:null,BACKUP_PUBLIC_KEY_PEM);
 const research=new ResearchEngine({snapshot:symbol=>derivatives.snapshot(symbol),candles:(symbol,interval,limit)=>history.candles(symbol,interval,limit)},coordinator,collaboration,messages,memories,strategies,strategyLab,backtester,researchRuns,bus);
 const researchJobs=new ResearchJobs(research,bus,()=>persist(),domainEvents,()=>studies.status().busy||agents.get('euler')?.status==='BACKTESTING');

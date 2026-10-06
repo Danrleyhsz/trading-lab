@@ -19,3 +19,13 @@ test('sem dados suficientes, nada é inventado', ()=>{
 test('equity horária usa o último ponto de cada hora', ()=>{
  assert.deepEqual(hourlyEquity([{timestamp:0,equity:1},{timestamp:10,equity:2},{timestamp:H,equity:3}]).map(p=>p.equity),[2,3]);
 });
+
+test('expectativa por operação e variação do mercado (item 4 da auditoria)',()=>{
+ const pts=[1000,1010,1005,990,1000,1020,1030].map((e,i)=>({timestamp:i*H,equity:e}));
+ const m=performanceMetrics(pts,[{netPnl:10},{netPnl:-15},{netPnl:41}],undefined,{startPrice:100,endPrice:90});
+ assert.equal(m.expectancy,12,'média líquida por operação: (10 - 15 + 41) / 3');
+ assert.equal(m.marketChange!.toFixed(4),'-0.1000');
+ const none=performanceMetrics(pts);assert.equal(none.expectancy,null,'sem operações não há expectativa');assert.equal(none.marketChange,null,'sem preço de referência não há variação');
+ assert.equal(performanceMetrics(pts,[],undefined,{startPrice:0,endPrice:90}).marketChange,null,'preço inválido não vira número');
+ assert.equal(performanceMetrics([],[{netPnl:-5}]).expectancy,-5,'a expectativa existe mesmo sem curva de patrimônio suficiente');
+});

@@ -7,6 +7,8 @@ export function assertHistoricalStudiesAppendOnly(previous: PerpetualStudy[] = [
         const current = next.find(row => row.id === study.id);
         if (!current || current.createdAt !== study.createdAt || !same(current.request, study.request))
             throw Error('study identity rewrite rejected');
+        if (study.provenance !== undefined && (current.provenance === undefined || !same(current.provenance, study.provenance)))
+            throw Error('study provenance rewrite rejected');
         if (study.dataset !== undefined && (current.dataset === undefined || !same(current.dataset, study.dataset)))
             throw Error('study input evidence rewrite rejected');
         if (study.datasetHash !== undefined && current.datasetHash !== study.datasetHash)
