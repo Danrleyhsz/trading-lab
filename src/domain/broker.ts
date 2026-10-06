@@ -2,6 +2,7 @@ export type Side = 'BUY' | 'SELL';
 export interface PaperOrder {
  symbol:string; side:Side; quantity:number; referencePrice:number;
  instrument?:'BINANCE_USDM:BTCUSDT'; accountId?:string; agentId?:string; strategyId?:string; proposalId?:string;
+ /** Decisão autônoma que originou a ordem (AUTONOMOUS_DECISION.id), quando houver. */ decisionEventId?:string;
 }
 export interface PaperFill extends PaperOrder {id:string;fillPrice:number;fee:number;filledAt:string}
 export interface Broker {submit(order:PaperOrder):Promise<PaperFill>}

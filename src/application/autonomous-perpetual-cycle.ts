@@ -19,12 +19,16 @@ export interface PilotOptions {
  retryDelayMs?:number;
  /** Team briefing hook; it never affects the decision and its failures are contained. */
  onDecision?:(context:PilotDecisionContext)=>void;
+ /** Release que decide (commit e impressão digital do backend), gravado em cada decisão (lacuna L5). */
+ release?:{codeCommit:string|null;backendFingerprint:string|null};
 }
+/** Versão do registro das checagens do ciclo (lacunas L2 e L6): só registra, nunca muda uma condição. */
+export const CYCLE_CHECKS_VERSION='CYCLE_CHECKS_V1';
 export class AutonomousPerpetualCycle {
  private busy=false;private error:string|null=null;private nextAttemptAt=0;private stopReason:string|null=null;private lastAttemptFailed=false;
- private readonly blockedReason:string|null;private readonly maxLossFraction:number;private readonly retryDelayMs:number;private readonly onDecision?:(context:PilotDecisionContext)=>void;
+ private readonly blockedReason:string|null;private readonly maxLossFraction:number;private readonly retryDelayMs:number;private readonly onDecision?:(context:PilotDecisionContext)=>void;private readonly release:{codeCommit:string|null;backendFingerprint:string|null};
  constructor(private enabled:boolean,private studyId:string,private studies:PerpetualStudies,private book:PerpetualPaperBook,private source:{load(count:number):Promise<PerpetualDataset>},private save:(state:PerpetualBookState)=>Promise<void>,private memories:MemoryStore,private bus:EventBus,private persist:()=>Promise<void>,private now:()=>number=Date.now,private canContinue:()=>boolean=()=>true,options:PilotOptions={}){
-  this.blockedReason=options.blockedReason??null;this.maxLossFraction=options.maxLossFraction??0.03;this.retryDelayMs=options.retryDelayMs??300000;this.onDecision=options.onDecision;
+  this.blockedReason=options.blockedReason??null;this.maxLossFraction=options.maxLossFraction??0.03;this.retryDelayMs=options.retryDelayMs??300000;this.onDecision=options.onDecision;this.release=options.release??{codeCommit:null,backendFingerprint:null};
   if(!(this.maxLossFraction>0&&this.maxLossFraction<0.1))throw Error('pilot loss limit must be between 0 and the 10% risk drawdown limit');
  }
  private active(){return this.enabled&&!this.blockedReason;}
@@ -53,10 +57,11 @@ export class AutonomousPerpetualCycle {
    const hash=validatePerpetualDataset(data);const last=data.trade.at(-1)!;if(last.timestamp+3600000>this.now()||this.now()-last.timestamp>2*3600000)throw Error('signal history stale');if((this.book.status().autonomousCursor??0)>=last.timestamp)return;
    const direction=perpetualDirection(data.trade,configuration,current);
    // Persist the decision cursor before execution: restart never duplicates this candle.
-   await this.book.checkpoint(last.timestamp,this.save);const decision=event('AUTONOMOUS_DECISION',{accountId:account.id,studyId:study.id,studyDatasetHash:study.result!.datasetHash,signalDatasetHash:hash,signalDataset:data,candleTimestamp:last.timestamp,direction,currentQuantity:current,configuration});this.bus.publish(decision);
+   await this.book.checkpoint(last.timestamp,this.save);const checks=[{id:'STUDY_ELIGIBLE',ok:true},{id:'PILOT_LOSS_LIMIT',ok:true},{id:'NOT_HALTED',ok:true},{id:'SOURCES_READY',ok:true},{id:'DATASET_VALID',ok:true},{id:'SIGNAL_FRESH',ok:true,detail:Math.round((this.now()-last.timestamp-3600000)/1000)+' s após o fechamento'},{id:'CANDLE_NOT_PROCESSED',ok:true}];
+   const decision=event('AUTONOMOUS_DECISION',{accountId:account.id,studyId:study.id,studyDatasetHash:study.result!.datasetHash,signalDatasetHash:hash,signalDataset:data,candleTimestamp:last.timestamp,direction,currentQuantity:current,configuration,checksVersion:CYCLE_CHECKS_VERSION,checks,release:this.release});this.bus.publish(decision);
    this.memories.add({agentId:'nova',kind:'OBSERVATION',summary:'computed paper signal from closed USD-M candles',sourceEventId:decision.id,strategyId:study.id,metadata:{accountId:account.id,candleTimestamp:last.timestamp,signalDatasetHash:hash,direction}});
    try{this.onDecision?.({data,quote:this.book.market(),direction,currentQuantity:current,configuration,studyId:study.id,candleTimestamp:last.timestamp,decisionEventId:decision.id});}catch{/* Advisory briefing only; never blocks the decision. */}await this.persist();
-   if(current&&Math.sign(current)!==direction)await this.book.propose(account.id,current>0?'SELL':'BUY',Math.abs(current),this.save,study.id);
+   if(current&&Math.sign(current)!==direction)await this.book.propose(account.id,current>0?'SELL':'BUY',Math.abs(current),this.save,study.id,decision.id);
    const fresh=this.book.list().find(a=>a.id===account.id)!;
    // Proteções do estudo (se houver): mesma regra do backtest; só impedem abrir, nunca fechar.
    const closed=(this.book.performance(account.id)?.closedTrades??[]).map(t=>({closedAt:Date.parse(t.closedAt),netPnl:t.netPnl}));const guard=protectionsAllowEntry(configuration.protections,closed,this.now(),fresh.initialCash);
@@ -64,9 +69,18 @@ export class AutonomousPerpetualCycle {
    const backupData=data.instrument!=='BINANCE_USDM:BTCUSDT';
    if(!fresh.portfolio.positions.length&&direction&&backupData)this.memories.add({agentId:'sentinel',kind:'DECISION',summary:'entrada adiada: sinal calculado com dados de reserva ('+data.instrument+')',sourceEventId:decision.id,strategyId:study.id,metadata:{accountId:account.id,candleTimestamp:last.timestamp,reason:'BACKUP_DATA',direction,instrument:data.instrument}});
    if(!fresh.portfolio.positions.length&&direction&&!backupData&&!guard.allowed)this.memories.add({agentId:'sentinel',kind:'DECISION',summary:'entrada bloqueada pela proteção '+guard.reason,sourceEventId:decision.id,strategyId:study.id,metadata:{accountId:account.id,candleTimestamp:last.timestamp,reason:guard.reason,direction}});
-   if(!fresh.portfolio.positions.length&&direction&&!backupData&&guard.allowed&&fresh.portfolio.equity>0){const quote=this.book.market();if(!quote)throw Error('market unavailable');await this.book.propose(account.id,direction>0?'BUY':'SELL',fresh.portfolio.equity*0.1/(direction>0?quote.ask:quote.bid),this.save,study.id);}
+   if(!fresh.portfolio.positions.length&&direction&&!backupData&&guard.allowed&&fresh.portfolio.equity>0){const quote=this.book.market();if(!quote)throw Error('market unavailable');await this.book.propose(account.id,direction>0?'BUY':'SELL',fresh.portfolio.equity*0.1/(direction>0?quote.ask:quote.bid),this.save,study.id,decision.id);}
+   // L2/L6: quando havia entrada a considerar, grava as checagens dela e o desfecho (as mesmas condições acima).
+   if(!fresh.portfolio.positions.length&&direction){
+    const entryChecks=[{id:'PRIMARY_DATA',ok:!backupData,detail:data.instrument},{id:'PROTECTIONS',ok:guard.allowed,detail:guard.reason??null},{id:'EQUITY_POSITIVE',ok:fresh.portfolio.equity>0}];
+    const failed=entryChecks.find(c=>!c.ok);
+    this.bus.publish(event('AUTONOMOUS_ENTRY_CHECKED',{accountId:account.id,studyId:study.id,decisionEventId:decision.id,candleTimestamp:last.timestamp,direction,checksVersion:CYCLE_CHECKS_VERSION,checks:entryChecks,outcome:failed?'ENTRY_BLOCKED':'ENTRY_SUBMITTED',reason:failed?(failed.id==='PROTECTIONS'?failed.detail??'PROTECTIONS':failed.id==='PRIMARY_DATA'?'BACKUP_DATA':failed.id):null}));
+   }
    this.succeeded();
-  }catch(error){this.error=error instanceof Error?error.message:'autonomous evaluation unavailable';this.lastAttemptFailed=true;this.nextAttemptAt=this.now()+this.retryDelayMs;throw error;}finally{this.busy=false;}
+  }catch(error){const reason=error instanceof Error?error.message:'autonomous evaluation unavailable';const changed=!this.lastAttemptFailed||this.error!==reason;
+   this.error=reason;this.lastAttemptFailed=true;this.nextAttemptAt=this.now()+this.retryDelayMs;
+   if(changed)this.bus.publish(event('AUTONOMOUS_ATTEMPT_FAILED',{accountId:'evaluation:nova:usdm',studyId:this.studyId,reason:reason.slice(0,200),nextAttemptAt:this.nextAttemptAt}));
+   throw error;}finally{this.busy=false;}
  }
- private succeeded(){this.error=null;this.lastAttemptFailed=false;this.nextAttemptAt=0;}
+ private succeeded(){if(this.lastAttemptFailed)this.bus.publish(event('AUTONOMOUS_ATTEMPT_RECOVERED',{accountId:'evaluation:nova:usdm',studyId:this.studyId,previousReason:this.error}));this.error=null;this.lastAttemptFailed=false;this.nextAttemptAt=0;}
 }

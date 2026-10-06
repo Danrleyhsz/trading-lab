@@ -8,13 +8,16 @@ import type {MemoryRecord} from '../domain/memory.js';
 import type {AgentMessage} from '../domain/agent-messages.js';
 import type {PerpetualConfig,PerpetualDataset} from '../domain/perpetual-backtest.js';
 
-export const RECEIPT_POLICY=Object.freeze({version:'DECISION_RECEIPT_V1',pendingMs:5*60000,quantityEpsilon:1e-12,
- // Decisão e ordem ainda não têm ID em comum (lacuna L1): a ordem pertence à decisão se acontece entre ela e a próxima.
- linkage:'TIME_WINDOW' as const});
+export const RECEIPT_POLICY=Object.freeze({version:'DECISION_RECEIPT_V2',pendingMs:5*60000,quantityEpsilon:1e-12,
+ // V2 (passo 5): ordens com decisionEventId pertencem à decisão pelo ID; ordens antigas, sem ID, pela janela de tempo
+ // entre a decisão e a próxima. Cada ficha diz qual ligação usou.
+ linkage:'DECISION_ID_OR_TIME_WINDOW' as const});
 const HOUR=3600000;
 export type ReceiptOutcome='EXECUTED'|'RISK_REJECTED'|'ENTRY_BLOCKED'|'PILOT_STOPPED'|'NO_ACTION_NEEDED'|'PENDING'|'UNEXPLAINED';
-interface DecisionPayload {accountId:string;studyId:string;studyDatasetHash?:string;signalDatasetHash?:string;signalDataset?:PerpetualDataset;candleTimestamp:number;direction:number;currentQuantity?:number;configuration:PerpetualConfig}
-interface OrderPayload {side:'BUY'|'SELL';quantity:number;referencePrice:number;proposalId?:string;strategyId?:string}
+interface Check {id:string;ok:boolean;detail?:string|null}
+interface DecisionPayload {accountId:string;studyId:string;studyDatasetHash?:string;signalDatasetHash?:string;signalDataset?:PerpetualDataset;candleTimestamp:number;direction:number;currentQuantity?:number;configuration:PerpetualConfig;checksVersion?:string;checks?:Check[];release?:{codeCommit:string|null;backendFingerprint:string|null}}
+interface OrderPayload {side:'BUY'|'SELL';quantity:number;referencePrice:number;proposalId?:string;strategyId?:string;decisionEventId?:string}
+interface EntryCheckedPayload {decisionEventId:string;checks:Check[];outcome:'ENTRY_BLOCKED'|'ENTRY_SUBMITTED';reason:string|null}
 export interface ReceiptInput {accountId:string|null;events:DomainEvent[];ledger:DomainEvent[];memories:MemoryRecord[];messages:AgentMessage[];now:number}
 
 const time=(e:{occurredAt:string})=>Date.parse(e.occurredAt);
@@ -32,18 +35,27 @@ function receipt(input:ReceiptInput,decision:DomainEvent,nextAt:number|null){
  const p=decision.payload as DecisionPayload,at=time(decision),within=(t:number)=>t>=at&&(nextAt===null||t<nextAt);
  // Propostas da janela, na ordem gravada no livro, agrupadas pelo proposalId que o livro grava em cada etapa.
  const proposals=new Map<string,{proposalId:string;proposedAt:string;side:string;quantity:number;referencePrice:number;risk:{approved:boolean;reasons:string[]}|null;fill:{fillId:string;at:string;price:number;fee:number}|null;liquidation:boolean}>();
+ let linkedById=false;
  for(const e of input.ledger){
-  if(!within(time(e)))continue;
   const payload=e.payload as {order?:OrderPayload;decision?:{approved:boolean;reasons:string[]};fill?:{id:string;proposalId?:string;fillPrice:number;fee:number};proposalId?:string};
-  if(e.type==='TRADE_PROPOSED'){const o=e.payload as OrderPayload;if(o.proposalId)proposals.set(o.proposalId,{proposalId:o.proposalId,proposedAt:e.occurredAt,side:o.side,quantity:o.quantity,referencePrice:o.referencePrice,risk:null,fill:null,liquidation:false});}
+  if(e.type==='TRADE_PROPOSED'){const o=e.payload as OrderPayload;
+   const mine=o.decisionEventId?o.decisionEventId===decision.id:within(time(e));if(!mine)continue;if(o.decisionEventId)linkedById=true;
+   if(o.proposalId)proposals.set(o.proposalId,{proposalId:o.proposalId,proposedAt:e.occurredAt,side:o.side,quantity:o.quantity,referencePrice:o.referencePrice,risk:null,fill:null,liquidation:false});}
+  else if(!within(time(e))&&!(payload.order?.proposalId&&proposals.has(payload.order.proposalId))&&!(payload.fill?.proposalId&&proposals.has(payload.fill.proposalId))&&!(payload.proposalId&&proposals.has(payload.proposalId)))continue;
   else if((e.type==='RISK_APPROVED'||e.type==='RISK_REJECTED')&&payload.order?.proposalId){const r=proposals.get(payload.order.proposalId);if(r)r.risk={approved:e.type==='RISK_APPROVED',reasons:[...(payload.decision?.reasons??[])]};}
   else if(e.type==='PAPER_FILL'&&payload.fill?.proposalId){const r=proposals.get(payload.fill.proposalId);if(r)r.fill={fillId:payload.fill.id,at:e.occurredAt,price:payload.fill.fillPrice,fee:payload.fill.fee};}
   else if(e.type==='PAPER_LIQUIDATION'&&payload.proposalId){const r=proposals.get(payload.proposalId);if(r)r.liquidation=true;}
  }
  const actions=[...proposals.values()];
- // Bloqueios do ciclo: hoje só existem como memória do Sentinel ligada à decisão (lacuna L2).
- const blocks=input.memories.filter(m=>m.sourceEventId===decision.id&&m.agentId==='sentinel'&&m.kind==='DECISION')
-  .map(m=>({reason:typeof m.metadata?.reason==='string'?m.metadata.reason:null,summary:m.summary,at:m.createdAt}));
+ // Checagens da entrada (passo 5): evento gravado pelo ciclo. Antes dele, o bloqueio só existia como memória do Sentinel.
+ const entryEvent=input.events.find(e=>e.type==='AUTONOMOUS_ENTRY_CHECKED'&&(e.payload as EntryCheckedPayload).decisionEventId===decision.id)??null;
+ const entry=entryEvent?entryEvent.payload as EntryCheckedPayload:null;
+ const blocks=entry?(entry.outcome==='ENTRY_BLOCKED'?[{reason:entry.reason,summary:'entrada bloqueada pelo ciclo: '+(entry.reason??'sem motivo'),at:entryEvent!.occurredAt,source:'EVENT' as const}]:[])
+  :input.memories.filter(m=>m.sourceEventId===decision.id&&m.agentId==='sentinel'&&m.kind==='DECISION')
+  .map(m=>({reason:typeof m.metadata?.reason==='string'?m.metadata.reason:null,summary:m.summary,at:m.createdAt,source:'MEMORY' as const}));
+ // Falhas e recuperação do ciclo na janela desta decisão (passo 5; antes não eram gravadas).
+ const attempts=input.events.filter(e=>(e.type==='AUTONOMOUS_ATTEMPT_FAILED'||e.type==='AUTONOMOUS_ATTEMPT_RECOVERED')&&(e.payload as {accountId?:string})?.accountId===input.accountId&&within(time(e)))
+  .map(e=>({at:e.occurredAt,kind:e.type==='AUTONOMOUS_ATTEMPT_FAILED'?'FAILED' as const:'RECOVERED' as const,reason:((e.payload as {reason?:string;previousReason?:string}).reason??(e.payload as {previousReason?:string}).previousReason)??null}));
  const stops=input.events.filter(e=>e.type==='AUTONOMOUS_PILOT_STOPPED'&&(e.payload as {accountId?:string})?.accountId===input.accountId&&within(time(e)))
   .map(e=>({eventId:e.id,at:e.occurredAt,reason:(e.payload as {reason?:string}).reason??null}));
  const ids=new Set(actions.map(a=>a.proposalId));
@@ -68,9 +80,11 @@ function receipt(input:ReceiptInput,decision:DomainEvent,nextAt:number|null){
   proposal:{direction:p.direction,positionBefore:before,positionSource:recordedPosition?'RECORDED' as const:'FILLS' as const,positionAfter:after,configuration:p.configuration},
   provenance:{studyId:p.studyId,studyDatasetHash:p.studyDatasetHash??null,signalDatasetHash:p.signalDatasetHash??null,
    signalCandles:candles?.length?{instrument:p.signalDataset!.instrument,count:candles.length,from:iso(candles[0].timestamp),to:iso(candles.at(-1)!.timestamp)}:null,
-   // A decisão ainda não grava o commit/impressão digital do backend (lacuna L5).
-   backendFingerprint:null},
-  actions,blocks,stops,team,outcome,
+   // Decisões gravadas antes do passo 5 não têm a release (null).
+   codeCommit:p.release?.codeCommit??null,backendFingerprint:p.release?.backendFingerprint??null},
+  checks:p.checks?{version:p.checksVersion??null,decision:p.checks,entry:entry?.checks??null,entryOutcome:entry?.outcome??null}:null,
+  linkage:linkedById||p.checks?'DECISION_ID' as const:'TIME_WINDOW' as const,
+  actions,blocks,stops,attempts,team,outcome,
   complete:outcome!=='PENDING'&&outcome!=='UNEXPLAINED',
   latencySeconds:{closeToDecision:(at-close)/1000,decisionToFirstFill:firstFill===undefined?null:(firstFill-at)/1000},
   window:{from:decision.occurredAt,to:nextAt===null?null:iso(nextAt)},
@@ -97,7 +111,7 @@ export function decisionReceipts(input:ReceiptInput,limit:number){
   summary:{decisions:all.length,complete:all.filter(r=>r.complete).length,completeFraction:settled.length?settled.filter(r=>r.complete).length/settled.length:null,byOutcome,reasons,
    closeToDecisionSeconds:latencies.length?{p50:pct(0.5),p95:pct(0.95),max:latencies.at(-1)!}:null},
   receipts:all.slice(-limit).reverse(),
-  coverage:'Ordem ligada à decisão pela janela de tempo (lacuna L1). Bloqueios do ciclo só aparecem quando o Sentinel gravou memória; histórico velho e falha de fonte não são gravados (lacuna L2). Sem impressão digital do backend por decisão (lacuna L5).'};
+  coverage:'Decisões gravadas depois do passo 5 trazem checagens, ligação por ID, bloqueios e falhas como eventos e a release que decidiu. Decisões anteriores usam a janela de tempo, a memória do Sentinel e não têm checagens nem release (campos null).'};
 }
 
 export function registerDecisionReceipts(app:FastifyInstance,input:()=>ReceiptInput){

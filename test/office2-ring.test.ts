@@ -35,7 +35,7 @@ test('os 5 estágios saem da ficha real: executada, rejeitada, bloqueada e sem a
  assert.deepEqual(st(noAction),{trader:'ok',risk:'none',validator:'unknown',execution:'none',audit:'ok'});
  // Sem registro, o validador nunca aparece como aprovado.
  for(const s of [executed,rejected,noAction])assert.equal(s.find((x:any)=>x.id==='validator').truth,'UNKNOWN');
- const sum=R.summary(body);assert.equal(sum.decisions,4);assert.equal(sum.completePct,100);assert.equal(sum.linkage,'TIME_WINDOW');
+ const sum=R.summary(body);assert.equal(sum.decisions,4);assert.equal(sum.completePct,100);assert.equal(sum.linkage,'DECISION_ID_OR_TIME_WINDOW');assert.ok(body.receipts.every((r:any)=>r.linkage==='TIME_WINDOW'&&r.checks===null));
  assert.deepEqual(JSON.parse(JSON.stringify(sum.reasons)),[{label:'RISK:DAILY_LOSS_LIMIT',n:1},{label:'CYCLE:BACKUP_DATA',n:1}]);
 });
 
@@ -53,4 +53,12 @@ test('telas do Ring: desenham só com dado; a de execução devolve false sem cu
  const inner=[{x:0,y:0},{x:96,y:48},{x:96,y:96},{x:0,y:48}];
  R.paintRing(ctx,inner,R.stages(receipts().receipts[3]));assert.ok(calls.filter(c=>c==='fillRect').length>=6);
  assert.equal(R.paintExecution(ctx,inner,{hourly:[]}),false);assert.equal(R.paintExecution(ctx,inner,{hourly:[1,2,3],position:null}),true);
+});
+
+test('passo 5: com as checagens gravadas, o validador fica REAL; sem elas, continua UNKNOWN',()=>{
+ const R=ring(),base=receipts().receipts[0];
+ const withChecks={...base,checks:{version:'CYCLE_CHECKS_V1',decision:[{id:'STUDY_ELIGIBLE',ok:true},{id:'SIGNAL_FRESH',ok:true}],entry:[{id:'PRIMARY_DATA',ok:true},{id:'PROTECTIONS',ok:true}],entryOutcome:'ENTRY_SUBMITTED'}};
+ const v=R.stages(withChecks).find((s:any)=>s.id==='validator');
+ assert.equal(v.state,'ok');assert.equal(v.truth,'REAL');assert.match(v.text,/2 de 2 checagens do ciclo passaram · entrada: 2 de 2/);
+ assert.equal(R.stages(base).find((s:any)=>s.id==='validator').truth,'UNKNOWN');
 });
