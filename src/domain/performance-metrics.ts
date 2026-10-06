@@ -11,6 +11,10 @@ export interface PerformanceMetrics {
  sharpe:number|null;sortino:number|null;calmar:number|null;
  maxDrawdown:number|null;maxDrawdownHours:number|null;timeInMarket:number|null;
  trades:number;winRate:number|null;profitFactor:number|null;averageWin:number|null;averageLoss:number|null;
+ /** Resultado líquido médio por operação encerrada (taxas e funding incluídos), em USDT. */
+ expectancy:number|null;
+ /** Variação do preço do ativo no mesmo período (referência; não é critério). */
+ marketChange:number|null;
  bestTrade:number|null;worstTrade:number|null;longestLosingStreak:number;
  notes:string[];
 }
@@ -19,7 +23,10 @@ export function hourlyEquity(points:EquityPoint[]){
  const byHour=new Map<number,EquityPoint>();for(const p of points)if(Number.isFinite(p.equity)&&Number.isFinite(p.timestamp))byHour.set(Math.floor(p.timestamp/HOUR),p);
  return [...byHour.values()].sort((a,b)=>a.timestamp-b.timestamp);
 }
-export function performanceMetrics(points:EquityPoint[],trades:TradeResult[]=[],exposure?:{inMarketHours:number}):PerformanceMetrics{
+/** Preço do ativo no início e no fim do período medido, para a variação do mercado. */
+export interface MarketReference {startPrice:number;endPrice:number}
+const marketChangeOf=(m?:MarketReference)=>m&&Number.isFinite(m.startPrice)&&Number.isFinite(m.endPrice)&&m.startPrice>0&&m.endPrice>0?m.endPrice/m.startPrice-1:null;
+export function performanceMetrics(points:EquityPoint[],trades:TradeResult[]=[],exposure?:{inMarketHours:number},market?:MarketReference):PerformanceMetrics{
  const equity=hourlyEquity(points),notes:string[]=[];
  const results=trades.map(t=>t.netPnl).filter(Number.isFinite);
  const wins=results.filter(r=>r>0),losses=results.filter(r=>r<0);
@@ -27,6 +34,7 @@ export function performanceMetrics(points:EquityPoint[],trades:TradeResult[]=[],
  const tradeStats={trades:results.length,winRate:results.length?wins.length/results.length:null,
   profitFactor:losses.length?wins.reduce((s,r)=>s+r,0)/Math.abs(losses.reduce((s,r)=>s+r,0)):wins.length?null:null,
   averageWin:wins.length?wins.reduce((s,r)=>s+r,0)/wins.length:null,averageLoss:losses.length?losses.reduce((s,r)=>s+r,0)/losses.length:null,
+  expectancy:results.length?results.reduce((s,r)=>s+r,0)/results.length:null,marketChange:marketChangeOf(market),
   bestTrade:results.length?Math.max(...results):null,worstTrade:results.length?Math.min(...results):null,longestLosingStreak:longest};
  if(results.length&&!losses.length)notes.push('Sem operações perdedoras: fator de lucro indefinido.');
  if(equity.length<3){notes.push('Menos de 3 horas de equity registradas: métricas de retorno indisponíveis.');
