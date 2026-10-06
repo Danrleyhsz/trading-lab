@@ -2,6 +2,7 @@
 // servidor, com os datasets em cache de scripts/estudos/out (hash conferido); não envia ordens. Relatório em docs/estudos/.
 // Uso: npx tsx scripts/estudos/momentum.ts
 import {readFileSync,writeFileSync,existsSync} from 'node:fs';
+import {scriptProvenance} from './proveniencia.js';
 import {simulateCrossSectional,type CrossSectionalConfig} from '../../src/domain/cross-sectional-momentum.js';
 import type {PerpetualDataset} from '../../src/domain/perpetual-backtest.js';
 import {deflatedSharpe,hourlyReturns,moments} from '../../src/domain/backtest-robustness.js';
@@ -59,7 +60,7 @@ function main(){
   v.checks=Object.fromEntries(checks);v.passed=checks.every(([,ok])=>ok);v.failed=checks.filter(([,ok])=>!ok).map(([id])=>id);delete v.returns;
   console.log(name.padEnd(10),Object.entries(v.periods).map(([l,p]:[string,any])=>`${l}: ${(p.returnPct*100).toFixed(2)}% DD ${(p.maxDrawdown*100).toFixed(1)}% enc ${p.closedLegs} corr ${p.marketCorrelation.toFixed(2)} Sharpe ${p.sharpeAnnualized.toFixed(2)}`).join(' | '),'| DSR',v.deflatedSharpe.toFixed(2),v.passed?'APROVADA':'reprovada: '+v.failed.join(','));
  }
- const report={protocol:P,execution:'HISTORICAL_SIMULATION_OFFLINE',automaticPaperApproval:false,runAt:new Date().toISOString(),trialSharpeVariance:variance,variants};
+ const report={protocol:P,execution:'HISTORICAL_SIMULATION_OFFLINE',automaticPaperApproval:false,runAt:new Date().toISOString(),provenance:scriptProvenance('scripts/estudos/momentum.ts'),trialSharpeVariance:variance,variants};
  const base='docs/estudos/momentum-entre-moedas-2026-10-05';writeFileSync(base+'.json',JSON.stringify(report,null,1));writeFileSync(base+'.md',markdown(report));console.log('relatório:',base);
 }
 function weeklyReturns(series:{timestamp:number;equity:number}[]){const out:number[]=[];for(let i=168;i<series.length;i+=168)out.push(series[i].equity/series[i-168].equity-1);return out;}
