@@ -1,0 +1,202 @@
+{
+ "protocol": {
+  "version": "XSMOM_LONG_HISTORY_V1",
+  "declaredAt": "2026-10-06",
+  "symbols": [
+   "ZECUSDT",
+   "NEARUSDT",
+   "UNIUSDT",
+   "BCHUSDT",
+   "FILUSDT",
+   "AAVEUSDT",
+   "AVAXUSDT",
+   "LINKUSDT",
+   "XRPUSDT",
+   "XLMUSDT",
+   "DOGEUSDT",
+   "SOLUSDT",
+   "LTCUSDT",
+   "ETHUSDT",
+   "BTCUSDT"
+  ],
+  "firstBar": 1638576000000,
+  "firstDecisionBar": 1640995200000,
+  "lastBar": 1755237600000,
+  "rule": {
+   "lookbackHours": 672,
+   "rebalanceHours": 168,
+   "longCount": 5,
+   "shortCount": 5,
+   "legFraction": 0.05,
+   "feeRate": 0.00055,
+   "slippageBps": 2,
+   "initialCapital": 10000
+  },
+  "screen": {
+   "version": "XSMOM_LONG_SCREEN_V1",
+   "maximumDrawdown": 0.15,
+   "minimumPositiveYears": 3,
+   "minimumDeflatedSharpe": 0.9,
+   "trials": 5,
+   "maximumFilledShare": 0.01
+  }
+ },
+ "execution": "HISTORICAL_SIMULATION_OFFLINE",
+ "automaticPaperApproval": false,
+ "runAt": "2026-10-06T01:52:37.728Z",
+ "symbols": [
+  "ZECUSDT",
+  "NEARUSDT",
+  "UNIUSDT",
+  "BCHUSDT",
+  "FILUSDT",
+  "AAVEUSDT",
+  "AVAXUSDT",
+  "LINKUSDT",
+  "XRPUSDT",
+  "XLMUSDT",
+  "DOGEUSDT",
+  "SOLUSDT",
+  "LTCUSDT",
+  "ETHUSDT",
+  "BTCUSDT"
+ ],
+ "failures": [],
+ "quality": {
+  "ZECUSDT": {
+   "filled": 0,
+   "share": 0,
+   "fundingMarkFilled": 2089
+  },
+  "NEARUSDT": {
+   "filled": 0,
+   "share": 0,
+   "fundingMarkFilled": 2089
+  },
+  "UNIUSDT": {
+   "filled": 0,
+   "share": 0,
+   "fundingMarkFilled": 2089
+  },
+  "BCHUSDT": {
+   "filled": 0,
+   "share": 0,
+   "fundingMarkFilled": 2089
+  },
+  "FILUSDT": {
+   "filled": 0,
+   "share": 0,
+   "fundingMarkFilled": 2089
+  },
+  "AAVEUSDT": {
+   "filled": 0,
+   "share": 0,
+   "fundingMarkFilled": 2089
+  },
+  "AVAXUSDT": {
+   "filled": 0,
+   "share": 0,
+   "fundingMarkFilled": 2089
+  },
+  "LINKUSDT": {
+   "filled": 0,
+   "share": 0,
+   "fundingMarkFilled": 2089
+  },
+  "XRPUSDT": {
+   "filled": 0,
+   "share": 0,
+   "fundingMarkFilled": 2089
+  },
+  "XLMUSDT": {
+   "filled": 0,
+   "share": 0,
+   "fundingMarkFilled": 2089
+  },
+  "DOGEUSDT": {
+   "filled": 0,
+   "share": 0,
+   "fundingMarkFilled": 2089
+  },
+  "SOLUSDT": {
+   "filled": 0,
+   "share": 0,
+   "fundingMarkFilled": 2164
+  },
+  "LTCUSDT": {
+   "filled": 0,
+   "share": 0,
+   "fundingMarkFilled": 2089
+  },
+  "ETHUSDT": {
+   "filled": 0,
+   "share": 0,
+   "fundingMarkFilled": 2089
+  },
+  "BTCUSDT": {
+   "filled": 0,
+   "share": 0,
+   "fundingMarkFilled": 2089
+  }
+ },
+ "netPnl": 5505.731816765305,
+ "returnPct": 0.5505731816765305,
+ "maxDrawdown": 0.08773707325626035,
+ "years": {
+  "2022": {
+   "returnPct": 0.08332109783144159,
+   "maxDrawdown": 0.07573228964651557
+  },
+  "2023": {
+   "returnPct": 0.29217744404332757,
+   "maxDrawdown": 0.0757886763516129
+  },
+  "2024": {
+   "returnPct": 0.01691105552569505,
+   "maxDrawdown": 0.08773707325626035
+  },
+  "2025": {
+   "returnPct": 0.08925595365976369,
+   "maxDrawdown": 0.04407611617225171
+  }
+ },
+ "positiveYears": 4,
+ "sharpeAnnualized": 1.1317471754064312,
+ "deflatedSharpe": 0.32557725689675115,
+ "trialSharpeVariance": 0.00015029899385922627,
+ "marketCorrelation": -0.009793583160137,
+ "buyHold": 0.16765759934959673,
+ "feesPaid": 441.2391393687754,
+ "fundingCashDelta": -39.310748112986566,
+ "turnover": 80.22529806705012,
+ "rebalances": 189,
+ "closedLegs": 580,
+ "datasetHashes": {
+  "AAVEUSDT": "663073775edb6ddc4824e0d3c4b394ec737791f2ce3fce82de4c9621824913cf",
+  "AVAXUSDT": "dacad6e7085481eba7c9330736c291c1a6a283aa4986e091a85039c78de2b3c6",
+  "BCHUSDT": "1f73c2dc04d56c8e4dca12ecf143edf3dbc4c33db87540d390bc29b988afc2bb",
+  "BTCUSDT": "cb4262a96403d009b48ab7b1b997d74e02925a7286c0a92cc8aa6802299d5051",
+  "DOGEUSDT": "7805152af1d115093ad21fbe7e84c00c1991d2281f9cc2314c2c3dc117c1765c",
+  "ETHUSDT": "35d21914372a519f668b333c7208924b8c6f6c3c9f330d296346dff602d479c0",
+  "FILUSDT": "b21f89557311e94e83c18fa985075f2bc2f3184407f1b6ea88c5de2da8428878",
+  "LINKUSDT": "84fdf8b6e5dca58b131e5e26200df33f3e77a495eaa6698c5e17c1f45b4394d1",
+  "LTCUSDT": "aa85d632cd3eb13b472dbfceeab9d2fdf511878ebec48d06ab026b9bd157d7a4",
+  "NEARUSDT": "f2800d13286bec1d9d7f991a32693c0cace4288f97be988b660bc9014641d342",
+  "SOLUSDT": "eadbe30c30dbf698401ba20a30d48643749eacae56bf9e8b71d752961e2ace71",
+  "UNIUSDT": "0b074e7e8b88572ec04667d206eec9bad26774af78a23951c7c0c02b1c709237",
+  "XLMUSDT": "7af8f48428b27cab2b9ac8bd50c40c0a8622b5791690c165e40c71660b7a0ef5",
+  "XRPUSDT": "7ce378f1dfe61cfd8586f17afa3e83fff011a68ddad37d8f689566f4632a1853",
+  "ZECUSDT": "4d95daf599b2c9ab09a6f1ba10e3b21b2f5caf75ef7fe35b53447061505fa1a4"
+ },
+ "checks": {
+  "DATA_QUALITY": true,
+  "POSITIVE_PNL": true,
+  "BOUNDED_DRAWDOWN": true,
+  "POSITIVE_YEARS": true,
+  "DEFLATED_SHARPE": false
+ },
+ "passed": false,
+ "failed": [
+  "DEFLATED_SHARPE"
+ ]
+}

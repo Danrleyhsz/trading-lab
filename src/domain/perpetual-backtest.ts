@@ -13,8 +13,9 @@ export interface PerpetualDataset {instrument:DatasetInstrument;trade:Candle[];m
 export interface PerpetualConfig {strategy?:'SMA'|'BREAKOUT'|'MEAN_REVERSION';filters?:TeamFilters;protections?:Protections;initialCapital:number;feeRate:number;slippageBps:number;maintenanceRate:number;liquidationFeeRate:number;positionFraction:number;fastPeriod:number;slowPeriod:number}
 export interface SimulationEntry {kind:'PROPOSAL'|'FILL'|'FUNDING'|'LIQUIDATION';timestamp:number;quantity:number;price:number;cashDelta:number;approved?:boolean;reasons?:string[]}
 const hour=3600000;
-export function validatePerpetualDataset(data:PerpetualDataset){
- if(!isDatasetInstrument(data.instrument)||data.trade.length<3||data.trade.length>10000||data.mark.length!==data.trade.length)throw new Error('invalid dataset');
+/** `maxBars` só sobe em estudos offline de vários anos; o servidor e o piloto usam o padrão de 10 000 velas. */
+export function validatePerpetualDataset(data:PerpetualDataset,maxBars=10000){
+ if(!isDatasetInstrument(data.instrument)||data.trade.length<3||data.trade.length>maxBars||data.mark.length!==data.trade.length)throw new Error('invalid dataset');
  for(const series of [data.trade,data.mark])for(let i=0;i<series.length;i++){
   const c=series[i];if(!Number.isSafeInteger(c.timestamp)||c.timestamp%hour!==0||![c.open,c.high,c.low,c.close,c.volume].every(Number.isFinite)||Math.min(c.open,c.low,c.close)<=0||c.volume<0||c.high<Math.max(c.open,c.close,c.low)||c.low>Math.min(c.open,c.close)|| (i>0&&c.timestamp!==series[i-1].timestamp+hour))throw new Error('invalid or discontinuous candles');
   if(c.timestamp!==data.trade[i].timestamp)throw new Error('unaligned mark candles');
