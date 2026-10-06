@@ -52,6 +52,9 @@
   if(dg?.timeline.length)out['diagnostico-linha']=(c,inner)=>O.paintTimeline(c,inner,dg);
   if(au?.receipts?.decisions)out['auditoria-fichas']=(c,inner)=>O.paintAudit(c,inner,au);
   if(rk&&(rk.killSwitch!==null||rk.limits.some(l=>l.use!==null)))out['risk-limites']=(c,inner)=>O.paintRisk(c,inner,rk);
+  const hz=horizonView();
+  if(hz?.btc48h.length>1)out['horizon-a']=(c,inner)=>H.paintPrice(c,inner,hz);
+  if(hz?.book?.bids.length)out['horizon-b']=(c,inner)=>H.paintBook(c,inner,hz);
   return out;
  }
  // ---------- F3: Stress Lab e Backtest (SIMULAÇÃO) ----------
@@ -81,6 +84,11 @@
   nav.append(Object.assign(el('button','ghost','← anterior'),{type:'button',disabled:state.ring.index>=list.length-1,onclick:()=>{state.ring.index++;renderPanel();}}),
    el('span','','decisão '+(state.ring.index+1)+' de '+list.length+' (a mesma aberta no Ring)'),
    Object.assign(el('button','ghost','mais recente →'),{type:'button',disabled:state.ring.index===0,onclick:()=>{state.ring.index--;renderPanel();}}));box.append(nav);}
+ // ---------- F5: Horizon (mercado) ----------
+ const H=globalThis.Office2Horizon;
+ state.mkt={panorama:null,v3:null,venues:null};
+ async function fetchMarket(){const [panorama,v3,venues]=await Promise.all([get('/market/panorama'),get('/market/v3'),get('/market/venues')]);Object.assign(state.mkt,{panorama,v3,venues});}
+ const horizonView=()=>(state.mkt.panorama?.ok||state.mkt.v3?.ok)?H.horizon(state.mkt.panorama?.ok?state.mkt.panorama.body:null,state.mkt.v3?.ok?state.mkt.v3.body:null,state.mkt.venues?.ok?state.mkt.venues.body:null,state.ops.messages?.ok?state.ops.messages.body:null,Date.now()):null;
  const simSeal=text=>{const n=el('span','sim-seal',text);n.dataset.truth='SIMULATION';return n;};
  const truthChip=t=>{const c=el('span','truth',t);c.dataset.truth=t;return c;};
  const PANELS={
@@ -122,6 +130,24 @@
    if(!vm.rows.length){box.append(el('p','muted','Nenhum estudo gravado.'));return;}
    const ul=el('ul','studies');for(const r of vm.rows){const li=el('li','',r.short+(r.pilot?' (piloto)':'')+' · '+r.status+' · '+r.window+(r.candidateSet?' · '+r.candidateSet:'')+' · '+r.folds+' folds · líquido '+(r.netPnl===null?'n/d':(r.netPnl>=0?'+':'')+r.netPnl.toFixed(2)+' (capital simulado de 10.000)'));li.dataset.truth='SIMULATION';ul.append(li);}box.append(ul);
    box.append(el('p','muted','Resultado de estudo histórico não é previsão nem desempenho do piloto.'));
+  },
+  MARKET_HORIZON(box){
+   const vm=horizonView();if(!vm){box.append(truthChip('UNKNOWN'),el('p','muted','Mercado: '+why(state.mkt.panorama??{status:0})+'.'));return;}
+   box.append(truthChip('REAL'),el('p','muted','Dados públicos da Binance coletados pelo servidor. Nada aqui é sinal de entrada.'));
+   if(vm.tickers.length){const dl=el('dl','facts');for(const t of vm.tickers){const dd=el('dd','',Number(t.price).toLocaleString('pt-BR',{maximumFractionDigits:4})+' · '+H.pct(t.change)+(t.fresh?'':' · sem dado fresco'));dd.dataset.truth=t.fresh?'REAL':'UNKNOWN';dl.append(el('dt','',t.symbol.replace('USDT','')),dd);}box.append(dl);}
+   if(vm.perp){const p=vm.perp;box.append(el('p','','BTC perpétuo: mark '+Number(p.mark).toFixed(1)+' · funding '+(p.funding*100).toFixed(4)+'% · spread '+(p.spreadBps===null?'n/d':p.spreadBps.toFixed(2)+' bps')+(p.fresh?'':' · cotação sem dado fresco')));}
+   if(vm.regime||vm.volatility){const parts=[];if(vm.regime)parts.push('regime '+(vm.regime.regime??'n/d')+' ('+H.pct(vm.regime.distance)+' da média de 240 h, Oracle)');if(vm.volatility)const vol=v=>Number.isFinite(v)?(v*100).toFixed(2)+'%':'n/d';parts.push('volatilidade diária '+vol(vm.volatility.d24)+' em 24 h contra '+vol(vm.volatility.d7)+' em 7 dias'+(vm.volatility.expanding?', em expansão':'')+' (Vega)');box.append(el('p','',parts.join(' · ')));}
+   if(vm.oi)box.append(el('p','','Open interest: '+H.usd(vm.oi.usd)+' USD · '+H.pct(vm.oi.change)+' em 24 h'+(vm.oi.fresh?'':' · sem dado fresco')));
+   if(vm.flow)box.append(el('p','','Fluxo agressor (últimos '+vm.flow.minutes+' min): compra '+vm.flow.buy.toFixed(1)+' BTC · venda '+vm.flow.sell.toFixed(1)+' BTC · saldo '+(vm.flow.delta>=0?'+':'')+vm.flow.delta.toFixed(1)));
+   if(vm.liquidations)box.append(el('p','','Liquidações em '+vm.liquidations.hours.toFixed(1)+' h: comprados '+H.usd(vm.liquidations.longs)+' · vendidos '+H.usd(vm.liquidations.shorts)+' USD'),el('small','muted',vm.liquidations.note));
+   if(vm.venues){const n=el('p','','Outras corretoras ('+vm.venues.count+'): consenso '+Number(vm.venues.consensus).toFixed(1)+' · Binance a '+Number(vm.venues.divergenceBps).toFixed(1)+' bps · diferença de funding '+(vm.venues.fundingSpread8h*100).toFixed(4)+'% por 8 h');box.append(n,el('small','muted',vm.venues.note));}
+   if(vm.errors)box.append(el('p','muted',vm.errors+' fonte(s) do panorama com erro agora.'));
+  },
+  MAIN_FLOOR(box){
+   const vm=executionView();box.append(el('span','paper-seal','PAPER TRADING'));
+   if(!vm){box.append(truthChip('UNKNOWN'),el('p','muted','Conta do piloto: '+why(state.ring.accounts??{status:0})+'.'));return;}
+   box.append(truthChip(vm.fresh?'REAL':'UNKNOWN'),el('p','','Piloto (Nova): equity '+(Number.isFinite(vm.equity)?vm.equity.toFixed(2)+' USDT':'n/d')+(vm.pnlPct===null?'':' ('+(vm.pnlPct>=0?'+':'')+vm.pnlPct.toFixed(2)+'%)')+' · '+(vm.position?vm.position.side+' '+vm.position.qty+' BTC':'sem posição')));
+   box.append(el('p','muted','Dinheiro fictício. As contas de avaliação dos outros agentes não fazem parte do fundo.'));
   },
   NEXUS(box){
    const res=state.ops.messages;if(!res){box.append(el('p','muted','Carregando mensagens…'));return;}
@@ -274,7 +300,7 @@ function placeZoneLabels(){const c=state.camera;for(const z of zoneLabels){z.nod
   $('#agentsStatus').hidden=state.agentsReal;
   const status=await get('/paper/perpetual/status');state.lab.status=status;
   if(status.ok)chip($('#market'),status.body.marketReady?'mercado 24/7 · cotação fresca':'cotação sem dado fresco',status.body.marketReady?'REAL':'UNKNOWN');else chip($('#market'),'mercado: sem dado','UNKNOWN');
-  await Promise.all([fetchRing(),fetchLab(),fetchOps()]);
+  await Promise.all([fetchRing(),fetchLab(),fetchOps(),fetchMarket()]);
   if(state.focus)renderPanel();
  }
 
