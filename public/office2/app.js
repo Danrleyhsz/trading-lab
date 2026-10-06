@@ -44,8 +44,22 @@
   const out={},r=currentReceipt(),vm=executionView();
   if(r){const st=R.stages(r);out['ring-anel']=(c,inner)=>R.paintRing(c,inner,st);}
   if(vm?.hourly?.length)out['ring-execucao']=(c,inner)=>R.paintExecution(c,inner,vm);
+  const lab=stressView(),st=studiesView();
+  if(lab)out['stress-placar']=(c,inner)=>L.paintStress(c,inner,lab);
+  if(st?.rows.some(r=>r.netPnl!==null))out['backtest-estudos']=(c,inner)=>L.paintStudies(c,inner,st);
   return out;
  }
+ // ---------- F3: Stress Lab e Backtest (SIMULAÇÃO) ----------
+ const L=globalThis.Office2Lab;
+ state.lab={report:null,studies:null,status:null};
+ async function fetchLab(){
+  // Relatório estático do STRESS_LAB_V1 (gerado por npm run stress-lab; o teste confere que bate com uma rodada nova).
+  if(!state.lab.report?.ok)state.lab.report=await get('/office2/stress-report.json');
+  state.lab.studies=await get('/backtests/v2/studies');
+ }
+ const stressView=()=>state.lab.report?.ok?L.stress(state.lab.report.body):null;
+ const studiesView=()=>state.lab.studies?.ok?L.studies(state.lab.studies.body,state.lab.status?.ok?state.lab.status.body:null):null;
+ const simSeal=text=>{const n=el('span','sim-seal',text);n.dataset.truth='SIMULATION';return n;};
  const truthChip=t=>{const c=el('span','truth',t);c.dataset.truth=t;return c;};
  const PANELS={
   DECISION_RING(box){
@@ -67,6 +81,25 @@
    if(r.team?.length)box.append(el('p','muted','Equipe ('+r.team.length+' mensagens, consultivas): '+r.team.filter(m=>m.kind==='DEBATE').map(m=>m.summary).join(' ').slice(0,220)));
    box.append(el('p','muted','Ligação decisão → ordem por janela de tempo (lacuna L1); sem impressão digital do backend por decisão (L5).'));
    const a=el('a','',' ficha completa (JSON)');a.href='/paper/perpetual/pilot/receipts/'+encodeURIComponent(r.decisionEventId);a.target='_blank';a.rel='noopener';box.append(a);
+  },
+  STRESS_LAB(box){
+   const res=state.lab.report;if(!res){box.append(el('p','muted','Carregando relatório…'));return;}
+   const vm=stressView();if(!vm){box.append(truthChip('UNKNOWN'),el('p','muted','Relatório do laboratório: '+(res.ok?'formato inesperado':why(res))+'.'));return;}
+   box.append(simSeal('SIMULAÇÃO · mercado sintético · semente '+vm.seed),el('p','',vm.headline));
+   const dl=el('dl','facts');for(const [k,v] of vm.facts)dl.append(el('dt','',k),el('dd','',v));box.append(dl);
+   const ol=el('ol','scenarios');for(const c of vm.scenarios){const li=el('li','stage');li.dataset.state=c.survived?'ok':'rejected';li.dataset.truth='SIMULATION';const head=el('div','stage-head');head.append(el('b','',c.title),el('span','muted',c.survived?'sobreviveu':'falhou'));li.append(head,el('small','',c.id+' · '+c.line));
+    for(const v of c.violations)li.append(el('small','bad','invariante: '+v));for(const x of c.failed)li.append(el('small','bad','esperado: '+x));ol.append(li);}box.append(ol);
+   box.append(el('p','muted','Sobreviver = manter os invariantes e os controles de risco, não ter lucro. Os preços são sintéticos: nada aqui é resultado do piloto ou do mercado. '+vm.version+' · sha256 '+vm.sha.slice(0,12)+'…'));
+   const ul=el('ul');for(const t of ['O risco não tem limite de spread (entradas com spread de 2% pagam ~101 bps).','O limite de perda do piloto é checado de hora em hora: num salto de uma hora a perda passa do limite (4,35% contra 3%).','A divergência entre corretoras não é detectada (lacuna L7); só vale “dado de reserva nunca abre posição”.','Kill switch com posição aberta mantém a posição; ele só impede abrir ou aumentar.'])ul.append(el('li','',t));box.append(el('p','muted','Achados documentados (docs/STRESS_LAB.md):'),ul);
+  },
+  BACKTEST(box){
+   const res=state.lab.studies;if(!res){box.append(el('p','muted','Carregando estudos…'));return;}
+   if(!res.ok){box.append(truthChip('UNKNOWN'),el('p','muted','Estudos: '+why(res)+'.'));return;}
+   const vm=studiesView();box.append(simSeal('SIMULAÇÃO HISTÓRICA · walk-forward'));
+   if(vm.pilot){const p=el('p','','Estudo do piloto '+vm.pilot.id.slice(0,8)+': '+(vm.pilot.eligible?'elegível na triagem':'não elegível')+(vm.pilot.reason?' ('+vm.pilot.reason+')':''));p.dataset.truth='REAL';box.append(p);}else box.append(el('p','muted','Triagem do estudo do piloto: '+(state.lab.status?.ok?'sem estudo configurado':why(state.lab.status??{status:0}))+'.'));
+   if(!vm.rows.length){box.append(el('p','muted','Nenhum estudo gravado.'));return;}
+   const ul=el('ul','studies');for(const r of vm.rows){const li=el('li','',r.short+(r.pilot?' (piloto)':'')+' · '+r.status+' · '+r.window+(r.candidateSet?' · '+r.candidateSet:'')+' · '+r.folds+' folds · líquido '+(r.netPnl===null?'n/d':(r.netPnl>=0?'+':'')+r.netPnl.toFixed(2)+' (capital simulado de 10.000)'));li.dataset.truth='SIMULATION';ul.append(li);}box.append(ul);
+   box.append(el('p','muted','Resultado de estudo histórico não é previsão nem desempenho do piloto.'));
   },
   PAPER_EXECUTION(box){
    const res=state.ring.accounts;
@@ -114,7 +147,7 @@
    const list=el('ul');for(const s of info.sources)list.append(el('li','',s));box.append(el('p','muted','Fonte prevista:'),list);
    box.append(el('p','muted',info.phase==='F1'?'Sem painel de dados: área de ambiente.':'Painel com dados entra na fase '+info.phase+'. Até lá, as telas desta zona ficam apagadas (sem dado).'));panel.append(box);}
   const screens=state.map.screens.filter(s=>s.room===room.id);
-  if(screens.length){const box=el('section','module');box.append(el('h3','','Telas'));const ul=el('ul');for(const s of screens){const live=!!screenContent()[s.id];const li=el('li','',s.id+' · ');const chip=el('span','truth',live?'REAL':'UNKNOWN');chip.dataset.truth=live?'REAL':'UNKNOWN';li.append(chip,D.createTextNode(live?' com dado':' sem dado (fase '+MODULES[s.module].phase+')'));ul.append(li);}box.append(ul);panel.append(box);}
+  if(screens.length){const box=el('section','module');box.append(el('h3','','Telas'));const ul=el('ul');for(const s of screens){const live=!!screenContent()[s.id];const li=el('li','',s.id+' · ');const t=live?s.truth:'UNKNOWN',chip=el('span','truth',t);chip.dataset.truth=t;li.append(chip,D.createTextNode(live?' com dado':' sem dado (fase '+MODULES[s.module].phase+')'));ul.append(li);}box.append(ul);panel.append(box);}
   const here=[...state.agents.values()].filter(a=>state.iso.roomAt(Math.round(a.pos.i),Math.round(a.pos.j))?.id===room.id);
   const box=el('section','module');box.append(el('h3','','Agentes aqui'));
   if(!state.agentsReal)box.append(el('p','muted','Sem dado de agentes (sem acesso ou rota indisponível).'));
@@ -174,9 +207,9 @@ function placeZoneLabels(){const c=state.camera;for(const z of zoneLabels){z.nod
   state.agentsReal=agents.ok&&Array.isArray(agents.body);
   if(state.agentsReal)syncAgents(agents.body);else syncAgents([]);
   $('#agentsStatus').hidden=state.agentsReal;
-  const status=await get('/paper/perpetual/status');
+  const status=await get('/paper/perpetual/status');state.lab.status=status;
   if(status.ok)chip($('#market'),status.body.marketReady?'mercado 24/7 · cotação fresca':'cotação sem dado fresco',status.body.marketReady?'REAL':'UNKNOWN');else chip($('#market'),'mercado: sem dado','UNKNOWN');
-  await fetchRing();
+  await Promise.all([fetchRing(),fetchLab()]);
   if(state.focus)renderPanel();
  }
 

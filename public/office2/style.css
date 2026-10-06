@@ -66,3 +66,8 @@ nav select{background:var(--bar)}
 .facts{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;margin:10px 0;font-size:13px}
 .facts dt{color:var(--muted)}.facts dd{margin:0}
 .panel a{color:var(--accent);font-size:12px}
+/* F3: Stress Lab e Backtest (simulação) */
+.sim-seal{display:inline-block;margin:4px 0 6px;padding:2px 8px;border-radius:4px;background:#2a1f45;color:#c39bff;font-size:11px;font-weight:700;letter-spacing:.03em}
+.scenarios{list-style:none;margin:8px 0;padding:0}
+.stage .bad{color:#ff8f8f}
+.studies li{font-size:12px;margin-bottom:4px}

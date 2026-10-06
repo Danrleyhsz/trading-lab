@@ -13,7 +13,7 @@ function iso(){const context=vm.createContext({Math,Object,Array,Set,Map,Number,
 test('/office2 serve só a lista fixa, com nosniff, e a página não exige login (como o /office); os dados continuam protegidos',async()=>{
  const app=Fastify();registerAccessControl(app,'test-only-access-code-at-least-32-characters',true,'https://example.test');registerOfficeAssets(app);app.get('/agents',async()=>[]);
  try{
-  for(const [name,type] of [['','text/html'],['index.html','text/html'],['style.css','text/css'],['iso.js','application/javascript'],['scene.js','application/javascript'],['app.js','application/javascript'],['ring.js','application/javascript'],['scene-map.json','application/json']]){
+  for(const [name,type] of [['','text/html'],['index.html','text/html'],['style.css','text/css'],['iso.js','application/javascript'],['scene.js','application/javascript'],['app.js','application/javascript'],['ring.js','application/javascript'],['lab.js','application/javascript'],['stress-report.json','application/json'],['scene-map.json','application/json']]){
    const r=await app.inject('/office2/'+name);assert.equal(r.statusCode,200,name);assert.match(String(r.headers['content-type']),new RegExp('^'+type));assert.equal(r.headers['x-content-type-options'],'nosniff');}
   assert.deepEqual(JSON.parse((await app.inject('/office2/scene-map.json')).body),map);
   for(const p of ['/office2/../../.env','/office2/..%2F..%2F.env','/office2/%2e%2e/%2e%2e/.env'])assert.notEqual((await app.inject(p)).statusCode,200,p);assert.equal((await app.inject('/office2/private.json')).statusCode,404);
