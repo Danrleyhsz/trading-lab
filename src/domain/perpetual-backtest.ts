@@ -13,8 +13,10 @@ export interface PerpetualDataset {instrument:DatasetInstrument;trade:Candle[];m
 export interface PerpetualConfig {strategy?:'SMA'|'BREAKOUT'|'MEAN_REVERSION';filters?:TeamFilters;protections?:Protections;initialCapital:number;feeRate:number;slippageBps:number;maintenanceRate:number;liquidationFeeRate:number;positionFraction:number;fastPeriod:number;slowPeriod:number}
 export interface SimulationEntry {kind:'PROPOSAL'|'FILL'|'FUNDING'|'LIQUIDATION';timestamp:number;quantity:number;price:number;cashDelta:number;approved?:boolean;reasons?:string[]}
 const hour=3600000;
-export function validatePerpetualDataset(data:PerpetualDataset){
- if(!isDatasetInstrument(data.instrument)||data.trade.length<3||data.trade.length>10000||data.mark.length!==data.trade.length)throw new Error('invalid dataset');
+/** `maxBars` (padrão 10 000) só é maior em pesquisa offline com histórico longo; o produto continua no padrão. */
+export function validatePerpetualDataset(data:PerpetualDataset,maxBars=10000){
+ if(!Number.isSafeInteger(maxBars)||maxBars<3||maxBars>200000)throw new Error('invalid dataset limit');
+ if(!isDatasetInstrument(data.instrument)||data.trade.length<3||data.trade.length>maxBars||data.mark.length!==data.trade.length)throw new Error('invalid dataset');
  for(const series of [data.trade,data.mark])for(let i=0;i<series.length;i++){
   const c=series[i];if(!Number.isSafeInteger(c.timestamp)||c.timestamp%hour!==0||![c.open,c.high,c.low,c.close,c.volume].every(Number.isFinite)||Math.min(c.open,c.low,c.close)<=0||c.volume<0||c.high<Math.max(c.open,c.close,c.low)||c.low>Math.min(c.open,c.close)|| (i>0&&c.timestamp!==series[i-1].timestamp+hour))throw new Error('invalid or discontinuous candles');
   if(c.timestamp!==data.trade[i].timestamp)throw new Error('unaligned mark candles');
@@ -32,10 +34,11 @@ export function validatePerpetualDataset(data:PerpetualDataset){
  */
 /** Ganchos de pesquisa (só simulação): `entryAdvisory` só pode vetar a abertura; `entrySizing` só escolhe a fração da
  * entrada (0 < f ≤ 0,2, o limite do risco) e deve usar apenas velas anteriores a `timestamp`. Sem eles, o resultado é idêntico. */
-export interface BacktestOptions {entryAdvisory?:(timestamp:number,direction:number)=>boolean;entrySizing?:(timestamp:number,direction:number)=>number}
+export interface BacktestOptions {entryAdvisory?:(timestamp:number,direction:number)=>boolean;entrySizing?:(timestamp:number,direction:number)=>number;
+ /** Limite de velas do conjunto (padrão 10 000), maior só em pesquisa com histórico longo. */ maxBars?:number}
 /** Offline historical simulation only. Never emits broker events or writes account balances. */
 export function backtestPerpetual(data:PerpetualDataset,cfg:PerpetualConfig,options:BacktestOptions={}){
- const datasetHash=validatePerpetualDataset(data);if(cfg.strategy&&!['SMA','BREAKOUT','MEAN_REVERSION'].includes(cfg.strategy))throw Error('invalid strategy');
+ const datasetHash=validatePerpetualDataset(data,options.maxBars);if(cfg.strategy&&!['SMA','BREAKOUT','MEAN_REVERSION'].includes(cfg.strategy))throw Error('invalid strategy');
  if(!validTeamFilters(cfg.filters)||teamFilterWarmup(cfg.filters)>=data.trade.length)throw Error('invalid team filters');
  if(!validProtections(cfg.protections))throw Error('invalid protections');const warmup=Math.max(cfg.slowPeriod,teamFilterWarmup(cfg.filters));
  if(!Object.entries(cfg).filter(([key])=>key!=='strategy'&&key!=='filters'&&key!=='protections').every(([,value])=>Number.isFinite(value))||cfg.initialCapital<=0||cfg.feeRate<0||cfg.feeRate>=1||cfg.slippageBps<0||cfg.slippageBps>=10000||cfg.maintenanceRate<=0||cfg.maintenanceRate>=1||cfg.liquidationFeeRate<0||cfg.liquidationFeeRate>=1||cfg.positionFraction<=0||cfg.positionFraction>0.2||!Number.isInteger(cfg.fastPeriod)||!Number.isInteger(cfg.slowPeriod)||cfg.fastPeriod<1||cfg.slowPeriod<=cfg.fastPeriod||data.trade.length<=cfg.slowPeriod)throw new Error('invalid configuration');

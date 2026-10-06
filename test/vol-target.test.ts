@@ -48,3 +48,10 @@ test('bootstrap pareado é determinístico pela semente e acusa a série melhor'
  assert.ok(pairedBlockBootstrap(b,a,30,300,7).probability<0.1);
  assert.throws(()=>pairedBlockBootstrap(a,b.slice(1),30,300,7));
 });
+
+test('limite de velas: o padrão continua 10 000; pesquisa pode ampliar explicitamente, com teto',()=>{
+ const c=candles(10050);
+ assert.throws(()=>backtestPerpetual(dataset(c),cfg),/invalid dataset/);
+ assert.ok(backtestPerpetual(dataset(c),cfg,{maxBars:20000}).trades>0);
+ assert.throws(()=>backtestPerpetual(dataset(c),cfg,{maxBars:500000}),/invalid dataset limit/);
+});

@@ -62,7 +62,8 @@ function run(candles:Candle[],funding:FundingSettlement[],lookback:number|null,c
  const cfg={...P.base,...costs};
  let target:number|null=null,sizing:ReturnType<typeof volSizing>|null=null;
  if(lookback!==null){target=calibrateTarget(candles,lookback,P.calibration.from,P.calibration.to);sizing=volSizing(candles,{lookback,target,...P.sizing});}
- const res=backtestPerpetual(data,cfg,sizing?{entrySizing:t=>sizing!(t)}:{});
+ // O período avaliado tem ~34 000 velas: limite de dados ampliado só nesta pesquisa (o produto continua em 10 000).
+ const res=backtestPerpetual(data,cfg,{maxBars:60000,...(sizing?{entrySizing:(t:number)=>sizing!(t)}:{})});
  const series=res.equitySeries.filter(p=>p.timestamp>=P.evaluation.from);
  const trades=res.tradeOutcomes.map(netPnl=>({netPnl}));
  const total=performanceMetrics(series,trades);
