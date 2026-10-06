@@ -45,6 +45,7 @@ test('robustez de um estudo: usa só as horas de teste e conta as tentativas do 
  assert.equal(r.outOfSample.hours,199,'só as horas de teste entram (o aquecimento fica de fora)');
  assert.equal(r.multipleTesting.trials,8);assert.equal(r.overfitting.combinations,252);
  assert.equal(r.policy.version,'ROBUSTNESS_SCREEN_V2');assert.equal(typeof r.eligible,'boolean');
+ assert.equal(r.metrics.marketChange,closes[1099]/closes[899]-1,'mercado do fechamento anterior à janela de teste ao fim dela');
 });
 
 test('CPCV: 45 divisões e 9 caminhos completos, sem hora repetida; vantagem real dá caminhos positivos, ruído não', ()=>{

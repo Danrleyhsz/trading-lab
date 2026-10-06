@@ -11,7 +11,7 @@ const base={accountId:'a',ledger:[],equity:1010,initialCash:1000,maxDrawdown:0.0
 test('the report measures the pilot from its first decision against flat and same-exposure buy and hold',()=>{
  const r:any=pilotReport({...base,events:[decision(t0,0),decision(t0+H,1),decision(t0+2*H,-1)],autonomous:{enabled:false,eligible:false,stopReason:null,studyId:'s'}});
  assert.equal(r.startEquity,999.9,'pre-pilot fills stay out of the pilot result');assert.equal(r.pnl.toFixed(2),'10.10');
- assert.equal(r.benchmarks.btcReturn.toFixed(4),'0.0500');assert.equal(r.benchmarks.buyAndHoldSameExposure.toFixed(3),(999.9*0.1*0.05).toFixed(3));
+ assert.equal(r.benchmarks.btcReturn.toFixed(4),'0.0500');assert.equal(r.metrics.marketChange,r.benchmarks.btcReturn,'métrica e referência do piloto são o mesmo número');assert.equal(r.benchmarks.buyAndHoldSameExposure.toFixed(3),(999.9*0.1*0.05).toFixed(3));
  assert.deepEqual(r.decisions,{total:3,long:1,short:1,flat:1});
  assert.equal(r.verdict,'INSUFFICIENT_EVIDENCE','fewer than '+PILOT_EVALUATION_PROTOCOL.minimumClosedTrades+' closed trades');assert.match(r.nextStep,/Não estender/);
 });
