@@ -2,11 +2,11 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 
-// Mapa da cena isométrica do Escritório 2.0 (docs/design/office-scene-map.json): proposta de planta conferida aqui
+// Mapa da cena isométrica do Escritório 2.0 (public/office2/scene-map.json): proposta de planta conferida aqui
 // antes de qualquer renderização. Só lê o JSON; não toca o escritório atual.
 interface Tiles {i0:number;i1:number;j0:number;j1:number}
 interface Room {id:string;module:string;tiles:Tiles;doors?:{side:'i0'|'i1'|'j0'|'j1';at:number}[];subzones?:{module:string;tiles:Tiles}[]}
-const map=JSON.parse(readFileSync('docs/design/office-scene-map.json','utf8')) as {grid:{i:number;j:number};projection:{tile:{w:number;h:number};origin:{x:number;y:number};scene:{w:number;h:number};wallHeight:number};
+const map=JSON.parse(readFileSync('public/office2/scene-map.json','utf8')) as {grid:{i:number;j:number};projection:{tile:{w:number;h:number};origin:{x:number;y:number};scene:{w:number;h:number};wallHeight:number};
  rooms:Room[];points:{id:string;room:string;tile:{i:number;j:number};kind:string;agent?:string}[];screens:{id:string;room:string;wall:string;tiles:{from:number;to:number};truth:string}[]};
 const W=map.grid.i,H=map.grid.j,inside=(t:Tiles,i:number,j:number)=>i>=t.i0&&i<t.i1&&j>=t.j0&&j<t.j1;
 
@@ -48,4 +48,13 @@ test('a projeção 2:1 coloca a planta inteira dentro da cena de 1536 × 864, co
  const corners=[at(0,0),at(W,0),at(W,H),at(0,H)];
  for(const c of corners)assert.ok(c.x>=0&&c.x<=scene.w&&c.y>=0&&c.y<=scene.h,JSON.stringify(c));
  assert.ok(at(0,0).y-wallHeight>=0,'parede do fundo cabe acima da laje');
+});
+
+test('móveis ficam dentro da sala, sem sobreposição, sem ocupar posto, ponto de lazer ou porta',()=>{
+ const props=(map as any).props as {asset:string;room:string;tile:{i:number;j:number};footprint:{a:number;b:number};h:number}[];
+ const room=(id:string)=>map.rooms.find(r=>r.id===id)!,taken=new Set<string>();
+ for(const p of props){assert.ok(p.h>0&&p.footprint.a>0&&p.footprint.b>0,p.asset);
+  for(let i=p.tile.i;i<p.tile.i+p.footprint.a;i++)for(let j=p.tile.j;j<p.tile.j+p.footprint.b;j++){assert.ok(inside(room(p.room).tiles,i,j),p.asset+' fora de '+p.room);assert.ok(!taken.has(i+','+j),'sobreposição em '+i+','+j);taken.add(i+','+j);}}
+ for(const pt of map.points)assert.ok(!taken.has(pt.tile.i+','+pt.tile.j),pt.id);
+ for(const r of map.rooms)for(const d of r.doors??[]){const t=r.tiles,a=d.side==='i0'?[t.i0,d.at]:d.side==='i1'?[t.i1-1,d.at]:d.side==='j0'?[d.at,t.j0]:[d.at,t.j1-1];assert.ok(!taken.has(a.join(',')),'porta de '+r.id);}
 });

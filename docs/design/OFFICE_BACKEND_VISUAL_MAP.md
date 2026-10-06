@@ -11,11 +11,11 @@ Contrato do documento de handoff: todo estado visual é exatamente um destes qua
 
 Regra de implementação: cada elemento novo carrega `data-truth="REAL|STATIC|SIMULATION|UNKNOWN"`, e um teste falha se um módulo de zona usar `Math.random` fora do movimento cosmético ou das janelas da cidade (fixas por semente).
 
-No Escritório 2.0, cada módulo é uma **zona** da cena isométrica única (`office-scene-map.json`). Clicar numa zona dá foco 2× e abre o painel de dados (L7). As tabelas abaixo valem para as telas da zona (L4) e para o painel.
+No Escritório 2.0, cada módulo é uma **zona** da cena isométrica única (`public/office2/scene-map.json`). Clicar numa zona dá foco 2× e abre o painel de dados (L7). As tabelas abaixo valem para as telas da zona (L4) e para o painel.
 
 ## 0. Zonas, telas e barra de cima
 
-| Zona (`office-scene-map.json`) | Tela(s) | Painel | Classe |
+| Zona (`public/office2/scene-map.json`) | Tela(s) | Painel | Classe |
 |---|---|---|---|
 | `horizon` | `horizon-a`, `horizon-b` | seção 3 | REAL |
 | `nexus` | `nexus-grafo` | seção 4 | REAL |

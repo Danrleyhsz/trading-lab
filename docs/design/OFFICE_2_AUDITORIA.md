@@ -51,7 +51,7 @@ A diferença maior não é de módulo, é de **câmera**: a referência é isom�
 | Documento | Conteúdo |
 |---|---|
 | `OFFICE_VISUAL_SPEC.md` | leitura da referência (limites normalizados), desvios declarados, composição isométrica, zonas em tiles, áreas andáveis e bloqueadas, camadas L0 a L7, ordem de profundidade, câmera e escala, notebook e celular, áreas clicáveis, pontos de trabalho e lazer, montagem de telas, exterior, paleta, reuso |
-| `office-scene-map.json` + `references/office-scene-map-preview.png` | planta de máquina: 16 áreas, portas, 8 postos, 8 pontos de lazer, chegada, 10 telas; prévia desenhada a partir do JSON |
+| `public/office2/scene-map.json` + `references/office-scene-map-preview.png` | planta de máquina: 16 áreas, portas, 8 postos, 8 pontos de lazer, chegada, 10 telas; prévia desenhada a partir do JSON |
 | `OFFICE_ASSET_INVENTORY.md` | 103 PNG medidos, com a decisão de reuso atualizada para a vista isométrica |
 | `OFFICE_BACKEND_VISUAL_MAP.md` | zona → telas → painel → fonte → REAL, STATIC, SIMULATION ou UNKNOWN; barra de cima sem "nível do trader" |
 | `OFFICE_ASSET_REQUESTS.md` | **manifesto**: 21 pedidos (5 P0, 14 P1, 2 P2) → 74 imagens finais, com conferência de completude |

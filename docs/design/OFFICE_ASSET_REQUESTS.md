@@ -215,7 +215,7 @@ Um pedido por agente: atlas, euler, flux, nova, oracle, satoshi, sentinel, vega.
 
 | Pergunta do handoff | Resposta |
 |---|---|
-| Toda zona tem a estrutura completa? | Sim. Piso, parede, vidro, guarda-corpo e fachada são feitos por código para todas as 16 áreas do `office-scene-map.json`; não dependem de arte. |
+| Toda zona tem a estrutura completa? | Sim. Piso, parede, vidro, guarda-corpo e fachada são feitos por código para todas as 16 áreas do `public/office2/scene-map.json`; não dependem de arte. |
 | Todo módulo interativo tem telas e móveis? | Horizon: `mesa-monitores` ×2 + `telao-parede` ×2. Nexus: `mesa-reuniao` + `cadeira-*` + `telao-parede`. Ring: `mesa-curva-operacoes` ×2 + `telao-parede` ×2. Risk: `mesa-monitores` + `estante-arquivo` + `telao-parede`. Stress Lab: `esteira`, `saco-pancada`, `rack-halteres`, `bancada-teste` (+ animação) + `telao-parede`. Backtest: `mesa-monitores` + `telao-parede`. Auditoria: `armarios-arquivo` + `rack-servidor` + `telao-parede`. Diagnóstico: `mesa-reuniao` + `telao-parede`. Recepção: `balcao-recepcao`. Elevadores: `portas-elevador` + `catraca`. Lazer: `sofa`, `poltrona`, `mesa-centro`, `jardineira`, `bancada-cozinha`, `banqueta`, `geladeira`, `mesa-redonda`, `cadeira-cafe`, plantas. |
 | Todo estado de agente tem sprite? | Parado, caminhando (4 quadros) e sentado, nas 4 diagonais: TL-O2-CHAR-* (P1), com as folhas atuais mapeadas até lá. Trabalhando, aguardando, bloqueado, sem dado, mensagem e pausa: TL-O2-AGENT-STATE-ICONS. |
 | Transições, portas e bordas de caminho? | As portas são vãos na parede (código) e as rotas são A* na grade do mapa; não precisam de arte. Elevadores e catracas são o ponto de chegada. |
