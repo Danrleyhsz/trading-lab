@@ -30,7 +30,9 @@ export function validatePerpetualDataset(data:PerpetualDataset){
  * direção pedida, nunca abre, nunca impede de fechar e não muda nada quando ausente. Recebe o horário da vela em que a
  * entrada seria executada (abertura) e a direção; a evidência usada tem de terminar antes desse horário.
  */
-export interface BacktestOptions {entryAdvisory?:(timestamp:number,direction:number)=>boolean}
+/** Ganchos de pesquisa (só simulação): `entryAdvisory` só pode vetar a abertura; `entrySizing` só escolhe a fração da
+ * entrada (0 < f ≤ 0,2, o limite do risco) e deve usar apenas velas anteriores a `timestamp`. Sem eles, o resultado é idêntico. */
+export interface BacktestOptions {entryAdvisory?:(timestamp:number,direction:number)=>boolean;entrySizing?:(timestamp:number,direction:number)=>number}
 /** Offline historical simulation only. Never emits broker events or writes account balances. */
 export function backtestPerpetual(data:PerpetualDataset,cfg:PerpetualConfig,options:BacktestOptions={}){
  const datasetHash=validatePerpetualDataset(data);if(cfg.strategy&&!['SMA','BREAKOUT','MEAN_REVERSION'].includes(cfg.strategy))throw Error('invalid strategy');
@@ -56,7 +58,7 @@ export function backtestPerpetual(data:PerpetualDataset,cfg:PerpetualConfig,opti
   // Original timestamps remain in the audit. This ordering is a declared modeling assumption.
   const settle=(until:number)=>{while(fundingIndex<data.funding.length&&data.funding[fundingIndex].timestamp<until){const f=data.funding[fundingIndex++];const delta=-quantity*f.markPrice*f.rate;cash+=delta;funding+=delta;tradeNet+=delta;audit.push({kind:'FUNDING',timestamp:f.timestamp,quantity,price:f.markPrice,cashDelta:delta});record(f.timestamp,f.markPrice);}};
   settle(c.timestamp+1000);
-  if(i>=warmup){const direction=perpetualDirection(data.trade.slice(0,i),cfg,quantity);if(quantity&&Math.sign(quantity)!==direction)execute(-quantity,c.open,c.timestamp);if(!quantity&&direction&&cash>0&&protectionsAllowEntry(cfg.protections,closedTrades,c.timestamp,cfg.initialCapital).allowed&&(options.entryAdvisory?.(c.timestamp,direction)??true))execute(direction*cash*cfg.positionFraction/c.open,c.open,c.timestamp);}
+  if(i>=warmup){const direction=perpetualDirection(data.trade.slice(0,i),cfg,quantity);if(quantity&&Math.sign(quantity)!==direction)execute(-quantity,c.open,c.timestamp);if(!quantity&&direction&&cash>0&&protectionsAllowEntry(cfg.protections,closedTrades,c.timestamp,cfg.initialCapital).allowed&&(options.entryAdvisory?.(c.timestamp,direction)??true)){const fraction=options.entrySizing?options.entrySizing(c.timestamp,direction):cfg.positionFraction;if(!(Number.isFinite(fraction)&&fraction>0&&fraction<=0.2))throw Error('invalid entry sizing');execute(direction*cash*fraction/c.open,c.open,c.timestamp);}}
   settle(c.timestamp+hour);
   // OHLC cannot reveal chronology. Funding precedes the worst mark stress; liquidation
   // fills at the adverse trade extreme, deliberately conservative and not exchange parity.
