@@ -14,7 +14,7 @@ A previsão de um modelo de velas, usada **só como filtro de entrada**, melhora
 |---|---|---|
 | A · TRADINGLAB-BASELINE | A estratégia do piloto Nova, sem mudança. É a configuração da última janela do estudo d674cb32: rompimento de 480 velas de 1h, 10% do capital, taxa de 0,055% e slippage de 1 bp. | avaliado |
 | B · KRONOS-ORIGINAL | Mesma estratégia com o filtro do Kronos-mini (`NeoQuasar/Kronos-mini@f4e6869`, tokenizador `Kronos-Tokenizer-2k@26966d0`, código `shiyu-coder/Kronos@67b630e`). Usa contexto de 1h e, separadamente, de 4h. | avaliado |
-| C · KRONOS-BTC-FINETUNED | Mesma estratégia com o ajuste de BTC de `Liucong-JunZi/Kronos-Btc-finetune`. São pesos MIT no Hugging Face, sobre o Kronos-base, ajustados com dados de 19/10/2023 a 18/10/2025. | pendente: download de cerca de 1 GB à parte, que depende de aprovação |
+| C · KRONOS-BTC-FINETUNED | Mesma estratégia com o ajuste de BTC de `Liucong-JunZi/Kronos-Btc-finetune`. São pesos MIT no Hugging Face, sobre o Kronos-base, ajustados com dados de 19/10/2023 a 18/10/2025. | avaliado (ver a Emenda 1) |
 | D · CRYPTOMAMBA | `MShahabSepehri/CryptoMamba`, licença MIT. | N/A nesta máquina: exige `mamba-ssm` com CUDA, e o PC não tem GPU NVIDIA. Os modelos publicados são diários e não valem como evidência para 1h ou 4h. |
 
 ## Janela de avaliação (fixa)
@@ -96,3 +96,13 @@ Se nenhum braço cumprir, a recomendação é **manter só a base**.
 - A estratégia do piloto opera pouco: a base deve ter poucas operações na janela, então o teste de operação tem baixo poder estatístico. Por isso o critério 4 mede a previsão em cerca de 347 dias independentes.
 - Só BTC nesta etapa. A extensão para o universo de várias moedas, que fica congelado, depende de esta etapa ser reproduzível e de nova declaração.
 - Antes de 24/10/2025 não há avaliação, para evitar contaminação pelo pré-treino.
+
+## Emenda 1 (06/10/2026, antes de qualquer previsão do braço C)
+
+- **O braço C entra no teste.** O download foi autorizado. Ele usa só os pesos com licença MIT dos repositórios `lc2004/kronos_base_model_BTCUSDT_{1h,4h}_finetune` e dos tokenizadores correspondentes, nas revisões fixadas em `configs/kronos_ab_v1.json`. O código usado é o oficial do Kronos, porque o repositório do ajuste não tem licença.
+- **A janela continua limpa.** O registro de treino do modelo de 1h confirma dados de ajuste até 18/10/2025, e a janela de avaliação começa em 24/10/2025.
+- **Amostragem do braço C: 1 caminho em vez de 5.**
+  - **Por quê:** medi 361 segundos e 1 051 MB por previsão com 5 caminhos no Kronos-base, o que daria cerca de 70 horas nesta máquina.
+  - **Previsão de medição:** gerei uma única previsão de 1h, com origem em 23/10/2025 23:00, num arquivo temporário fora do experimento. Ela não é usada.
+- **Braço B1, só sensibilidade.** É o Kronos-mini com 1 caminho, a mesma amostragem do braço C. Serve para separar o efeito do modelo do efeito da média de caminhos. Aparece nas tabelas, mas **não entra no critério de decisão**.
+- O critério de decisão, a janela, os custos e a regra do filtro não mudam.

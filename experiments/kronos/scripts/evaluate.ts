@@ -21,7 +21,8 @@ const A={metrics:tradingMetrics(baseline,base,quarters,from),stressed:tradingMet
 type Arm={arm:string;timeframe:'1h'|'4h';status:string;forecasts?:number;rejected?:number;metrics?:TradingMetrics;stressed?:TradingMetrics;delta?:Record<string,number|null>;quality?:ReturnType<typeof forecastQuality>;
  entryDecisions?:{considered:number;allowed:number;vetoed:number};compute?:{meanSeconds:number;totalSeconds:number;peakMemoryMb:number};provenance?:Record<string,unknown>;incrementalValue?:boolean;checks?:Record<string,boolean>};
 const arms:Arm[]=[];
-for(const arm of ['B','C'])for(const timeframe of ['1h','4h'] as const){
+// B1 é só sensibilidade (1 caminho, como o braço C): aparece nas tabelas, mas não entra no critério de decisão.
+for(const arm of ['B','C','B1'])for(const timeframe of ['1h','4h'] as const){
  const file=`experiments/kronos/results/forecasts-${arm}-${timeframe}.jsonl`;
  if(!existsSync(file)){arms.push({arm,timeframe,status:cfg.arms[arm].status??'SEM PREVISÕES'});continue;}
  const records:ForecastRecord[]=readFileSync(file,'utf8').split('\n').filter(Boolean).map(l=>JSON.parse(l));
@@ -48,7 +49,7 @@ const rank=(key:(a:Arm)=>number,desc=true)=>[{name:'A',value:key({arm:'A',timefr
 const report={version:cfg.version,runAt:new Date().toISOString(),scope:cfg.scope,window:cfg.window,datasetSha256:sha256(raw),baselineConfig:base,stressedCosts:cfg.baseline.stressedCosts,
  controlReproducesBaseline:true,A,arms,
  rankings:{riskAdjusted:rank(a=>a.metrics!.sharpeAnnualized??-Infinity),drawdown:rank(a=>a.metrics!.maxDrawdown,false),robustnessQuartersPositive:rank(a=>a.metrics!.quarters.filter(q=>q>0).length),computeCost:['A',...evaluated.sort((x,y)=>x.compute!.totalSeconds-y.compute!.totalSeconds).map(a=>a.arm+'-'+a.timeframe)]},
- decision:evaluated.some(a=>a.incrementalValue)?'CONTINUAR PESQUISA COM O(S) BRAÇO(S) QUE PASSARAM':'MANTER SÓ A BASE (sem evidência de valor incremental)'};
+ decision:evaluated.some(a=>a.incrementalValue&&!cfg.arms[a.arm].sensitivityOnly)?'CONTINUAR PESQUISA COM O(S) BRAÇO(S) QUE PASSARAM':'MANTER SÓ A BASE (sem evidência de valor incremental)'};
 writeFileSync('experiments/kronos/results/comparison-v1.json',JSON.stringify(report,null,1));
 writeFileSync('experiments/kronos/results/RELATORIO_KRONOS_AB_V1.md',markdown(report));
 console.log('base',A.metrics.netPnl.toFixed(2),'trades',A.metrics.trades);for(const a of evaluated)console.log(a.arm,a.timeframe,'P&L',a.metrics!.netPnl.toFixed(2),'delta',a.delta!.netPnl!.toFixed(2),'acerto',(a.quality!.directionalAccuracy*100).toFixed(1)+'%','p',a.quality!.binomialPValue.toFixed(3),'vetos',a.entryDecisions!.vetoed+'/'+a.entryDecisions!.considered,a.incrementalValue?'VALOR':'sem valor');

@@ -11,6 +11,8 @@ import argparse, ctypes, hashlib, json, math, os, random, sys, time
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
+# Só configuração e pesos: imagens e registros dos repositórios de modelo não são necessários.
+WEIGHT_FILES = ['config.json', 'model.safetensors']
 STEP = {'1h': 3600000, '4h': 4 * 3600000}
 
 
@@ -53,15 +55,21 @@ def seed_for(origin):
 
 
 def peak_memory_mb():
+    """Memória de pico do processo (MB). No Windows, via GetProcessMemoryInfo com tipos explícitos (handle de 64 bits)."""
     if os.name != 'nt':
         import resource
         return resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024
+    import ctypes.wintypes as w
     class Counters(ctypes.Structure):
-        _fields_ = [('cb', ctypes.c_ulong), ('PageFaultCount', ctypes.c_ulong), ('PeakWorkingSetSize', ctypes.c_size_t), ('WorkingSetSize', ctypes.c_size_t),
+        _fields_ = [('cb', w.DWORD), ('PageFaultCount', w.DWORD), ('PeakWorkingSetSize', ctypes.c_size_t), ('WorkingSetSize', ctypes.c_size_t),
                     ('QuotaPeakPagedPoolUsage', ctypes.c_size_t), ('QuotaPagedPoolUsage', ctypes.c_size_t), ('QuotaPeakNonPagedPoolUsage', ctypes.c_size_t),
                     ('QuotaNonPagedPoolUsage', ctypes.c_size_t), ('PagefileUsage', ctypes.c_size_t), ('PeakPagefileUsage', ctypes.c_size_t)]
+    kernel32, psapi = ctypes.WinDLL('kernel32'), ctypes.WinDLL('psapi')
+    kernel32.GetCurrentProcess.restype = w.HANDLE
+    psapi.GetProcessMemoryInfo.argtypes = [w.HANDLE, ctypes.POINTER(Counters), w.DWORD]
     counters = Counters(); counters.cb = ctypes.sizeof(Counters)
-    ctypes.windll.psapi.GetProcessMemoryInfo(ctypes.windll.kernel32.GetCurrentProcess(), ctypes.byref(counters), counters.cb)
+    if not psapi.GetProcessMemoryInfo(kernel32.GetCurrentProcess(), ctypes.byref(counters), counters.cb):
+        return float('nan')
     return counters.PeakWorkingSetSize / 1024 / 1024
 
 
@@ -74,8 +82,8 @@ def load_predictor(arm_cfg, sampling):
     from huggingface_hub import snapshot_download
     from model import Kronos, KronosTokenizer, KronosPredictor
     torch.set_num_threads(sampling['torchThreads'])
-    tok_dir = snapshot_download(arm_cfg['tokenizer'], revision=arm_cfg['tokenizerRevision'])
-    mod_dir = snapshot_download(arm_cfg['model'], revision=arm_cfg['modelRevision'])
+    tok_dir = snapshot_download(arm_cfg['tokenizer'], revision=arm_cfg['tokenizerRevision'], allow_patterns=WEIGHT_FILES)
+    mod_dir = snapshot_download(arm_cfg['model'], revision=arm_cfg['modelRevision'], allow_patterns=WEIGHT_FILES)
     tokenizer = KronosTokenizer.from_pretrained(tok_dir)
     model = Kronos.from_pretrained(mod_dir)
     model.eval(); tokenizer.eval()
@@ -101,7 +109,11 @@ def main():
     parser.add_argument('--limit', type=int, default=0, help='só as N primeiras origens (verificação)')
     parser.add_argument('--out', default=None)
     args = parser.parse_args()
-    cfg = load_config(); arm = cfg['arms'][args.arm]; tf = cfg['forecast']['timeframes'][args.timeframe]; sampling = cfg['forecast']['sampling']
+    cfg = load_config(); arm = cfg['arms'][args.arm]
+    # Braços com um modelo por tempo gráfico (ajuste de BTC) declaram model/tokenizer dentro de timeframes.
+    arm = {**arm, **arm.get('timeframes', {}).get(args.timeframe, {})}
+    # Emendas de amostragem por braço (declaradas antes de rodar) sobrescrevem só os campos que citam.
+    tf = cfg['forecast']['timeframes'][args.timeframe]; sampling = {**cfg['forecast']['sampling'], **arm.get('sampling', {})}
     step = STEP[args.timeframe]
     data_path = os.path.join(ROOT, 'data', f'btc-{args.timeframe}.json')
     raw = open(data_path, 'rb').read(); data = json.loads(raw)
