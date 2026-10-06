@@ -10,7 +10,7 @@ const officeFiles:Record<string,string> = {
 // Escritório 2.0 (F1, em /office2 ao lado do atual). scene-map.json é a planta canônica (docs/design/OFFICE_VISUAL_SPEC.md).
 const officeTwoFiles:Record<string,string> = {
   'index.html':'text/html; charset=utf-8', 'style.css':'text/css; charset=utf-8', 'iso.js':'application/javascript; charset=utf-8',
-  'scene.js':'application/javascript; charset=utf-8', 'app.js':'application/javascript; charset=utf-8', 'ring.js':'application/javascript; charset=utf-8', 'lab.js':'application/javascript; charset=utf-8', 'stress-report.json':'application/json; charset=utf-8', 'scene-map.json':'application/json; charset=utf-8',
+  'scene.js':'application/javascript; charset=utf-8', 'app.js':'application/javascript; charset=utf-8', 'ring.js':'application/javascript; charset=utf-8', 'lab.js':'application/javascript; charset=utf-8', 'ops.js':'application/javascript; charset=utf-8', 'stress-report.json':'application/json; charset=utf-8', 'scene-map.json':'application/json; charset=utf-8',
 };
 export function registerOfficeAssets(app:FastifyInstance, directory=join(process.cwd(),'public','office'), officeTwo=join(process.cwd(),'public','office2')) {
   app.get('/office2/*', async(req,reply) => {
