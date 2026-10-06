@@ -68,7 +68,7 @@ Configuração da rodada:
 | `DUPLICATE_OUT_OF_ORDER` | eventos duplicados ou fora de ordem | sobreviveu | ciclo chamado 3x por hora: uma decisão por candle; 24 marcas fora de ordem e 24 cursores repetidos recusados |
 | `RESTART` | reinício | sobreviveu | reinício a cada hora por 24 h; mesmas decisões e mesma equity da linha de base |
 
-Totais: 14 de 14 sobreviveram, com 0 violações de invariante. A semente 7 também passa no teste automatizado.
+Totais: 14 de 14 sobreviveram, com 0 violações de invariante. `reportSha256` d99ec87b…f91630. A semente 7 também passa no teste automatizado.
 
 ## Achados (nenhum muda o piloto em andamento)
 
