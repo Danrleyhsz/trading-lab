@@ -73,7 +73,8 @@
    const r=roomById.get(s.room),J=r.tiles.j0,bottom=12;
    const pts=[P(s.tiles.from+0.15,J,bottom+s.heightPx),P(s.tiles.to-0.15,J,bottom+s.heightPx),P(s.tiles.to-0.15,J,bottom),P(s.tiles.from+0.15,J,bottom)];
    poly(ctx,pts,C.screenFrame);const inner=pts.map((p,k)=>({x:p.x+(k===0||k===3?2:-2),y:p.y+(k<2?2:-2)}));poly(ctx,inner,C.screenOff);
-   if(content){content(ctx,inner);return;}
+   // Conteúdo real desenhado por cima; se a função disser que não há dado (false), a tela volta a ficar apagada.
+   if(content&&content(ctx,inner)!==false)return;
    ctx.save();ctx.beginPath();inner.forEach((p,k)=>k?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));ctx.closePath();ctx.clip();ctx.strokeStyle=C.screenStripe;ctx.lineWidth=2;
    const minX=Math.min(...inner.map(p=>p.x)),maxX=Math.max(...inner.map(p=>p.x)),minY=Math.min(...inner.map(p=>p.y)),maxY=Math.max(...inner.map(p=>p.y));
    for(let x=minX-60;x<maxX;x+=6){ctx.beginPath();ctx.moveTo(x,maxY);ctx.lineTo(x+60,minY);ctx.stroke();}ctx.restore();

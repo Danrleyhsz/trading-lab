@@ -25,6 +25,65 @@
  const loadImage=src=>{const img=new Image();img.decoding='async';img.src=src;return img;};
  const charImages={},images={props:{}};
  async function get(path){try{const r=await fetch(path,{credentials:'same-origin',headers:{accept:'application/json'}});if(!r.ok)return {ok:false,status:r.status};return {ok:true,body:await r.json()};}catch{return {ok:false,status:0};}}
+ const why=res=>res.status===401||res.status===403?'sem acesso (entre pelo escritório atual)':res.status===404?'rota ainda não publicada em produção (deploy pendente)':res.status===0?'sem conexão':'indisponível (HTTP '+res.status+')';
+
+ // ---------- F2: Anel de decisão e Execução paper ----------
+ const R=globalThis.Office2Ring;
+ state.ring={receipts:null,accounts:null,fills:null,index:0,at:0};
+ async function fetchRing(){
+  const [receipts,accounts,fills]=await Promise.all([get('/paper/perpetual/pilot/receipts?limit=24'),get('/paper/perpetual/accounts'),get('/audit/events?type=PAPER_FILL&accountId='+encodeURIComponent(R.ACCOUNT)+'&limit=10&compact=1')]);
+  const prev=state.ring.receipts?.ok?state.ring.receipts.body.receipts[state.ring.index]?.decisionEventId:null;
+  Object.assign(state.ring,{receipts,accounts,fills,at:Date.now()});
+  // Mantém a mesma decisão aberta depois de atualizar (se ainda estiver na lista).
+  const list=receipts.ok?receipts.body.receipts:[];const k=prev?list.findIndex(r=>r.decisionEventId===prev):-1;state.ring.index=k>=0?k:0;
+ }
+ const currentReceipt=()=>state.ring.receipts?.ok?state.ring.receipts.body.receipts[state.ring.index]??null:null;
+ const executionView=()=>state.ring.accounts?.ok?R.execution(state.ring.accounts.body,state.ring.fills?.ok?state.ring.fills.body.events:[]):null;
+ /** Conteúdo das telas com dado; sem dado a tela fica apagada (o desenho padrão é UNKNOWN). */
+ function screenContent(){
+  const out={},r=currentReceipt(),vm=executionView();
+  if(r){const st=R.stages(r);out['ring-anel']=(c,inner)=>R.paintRing(c,inner,st);}
+  if(vm?.hourly?.length)out['ring-execucao']=(c,inner)=>R.paintExecution(c,inner,vm);
+  return out;
+ }
+ const truthChip=t=>{const c=el('span','truth',t);c.dataset.truth=t;return c;};
+ const PANELS={
+  DECISION_RING(box){
+   const res=state.ring.receipts;
+   if(!res){box.append(el('p','muted','Carregando fichas…'));return;}
+   if(!res.ok){box.append(truthChip('UNKNOWN'),el('p','muted','Fichas de decisão: '+why(res)+'.'));return;}
+   const sum=R.summary(res.body),list=res.body.receipts;
+   if(sum){const p=el('p','muted',sum.decisions+' decisões gravadas · '+(sum.completePct===null?'n/d':sum.completePct+'%')+' com ficha completa'+(sum.latency?' · fechamento → decisão p50 '+sum.latency.p50+', p95 '+sum.latency.p95:''));box.append(truthChip('REAL'),p);
+    if(sum.outcomes.length)box.append(el('p','muted','Desfechos: '+sum.outcomes.map(o=>o.label+' '+o.n).join(' · ')));
+    if(sum.reasons.length)box.append(el('p','muted','Motivos: '+sum.reasons.map(o=>o.label+' '+o.n).join(' · ')));}
+   if(!list.length){box.append(el('p','muted','Nenhuma decisão retida no servidor.'));return;}
+   const r=list[state.ring.index],nav=el('div','ring-nav');
+   const older=Object.assign(el('button','ghost','← anterior'),{type:'button',disabled:state.ring.index>=list.length-1,onclick:()=>{state.ring.index++;renderPanel();}});
+   const newer=Object.assign(el('button','ghost','mais recente →'),{type:'button',disabled:state.ring.index===0,onclick:()=>{state.ring.index--;renderPanel();}});
+   nav.append(older,el('span','',(state.ring.index+1)+' de '+list.length+' mais recentes'),newer);box.append(nav);
+   const ol=el('ol','stages');
+   for(const s of R.stages(r)){const li=el('li','stage');li.dataset.state=s.state;li.dataset.truth=s.truth;const head=el('div','stage-head');head.append(el('b','',s.label),truthChip(s.truth));li.append(head,el('span','',s.text));if(s.detail)li.append(el('small','',s.detail));ol.append(li);}
+   box.append(ol);
+   if(r.team?.length)box.append(el('p','muted','Equipe ('+r.team.length+' mensagens, consultivas): '+r.team.filter(m=>m.kind==='DEBATE').map(m=>m.summary).join(' ').slice(0,220)));
+   box.append(el('p','muted','Ligação decisão → ordem por janela de tempo (lacuna L1); sem impressão digital do backend por decisão (L5).'));
+   const a=el('a','',' ficha completa (JSON)');a.href='/paper/perpetual/pilot/receipts/'+encodeURIComponent(r.decisionEventId);a.target='_blank';a.rel='noopener';box.append(a);
+  },
+  PAPER_EXECUTION(box){
+   const res=state.ring.accounts;
+   if(!res){box.append(el('p','muted','Carregando conta paper…'));return;}
+   if(!res.ok){box.append(truthChip('UNKNOWN'),el('p','muted','Conta paper: '+why(res)+'.'));return;}
+   const vm=executionView();if(!vm){box.append(truthChip('UNKNOWN'),el('p','muted','Conta do piloto ('+R.ACCOUNT+') não encontrada.'));return;}
+   const money=v=>Number.isFinite(v)?v.toFixed(2)+' USDT':'n/d';
+   box.append(el('span','paper-seal','PAPER · dinheiro fictício'),truthChip(vm.fresh?'REAL':'UNKNOWN'));
+   const dl=el('dl','facts');const row=(k,v)=>dl.append(el('dt','',k),el('dd','',v));
+   row('Equity',money(vm.equity)+(vm.pnlPct===null?'':' ('+(vm.pnlPct>=0?'+':'')+vm.pnlPct.toFixed(2)+'%)'));
+   row('Posição',vm.position?vm.position.side+' '+vm.position.qty+' BTC @ '+Number(vm.position.avg).toFixed(2):'sem posição');
+   row('Taxas pagas',money(vm.fees));row('Funding',money(vm.funding));row('Fills',String(vm.fillCount??'n/d'));
+   row('Avaliação',vm.fresh?'cotação fresca':'cotação sem dado fresco');box.append(dl);
+   if(state.ring.fills?.ok&&vm.fills.length){const ul=el('ul');for(const f of vm.fills)ul.append(el('li','',new Date(f.at).toISOString().slice(0,16).replace('T',' ')+' · '+f.side+' '+f.qty+' @ '+Number(f.price).toFixed(2)+' · taxa '+Number(f.fee).toFixed(4)));box.append(el('p','muted','Últimos fills gravados:'),ul);}
+   else box.append(el('p','muted',state.ring.fills?.ok?'Nenhum fill gravado.':'Fills: '+why(state.ring.fills)+'.'));
+  },
+ };
 
  // ---------- câmera ----------
  function overview(){const {w,h}=state.map.projection.scene,vw=viewport.clientWidth,vh=viewport.clientHeight,s=Math.min(vw/w,vh/h);return {s,x:(vw-w*s)/2,y:(vh-h*s)/2};}
@@ -50,11 +109,12 @@
   const mods=[room.module,...(room.subzones??[]).map(s=>s.module)].filter((m,k,a)=>a.indexOf(m)===k);
   const head=el('header');head.append(el('h2','',room.label),Object.assign(el('button','ghost','Visão geral'),{type:'button',onclick:()=>focusRoom(null)}));panel.append(head);
   for(const m of mods){const info=MODULES[m];const box=el('section','module');box.append(el('h3','',info.name));
+   if(PANELS[m]){PANELS[m](box);panel.append(box);continue;}
    const chip=el('span','truth',info.truth);chip.dataset.truth=info.truth;box.append(chip);
    const list=el('ul');for(const s of info.sources)list.append(el('li','',s));box.append(el('p','muted','Fonte prevista:'),list);
    box.append(el('p','muted',info.phase==='F1'?'Sem painel de dados: área de ambiente.':'Painel com dados entra na fase '+info.phase+'. Até lá, as telas desta zona ficam apagadas (sem dado).'));panel.append(box);}
   const screens=state.map.screens.filter(s=>s.room===room.id);
-  if(screens.length){const box=el('section','module');box.append(el('h3','','Telas'));const ul=el('ul');for(const s of screens){const li=el('li','',s.id+' · ');const chip=el('span','truth','UNKNOWN');chip.dataset.truth='UNKNOWN';li.append(chip,D.createTextNode(' sem dado (fase '+MODULES[s.module].phase+')'));ul.append(li);}box.append(ul);panel.append(box);}
+  if(screens.length){const box=el('section','module');box.append(el('h3','','Telas'));const ul=el('ul');for(const s of screens){const live=!!screenContent()[s.id];const li=el('li','',s.id+' · ');const chip=el('span','truth',live?'REAL':'UNKNOWN');chip.dataset.truth=live?'REAL':'UNKNOWN';li.append(chip,D.createTextNode(live?' com dado':' sem dado (fase '+MODULES[s.module].phase+')'));ul.append(li);}box.append(ul);panel.append(box);}
   const here=[...state.agents.values()].filter(a=>state.iso.roomAt(Math.round(a.pos.i),Math.round(a.pos.j))?.id===room.id);
   const box=el('section','module');box.append(el('h3','','Agentes aqui'));
   if(!state.agentsReal)box.append(el('p','muted','Sem dado de agentes (sem acesso ou rota indisponível).'));
@@ -116,6 +176,7 @@ function placeZoneLabels(){const c=state.camera;for(const z of zoneLabels){z.nod
   $('#agentsStatus').hidden=state.agentsReal;
   const status=await get('/paper/perpetual/status');
   if(status.ok)chip($('#market'),status.body.marketReady?'mercado 24/7 · cotação fresca':'cotação sem dado fresco',status.body.marketReady?'REAL':'UNKNOWN');else chip($('#market'),'mercado: sem dado','UNKNOWN');
+  await fetchRing();
   if(state.focus)renderPanel();
  }
 
@@ -125,7 +186,7 @@ function placeZoneLabels(){const c=state.camera;for(const z of zoneLabels){z.nod
   for(const ag of state.agents.values())tickAgent(ag,now);
   const dpr=globalThis.devicePixelRatio||1,c=state.camera;ctx.setTransform(1,0,0,1,0,0);ctx.fillStyle='#0b1426';ctx.fillRect(0,0,canvas.width,canvas.height);
   ctx.imageSmoothingEnabled=false;ctx.setTransform(c.s*dpr,0,0,c.s*dpr,c.x*dpr,c.y*dpr);
-  state.scene.draw(ctx,state.cache,[...state.agents.values()],globalThis.OfficeSpriteSheets,charImages);
+  state.scene.draw(ctx,state.cache,[...state.agents.values()],globalThis.OfficeSpriteSheets,charImages,screenContent());
   for(const ag of state.agents.values())placePlate(ag);placeZoneLabels();
   requestAnimationFrame(frame);
  }
