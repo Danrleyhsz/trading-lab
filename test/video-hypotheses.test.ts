@@ -4,7 +4,7 @@ import type {Candle} from '../src/domain/backtest.js';
 import {backtestPerpetual,type PerpetualConfig,type PerpetualDataset} from '../src/domain/perpetual-backtest.js';
 import {perpetualDirection} from '../src/domain/perpetual-signals.js';
 import {signalBacktest,type SignalStrategy} from '../src/domain/signal-backtest.js';
-import {HYPOTHESIS_GRID,buildStrategy,supportResistance} from '../src/domain/video-hypotheses/strategies.js';
+import {HYPOTHESIS_GRID,AMENDMENT_1_GRID,buildStrategy,supportResistance} from '../src/domain/video-hypotheses/strategies.js';
 import {calendarStrategy,fitCalendar} from '../src/domain/video-hypotheses/calendar.js';
 import {findDecisionLookahead} from '../src/domain/lookahead-check.js';
 
@@ -45,7 +45,7 @@ test('stop, alvo, limite de tempo e gap: o stop vence quando os dois são tocado
 
 test('todas as 45 configurações de H01 a H05 decidem só com o passado (lado e stop)',()=>{
  const data=series(700,9).trade;
- for(const config of HYPOTHESIS_GRID){
+ for(const config of [...HYPOTHESIS_GRID,...AMENDMENT_1_GRID]){
   const side=(c:readonly Candle[])=>{const s=buildStrategy(c,config);return c.map((_,i)=>{const d=s(i,null);return d&&d!=='EXIT'?d.side:0;});};
   const stop=(c:readonly Candle[])=>{const s=buildStrategy(c,config);return c.map((_,i)=>{const d=s(i,null);return d&&d!=='EXIT'&&d.stop!==undefined?d.stop:NaN;});};
   for(const vector of [side,stop]){const r=findDecisionLookahead(data,vector,{from:200,stride:3});assert.deepEqual(r.violations,[],config.id);}
@@ -75,4 +75,13 @@ test('calendário: o ajuste só usa a janela de treino, exige |t| >= 3 e a decis
  const forced={...fit,buckets:fit.buckets.map((x,k)=>({...x,side:(k%3===0?1:k%3===1?-1:0) as -1|0|1}))};
  const side=(c:readonly Candle[])=>{const s=calendarStrategy(c,forced);return c.map((_,i)=>{const d=s(i,null);return d&&d!=='EXIT'?d.side:0;});};
  assert.deepEqual(findDecisionLookahead(a,side,{from:10,stride:7}).violations,[]);
+});
+
+test('emenda 1 (H04 V2): a zona sobrevive ao rompimento, então a taxa de acerto anterior varia e o filtro passa a valer',()=>{
+ const data=series(3000,21).trade;
+ const v1=supportResistance(data,{pivotBars:12,minRetests:1,minHoldRate:0.5}).touches.filter(t=>t.priorHoldRate!==null);
+ const v2=supportResistance(data,{pivotBars:12,minRetests:1,minHoldRate:0.5,keepBroken:1}).touches.filter(t=>t.priorHoldRate!==null);
+ assert.ok(v1.every(t=>t.priorHoldRate===1),'V1: zonas vivas só têm retestes que seguraram (o defeito documentado)');
+ assert.ok(v2.some(t=>t.priorHoldRate!<1)&&v2.some(t=>t.priorHoldRate!<0.5),'V2: aparecem taxas menores que 100% e menores que 50%');
+ assert.equal(AMENDMENT_1_GRID.length,8);assert.ok(AMENDMENT_1_GRID.every(c=>c.params.keepBroken===1));
 });

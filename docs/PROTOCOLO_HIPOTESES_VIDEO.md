@@ -75,3 +75,20 @@ Pelo próprio documento, só depois de os componentes se sustentarem sozinhos:
 ## O que não muda
 
 Nada disso toca o piloto, o acompanhamento XSMOM_FORWARD_V1, o experimento Kronos ou o servidor. Nenhum resultado vira estratégia automaticamente.
+
+## Emenda 1 (06/10/2026, depois do resultado V1 e antes de rodar o H04_V2)
+
+**Defeito encontrado na conferência do V1.** O H04 V1 descarta a zona quando ela rompe, como estava declarado. Com isso, as zonas que continuam vivas só têm retestes que seguraram, e a taxa de acerto delas é sempre 100%:
+
+- a faixa "taxa anterior abaixo de 50%" ficou vazia no relatório;
+- os parâmetros de taxa mínima (0,5 e 0,67) nunca filtraram nada;
+- o V1 testou "zona que já segurou antes", **não** a estatística "Held %" do vídeo.
+
+O resultado V1 fica registrado como rodou (`docs/estudos/hipoteses-video-2026-10-06.*`) e não é alterado.
+
+**H04_V2:** igual ao V1, exceto que a zona **sobrevive ao rompimento**. O rompimento conta como reteste que falhou, e a zona só sai pela idade (720 h) ou pelo limite de 20 por lado. Mesma grade: L ∈ {12, 24}, m ∈ {1, 2}, h ∈ {0,5; 0,67}, ou seja, **8 configurações novas**.
+
+- **Contagem de tentativas:** passa a **55** (47 + 8). O Sharpe deflacionado de todas as famílias, no relatório da emenda, usa 55 e a dispersão dos Sharpe de treino das 55.
+- **Critério:** o mesmo VIDEO_SCREEN_V1, com a estabilidade medida só entre as 8 configurações V2.
+- **Execução:** `VIDEO_AMENDMENT=1 npx tsx scripts/estudos/hipoteses-video.ts`, com saída em `docs/estudos/hipoteses-video-emenda1-2026-10-06.*`.
+- **Nada mais muda:** dados, custos, janelas e as outras hipóteses são idênticos.

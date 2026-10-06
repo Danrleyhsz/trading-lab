@@ -6,7 +6,7 @@ import {readFileSync,writeFileSync,existsSync} from 'node:fs';
 import type {Candle} from '../../src/domain/backtest.js';
 import type {FundingSettlement} from '../../src/domain/perpetual-backtest.js';
 import {signalBacktest,type SignalBacktestConfig,type SignalStrategy} from '../../src/domain/signal-backtest.js';
-import {HYPOTHESIS_GRID,buildStrategy,supportResistance,type HypothesisConfig} from '../../src/domain/video-hypotheses/strategies.js';
+import {HYPOTHESIS_GRID as GRID_V1,AMENDMENT_1_GRID,buildStrategy,supportResistance} from '../../src/domain/video-hypotheses/strategies.js';
 import {calendarStrategy,fitCalendar,type CalendarKind,type CalendarFit} from '../../src/domain/video-hypotheses/calendar.js';
 import {findDecisionLookahead} from '../../src/domain/lookahead-check.js';
 import {deflatedSharpe,moments} from '../../src/domain/backtest-robustness.js';
@@ -20,6 +20,8 @@ export const VIDEO_PROTOCOL=Object.freeze({version:'VIDEO_HYPOTHESES_V1',declare
  calendarKinds:['HOUR_OF_DAY','DAY_OF_WEEK'] as CalendarKind[],
  screen:{version:'VIDEO_SCREEN_V1',minimumDeflatedSharpe:0.9,minimumPositiveYears:2,minimumCoinBreadth:0.6,minimumStableShare:0.5,maximumFilledShare:0.01}});
 const P=VIDEO_PROTOCOL,S=P.screen,dir=process.env.VIDEO_CACHE_DIR??'scripts/estudos/out';
+// Emenda 1 (VIDEO_AMENDMENT=1): acrescenta o H04_V2; as 8 configurações novas entram na contagem de tentativas (55).
+const AMENDMENT=process.env.VIDEO_AMENDMENT==='1',HYPOTHESIS_GRID=AMENDMENT?[...GRID_V1,...AMENDMENT_1_GRID]:GRID_V1;
 const TRIALS=HYPOTHESIS_GRID.length+P.calendarKinds.length;
 const yearStart=(y:number)=>Date.UTC(y,0,1),testEnd=P.lastBar+H;
 
@@ -60,7 +62,7 @@ function main(){
  const sample=coins.at(-1)!.candles.slice(-1500);
  for(const config of HYPOTHESIS_GRID){const side=(c:readonly Candle[])=>{const s=buildStrategy(c,config);return c.map((_,i)=>{const d=s(i,null);return d&&d!=='EXIT'?d.side:0;});};
   const r=findDecisionLookahead(sample,side,{from:300,stride:23});if(r.violations.length)throw Error('viés de futuro em '+config.id);}
- console.log('verificação de viés de futuro: 45 configurações sem violação');
+ console.log(`verificação de viés de futuro: ${HYPOTHESIS_GRID.length} configurações sem violação`);
  const base:SignalBacktestConfig={...P.costs,warmup:P.warmup},stressed:SignalBacktestConfig={...base,...P.stressedCosts};
  // 1) H01 a H05: cada configuração no período inteiro, uma vez (as regras são causais).
  const runs=new Map<string,Run>();
@@ -106,17 +108,17 @@ function main(){
  const basket=P.testYears.map(y=>{const from=yearStart(y),to=Math.min(yearStart(y+1),testEnd);return coins.reduce((s,c)=>{const a=c.candles.filter(x=>x.timestamp<from).at(-1)!,b=c.candles.filter(x=>x.timestamp<to).at(-1)!;return s+(b.close/a.close-1)/coins.length;},0);});
  const baselines={flat:0,basketSameExposure:basket.reduce((e,r)=>e*(1+0.1*r),1)-1,basketByYear:Object.fromEntries(P.testYears.map((y,k)=>[y,basket[k]]))};
  // 6) H04: a taxa de acerto passada prevê o próximo reteste? (só toques a partir de 2024, resolvidos)
- const holdPrediction=[12,24].map(pivotBars=>{const buckets:Record<string,{hold:number;break:number}>={SEM_HISTORICO:{hold:0,break:0},ABAIXO_DE_50:{hold:0,break:0},A_PARTIR_DE_50:{hold:0,break:0}};
-  for(const c of coins)for(const t of supportResistance(c.candles,{pivotBars,minRetests:1,minHoldRate:0.5}).touches){if(t.time<yearStart(2024)||t.outcome==='NONE')continue;const k=t.priorHoldRate===null?'SEM_HISTORICO':t.priorHoldRate<0.5?'ABAIXO_DE_50':'A_PARTIR_DE_50';buckets[k][t.outcome==='HOLD'?'hold':'break']++;}
-  return {pivotBars,buckets:Object.fromEntries(Object.entries(buckets).map(([k,v])=>[k,{...v,holdRate:v.hold+v.break?v.hold/(v.hold+v.break):null}]))};});
+ const holdPrediction=[12,24].flatMap(pivotBars=>(AMENDMENT?[0,1]:[0]).map(keepBroken=>({pivotBars,keepBroken}))).map(({pivotBars,keepBroken})=>{const buckets:Record<string,{hold:number;break:number}>={SEM_HISTORICO:{hold:0,break:0},ABAIXO_DE_50:{hold:0,break:0},A_PARTIR_DE_50:{hold:0,break:0}};
+  for(const c of coins)for(const t of supportResistance(c.candles,{pivotBars,minRetests:1,minHoldRate:0.5,keepBroken}).touches){if(t.time<yearStart(2024)||t.outcome==='NONE')continue;const k=t.priorHoldRate===null?'SEM_HISTORICO':t.priorHoldRate<0.5?'ABAIXO_DE_50':'A_PARTIR_DE_50';buckets[k][t.outcome==='HOLD'?'hold':'break']++;}
+  return {pivotBars,version:keepBroken?'V2':'V1',buckets:Object.fromEntries(Object.entries(buckets).map(([k,v])=>[k,{...v,holdRate:v.hold+v.break?v.hold/(v.hold+v.break):null}]))};});
  // 7) H06: lados escolhidos no treino e o sinal do retorno médio no ano de teste.
  const calendarTables=Object.fromEntries(P.calendarKinds.map(kind=>[kind,P.testYears.map(y=>{const fit=calendar[kind].fits[y],test=fitCalendar(coins.map(c=>c.candles),kind,yearStart(y),Math.min(yearStart(y+1),testEnd));
   return {year:y,chosen:fit.buckets.filter(b=>b.side!==0).map(b=>({bucket:b.bucket,side:b.side,trainT:b.t,testMean:test.buckets.find(x=>x.bucket===b.bucket)?.meanReturn??null,signKept:Math.sign(test.buckets.find(x=>x.bucket===b.bucket)?.meanReturn??0)===b.side}))};})]));
  const candidates=report.filter(r=>r.verdict==='CANDIDATA').map(r=>r.family);
- const out={protocol:P,trials:TRIALS,provenance:scriptProvenance('scripts/estudos/hipoteses-video.ts'),execution:'HISTORICAL_SIMULATION_OFFLINE',automaticPaperApproval:false,runAt:new Date().toISOString(),
+ const out={protocol:P,amendment:AMENDMENT?'EMENDA_1_H04_V2':null,trials:TRIALS,provenance:scriptProvenance('scripts/estudos/hipoteses-video.ts'),execution:'HISTORICAL_SIMULATION_OFFLINE',automaticPaperApproval:false,runAt:new Date().toISOString(),
   data:coins.map(c=>({symbol:c.symbol,candles:c.candles.length,filled:c.filled,fundings:c.funding.length,fundingMarkFilled:c.fundingMarkFilled})),trialSharpeVariance:variance,families:report,baselines,holdPrediction,calendarTables,
   combinations:candidates.length?{status:'PENDENTE_DE_PROTOCOLO_PROPRIO',components:candidates}:{status:'NAO_EXECUTADAS',reason:'nenhum componente foi classificado como CANDIDATA (regra do documento: combinar só o que se sustenta sozinho)'}};
- const base_='docs/estudos/hipoteses-video-2026-10-06';writeFileSync(base_+'.json',JSON.stringify(out,null,1));writeFileSync(base_+'.md',markdown(out));
+ const base_=AMENDMENT?'docs/estudos/hipoteses-video-emenda1-2026-10-06':'docs/estudos/hipoteses-video-2026-10-06';writeFileSync(base_+'.json',JSON.stringify(out,null,1));writeFileSync(base_+'.md',markdown(out));
  console.log('referência: cesta com 10% de exposição',(baselines.basketSameExposure*100).toFixed(2)+'%','| combinações:',out.combinations.status);
 }
 const pct=(v:number|null|undefined)=>v===null||v===undefined||!Number.isFinite(v)?'—':(v>=0?'+':'')+(v*100).toFixed(2)+'%',num=(v:number|null|undefined,d=2)=>v===null||v===undefined||!Number.isFinite(v)?'—':v.toFixed(d);
@@ -128,7 +130,7 @@ function markdown(r:any){
   `Referência: cesta das 15 moedas comprada com a mesma exposição (10%): ${pct(r.baselines.basketSameExposure)}; ficar de fora: 0%.`,'',
   '## Configuração escolhida em cada ano (pelo treino)','',...r.families.map((f:any)=>`- ${f.family}: ${Object.entries(f.selected).map(([y,id])=>`${y} → ${id}`).join('; ')}`),'',
   '## H04: a taxa de acerto passada prevê o próximo reteste? (toques de 2024 em diante)','','| Pivô | Sem histórico | Taxa anterior < 50% | Taxa anterior ≥ 50% |','|---|---|---|---|',
-  ...r.holdPrediction.map((h:any)=>`| ${h.pivotBars} velas | ${pct(h.buckets.SEM_HISTORICO.holdRate)} (${h.buckets.SEM_HISTORICO.hold+h.buckets.SEM_HISTORICO.break}) | ${pct(h.buckets.ABAIXO_DE_50.holdRate)} (${h.buckets.ABAIXO_DE_50.hold+h.buckets.ABAIXO_DE_50.break}) | ${pct(h.buckets.A_PARTIR_DE_50.holdRate)} (${h.buckets.A_PARTIR_DE_50.hold+h.buckets.A_PARTIR_DE_50.break}) |`),'',
+  ...r.holdPrediction.map((h:any)=>`| ${h.pivotBars} velas (${h.version}) | ${pct(h.buckets.SEM_HISTORICO.holdRate)} (${h.buckets.SEM_HISTORICO.hold+h.buckets.SEM_HISTORICO.break}) | ${pct(h.buckets.ABAIXO_DE_50.holdRate)} (${h.buckets.ABAIXO_DE_50.hold+h.buckets.ABAIXO_DE_50.break}) | ${pct(h.buckets.A_PARTIR_DE_50.holdRate)} (${h.buckets.A_PARTIR_DE_50.hold+h.buckets.A_PARTIR_DE_50.break}) |`),'',
   '## H06: períodos escolhidos no treino (|t| ≥ 3) e se o sinal se manteve no ano de teste','',
   ...Object.entries(r.calendarTables).flatMap(([kind,rows]:[string,any])=>[`**${kind}**`,'',...rows.map((row:any)=>`- ${row.year}: ${row.chosen.length?row.chosen.map((c:any)=>`${c.bucket} (${c.side>0?'compra':'venda'}, t=${num(c.trainT,1)}, ${c.signKept?'manteve':'inverteu'})`).join(', '):'nenhum período passou no corte'}`),'']),
   `## Combinações (C01 a C03)`,'',r.combinations.status==='NAO_EXECUTADAS'?`Não executadas: ${r.combinations.reason}.`:`Componentes candidatos: ${r.combinations.components.join(', ')}. As combinações exigem protocolo próprio, declarado antes de rodar.`,'',

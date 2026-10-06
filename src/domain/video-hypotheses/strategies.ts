@@ -7,7 +7,7 @@ import {atr,returnStd,rollingExtremes,rollingVwap,sessionVwap,sma} from './indic
  * VIDEO_HYPOTHESES_V1, docs/PROTOCOLO_HIPOTESES_VIDEO.md). Cada estratégia pré-calcula indicadores causais e decide no
  * fechamento da vela i usando só as velas 0..i. A H06 (calendário) depende da janela de treino e fica em calendar.ts.
  */
-export type Family='H01_FIBONACCI'|'H02_MA_DEVIATION'|'H03_VWAP'|'H04_SUPPORT_RESISTANCE'|'H05_FLAG';
+export type Family='H01_FIBONACCI'|'H02_MA_DEVIATION'|'H03_VWAP'|'H04_SUPPORT_RESISTANCE'|'H04_V2_SUPPORT_RESISTANCE'|'H05_FLAG';
 export interface HypothesisConfig {id:string;family:Family;params:Record<string,number|string>}
 const ATR_BARS=24;
 
@@ -99,13 +99,16 @@ interface Zone {type:'SUPPORT'|'RESISTANCE';top:number;bottom:number;created:num
 /** Zonas de pivôs confirmados e estatística de retestes, tudo no ponto do tempo (sem pivô futuro, sem resultado futuro). */
 export function supportResistance(candles:readonly Candle[],p:Record<string,number|string>){
  const L=Number(p.pivotBars),minRetests=Number(p.minRetests),minHold=Number(p.minHoldRate),range=atr(candles,ATR_BARS);
+ // V1 descarta a zona no rompimento (então a taxa de acerto das zonas vivas é sempre 100%). V2 (emenda 1) mantém a zona:
+ // o rompimento conta como reteste que falhou e a zona só sai pela idade, como na estatística "Held %" do vídeo.
+ const keepBroken=p.keepBroken===1;
  const zones:Zone[]=[],signal=new Array<Decision>(candles.length).fill(null),touches:ZoneTouchStat[]=[];
  for(let i=0;i<candles.length;i++){
   const c=candles[i],a=range[i];
   // 1) Resolve retestes pendentes: segura se fechar 0,5 ATR além da zona em até 12 velas antes de fechar do outro lado.
   for(const z of zones){if(!z.pending||z.broken)continue;const age=i-z.pending.at,stat=z.pending.stat;
    const held=z.type==='SUPPORT'?c.close>z.top+0.5*(range[z.pending.at]||0):c.close<z.bottom-0.5*(range[z.pending.at]||0),broke=z.type==='SUPPORT'?c.close<z.bottom:c.close>z.top;
-   if(broke){z.eligible++;z.broken=true;z.pending=null;stat.outcome='BREAK';}else if(held){z.eligible++;z.holds++;z.pending=null;stat.outcome='HOLD';}else if(age>=12){z.pending=null;}}
+   if(broke){z.eligible++;z.broken=!keepBroken;z.pending=null;stat.outcome='BREAK';}else if(held){z.eligible++;z.holds++;z.pending=null;stat.outcome='HOLD';}else if(age>=12){z.pending=null;}}
   for(let k=zones.length-1;k>=0;k--)if(zones[k].broken||i-zones[k].created>720)zones.splice(k,1);
   // 2) Pivô em i-L confirmado agora (extremo das L velas antes e das L depois, todas já fechadas).
   const pv=i-L;if(pv>=L&&Number.isFinite(range[i])){let isHigh=true,isLow=true;for(let k=pv-L;k<=pv+L;k++){if(candles[k].high>candles[pv].high)isHigh=false;if(candles[k].low<candles[pv].low)isLow=false;}
@@ -135,6 +138,8 @@ export const HYPOTHESIS_GRID:HypothesisConfig[]=[
  ...[48,168].flatMap(lookback=>[0.236,0.382,0.5,0.618].map(level=>({id:`H01_N${lookback}_L${level}`,family:'H01_FIBONACCI' as const,params:{lookback,level}}))),
  ...[6,12].flatMap(impulseBars=>[0.382,0.5].map(depth=>({id:`H05_I${impulseBars}_D${depth}`,family:'H05_FLAG' as const,params:{impulseBars,depth}}))),
 ];
+/** Emenda 1 (declarada em docs/PROTOCOLO_HIPOTESES_VIDEO.md antes de rodar): H04 com zonas que sobrevivem ao rompimento. */
+export const AMENDMENT_1_GRID:HypothesisConfig[]=[12,24].flatMap(pivotBars=>[1,2].flatMap(minRetests=>[0.5,0.67].map(minHoldRate=>({id:`H04V2_P${pivotBars}_M${minRetests}_H${minHoldRate}`,family:'H04_V2_SUPPORT_RESISTANCE' as const,params:{pivotBars,minRetests,minHoldRate,keepBroken:1}}))));
 export function buildStrategy(candles:readonly Candle[],config:HypothesisConfig):SignalStrategy{
  const p=config.params;
  switch(config.family){
@@ -142,6 +147,6 @@ export function buildStrategy(candles:readonly Candle[],config:HypothesisConfig)
   case 'H02_MA_DEVIATION':return maDeviation(candles,p);
   case 'H01_FIBONACCI':return fibonacci(candles,p);
   case 'H05_FLAG':return flag(candles,p);
-  case 'H04_SUPPORT_RESISTANCE':return supportResistance(candles,p).strategy;
+  case 'H04_SUPPORT_RESISTANCE':case 'H04_V2_SUPPORT_RESISTANCE':return supportResistance(candles,p).strategy;
  }
 }
