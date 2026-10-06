@@ -71,3 +71,7 @@ nav select{background:var(--bar)}
 .scenarios{list-style:none;margin:8px 0;padding:0}
 .stage .bad{color:#ff8f8f}
 .studies li{font-size:12px;margin-bottom:4px}
+/* F4: Nexus, Diagnóstico, Auditoria, Risk */
+.graph{display:block;width:100%;max-width:300px;margin:8px auto;border:1px solid var(--line);border-radius:8px;image-rendering:auto}
+.meter{height:6px;background:#26314a;border-radius:3px;overflow:hidden;margin:4px 0}
+.meter span{display:block;height:100%;background:var(--state,#22e39f)}
