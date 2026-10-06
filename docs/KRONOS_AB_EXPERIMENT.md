@@ -247,3 +247,45 @@ At completion, write a repository report containing:
 - recommendation: reject, continue research, or prepare a separate reviewed next experiment.
 
 Do not merge or deploy. Await human review.
+
+
+## Multi-model comparison extension
+
+Run the experiment as four strictly comparable arms, using identical evaluation windows, symbols, candle source, capital, fees, spread/slippage, funding assumptions, execution timing, risk constraints and frozen scoring rules:
+
+A. TRADINGLAB-BASELINE — existing research behavior unchanged.
+
+B. KRONOS-ORIGINAL — upstream shiyu-coder/Kronos, beginning with Kronos-mini as already specified above.
+
+C. KRONOS-BTC-FINETUNED — evaluate the open-source BTC/USDT fine-tuned Kronos candidate from Liucong-JunZi/Kronos-Btc-finetune, specifically the 1h/4h variants when compatible with the retained Trading Lab data. Treat this as an external research artifact: inspect its code, training/evaluation assumptions, license, weights provenance and potential leakage before use. Pin the exact repository commit/model revision actually tested. If provenance, licensing, chronology or reproducibility cannot be established, mark this arm rejected/unavailable rather than improvising.
+
+D. CRYPTOMAMBA — evaluate MShahabSepehri/CryptoMamba as a crypto-specific candidate. Inspect and pin the exact upstream commit, dependencies, data preprocessing and model configuration. Its published/default BTC daily setup must NOT be presented as evidence for 1h/4h performance. Any adaptation to Trading Lab timeframes must be versioned, calibrated only on pre-test data and reported separately from upstream/default behavior.
+
+### Fair-comparison requirements
+
+- No model may receive candles or derived information unavailable to the other arm at prediction time.
+- Use a shared canonical OHLCV/evaluation dataset wherever model input contracts permit.
+- Do not alter the final test interval, cost model or Trading Lab universe after seeing any model result.
+- Model-specific calibration is allowed only on chronological train/calibration periods and must be frozen before final evaluation.
+- Record all failed configurations and rejected predictions.
+- Compare both forecast quality and trading utility; lower forecast error alone is not a win.
+- Keep raw model forecasts separate from the versioned rule that maps forecasts into advisory trading signals.
+- No model gets order authority. All four arms remain offline historical research only.
+
+### Required comparison output
+
+Produce one consolidated machine-readable comparison plus a human-readable table containing, for every valid arm and timeframe: net P&L after costs, max drawdown, Sharpe, profit factor, win rate where supported, trades/signals, turnover, gross vs net result, directional accuracy, forecast error, coverage/rejections, inference time and resource use.
+
+Also report pairwise deltas versus TRADINGLAB-BASELINE and rank candidates separately by: (1) risk-adjusted trading result, (2) drawdown, (3) robustness across walk-forward windows/regimes, and (4) compute/resource cost. Do not collapse these into a single opaque score.
+
+### Staged execution
+
+First prove the shared pipeline and leakage controls with BTC and the smallest practical model/configuration. Then run the comparable 1h/4h arms supported by the retained dataset. A model that cannot validly support a timeframe must be marked N/A; do not fabricate an adaptation merely to fill the table.
+
+Only after the BTC comparison is reproducible may a candidate extend to the repository's pre-declared multicoins universe. The universe must remain frozen before results are inspected.
+
+### Updated decision rule
+
+The purpose is model selection, not confirmation of Kronos. The final report must recommend one of: keep baseline only; continue research on Kronos original; continue research on Kronos BTC fine-tune; continue research on CryptoMamba; or continue more than one candidate because evidence is inconclusive. A profitable result by itself is insufficient. Prefer evidence that survives costs, walk-forward testing, regime changes and leakage checks.
+
+The existing XSMOM_FORWARD_V1 12-week forward protocol remains untouched and independent from this multi-model historical experiment.
