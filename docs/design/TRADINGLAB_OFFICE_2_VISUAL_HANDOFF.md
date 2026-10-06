@@ -271,3 +271,142 @@ Office 2.0 is done only when:
 - security invariants remain green
 - tests pass
 - documentation describes how each view maps to backend truth
+
+
+## OFFICIAL VISUAL REFERENCE — APPROVED 2026-10-06
+
+The user has selected the previously approved isometric office image as the official structural reference for the TradingLab home/Office 2.0. Do not substitute the later futuristic crypto-city concept.
+
+Reference source characteristics:
+- source image: 709 x 1536 px, portrait
+- intent: concept/reference, NOT a baked production background
+- target: responsive website/notebook-first Office 2.0
+- preserve: isometric overview, complete-office readability, 30th-floor/high-rise feeling, panoramic exterior/city context, pixel-art identity
+- allowed: improve proportions, circulation, furniture, zoning, lighting and module placement
+- forbidden: flatten into a generic dashboard; replace with a crypto-city scene; stretch the portrait image to fit viewport; bake live UI text/metrics into background art
+
+### Required spatial mapping
+
+Claude must inspect the reference image and turn it into a reproducible scene map. The production layout must contain clear homes for:
+1. MAIN TRADING FLOOR — central agent workspace and primary overview.
+2. MARKET / HORIZON — market intelligence, symbols, regime, volatility and evidence.
+3. DECISION RING — Trader -> Risk -> Validator -> Paper Execution -> Audit lifecycle.
+4. RISK CONTROL — risk blocks, limits, kill switch and exposure state.
+5. NEXUS — real agent/service communications and handoffs.
+6. COLLISION / DIAGNOSTICS — selected-run timeline, provenance, retries, disagreements and latency.
+7. STRESS LAB — deterministic adverse-scenario testing.
+8. BACKTEST / EXPERIMENT AREA — historical experiments and comparison.
+9. PAPER EXECUTION — simulated orders/positions only; visually distinct from analysis.
+10. AUDIT / LOGS — receipts, event history and traceability.
+11. IDLE / LOUNGE — safe visual state for agents not actively processing work.
+12. PANORAMIC 30TH-FLOOR EDGE — windows/exterior depth that communicates the office is high in a tower.
+
+Claude may merge adjacent areas when viewport constraints require it, but every functional module above must have an explicit navigation/visual home.
+
+### Scene-layer contract
+
+Do not treat the reference as one giant image. Audit the current renderer and prefer composable layers:
+- L0 exterior skyline / depth
+- L1 structural shell, windows, floor
+- L2 walls/partitions/room boundaries
+- L3 static furniture and architectural props
+- L4 interactive terminals/screens/room hotspots
+- L5 agent sprites and movement paths
+- L6 effects/status indicators
+- L7 HTML/Canvas UI labels, metrics and overlays
+
+Live metrics belong in L7 or runtime-rendered screens, not permanently painted into static PNG backgrounds.
+
+### Audit required before asset requests
+
+Before asking ChatGPT for any new image, Claude MUST:
+- locate the actual current office renderer and all asset directories
+- enumerate every current reusable sprite/background/furniture/character asset
+- verify exact dimensions, alpha/transparency, scale and camera/perspective
+- identify current agent sprite frame contracts
+- identify navigation/collision/walkable-grid constraints
+- identify responsive breakpoints and notebook viewport
+- identify every backend event/API/WebSocket that can drive each visual state
+- mark each proposed visual element REAL, STATIC, SIMULATION or UNKNOWN/OFFLINE
+- compare current implementation against the 12 required spatial modules above
+- list gaps before creating requests
+
+### Required reference mapping deliverable
+
+Create/update `docs/design/OFFICE_VISUAL_SPEC.md` with:
+- reference-image breakdown
+- proposed landscape/isometric production composition
+- room/module coordinates or normalized bounds
+- walkable areas and blocked areas
+- z-order/layering rules
+- camera/scale rules
+- desktop/notebook/mobile behavior
+- click/tap hotspots
+- agent spawn/work/idle points
+- screen/terminal mounting points
+- exterior/window treatment
+- palette and lighting rules
+- asset reuse/replacement decisions
+
+Also create a machine-friendly scene map if the renderer benefits from it, e.g. `office-scene-map.json`, but only after confirming the existing architecture and schema.
+
+### Asset completeness gate
+
+`OFFICE_ASSET_REQUESTS.md` must be produced only AFTER the audit and visual spec. Claude must perform a second completeness pass and explicitly answer:
+- Does every mapped room have all structural assets?
+- Does every interactive module have required terminal/screen/prop assets?
+- Do all agent states have compatible sprites/animations?
+- Are transitions/doors/path edges covered?
+- Are background/exterior layers covered?
+- Are status/effect assets covered?
+- Are notebook/mobile variants needed?
+- Are any assets duplicated by existing files?
+- Are dimensions and filenames executable without guessing?
+
+The manifest must include every required P0/P1/P2 asset with exact filename, destination, dimensions, alpha, view angle, prompt/description, frame contract and integration notes.
+
+### Stop point for Claude
+
+After completing the audit, visual spec, inventory, backend map and complete asset request manifest:
+1. run a self-review against this official reference section
+2. fix missing/duplicate/ambiguous asset requests
+3. commit all documents
+4. STOP asset-dependent implementation
+5. report branch, commit SHA, exact manifest paths and P0/P1/P2 counts
+
+ChatGPT will then read the committed manifest, generate/prepare the requested images and sprites, and return them in the exact structure required for Claude integration.
+
+### Reference image repository requirement
+
+Store the approved source reference under:
+`docs/design/references/tradinglab-office-2-approved-reference.jpg`
+
+Claude must use that repository file as the visual source of truth together with this document. If the binary reference is not yet present in the branch when Claude reads this, do not substitute another image: report it as a blocker and continue only with the audit/inventory tasks that do not require visual inspection.
+
+
+### Local handoff note — approved reference image
+
+The approved reference image has been downloaded to the user's Windows notebook Downloads folder with filename:
+`tradinglab-office-2-approved-reference.jpg`
+
+Before visual inspection/implementation, Claude must locate that exact file in the current user's Downloads folder, verify it is the approved isometric Office 2.0 reference, then copy it into the repository at:
+`docs/design/references/tradinglab-office-2-approved-reference.jpg`
+
+Do not rename/substitute/regenerate the reference. After copying it, verify the repository file opens correctly and include it in the same working branch before completing the visual audit and asset manifest.
+
+
+### FINAL REFERENCE CONFIRMATION — 2026-10-06
+
+The definitive Office 2.0 visual reference is the user-confirmed isometric TradingLab office image showing the 30th-floor HQ with visible labeled zones including HORIZON, NEXUS, RING, STRESS LAB and RISK, plus reception, lounge/convivência, kitchen, meeting/operations areas, balcony and panoramic city glazing.
+
+The source file downloaded from ChatGPT must be named exactly:
+`tradinglab-office-2-approved-reference.jpg`
+
+Claude must look for this exact filename in the Windows Downloads folder. If the downloaded file is still named `387958.jpg`, rename it to `tradinglab-office-2-approved-reference.jpg` before copying it into the repository.
+
+Canonical repository destination:
+`docs/design/references/tradinglab-office-2-approved-reference.jpg`
+
+Identity check before use: the image must visibly contain the 30º ANDAR / TRADINGLAB HQ card and the labeled HORIZON, NEXUS, RING, STRESS LAB and RISK spaces. If those elements are not present, it is the wrong image. Do not substitute any ATS-MATRIX diagram, Matrix links/assets, futuristic crypto-city image, or any other generated concept.
+
+This confirmation overrides any earlier ambiguous reference-image note. Use this image as the visual source of truth for the Office 2.0 audit, spatial specification and asset manifest.

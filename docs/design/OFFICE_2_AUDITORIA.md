@@ -1,91 +1,100 @@
 # Escritório 2.0: auditoria, linha de base e fases
 
-Status: primeira entrega do `TRADINGLAB_OFFICE_2_VISUAL_HANDOFF.md`. **Só documentação.** Nenhum código ou arte do escritório foi alterado.
+Status: primeira entrega do `TRADINGLAB_OFFICE_2_VISUAL_HANDOFF.md`, já com a **referência oficial aprovada em 06/10/2026**. Só documentação, mapa e um teste do mapa. Nenhum código ou arte do escritório atual foi alterado.
 Data: 06/10/2026.
 Base: `main` 224c430.
 
-## 1. Linha de base
+## 1. Referência oficial
+
+| Item | Valor |
+|---|---|
+| Arquivo | `docs/design/references/tradinglab-office-2-approved-reference.jpg` |
+| Origem | `C:\Users\Danrley\Downloads\tradinglab-office-2-approved-reference.jpg`, copiado sem renomear nem alterar |
+| Dimensões | 1536 × 1024, JPEG (o handoff dizia 709 × 1536 em retrato; vale o arquivo) |
+| sha256 | `a958874603ea5f34da1aa035dce0125dce0f9c17012b136552dc7e15298d9376` |
+| Identidade | confere: cartão "30º ANDAR · TRADINGLAB HQ", áreas HORIZON, NEXUS, RING, STRESS LAB e RISK, recepção, convivência, cozinha, varanda e fachada panorâmica |
+| Abre corretamente | sim (decodificada e inspecionada em 4 quadrantes em resolução cheia) |
+
+## 2. Linha de base
 
 | Item | Resultado |
 |---|---|
-| Testes (CI da `main` em 224c430, com PostgreSQL) | `npm test`: 381 testes, 381 passam, 0 pulados |
-| Testes do escritório no CI (`office*.test.js`) | 109 de 109 passam |
-| Assets | 103 PNG medidos (`OFFICE_ASSET_INVENTORY.md`) |
-| Cena | 1852 × 849, fundo único `cenario-modular.png` (2,19 MB) montado de 88 peças |
-| Personagens | 8 folhas, 24 quadros cada (6 × 4), em DOM ou canvas opcional |
-| Telas com dados | 24 telas de mesa + 10 telões, todas com dado real ou apagadas sem dado |
-| Desempenho | o `scene-canvas.js` mede FPS e p95 no navegador; **não medido nesta entrega**. Medição prevista na fase F7, no notebook, com e sem salas abertas |
+| Testes (CI da `main` em 224c430, com PostgreSQL) | `npm test`: 381 de 381 |
+| Testes do escritório no CI | 109 de 109 |
+| Teste novo desta entrega | `test/office-scene-map.test.ts`: 4 de 4 |
+| Assets atuais | 103 PNG medidos (`OFFICE_ASSET_INVENTORY.md`) |
+| Cena atual | 1852 × 849, vista **3/4 frontal**, fundo único `cenario-modular.png` (2,19 MB) de 88 peças |
+| Personagens | 8 folhas 6 × 4 (frente, esquerda, direita, costas) |
+| Desempenho | o `scene-canvas.js` mede FPS e p95; **não medido nesta entrega** (fase F7) |
 
-## 2. O escritório hoje
+## 3. Escritório atual × os 12 módulos da referência
 
-- **Interface:** `public/office/` tem 26 módulos JS sem framework, cada um com um papel declarado no cabeçalho ("só apresentação", "sem capacidade de execução").
-- **Arquivos servidos:** o servidor só entrega os da lista fixa em `src/application/office-assets.ts`, com `nosniff` e `no-cache`.
-- **Movimento dos agentes:**
-  - posição e sala vêm de `/agents`;
-  - a caminhada até outro agente vem de mensagem gravada;
-  - os passeios cosméticos são rotulados como pausa e não mudam estado (`life.js`).
-- **Telas:**
-  - `screens.js` e `desk-screens.js` desenham só o que a página recebeu;
-  - sem fonte fresca, a tela diz isso em vez de mostrar um gráfico de mentira.
-- **Navegação:**
-  - menu lateral com 9 itens;
-  - 3 áreas clicáveis na cena (Data Center, War Room, Análise de Mercado);
-  - diálogos para agente, tela, gráfico, auditoria, sala, pesquisa e estudo.
-- **Responsivo:**
-  - pontos de quebra em 600, 640, 700, 760, 1050 e 1100 px;
-  - movimento reduzido respeita `prefers-reduced-motion`;
-  - a animação do canvas pausa com a aba oculta.
-- **Fluxo de assets:** já existe (`docs/ASSETS_MODULARES.md`):
-  - folhas geradas por imagem;
-  - recorte por `scripts/assets/slice-sheet.ts` (com testes);
-  - catálogo, escala e montagem em `scripts/assets/compor-cenario.html`.
-  - O Escritório 2.0 usa o mesmo fluxo.
+| Módulo | Hoje | Lacuna |
+|---|---|---|
+| Main trading floor | Trading Floor (Nova, Flux) | vira o Ring; o hall é a visão geral |
+| Market / Horizon | Análise de Mercado (4 telões reais) | zona própria com mesas e 2 telões |
+| Decision Ring | não existe; fichas de decisão já na `main` (#84) | zona + painel novos |
+| Risk control | Risk Desk (quadro de 5 checagens) | zona com kill switch, motivos e limites |
+| Nexus | só a lista de mensagens | grafo novo |
+| Collision / Diagnostics | Data Center (prontidão) | linha do tempo da decisão |
+| Stress Lab | não existe; laboratório na `main` (#85), sem rota | zona + rota de leitura |
+| Backtest | painel de estudos | zona própria |
+| Paper execution | War Room (equity, posições) | subzona separada da análise |
+| Audit / logs | diálogo de auditoria | zona própria |
+| Idle / lounge | Lounge e copa (passeio cosmético rotulado) | convivência, cozinha, café, varanda |
+| Panoramic edge | faixa de cidade 1852 × 82 | cidade em L0 + fachada de vidro + terraço e varanda |
 
-O que **já cumpre** o contrato do documento:
-- não há telemetria inventada;
-- UNKNOWN aparece como tela apagada;
-- não há chave no cliente;
-- toda imagem passa por uma lista fixa.
+A diferença maior não é de módulo, é de **câmera**: a referência é isométrica 2:1, e nenhuma peça 3/4 atual serve nela.
 
-O que **falta**:
-- as 5 visões novas: Anel, Horizonte, Comunicação, Diagnóstico e Laboratório;
-- marcação `REAL`, `STATIC`, `SIMULATION` ou `UNKNOWN` por elemento;
-- rota para o laboratório de estresse;
-- deploy das fichas de decisão.
-
-## 3. Entregáveis desta etapa
+## 4. Entregáveis
 
 | Documento | Conteúdo |
 |---|---|
-| `docs/design/OFFICE_ASSET_INVENTORY.md` | 103 PNG com caminho, formato, dimensões, transparência, fração opaca, quadros, referências, uso e reuso |
-| `docs/design/OFFICE_BACKEND_VISUAL_MAP.md` | cada elemento visual atual e novo → fonte no backend e classe (`REAL`, `STATIC`, `SIMULATION`, `UNKNOWN`), mais as lacunas que limitam o visual |
-| `docs/design/OFFICE_VISUAL_SPEC.md` | arquitetura (cena única + salas sob demanda), zonas, salas, estilo, desempenho, responsivo e segurança |
-| `docs/design/OFFICE_ASSET_REQUESTS.md` | **manifesto de produção:** 10 pedidos (3 P0, 6 P1, 1 P2) → 37 imagens finais |
-| `docs/design/TRADINGLAB_OFFICE_2_VISUAL_HANDOFF.md`, `docs/research/atsmatrix-tradinglab-evolution.md` | cópias dos documentos-base do branch `research/atsmatrix-agent-architecture`, sem alteração, para as referências funcionarem nesta branch |
+| `OFFICE_VISUAL_SPEC.md` | leitura da referência (limites normalizados), desvios declarados, composição isométrica, zonas em tiles, áreas andáveis e bloqueadas, camadas L0 a L7, ordem de profundidade, câmera e escala, notebook e celular, áreas clicáveis, pontos de trabalho e lazer, montagem de telas, exterior, paleta, reuso |
+| `office-scene-map.json` + `references/office-scene-map-preview.png` | planta de máquina: 16 áreas, portas, 8 postos, 8 pontos de lazer, chegada, 10 telas; prévia desenhada a partir do JSON |
+| `OFFICE_ASSET_INVENTORY.md` | 103 PNG medidos, com a decisão de reuso atualizada para a vista isométrica |
+| `OFFICE_BACKEND_VISUAL_MAP.md` | zona → telas → painel → fonte → REAL, STATIC, SIMULATION ou UNKNOWN; barra de cima sem "nível do trader" |
+| `OFFICE_ASSET_REQUESTS.md` | **manifesto**: 21 pedidos (5 P0, 14 P1, 2 P2) → 74 imagens finais, com conferência de completude |
+| `references/tradinglab-office-2-approved-reference.jpg` | referência oficial |
 
-## 4. Fases propostas
+## 5. Revisão contra a seção da referência oficial
+
+| Exigência do handoff | Feito? |
+|---|---|
+| Copiar a referência para o caminho canônico, sem substituir | sim (seção 1) |
+| Visão isométrica geral, legível, 30º andar, cidade panorâmica, identidade pixel-art | sim (`OFFICE_VISUAL_SPEC.md`, seções 2 a 8) |
+| Não achatar em dashboard, não trocar por cidade cripto, não esticar a imagem, não gravar texto ao vivo na arte | sim (texto só em L7, arte sem texto, composição 16:9 própria) |
+| Lugar explícito para os 12 módulos | sim; conferido pelo teste do mapa |
+| Contrato de camadas L0 a L7 | sim (`OFFICE_VISUAL_SPEC.md`, seção 4) |
+| Auditoria antes dos pedidos (renderizador, assets, dimensões, alfa, escala, câmera, quadros, navegação, pontos de quebra, fontes de dados, classes, comparação com os 12 módulos) | sim (este documento, inventário e mapa backend) |
+| Especificação com todos os itens pedidos | sim |
+| Mapa de máquina só depois de conferir a arquitetura | sim; marcado como PROPOSTA, para a F1 conferir no compositor |
+| Conferência de completude respondida | sim (fim do manifesto) |
+| Corrigir pedidos faltantes, duplicados ou ambíguos | os 5 fundos de sala da versão anterior saíram; os móveis ganharam retângulo e ponto de apoio exatos |
+
+## 6. Fases propostas
 
 Cada fase é um PR, sem merge automático e com testes.
 
 | Fase | O que entra | Depende da arte? |
 |---|---|---|
-| F1 | Casca de sala: `room-view`, item "Salas" no menu, áreas clicáveis nas zonas, botão voltar, pausa da cena, carregamento sob demanda; marcação `data-truth` e teste contra `Math.random` nos módulos de sala | não (fundo de cor sólida marcado "placeholder de desenvolvimento") |
-| F2 | Anel de Decisão com dados: 5 estágios a partir de `/paper/perpetual/pilot/receipts`, navegação entre decisões, VALIDATOR parcialmente `UNKNOWN`, resumo | não (fica melhor com P0) |
-| F3 | Laboratório de Estresse com dados: rota do relatório (só leitura do último, ou execução autenticada e única), lâmpadas, placar, selo SIMULAÇÃO | não (fica melhor com P0) |
-| F4 | Comunicação (grafo de `/agent-messages`) e Diagnóstico (ficha + paridade + prontidão) | não |
-| F5 | Horizonte (reaproveita os gráficos da Análise de Mercado em tamanho de sala) | não |
-| F6 | Integração da arte: recorte, medição dos retângulos de tela, lista de arquivos servidos, otimização | **sim** |
-| F7 | Desempenho (FPS e p95 com cada sala, no notebook), responsivo, segurança, regressão visual manual | depois de F6 |
-| F8 | Documentação final: cada visão → fonte no backend | — |
+| F1 | Renderizador isométrico: projeção, casca por código (L1 e L2), grade andável e A*, agentes com as folhas atuais mapeadas, foco 2× por zona, barra de cima, marcação `data-truth`. Rota `/office2` ao lado do escritório atual (rollback = continuar no `/office`). | não (móveis como blocos marcados "placeholder de desenvolvimento") |
+| F2 | Ring: Anel de Decisão (fichas #84) e Execução paper | não |
+| F3 | Stress Lab (rota de leitura do relatório) e Backtest | não |
+| F4 | Nexus, Diagnóstico, Auditoria, Risk | não |
+| F5 | Horizon (gráficos atuais em telas de zona) | não |
+| F6 | Integração da arte P0 e P1: recorte, medição de quadriláteros, lista de arquivos servidos | **sim** |
+| F7 | Desempenho no notebook (FPS e p95), celular, segurança, revisão visual | depois da F6 |
+| F8 | Troca do `/office` padrão para o 2.0 (com aprovação) e documentação final | — |
 
 Pré-requisitos de backend fora deste trabalho:
 - deploy aprovado das fichas (#84);
-- passo 5 do mapa ATS-MATRIX (lacunas L1, L2, L5 e L6), só depois do piloto (≈ 11/10).
+- passo 5 do mapa ATS-MATRIX (L1, L2, L5, L6), depois do piloto (≈ 11/10).
 
-## 5. Ponto de parada
+## 7. Ponto de parada
 
-Conforme o documento, o trabalho visual que depende de arte para aqui. O próximo passo do dono:
-1. pedir ao ChatGPT para ler `docs/design/OFFICE_ASSET_REQUESTS.md`;
-2. o ChatGPT valida o manifesto, gera a arte e entrega no branch `assets/escritorio-2`.
+O trabalho que depende de arte para aqui. O próximo passo do dono:
+1. pedir ao ChatGPT para ler `docs/design/OFFICE_ASSET_REQUESTS.md`, com a referência em `docs/design/references/`;
+2. o ChatGPT entrega no branch `assets/escritorio-2`.
 
-**Pode continuar sem a arte:** F1 a F5 inteiras, com fundos de placeholder marcados como tal. A arte entra na F6 sem mudar a lógica.
+**Pode continuar sem a arte:** F1 a F5, com móveis em placeholder marcado.
