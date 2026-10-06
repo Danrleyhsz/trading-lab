@@ -62,7 +62,7 @@ test('qualidade da previsão: acerto, p-valor binomial e referências',()=>{
 });
 
 test('isolamento: o código do experimento não importa corretora, contas, ordens nem credenciais',()=>{
- const files=['experiments/kronos/lib.js',...readdirSync('experiments/kronos/scripts').map(f=>'experiments/kronos/scripts/'+f)];
+ const files=['experiments/kronos/lib.ts',...readdirSync('experiments/kronos/scripts').map(f=>'experiments/kronos/scripts/'+f)];
  for(const f of files){const s=readFileSync(f,'utf8');
   assert.doesNotMatch(s,/paper-broker|perpetual-paper-book|paper-accounts|binance-futures-demo|trading-service|BINANCE_DEMO_API|apiKey|fapi\/v1\/order|signature=/i,f);}
 });
