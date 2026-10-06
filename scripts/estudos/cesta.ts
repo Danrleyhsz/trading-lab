@@ -2,6 +2,7 @@
 // servidor, só com dados públicos da Binance USD-M; não envia ordens e não grava estado. Relatório em docs/estudos/.
 // Uso: CURL=1 npx tsx scripts/estudos/cesta.ts
 import {readFileSync,writeFileSync,mkdirSync,existsSync} from 'node:fs';
+import {scriptProvenance} from './proveniencia.js';
 import {execFile} from 'node:child_process';
 import {BinancePerpetualHistory} from '../../src/infrastructure/binance-perpetual-history.js';
 import {walkForwardPerpetual} from '../../src/domain/perpetual-walk-forward.js';
@@ -71,7 +72,7 @@ async function main(){
   r.checks=Object.fromEntries(checks);r.passed=checks.every(([,ok])=>ok);r.failed=checks.filter(([,ok])=>!ok).map(([id])=>id);delete r.returns;
   console.log(r.set.padEnd(26),'P&L',r.netPnl.toFixed(2),'retorno',(r.returnPct*100).toFixed(2)+'%','ops',r.trades,'DD',(r.maxDrawdown*100).toFixed(2)+'%','janelas+',r.positiveFolds+'/7','moedas+',r.positiveCoins+'/'+r.coins,'Sharpe',r.sharpeAnnualized.toFixed(2),'DSR',r.deflatedSharpe.toFixed(2),'B&H',(r.buyHold*100).toFixed(1)+'%',r.passed?'APROVADA':'reprovada: '+r.failed.join(','));
  }
- const report={protocol:P,execution:'HISTORICAL_SIMULATION_OFFLINE',automaticPaperApproval:false,runAt:new Date().toISOString(),trialSharpeVariance:variance,failures,results};
+ const report={protocol:P,execution:'HISTORICAL_SIMULATION_OFFLINE',automaticPaperApproval:false,runAt:new Date().toISOString(),provenance:scriptProvenance('scripts/estudos/cesta.ts'),trialSharpeVariance:variance,failures,results};
  const base='docs/estudos/cesta-tendencia-2026-10-05';writeFileSync(base+'.json',JSON.stringify(report,null,1));writeFileSync(base+'.md',markdown(report));console.log('relatório:',base);
 }
 const pct=(v:number)=>(v>=0?'+':'')+(v*100).toFixed(2)+'%';

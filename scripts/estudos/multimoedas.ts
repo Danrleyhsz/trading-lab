@@ -3,6 +3,7 @@
 // docs/estudos/ com o hash de cada dataset, para qualquer pessoa reproduzir o resultado.
 // Uso: npx tsx scripts/estudos/multimoedas.ts            (CURL=1 usa curl no lugar do fetch do Node)
 import {readFileSync,writeFileSync,mkdirSync,existsSync} from 'node:fs';
+import {scriptProvenance} from './proveniencia.js';
 import {execFile} from 'node:child_process';
 import {BinancePerpetualHistory} from '../../src/infrastructure/binance-perpetual-history.js';
 import {walkForwardPerpetual} from '../../src/domain/perpetual-walk-forward.js';
@@ -68,7 +69,7 @@ async function main(){
   delete s.oosReturns;delete s.trialSharpes;
  }
  const day=new Date(runAt).toISOString().slice(0,10),base=`docs/estudos/multimoedas-${day}`;
- const report={protocol:PROTOCOL,runAt:new Date(runAt).toISOString(),execution:'HISTORICAL_SIMULATION_OFFLINE',automaticPaperApproval:false,trials:n,trialSharpeVariance:variance,failures,studies};
+ const report={protocol:PROTOCOL,runAt:new Date(runAt).toISOString(),provenance:scriptProvenance('scripts/estudos/multimoedas.ts'),execution:'HISTORICAL_SIMULATION_OFFLINE',automaticPaperApproval:false,trials:n,trialSharpeVariance:variance,failures,studies};
  writeFileSync(base+'.json',JSON.stringify(report,null,1));writeFileSync(base+'.md',markdown(report));
  console.log('\nrelatório:',base+'.json / .md','·',studies.filter(s=>s.passed).length,'aprovadas de',studies.length);
 }
