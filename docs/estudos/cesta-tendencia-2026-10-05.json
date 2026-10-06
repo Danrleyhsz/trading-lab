@@ -1,0 +1,2438 @@
+{
+ "protocol": {
+  "version": "TREND_BASKET_V1",
+  "declaredAt": "2026-10-05",
+  "bars": 5000,
+  "trainBars": 1500,
+  "testBars": 500,
+  "previousStudyStart": 1773241200000,
+  "hypotheses": {
+   "CESTA_TENDENCIA_SMA": "MULTI_DAY_TREND_V1",
+   "CESTA_ROMPIMENTO_PROTEGIDO": "BREAKOUT_480_PROTECTED_V1"
+  },
+  "screen": {
+   "version": "TREND_BASKET_SCREEN_V1",
+   "minimumTrades": 30,
+   "maximumDrawdown": 0.15,
+   "minimumPositiveFolds": 4,
+   "minimumPositiveCoinShare": 0.6,
+   "minimumDeflatedSharpe": 0.9,
+   "trials": 2
+  }
+ },
+ "execution": "HISTORICAL_SIMULATION_OFFLINE",
+ "automaticPaperApproval": false,
+ "runAt": "2026-10-06T00:27:32.196Z",
+ "trialSharpeVariance": 8.129603812226624e-8,
+ "failures": [],
+ "results": {
+  "CESTA_TENDENCIA_SMA": {
+   "set": "MULTI_DAY_TREND_V1",
+   "netPnl": -21.715196869052306,
+   "returnPct": -0.002171519686905231,
+   "trades": 369,
+   "maxDrawdown": 0.02709560653239962,
+   "positiveFolds": 2,
+   "folds": [
+    {
+     "testStart": 1760641200000,
+     "testEnd": 1762437600000,
+     "returnPct": 0.008171465850110464
+    },
+    {
+     "testStart": 1762441200000,
+     "testEnd": 1764237600000,
+     "returnPct": -0.0020478935504965887
+    },
+    {
+     "testStart": 1764241200000,
+     "testEnd": 1766037600000,
+     "returnPct": -0.00727080541447215
+    },
+    {
+     "testStart": 1766041200000,
+     "testEnd": 1767837600000,
+     "returnPct": -0.008246425511313759
+    },
+    {
+     "testStart": 1767841200000,
+     "testEnd": 1769637600000,
+     "returnPct": -0.0043188370795240434
+    },
+    {
+     "testStart": 1769641200000,
+     "testEnd": 1771437600000,
+     "returnPct": 0.019129388190930033
+    },
+    {
+     "testStart": 1771441200000,
+     "testEnd": 1773237600000,
+     "returnPct": -0.007588412172139379
+    }
+   ],
+   "positiveCoins": 8,
+   "coins": 21,
+   "sharpeAnnualized": -0.11271079882660413,
+   "buyHold": -0.463340133923286,
+   "funding": 2.5623347477236456,
+   "liquidations": 0,
+   "perCoin": [
+    {
+     "symbol": "ENAUSDT",
+     "datasetHash": "a880fb5b4fbdd7ce7d777ba533ca4d702e89841d2b7269f5488e888de40fbe79",
+     "netPnl": -942.9701099213471,
+     "returnPct": -0.09429701099213471,
+     "trades": 17,
+     "liquidations": 0,
+     "funding": -10.02440913723354,
+     "buyHold": -0.7416502946954813,
+     "folds": [
+      {
+       "testStart": 1760641200000,
+       "testEnd": 1762437600000,
+       "netPnl": -232.57714599667997,
+       "returnPct": -0.023257714599667998
+      },
+      {
+       "testStart": 1762441200000,
+       "testEnd": 1764237600000,
+       "netPnl": -22.086075017885378,
+       "returnPct": -0.002208607501788538
+      },
+      {
+       "testStart": 1764241200000,
+       "testEnd": 1766037600000,
+       "netPnl": -543.7963000143482,
+       "returnPct": -0.054379630001434816
+      },
+      {
+       "testStart": 1766041200000,
+       "testEnd": 1767837600000,
+       "netPnl": -272.62672623180515,
+       "returnPct": -0.027262672623180516
+      },
+      {
+       "testStart": 1767841200000,
+       "testEnd": 1769637600000,
+       "netPnl": 84.33000657723824,
+       "returnPct": 0.008433000657723823
+      },
+      {
+       "testStart": 1769641200000,
+       "testEnd": 1771437600000,
+       "netPnl": 134.54474571765968,
+       "returnPct": 0.013454474571765967
+      },
+      {
+       "testStart": 1771441200000,
+       "testEnd": 1773237600000,
+       "netPnl": -90.75861495552635,
+       "returnPct": -0.009075861495552635
+      }
+     ]
+    },
+    {
+     "symbol": "ZECUSDT",
+     "datasetHash": "a101d4ad59fb0b2799bcf97fbdeb4fe9e516208aa89e318ada807d8b2e9b2e2d",
+     "netPnl": 2059.206250082794,
+     "returnPct": 0.20592062500827943,
+     "trades": 13,
+     "liquidations": 0,
+     "funding": 93.66730773875923,
+     "buyHold": -0.027928132817830242,
+     "folds": [
+      {
+       "testStart": 1760641200000,
+       "testEnd": 1762437600000,
+       "netPnl": 1491.8753520285063,
+       "returnPct": 0.14918753520285064
+      },
+      {
+       "testStart": 1762441200000,
+       "testEnd": 1764237600000,
+       "netPnl": 314.9253503611071,
+       "returnPct": 0.031492535036110714
+      },
+      {
+       "testStart": 1764241200000,
+       "testEnd": 1766037600000,
+       "netPnl": -24.194974202200683,
+       "returnPct": -0.0024194974202200684
+      },
+      {
+       "testStart": 1766041200000,
+       "testEnd": 1767837600000,
+       "netPnl": 35.15942915348023,
+       "returnPct": 0.0035159429153480233
+      },
+      {
+       "testStart": 1767841200000,
+       "testEnd": 1769637600000,
+       "netPnl": 11.814575080627037,
+       "returnPct": 0.0011814575080627038
+      },
+      {
+       "testStart": 1769641200000,
+       "testEnd": 1771437600000,
+       "netPnl": 203.31466071017712,
+       "returnPct": 0.020331466071017712
+      },
+      {
+       "testStart": 1771441200000,
+       "testEnd": 1773237600000,
+       "netPnl": 26.31185695109707,
+       "returnPct": 0.002631185695109707
+      }
+     ]
+    },
+    {
+     "symbol": "WLDUSDT",
+     "datasetHash": "44f9a1da20e4f0e7f983d49fe80df2feb0ab56c0248293331e282c675a496fde",
+     "netPnl": 294.031416408081,
+     "returnPct": 0.029403141640808098,
+     "trades": 17,
+     "liquidations": 0,
+     "funding": -17.86094274049484,
+     "buyHold": -0.6061137284978635,
+     "folds": [
+      {
+       "testStart": 1760641200000,
+       "testEnd": 1762437600000,
+       "netPnl": 89.2150564880194,
+       "returnPct": 0.00892150564880194
+      },
+      {
+       "testStart": 1762441200000,
+       "testEnd": 1764237600000,
+       "netPnl": 84.22335233590275,
+       "returnPct": 0.008422335233590275
+      },
+      {
+       "testStart": 1764241200000,
+       "testEnd": 1766037600000,
+       "netPnl": 237.71825592932873,
+       "returnPct": 0.023771825592932873
+      },
+      {
+       "testStart": 1766041200000,
+       "testEnd": 1767837600000,
+       "netPnl": -116.93434022024485,
+       "returnPct": -0.011693434022024485
+      },
+      {
+       "testStart": 1767841200000,
+       "testEnd": 1769637600000,
+       "netPnl": -232.32799314515614,
+       "returnPct": -0.023232799314515613
+      },
+      {
+       "testStart": 1769641200000,
+       "testEnd": 1771437600000,
+       "netPnl": 395.74677308835817,
+       "returnPct": 0.039574677308835814
+      },
+      {
+       "testStart": 1771441200000,
+       "testEnd": 1773237600000,
+       "netPnl": -163.60968806812707,
+       "returnPct": -0.016360968806812707
+      }
+     ]
+    },
+    {
+     "symbol": "NEARUSDT",
+     "datasetHash": "1a31cf45c57e978d45730cc17358a792447261ed47b9f440d1756fd600d61b35",
+     "netPnl": -22.09343436573181,
+     "returnPct": -0.002209343436573181,
+     "trades": 12,
+     "liquidations": 0,
+     "funding": 7.218796928975298,
+     "buyHold": -0.4193691692581075,
+     "folds": [
+      {
+       "testStart": 1760641200000,
+       "testEnd": 1762437600000,
+       "netPnl": 2.536968363712731,
+       "returnPct": 0.0002536968363712731
+      },
+      {
+       "testStart": 1762441200000,
+       "testEnd": 1764237600000,
+       "netPnl": -217.20951437561234,
+       "returnPct": -0.021720951437561236
+      },
+      {
+       "testStart": 1764241200000,
+       "testEnd": 1766037600000,
+       "netPnl": 235.79725973381937,
+       "returnPct": 0.023579725973381937
+      },
+      {
+       "testStart": 1766041200000,
+       "testEnd": 1767837600000,
+       "netPnl": -163.48842357379363,
+       "returnPct": -0.01634884235737936
+      },
+      {
+       "testStart": 1767841200000,
+       "testEnd": 1769637600000,
+       "netPnl": -217.8609102033388,
+       "returnPct": -0.021786091020333877
+      },
+      {
+       "testStart": 1769641200000,
+       "testEnd": 1771437600000,
+       "netPnl": 305.8663779561357,
+       "returnPct": 0.030586637795613568
+      },
+      {
+       "testStart": 1771441200000,
+       "testEnd": 1773237600000,
+       "netPnl": 32.26480773334515,
+       "returnPct": 0.0032264807733345152
+      }
+     ]
+    },
+    {
+     "symbol": "UNIUSDT",
+     "datasetHash": "50e528290adca8543ed59d796c10b4179a001dc26d4265c3d1659f6c157538f3",
+     "netPnl": 271.1997665122217,
+     "returnPct": 0.027119976651222167,
+     "trades": 17,
+     "liquidations": 0,
+     "funding": 2.3443967905972456,
+     "buyHold": -0.3844347009082367,
+     "folds": [
+      {
+       "testStart": 1760641200000,
+       "testEnd": 1762437600000,
+       "netPnl": 70.41645406727366,
+       "returnPct": 0.007041645406727366
+      },
+      {
+       "testStart": 1762441200000,
+       "testEnd": 1764237600000,
+       "netPnl": 245.22740514989528,
+       "returnPct": 0.024522740514989528
+      },
+      {
+       "testStart": 1764241200000,
+       "testEnd": 1766037600000,
+       "netPnl": 180.04943409985754,
+       "returnPct": 0.018004943409985753
+      },
+      {
+       "testStart": 1766041200000,
+       "testEnd": 1767837600000,
+       "netPnl": -459.96056641664836,
+       "returnPct": -0.04599605664166483
+      },
+      {
+       "testStart": 1767841200000,
+       "testEnd": 1769637600000,
+       "netPnl": 45.08631805710502,
+       "returnPct": 0.004508631805710502
+      },
+      {
+       "testStart": 1769641200000,
+       "testEnd": 1771437600000,
+       "netPnl": 190.38072155473856,
+       "returnPct": 0.019038072155473856
+      },
+      {
+       "testStart": 1771441200000,
+       "testEnd": 1773237600000,
+       "netPnl": 0,
+       "returnPct": 0
+      }
+     ]
+    },
+    {
+     "symbol": "ONDOUSDT",
+     "datasetHash": "28f74a093653d2ea1c45b7a060d788774e68f96746a1f57fd1a4e6d32dc8029a",
+     "netPnl": 740.4089041382485,
+     "returnPct": 0.07404089041382486,
+     "trades": 9,
+     "liquidations": 0,
+     "funding": -9.623447420145501,
+     "buyHold": -0.650744248985115,
+     "folds": [
+      {
+       "testStart": 1760641200000,
+       "testEnd": 1762437600000,
+       "netPnl": 196.16033356168919,
+       "returnPct": 0.01961603335616892
+      },
+      {
+       "testStart": 1762441200000,
+       "testEnd": 1764237600000,
+       "netPnl": 120.73177025350014,
+       "returnPct": 0.012073177025350015
+      },
+      {
+       "testStart": 1764241200000,
+       "testEnd": 1766037600000,
+       "netPnl": 269.43931514142787,
+       "returnPct": 0.026943931514142788
+      },
+      {
+       "testStart": 1766041200000,
+       "testEnd": 1767837600000,
+       "netPnl": -95.1455222153545,
+       "returnPct": -0.00951455222153545
+      },
+      {
+       "testStart": 1767841200000,
+       "testEnd": 1769637600000,
+       "netPnl": 64.03565105866619,
+       "returnPct": 0.006403565105866619
+      },
+      {
+       "testStart": 1769641200000,
+       "testEnd": 1771437600000,
+       "netPnl": 185.18735633831966,
+       "returnPct": 0.018518735633831968
+      },
+      {
+       "testStart": 1771441200000,
+       "testEnd": 1773237600000,
+       "netPnl": 0,
+       "returnPct": 0
+      }
+     ]
+    },
+    {
+     "symbol": "1000PEPEUSDT",
+     "datasetHash": "abadccdc9eac71a5edb2b802807c8d9680cb6cd6148db768b674aa5e8a00142f",
+     "netPnl": 155.99622002736032,
+     "returnPct": 0.015599622002736032,
+     "trades": 19,
+     "liquidations": 0,
+     "funding": -11.075940521414049,
+     "buyHold": -0.5196044662590774,
+     "folds": [
+      {
+       "testStart": 1760641200000,
+       "testEnd": 1762437600000,
+       "netPnl": 156.62852119677154,
+       "returnPct": 0.015662852119677155
+      },
+      {
+       "testStart": 1762441200000,
+       "testEnd": 1764237600000,
+       "netPnl": 71.6921722482166,
+       "returnPct": 0.007169217224821659
+      },
+      {
+       "testStart": 1764241200000,
+       "testEnd": 1766037600000,
+       "netPnl": -542.5674952180125,
+       "returnPct": -0.05425674952180125
+      },
+      {
+       "testStart": 1766041200000,
+       "testEnd": 1767837600000,
+       "netPnl": 250.62385612830258,
+       "returnPct": 0.02506238561283026
+      },
+      {
+       "testStart": 1767841200000,
+       "testEnd": 1769637600000,
+       "netPnl": 4.395122641171838,
+       "returnPct": 0.00043951226411718383
+      },
+      {
+       "testStart": 1769641200000,
+       "testEnd": 1771437600000,
+       "netPnl": 87.78524204696078,
+       "returnPct": 0.008778524204696077
+      },
+      {
+       "testStart": 1771441200000,
+       "testEnd": 1773237600000,
+       "netPnl": 127.43880098394948,
+       "returnPct": 0.012743880098394948
+      }
+     ]
+    },
+    {
+     "symbol": "BCHUSDT",
+     "datasetHash": "576a3350704b9c574db0319f0f0853761c39e12c35d81fa56852eea6a74693fe",
+     "netPnl": -260.5552376990727,
+     "returnPct": -0.026055523769907267,
+     "trades": 17,
+     "liquidations": 0,
+     "funding": 1.7053067790339345,
+     "buyHold": -0.1100117324990223,
+     "folds": [
+      {
+       "testStart": 1760641200000,
+       "testEnd": 1762437600000,
+       "netPnl": 142.0524556903547,
+       "returnPct": 0.01420524556903547
+      },
+      {
+       "testStart": 1762441200000,
+       "testEnd": 1764237600000,
+       "netPnl": -346.973985604418,
+       "returnPct": -0.034697398560441794
+      },
+      {
+       "testStart": 1764241200000,
+       "testEnd": 1766037600000,
+       "netPnl": -81.5226110036765,
+       "returnPct": -0.008152261100367651
+      },
+      {
+       "testStart": 1766041200000,
+       "testEnd": 1767837600000,
+       "netPnl": 43.560622021510426,
+       "returnPct": 0.004356062202151042
+      },
+      {
+       "testStart": 1767841200000,
+       "testEnd": 1769637600000,
+       "netPnl": -25.335912440350512,
+       "returnPct": -0.0025335912440350512
+      },
+      {
+       "testStart": 1769641200000,
+       "testEnd": 1771437600000,
+       "netPnl": -11.234719687927281,
+       "returnPct": -0.0011234719687927281
+      },
+      {
+       "testStart": 1771441200000,
+       "testEnd": 1773237600000,
+       "netPnl": 18.898913325434478,
+       "returnPct": 0.0018898913325434477
+      }
+     ]
+    },
+    {
+     "symbol": "FILUSDT",
+     "datasetHash": "d8896cc0eaa04fe02308c89d782af969e72a544719a01c5741c852adf8156f40",
+     "netPnl": -594.6853068614746,
+     "returnPct": -0.05946853068614746,
+     "trades": 16,
+     "liquidations": 0,
+     "funding": 0.9962980750740007,
+     "buyHold": -0.4139960758665794,
+     "folds": [
+      {
+       "testStart": 1760641200000,
+       "testEnd": 1762437600000,
+       "netPnl": -508.0576843427971,
+       "returnPct": -0.05080576843427971
+      },
+      {
+       "testStart": 1762441200000,
+       "testEnd": 1764237600000,
+       "netPnl": -119.13544715049102,
+       "returnPct": -0.011913544715049101
+      },
+      {
+       "testStart": 1764241200000,
+       "testEnd": 1766037600000,
+       "netPnl": 158.37686353479148,
+       "returnPct": 0.01583768635347915
+      },
+      {
+       "testStart": 1766041200000,
+       "testEnd": 1767837600000,
+       "netPnl": -116.73176503102331,
+       "returnPct": -0.011673176503102331
+      },
+      {
+       "testStart": 1767841200000,
+       "testEnd": 1769637600000,
+       "netPnl": -106.29021579901382,
+       "returnPct": -0.010629021579901383
+      },
+      {
+       "testStart": 1769641200000,
+       "testEnd": 1771437600000,
+       "netPnl": 250.92837448059072,
+       "returnPct": 0.025092837448059072
+      },
+      {
+       "testStart": 1771441200000,
+       "testEnd": 1773237600000,
+       "netPnl": -153.77543255353157,
+       "returnPct": -0.015377543255353157
+      }
+     ]
+    },
+    {
+     "symbol": "AAVEUSDT",
+     "datasetHash": "0a32203e69b0ccb6e60fa206c6eeeba6959eeefaacd63fb920130c65b8991679",
+     "netPnl": -473.2553876439997,
+     "returnPct": -0.047325538764399974,
+     "trades": 20,
+     "liquidations": 0,
+     "funding": 3.0396568695606336,
+     "buyHold": -0.5254495451660672,
+     "folds": [
+      {
+       "testStart": 1760641200000,
+       "testEnd": 1762437600000,
+       "netPnl": -11.60871325156404,
+       "returnPct": -0.0011608713251564041
+      },
+      {
+       "testStart": 1762441200000,
+       "testEnd": 1764237600000,
+       "netPnl": -247.36550547585284,
+       "returnPct": -0.024736550547585286
+      },
+      {
+       "testStart": 1764241200000,
+       "testEnd": 1766037600000,
+       "netPnl": -311.0374598542476,
+       "returnPct": -0.031103745985424758
+      },
+      {
+       "testStart": 1766041200000,
+       "testEnd": 1767837600000,
+       "netPnl": 83.29982470943469,
+       "returnPct": 0.00832998247094347
+      },
+      {
+       "testStart": 1767841200000,
+       "testEnd": 1769637600000,
+       "netPnl": -76.35011151863,
+       "returnPct": -0.007635011151863
+      },
+      {
+       "testStart": 1769641200000,
+       "testEnd": 1771437600000,
+       "netPnl": 173.58245988833733,
+       "returnPct": 0.01735824598883373
+      },
+      {
+       "testStart": 1771441200000,
+       "testEnd": 1773237600000,
+       "netPnl": -83.77588214147727,
+       "returnPct": -0.008377588214147727
+      }
+     ]
+    },
+    {
+     "symbol": "SUIUSDT",
+     "datasetHash": "4afbbb2e38159fc90362ac7e14382753092d7961b4dac1d26badb1e81d7e0446",
+     "netPnl": -56.12348248915805,
+     "returnPct": -0.005612348248915805,
+     "trades": 19,
+     "liquidations": 0,
+     "funding": 4.422299769475499,
+     "buyHold": -0.6240885768295976,
+     "folds": [
+      {
+       "testStart": 1760641200000,
+       "testEnd": 1762437600000,
+       "netPnl": 180.98147462532143,
+       "returnPct": 0.018098147462532143
+      },
+      {
+       "testStart": 1762441200000,
+       "testEnd": 1764237600000,
+       "netPnl": 153.41765320589548,
+       "returnPct": 0.015341765320589548
+      },
+      {
+       "testStart": 1764241200000,
+       "testEnd": 1766037600000,
+       "netPnl": -371.50927337961,
+       "returnPct": -0.037150927337961
+      },
+      {
+       "testStart": 1766041200000,
+       "testEnd": 1767837600000,
+       "netPnl": 85.5684747548039,
+       "returnPct": 0.00855684747548039
+      },
+      {
+       "testStart": 1767841200000,
+       "testEnd": 1769637600000,
+       "netPnl": 7.195549757429035,
+       "returnPct": 0.0007195549757429034
+      },
+      {
+       "testStart": 1769641200000,
+       "testEnd": 1771437600000,
+       "netPnl": 184.97791030902044,
+       "returnPct": 0.018497791030902044
+      },
+      {
+       "testStart": 1771441200000,
+       "testEnd": 1773237600000,
+       "netPnl": -296.7552717620183,
+       "returnPct": -0.02967552717620183
+      }
+     ]
+    },
+    {
+     "symbol": "TAOUSDT",
+     "datasetHash": "ec243f6fecadc24f4eef4514a9e17e01f50eaf894824c564df304b8179b3bb9e",
+     "netPnl": 106.59632472302292,
+     "returnPct": 0.010659632472302292,
+     "trades": 17,
+     "liquidations": 0,
+     "funding": 2.3809540773506486,
+     "buyHold": -0.5006244068135272,
+     "folds": [
+      {
+       "testStart": 1760641200000,
+       "testEnd": 1762437600000,
+       "netPnl": -15.498278897528508,
+       "returnPct": -0.0015498278897528508
+      },
+      {
+       "testStart": 1762441200000,
+       "testEnd": 1764237600000,
+       "netPnl": 212.82254597266183,
+       "returnPct": 0.02128225459726618
+      },
+      {
+       "testStart": 1764241200000,
+       "testEnd": 1766037600000,
+       "netPnl": 136.9032862672193,
+       "returnPct": 0.01369032862672193
+      },
+      {
+       "testStart": 1766041200000,
+       "testEnd": 1767837600000,
+       "netPnl": -220.89590528924964,
+       "returnPct": -0.022089590528924966
+      },
+      {
+       "testStart": 1767841200000,
+       "testEnd": 1769637600000,
+       "netPnl": 0.3726340685007017,
+       "returnPct": 0.000037263406850070166
+      },
+      {
+       "testStart": 1769641200000,
+       "testEnd": 1771437600000,
+       "netPnl": 67.39010512726782,
+       "returnPct": 0.006739010512726781
+      },
+      {
+       "testStart": 1771441200000,
+       "testEnd": 1773237600000,
+       "netPnl": -74.49806252584858,
+       "returnPct": -0.007449806252584858
+      }
+     ]
+    },
+    {
+     "symbol": "AVAXUSDT",
+     "datasetHash": "9edce2aaf2d52e234b01655a070b0d0cc8b00a820e0083e0946d29063d19350f",
+     "netPnl": 241.43488487705872,
+     "returnPct": 0.024143488487705873,
+     "trades": 18,
+     "liquidations": 0,
+     "funding": -12.475550433176807,
+     "buyHold": -0.5406444265173445,
+     "folds": [
+      {
+       "testStart": 1760641200000,
+       "testEnd": 1762437600000,
+       "netPnl": 235.48136511647863,
+       "returnPct": 0.023548136511647864
+      },
+      {
+       "testStart": 1762441200000,
+       "testEnd": 1764237600000,
+       "netPnl": -16.715830588251265,
+       "returnPct": -0.0016715830588251266
+      },
+      {
+       "testStart": 1764241200000,
+       "testEnd": 1766037600000,
+       "netPnl": 12.523219345284815,
+       "returnPct": 0.0012523219345284815
+      },
+      {
+       "testStart": 1766041200000,
+       "testEnd": 1767837600000,
+       "netPnl": -165.66719544076477,
+       "returnPct": -0.01656671954407648
+      },
+      {
+       "testStart": 1767841200000,
+       "testEnd": 1769637600000,
+       "netPnl": 62.95208100799209,
+       "returnPct": 0.006295208100799209
+      },
+      {
+       "testStart": 1769641200000,
+       "testEnd": 1771437600000,
+       "netPnl": 263.24708134370303,
+       "returnPct": 0.026324708134370302
+      },
+      {
+       "testStart": 1771441200000,
+       "testEnd": 1773237600000,
+       "netPnl": -150.3858359073838,
+       "returnPct": -0.015038583590738381
+      }
+     ]
+    },
+    {
+     "symbol": "LINKUSDT",
+     "datasetHash": "5e5ce4e1609d15701ea1d11b6daf13708ac04e5e5dd91f1de9ea0865206cebf3",
+     "netPnl": -311.8032824330494,
+     "returnPct": -0.03118032824330494,
+     "trades": 16,
+     "liquidations": 0,
+     "funding": 5.790753324994064,
+     "buyHold": -0.48767107793236064,
+     "folds": [
+      {
+       "testStart": 1760641200000,
+       "testEnd": 1762437600000,
+       "netPnl": 41.80239479714692,
+       "returnPct": 0.004180239479714692
+      },
+      {
+       "testStart": 1762441200000,
+       "testEnd": 1764237600000,
+       "netPnl": 12.277519411731191,
+       "returnPct": 0.001227751941173119
+      },
+      {
+       "testStart": 1764241200000,
+       "testEnd": 1766037600000,
+       "netPnl": -145.78840432962897,
+       "returnPct": -0.014578840432962897
+      },
+      {
+       "testStart": 1766041200000,
+       "testEnd": 1767837600000,
+       "netPnl": -99.7413235639433,
+       "returnPct": -0.009974132356394329
+      },
+      {
+       "testStart": 1767841200000,
+       "testEnd": 1769637600000,
+       "netPnl": -127.74880666245372,
+       "returnPct": -0.012774880666245372
+      },
+      {
+       "testStart": 1769641200000,
+       "testEnd": 1771437600000,
+       "netPnl": 267.091181992324,
+       "returnPct": 0.0267091181992324
+      },
+      {
+       "testStart": 1771441200000,
+       "testEnd": 1773237600000,
+       "netPnl": -259.6958440782255,
+       "returnPct": -0.02596958440782255
+      }
+     ]
+    },
+    {
+     "symbol": "XRPUSDT",
+     "datasetHash": "f2e61c0a63e3c530e4ca25b426125004561341ba3658e588c70c1009b1533a29",
+     "netPnl": -315.96447491615254,
+     "returnPct": -0.031596447491615255,
+     "trades": 22,
+     "liquidations": 0,
+     "funding": -5.420287233822552,
+     "buyHold": -0.4079479215419308,
+     "folds": [
+      {
+       "testStart": 1760641200000,
+       "testEnd": 1762437600000,
+       "netPnl": -34.77526069747728,
+       "returnPct": -0.003477526069747728
+      },
+      {
+       "testStart": 1762441200000,
+       "testEnd": 1764237600000,
+       "netPnl": -205.87647763127643,
+       "returnPct": -0.02058764776312764
+      },
+      {
+       "testStart": 1764241200000,
+       "testEnd": 1766037600000,
+       "netPnl": 51.923847481997655,
+       "returnPct": 0.005192384748199766
+      },
+      {
+       "testStart": 1766041200000,
+       "testEnd": 1767837600000,
+       "netPnl": -44.67380806890287,
+       "returnPct": -0.004467380806890287
+      },
+      {
+       "testStart": 1767841200000,
+       "testEnd": 1769637600000,
+       "netPnl": -45.44769443782934,
+       "returnPct": -0.004544769443782934
+      },
+      {
+       "testStart": 1769641200000,
+       "testEnd": 1771437600000,
+       "netPnl": 171.14074600499225,
+       "returnPct": 0.017114074600499227
+      },
+      {
+       "testStart": 1771441200000,
+       "testEnd": 1773237600000,
+       "netPnl": -208.25582756765652,
+       "returnPct": -0.020825582756765652
+      }
+     ]
+    },
+    {
+     "symbol": "XLMUSDT",
+     "datasetHash": "24b97b4f7951c2f9d1b0de4e2754dc3453cb1e6c71306fa536c360fe1c062760",
+     "netPnl": -167.33215057802408,
+     "returnPct": -0.016733215057802408,
+     "trades": 20,
+     "liquidations": 0,
+     "funding": -5.244843990428118,
+     "buyHold": -0.49213397614818566,
+     "folds": [
+      {
+       "testStart": 1760641200000,
+       "testEnd": 1762437600000,
+       "netPnl": 58.50643264624705,
+       "returnPct": 0.005850643264624705
+      },
+      {
+       "testStart": 1762441200000,
+       "testEnd": 1764237600000,
+       "netPnl": -171.3996703685425,
+       "returnPct": -0.01713996703685425
+      },
+      {
+       "testStart": 1764241200000,
+       "testEnd": 1766037600000,
+       "netPnl": -72.93767054025739,
+       "returnPct": -0.007293767054025738
+      },
+      {
+       "testStart": 1766041200000,
+       "testEnd": 1767837600000,
+       "netPnl": -145.76166580374593,
+       "returnPct": -0.014576166580374592
+      },
+      {
+       "testStart": 1767841200000,
+       "testEnd": 1769637600000,
+       "netPnl": -44.657530219647015,
+       "returnPct": -0.004465753021964701
+      },
+      {
+       "testStart": 1769641200000,
+       "testEnd": 1771437600000,
+       "netPnl": 208.9179537079217,
+       "returnPct": 0.02089179537079217
+      },
+      {
+       "testStart": 1771441200000,
+       "testEnd": 1773237600000,
+       "netPnl": 0,
+       "returnPct": 0
+      }
+     ]
+    },
+    {
+     "symbol": "DOGEUSDT",
+     "datasetHash": "576e3e6eb2f27219b2d1e907e367e134b779147c98fcb40deba7a12b7dac7a25",
+     "netPnl": -277.25756460791854,
+     "returnPct": -0.027725756460791853,
+     "trades": 21,
+     "liquidations": 0,
+     "funding": 1.3606149052262888,
+     "buyHold": -0.5094785485480229,
+     "folds": [
+      {
+       "testStart": 1760641200000,
+       "testEnd": 1762437600000,
+       "netPnl": 19.33239162055179,
+       "returnPct": 0.001933239162055179
+      },
+      {
+       "testStart": 1762441200000,
+       "testEnd": 1764237600000,
+       "netPnl": -47.90958724151096,
+       "returnPct": -0.004790958724151096
+      },
+      {
+       "testStart": 1764241200000,
+       "testEnd": 1766037600000,
+       "netPnl": -285.99267294643323,
+       "returnPct": -0.028599267294643325
+      },
+      {
+       "testStart": 1766041200000,
+       "testEnd": 1767837600000,
+       "netPnl": -119.92302989750533,
+       "returnPct": -0.011992302989750533
+      },
+      {
+       "testStart": 1767841200000,
+       "testEnd": 1769637600000,
+       "netPnl": 23.133785377482127,
+       "returnPct": 0.0023133785377482128
+      },
+      {
+       "testStart": 1769641200000,
+       "testEnd": 1771437600000,
+       "netPnl": 134.10154847949707,
+       "returnPct": 0.013410154847949707
+      },
+      {
+       "testStart": 1771441200000,
+       "testEnd": 1773237600000,
+       "netPnl": 0,
+       "returnPct": 0
+      }
+     ]
+    },
+    {
+     "symbol": "SOLUSDT",
+     "datasetHash": "84658e671e5afd6009d97bb9a8bd6d9c5a9eea96fccf6419a72e3771caeb947e",
+     "netPnl": -630.9697304809451,
+     "returnPct": -0.06309697304809452,
+     "trades": 25,
+     "liquidations": 0,
+     "funding": -3.6627026566830434,
+     "buyHold": -0.5429371664112456,
+     "folds": [
+      {
+       "testStart": 1760641200000,
+       "testEnd": 1762437600000,
+       "netPnl": 59.66935781379834,
+       "returnPct": 0.005966935781379835
+      },
+      {
+       "testStart": 1762441200000,
+       "testEnd": 1764237600000,
+       "netPnl": 23.67559096919831,
+       "returnPct": 0.002367559096919831
+      },
+      {
+       "testStart": 1764241200000,
+       "testEnd": 1766037600000,
+       "netPnl": -334.00929280100536,
+       "returnPct": -0.033400929280100536
+      },
+      {
+       "testStart": 1766041200000,
+       "testEnd": 1767837600000,
+       "netPnl": -151.58006232590924,
+       "returnPct": -0.015158006232590924
+      },
+      {
+       "testStart": 1767841200000,
+       "testEnd": 1769637600000,
+       "netPnl": -184.21938301616137,
+       "returnPct": -0.018421938301616137
+      },
+      {
+       "testStart": 1769641200000,
+       "testEnd": 1771437600000,
+       "netPnl": 195.9804498388039,
+       "returnPct": 0.019598044983880392
+      },
+      {
+       "testStart": 1771441200000,
+       "testEnd": 1773237600000,
+       "netPnl": -240.48639095966973,
+       "returnPct": -0.024048639095966974
+      }
+     ]
+    },
+    {
+     "symbol": "LTCUSDT",
+     "datasetHash": "3513ae21497dbad85d4a8136a32db67c932193f1d9874ebcc6ccb50745fd6b6b",
+     "netPnl": -428.3923118977673,
+     "returnPct": -0.04283923118977673,
+     "trades": 20,
+     "liquidations": 0,
+     "funding": 0.9396860215617152,
+     "buyHold": -0.40303063338057343,
+     "folds": [
+      {
+       "testStart": 1760641200000,
+       "testEnd": 1762437600000,
+       "netPnl": -256.7718089678892,
+       "returnPct": -0.025677180896788922
+      },
+      {
+       "testStart": 1762441200000,
+       "testEnd": 1764237600000,
+       "netPnl": -218.97652260864743,
+       "returnPct": -0.021897652260864743
+      },
+      {
+       "testStart": 1764241200000,
+       "testEnd": 1766037600000,
+       "netPnl": 33.16863308136635,
+       "returnPct": 0.0033168633081366353
+      },
+      {
+       "testStart": 1766041200000,
+       "testEnd": 1767837600000,
+       "netPnl": -45.03095605868475,
+       "returnPct": -0.004503095605868475
+      },
+      {
+       "testStart": 1767841200000,
+       "testEnd": 1769637600000,
+       "netPnl": 95.76596489495205,
+       "returnPct": 0.009576596489495205
+      },
+      {
+       "testStart": 1769641200000,
+       "testEnd": 1771437600000,
+       "netPnl": 15.078246109364045,
+       "returnPct": 0.0015078246109364046
+      },
+      {
+       "testStart": 1771441200000,
+       "testEnd": 1773237600000,
+       "netPnl": -51.62586834822832,
+       "returnPct": -0.005162586834822833
+      }
+     ]
+    },
+    {
+     "symbol": "ETHUSDT",
+     "datasetHash": "4fb4e6e4e59449cc145eaba2368eb56d48f7d8cc20b0e1995c3013b04d189ed9",
+     "netPnl": -5.1356097963725915,
+     "returnPct": -0.0005135609796372592,
+     "trades": 21,
+     "liquidations": 0,
+     "funding": 2.394507889261695,
+     "buyHold": -0.4717922706056553,
+     "folds": [
+      {
+       "testStart": 1760641200000,
+       "testEnd": 1762437600000,
+       "netPnl": 55.62915359676117,
+       "returnPct": 0.005562915359676117
+      },
+      {
+       "testStart": 1762441200000,
+       "testEnd": 1764237600000,
+       "netPnl": -92.85183764848443,
+       "returnPct": -0.009285183764848444
+      },
+      {
+       "testStart": 1764241200000,
+       "testEnd": 1766037600000,
+       "netPnl": -129.41309736482435,
+       "returnPct": -0.012941309736482436
+      },
+      {
+       "testStart": 1766041200000,
+       "testEnd": 1767837600000,
+       "netPnl": -5.52810503253022,
+       "returnPct": -0.0005528105032530221
+      },
+      {
+       "testStart": 1767841200000,
+       "testEnd": 1769637600000,
+       "netPnl": -137.40650297263164,
+       "returnPct": -0.013740650297263164
+      },
+      {
+       "testStart": 1769641200000,
+       "testEnd": 1771437600000,
+       "netPnl": 339.57352954322596,
+       "returnPct": 0.033957352954322596
+      },
+      {
+       "testStart": 1771441200000,
+       "testEnd": 1773237600000,
+       "netPnl": -35.13874991788907,
+       "returnPct": -0.0035138749917889072
+      }
+     ]
+    },
+    {
+     "symbol": "BTCUSDT",
+     "datasetHash": "7a834fa5c7e2fdfcee4a2820eef21f97b15e5e8b6bbff80e92f1e00c30da1fd2",
+     "netPnl": 161.64518267208769,
+     "returnPct": 0.016164518267208768,
+     "trades": 13,
+     "liquidations": 0,
+     "funding": 2.9365746657247596,
+     "buyHold": -0.35049171270718227,
+     "folds": [
+      {
+       "testStart": 1760641200000,
+       "testEnd": 1762437600000,
+       "netPnl": -24.990990935499212,
+       "returnPct": -0.002499099093549921
+      },
+      {
+       "testStart": 1762441200000,
+       "testEnd": 1764237600000,
+       "netPnl": 37.449448198580285,
+       "returnPct": 0.0037449448198580283
+      },
+      {
+       "testStart": 1764241200000,
+       "testEnd": 1766037600000,
+       "netPnl": 0,
+       "returnPct": 0
+      },
+      {
+       "testStart": 1766041200000,
+       "testEnd": 1767837600000,
+       "netPnl": -6.272168973315274,
+       "returnPct": -0.0006272168973315274
+      },
+      {
+       "testStart": 1767841200000,
+       "testEnd": 1769637600000,
+       "netPnl": -108.3924148060014,
+       "returnPct": -0.010839241480600139
+      },
+      {
+       "testStart": 1769641200000,
+       "testEnd": 1771437600000,
+       "netPnl": 253.57077554583702,
+       "returnPct": 0.0253570775545837
+      },
+      {
+       "testStart": 1771441200000,
+       "testEnd": 1773237600000,
+       "netPnl": 10.280533642486262,
+       "returnPct": 0.0010280533642486262
+      }
+     ]
+    }
+   ],
+   "hours": 3500,
+   "deflatedSharpe": 0.46811567051335357,
+   "checks": {
+    "POSITIVE_BASKET_PNL": false,
+    "MINIMUM_TRADES": true,
+    "BOUNDED_DRAWDOWN": true,
+    "POSITIVE_FOLDS": false,
+    "BREADTH": false,
+    "DEFLATED_SHARPE": false
+   },
+   "passed": false,
+   "failed": [
+    "POSITIVE_BASKET_PNL",
+    "POSITIVE_FOLDS",
+    "BREADTH",
+    "DEFLATED_SHARPE"
+   ]
+  },
+  "CESTA_ROMPIMENTO_PROTEGIDO": {
+   "set": "BREAKOUT_480_PROTECTED_V1",
+   "netPnl": -12.673786751805892,
+   "returnPct": -0.0012673786751805892,
+   "trades": 152,
+   "maxDrawdown": 0.02778879366213538,
+   "positiveFolds": 3,
+   "folds": [
+    {
+     "testStart": 1760641200000,
+     "testEnd": 1762437600000,
+     "returnPct": 0.006113950373799915
+    },
+    {
+     "testStart": 1762441200000,
+     "testEnd": 1764237600000,
+     "returnPct": -0.0023365352523958783
+    },
+    {
+     "testStart": 1764241200000,
+     "testEnd": 1766037600000,
+     "returnPct": 0.002731424080435152
+    },
+    {
+     "testStart": 1766041200000,
+     "testEnd": 1767837600000,
+     "returnPct": -0.012948903739993254
+    },
+    {
+     "testStart": 1767841200000,
+     "testEnd": 1769637600000,
+     "returnPct": -0.006886756726686482
+    },
+    {
+     "testStart": 1769641200000,
+     "testEnd": 1771437600000,
+     "returnPct": 0.0157522100137333
+    },
+    {
+     "testStart": 1771441200000,
+     "testEnd": 1773237600000,
+     "returnPct": -0.003692767424073272
+    }
+   ],
+   "positiveCoins": 10,
+   "coins": 21,
+   "sharpeAnnualized": -0.07497081223542866,
+   "buyHold": -0.463340133923286,
+   "funding": 1.3118324597288615,
+   "liquidations": 0,
+   "perCoin": [
+    {
+     "symbol": "ENAUSDT",
+     "datasetHash": "a880fb5b4fbdd7ce7d777ba533ca4d702e89841d2b7269f5488e888de40fbe79",
+     "netPnl": 236.9893364412801,
+     "returnPct": 0.02369893364412801,
+     "trades": 8,
+     "liquidations": 0,
+     "funding": -0.9263154395596579,
+     "buyHold": -0.7416502946954813,
+     "folds": [
+      {
+       "testStart": 1760641200000,
+       "testEnd": 1762437600000,
+       "netPnl": 158.23464186886486,
+       "returnPct": 0.015823464186886484
+      },
+      {
+       "testStart": 1762441200000,
+       "testEnd": 1764237600000,
+       "netPnl": 31.938138622335828,
+       "returnPct": 0.003193813862233583
+      },
+      {
+       "testStart": 1764241200000,
+       "testEnd": 1766037600000,
+       "netPnl": 122.47647209907882,
+       "returnPct": 0.012247647209907881
+      },
+      {
+       "testStart": 1766041200000,
+       "testEnd": 1767837600000,
+       "netPnl": -334.44683640080984,
+       "returnPct": -0.033444683640080984
+      },
+      {
+       "testStart": 1767841200000,
+       "testEnd": 1769637600000,
+       "netPnl": 94.24011684826837,
+       "returnPct": 0.009424011684826837
+      },
+      {
+       "testStart": 1769641200000,
+       "testEnd": 1771437600000,
+       "netPnl": 267.1295468377484,
+       "returnPct": 0.026712954683774843
+      },
+      {
+       "testStart": 1771441200000,
+       "testEnd": 1773237600000,
+       "netPnl": -102.58274343420635,
+       "returnPct": -0.010258274343420635
+      }
+     ]
+    },
+    {
+     "symbol": "ZECUSDT",
+     "datasetHash": "a101d4ad59fb0b2799bcf97fbdeb4fe9e516208aa89e318ada807d8b2e9b2e2d",
+     "netPnl": 804.5433433976377,
+     "returnPct": 0.08045433433976378,
+     "trades": 7,
+     "liquidations": 0,
+     "funding": 65.94837591181867,
+     "buyHold": -0.027928132817830242,
+     "folds": [
+      {
+       "testStart": 1760641200000,
+       "testEnd": 1762437600000,
+       "netPnl": 681.530017531657,
+       "returnPct": 0.0681530017531657
+      },
+      {
+       "testStart": 1762441200000,
+       "testEnd": 1764237600000,
+       "netPnl": -52.78082644336973,
+       "returnPct": -0.0052780826443369734
+      },
+      {
+       "testStart": 1764241200000,
+       "testEnd": 1766037600000,
+       "netPnl": -10.370546943293448,
+       "returnPct": -0.0010370546943293448
+      },
+      {
+       "testStart": 1766041200000,
+       "testEnd": 1767837600000,
+       "netPnl": -13.59399018653312,
+       "returnPct": -0.001359399018653312
+      },
+      {
+       "testStart": 1767841200000,
+       "testEnd": 1769637600000,
+       "netPnl": 30.21072891499898,
+       "returnPct": 0.0030210728914998983
+      },
+      {
+       "testStart": 1769641200000,
+       "testEnd": 1771437600000,
+       "netPnl": 145.97363954667162,
+       "returnPct": 0.014597363954667162
+      },
+      {
+       "testStart": 1771441200000,
+       "testEnd": 1773237600000,
+       "netPnl": 23.57432097750643,
+       "returnPct": 0.002357432097750643
+      }
+     ]
+    },
+    {
+     "symbol": "WLDUSDT",
+     "datasetHash": "44f9a1da20e4f0e7f983d49fe80df2feb0ab56c0248293331e282c675a496fde",
+     "netPnl": -1217.4572896633472,
+     "returnPct": -0.12174572896633472,
+     "trades": 9,
+     "liquidations": 0,
+     "funding": -4.354501471196883,
+     "buyHold": -0.6061137284978635,
+     "folds": [
+      {
+       "testStart": 1760641200000,
+       "testEnd": 1762437600000,
+       "netPnl": 23.429943356903095,
+       "returnPct": 0.0023429943356903095
+      },
+      {
+       "testStart": 1762441200000,
+       "testEnd": 1764237600000,
+       "netPnl": -12.391060787374954,
+       "returnPct": -0.0012391060787374955
+      },
+      {
+       "testStart": 1764241200000,
+       "testEnd": 1766037600000,
+       "netPnl": 85.70028573223681,
+       "returnPct": 0.00857002857322368
+      },
+      {
+       "testStart": 1766041200000,
+       "testEnd": 1767837600000,
+       "netPnl": -326.6840788797999,
+       "returnPct": -0.03266840788797999
+      },
+      {
+       "testStart": 1767841200000,
+       "testEnd": 1769637600000,
+       "netPnl": -410.9082845353587,
+       "returnPct": -0.04109082845353587
+      },
+      {
+       "testStart": 1769641200000,
+       "testEnd": 1771437600000,
+       "netPnl": -397.7659404425449,
+       "returnPct": -0.03977659404425449
+      },
+      {
+       "testStart": 1771441200000,
+       "testEnd": 1773237600000,
+       "netPnl": -178.83815410740863,
+       "returnPct": -0.017883815410740862
+      }
+     ]
+    },
+    {
+     "symbol": "NEARUSDT",
+     "datasetHash": "1a31cf45c57e978d45730cc17358a792447261ed47b9f440d1756fd600d61b35",
+     "netPnl": -125.47721669887687,
+     "returnPct": -0.012547721669887687,
+     "trades": 8,
+     "liquidations": 0,
+     "funding": 6.898714441745508,
+     "buyHold": -0.4193691692581075,
+     "folds": [
+      {
+       "testStart": 1760641200000,
+       "testEnd": 1762437600000,
+       "netPnl": 2.536968363712731,
+       "returnPct": 0.0002536968363712731
+      },
+      {
+       "testStart": 1762441200000,
+       "testEnd": 1764237600000,
+       "netPnl": -217.20951437561234,
+       "returnPct": -0.021720951437561236
+      },
+      {
+       "testStart": 1764241200000,
+       "testEnd": 1766037600000,
+       "netPnl": 134.82088408665186,
+       "returnPct": 0.013482088408665186
+      },
+      {
+       "testStart": 1766041200000,
+       "testEnd": 1767837600000,
+       "netPnl": -203.5266395832332,
+       "returnPct": -0.02035266395832332
+      },
+      {
+       "testStart": 1767841200000,
+       "testEnd": 1769637600000,
+       "netPnl": -239.2311147271721,
+       "returnPct": -0.02392311147271721
+      },
+      {
+       "testStart": 1769641200000,
+       "testEnd": 1771437600000,
+       "netPnl": 253.84071296371803,
+       "returnPct": 0.025384071296371803
+      },
+      {
+       "testStart": 1771441200000,
+       "testEnd": 1773237600000,
+       "netPnl": 143.29148657305814,
+       "returnPct": 0.014329148657305814
+      }
+     ]
+    },
+    {
+     "symbol": "UNIUSDT",
+     "datasetHash": "50e528290adca8543ed59d796c10b4179a001dc26d4265c3d1659f6c157538f3",
+     "netPnl": 314.40046075187274,
+     "returnPct": 0.03144004607518727,
+     "trades": 6,
+     "liquidations": 0,
+     "funding": -1.6590763636553834,
+     "buyHold": -0.3844347009082367,
+     "folds": [
+      {
+       "testStart": 1760641200000,
+       "testEnd": 1762437600000,
+       "netPnl": 70.41645406727366,
+       "returnPct": 0.007041645406727366
+      },
+      {
+       "testStart": 1762441200000,
+       "testEnd": 1764237600000,
+       "netPnl": -121.06032675824645,
+       "returnPct": -0.012106032675824645
+      },
+      {
+       "testStart": 1764241200000,
+       "testEnd": 1766037600000,
+       "netPnl": 125.42335658803677,
+       "returnPct": 0.012542335658803676
+      },
+      {
+       "testStart": 1766041200000,
+       "testEnd": 1767837600000,
+       "netPnl": -80.82970353381643,
+       "returnPct": -0.008082970353381643
+      },
+      {
+       "testStart": 1767841200000,
+       "testEnd": 1769637600000,
+       "netPnl": 90.9948341631025,
+       "returnPct": 0.00909948341631025
+      },
+      {
+       "testStart": 1769641200000,
+       "testEnd": 1771437600000,
+       "netPnl": 229.4558462255227,
+       "returnPct": 0.022945584622552268
+      },
+      {
+       "testStart": 1771441200000,
+       "testEnd": 1773237600000,
+       "netPnl": 0,
+       "returnPct": 0
+      }
+     ]
+    },
+    {
+     "symbol": "ONDOUSDT",
+     "datasetHash": "28f74a093653d2ea1c45b7a060d788774e68f96746a1f57fd1a4e6d32dc8029a",
+     "netPnl": 61.019882216374754,
+     "returnPct": 0.006101988221637476,
+     "trades": 7,
+     "liquidations": 0,
+     "funding": -3.970743395731343,
+     "buyHold": -0.650744248985115,
+     "folds": [
+      {
+       "testStart": 1760641200000,
+       "testEnd": 1762437600000,
+       "netPnl": 93.16518373491635,
+       "returnPct": 0.009316518373491636
+      },
+      {
+       "testStart": 1762441200000,
+       "testEnd": 1764237600000,
+       "netPnl": 21.23625178385737,
+       "returnPct": 0.002123625178385737
+      },
+      {
+       "testStart": 1764241200000,
+       "testEnd": 1766037600000,
+       "netPnl": 135.83330169479086,
+       "returnPct": 0.013583330169479086
+      },
+      {
+       "testStart": 1766041200000,
+       "testEnd": 1767837600000,
+       "netPnl": -291.9742470649162,
+       "returnPct": -0.02919742470649162
+      },
+      {
+       "testStart": 1767841200000,
+       "testEnd": 1769637600000,
+       "netPnl": -28.138430884664558,
+       "returnPct": -0.002813843088466456
+      },
+      {
+       "testStart": 1769641200000,
+       "testEnd": 1771437600000,
+       "netPnl": 130.89782295239092,
+       "returnPct": 0.013089782295239093
+      },
+      {
+       "testStart": 1771441200000,
+       "testEnd": 1773237600000,
+       "netPnl": 0,
+       "returnPct": 0
+      }
+     ]
+    },
+    {
+     "symbol": "1000PEPEUSDT",
+     "datasetHash": "abadccdc9eac71a5edb2b802807c8d9680cb6cd6148db768b674aa5e8a00142f",
+     "netPnl": 78.11549104390724,
+     "returnPct": 0.0078115491043907245,
+     "trades": 8,
+     "liquidations": 0,
+     "funding": -8.8977907134227,
+     "buyHold": -0.5196044662590774,
+     "folds": [
+      {
+       "testStart": 1760641200000,
+       "testEnd": 1762437600000,
+       "netPnl": 115.32575514864766,
+       "returnPct": 0.011532575514864765
+      },
+      {
+       "testStart": 1762441200000,
+       "testEnd": 1764237600000,
+       "netPnl": 80.37338918348178,
+       "returnPct": 0.008037338918348179
+      },
+      {
+       "testStart": 1764241200000,
+       "testEnd": 1766037600000,
+       "netPnl": 2.0287454336830706,
+       "returnPct": 0.00020287454336830705
+      },
+      {
+       "testStart": 1766041200000,
+       "testEnd": 1767837600000,
+       "netPnl": -122.14095199631265,
+       "returnPct": -0.012214095199631266
+      },
+      {
+       "testStart": 1767841200000,
+       "testEnd": 1769637600000,
+       "netPnl": -46.56273175749811,
+       "returnPct": -0.004656273175749811
+      },
+      {
+       "testStart": 1769641200000,
+       "testEnd": 1771437600000,
+       "netPnl": 52.063535472845615,
+       "returnPct": 0.005206353547284562
+      },
+      {
+       "testStart": 1771441200000,
+       "testEnd": 1773237600000,
+       "netPnl": -2.9722504409401154,
+       "returnPct": -0.0002972250440940115
+      }
+     ]
+    },
+    {
+     "symbol": "BCHUSDT",
+     "datasetHash": "576a3350704b9c574db0319f0f0853761c39e12c35d81fa56852eea6a74693fe",
+     "netPnl": -155.33673561592514,
+     "returnPct": -0.015533673561592513,
+     "trades": 7,
+     "liquidations": 0,
+     "funding": -4.05375835462463,
+     "buyHold": -0.1100117324990223,
+     "folds": [
+      {
+       "testStart": 1760641200000,
+       "testEnd": 1762437600000,
+       "netPnl": -49.21235969802365,
+       "returnPct": -0.004921235969802365
+      },
+      {
+       "testStart": 1762441200000,
+       "testEnd": 1764237600000,
+       "netPnl": -29.245636229408774,
+       "returnPct": -0.0029245636229408775
+      },
+      {
+       "testStart": 1764241200000,
+       "testEnd": 1766037600000,
+       "netPnl": -103.04732944821808,
+       "returnPct": -0.010304732944821808
+      },
+      {
+       "testStart": 1766041200000,
+       "testEnd": 1767837600000,
+       "netPnl": 44.03122209274261,
+       "returnPct": 0.004403122209274261
+      },
+      {
+       "testStart": 1767841200000,
+       "testEnd": 1769637600000,
+       "netPnl": -25.609624835755312,
+       "returnPct": -0.002560962483575531
+      },
+      {
+       "testStart": 1769641200000,
+       "testEnd": 1771437600000,
+       "netPnl": -11.356092148647804,
+       "returnPct": -0.0011356092148647804
+      },
+      {
+       "testStart": 1771441200000,
+       "testEnd": 1773237600000,
+       "netPnl": 19.10308465138587,
+       "returnPct": 0.001910308465138587
+      }
+     ]
+    },
+    {
+     "symbol": "FILUSDT",
+     "datasetHash": "d8896cc0eaa04fe02308c89d782af969e72a544719a01c5741c852adf8156f40",
+     "netPnl": -175.2804744881796,
+     "returnPct": -0.01752804744881796,
+     "trades": 7,
+     "liquidations": 0,
+     "funding": 0.8411258244470732,
+     "buyHold": -0.4139960758665794,
+     "folds": [
+      {
+       "testStart": 1760641200000,
+       "testEnd": 1762437600000,
+       "netPnl": 0,
+       "returnPct": 0
+      },
+      {
+       "testStart": 1762441200000,
+       "testEnd": 1764237600000,
+       "netPnl": -125.51219043332276,
+       "returnPct": -0.012551219043332276
+      },
+      {
+       "testStart": 1764241200000,
+       "testEnd": 1766037600000,
+       "netPnl": 166.85400971468516,
+       "returnPct": 0.016685400971468516
+      },
+      {
+       "testStart": 1766041200000,
+       "testEnd": 1767837600000,
+       "netPnl": -235.23543065153535,
+       "returnPct": -0.023523543065153536
+      },
+      {
+       "testStart": 1767841200000,
+       "testEnd": 1769637600000,
+       "netPnl": -33.26790288067605,
+       "returnPct": -0.0033267902880676045
+      },
+      {
+       "testStart": 1769641200000,
+       "testEnd": 1771437600000,
+       "netPnl": 212.51367610123634,
+       "returnPct": 0.021251367610123636
+      },
+      {
+       "testStart": 1771441200000,
+       "testEnd": 1773237600000,
+       "netPnl": -160.63263633856695,
+       "returnPct": -0.016063263633856694
+      }
+     ]
+    },
+    {
+     "symbol": "AAVEUSDT",
+     "datasetHash": "0a32203e69b0ccb6e60fa206c6eeeba6959eeefaacd63fb920130c65b8991679",
+     "netPnl": -305.7592897217437,
+     "returnPct": -0.03057592897217437,
+     "trades": 6,
+     "liquidations": 0,
+     "funding": 1.6931361428662999,
+     "buyHold": -0.5254495451660672,
+     "folds": [
+      {
+       "testStart": 1760641200000,
+       "testEnd": 1762437600000,
+       "netPnl": -11.60871325156404,
+       "returnPct": -0.0011608713251564041
+      },
+      {
+       "testStart": 1762441200000,
+       "testEnd": 1764237600000,
+       "netPnl": -83.36109936440516,
+       "returnPct": -0.008336109936440517
+      },
+      {
+       "testStart": 1764241200000,
+       "testEnd": 1766037600000,
+       "netPnl": -135.4815049145509,
+       "returnPct": -0.01354815049145509
+      },
+      {
+       "testStart": 1766041200000,
+       "testEnd": 1767837600000,
+       "netPnl": -53.61047754480205,
+       "returnPct": -0.005361047754480206
+      },
+      {
+       "testStart": 1767841200000,
+       "testEnd": 1769637600000,
+       "netPnl": -150.39283056572094,
+       "returnPct": -0.015039283056572095
+      },
+      {
+       "testStart": 1769641200000,
+       "testEnd": 1771437600000,
+       "netPnl": 128.6953359192994,
+       "returnPct": 0.01286953359192994
+      },
+      {
+       "testStart": 1771441200000,
+       "testEnd": 1773237600000,
+       "netPnl": 0,
+       "returnPct": 0
+      }
+     ]
+    },
+    {
+     "symbol": "SUIUSDT",
+     "datasetHash": "4afbbb2e38159fc90362ac7e14382753092d7961b4dac1d26badb1e81d7e0446",
+     "netPnl": 488.22815164629355,
+     "returnPct": 0.04882281516462936,
+     "trades": 6,
+     "liquidations": 0,
+     "funding": 3.085470059053519,
+     "buyHold": -0.6240885768295976,
+     "folds": [
+      {
+       "testStart": 1760641200000,
+       "testEnd": 1762437600000,
+       "netPnl": 99.01299413599736,
+       "returnPct": 0.009901299413599737
+      },
+      {
+       "testStart": 1762441200000,
+       "testEnd": 1764237600000,
+       "netPnl": 152.18246660380646,
+       "returnPct": 0.015218246660380646
+      },
+      {
+       "testStart": 1764241200000,
+       "testEnd": 1766037600000,
+       "netPnl": 0,
+       "returnPct": 0
+      },
+      {
+       "testStart": 1766041200000,
+       "testEnd": 1767837600000,
+       "netPnl": 88.0446509801568,
+       "returnPct": 0.00880446509801568
+      },
+      {
+       "testStart": 1767841200000,
+       "testEnd": 1769637600000,
+       "netPnl": 7.403774214964869,
+       "returnPct": 0.000740377421496487
+      },
+      {
+       "testStart": 1769641200000,
+       "testEnd": 1771437600000,
+       "netPnl": 321.49069155255347,
+       "returnPct": 0.032149069155255346
+      },
+      {
+       "testStart": 1771441200000,
+       "testEnd": 1773237600000,
+       "netPnl": -179.9064258411854,
+       "returnPct": -0.01799064258411854
+      }
+     ]
+    },
+    {
+     "symbol": "TAOUSDT",
+     "datasetHash": "ec243f6fecadc24f4eef4514a9e17e01f50eaf894824c564df304b8179b3bb9e",
+     "netPnl": -115.83659232794707,
+     "returnPct": -0.011583659232794707,
+     "trades": 6,
+     "liquidations": 0,
+     "funding": -7.393964575022634,
+     "buyHold": -0.5006244068135272,
+     "folds": [
+      {
+       "testStart": 1760641200000,
+       "testEnd": 1762437600000,
+       "netPnl": -197.2175977230836,
+       "returnPct": -0.01972175977230836
+      },
+      {
+       "testStart": 1762441200000,
+       "testEnd": 1764237600000,
+       "netPnl": 138.18210246925446,
+       "returnPct": 0.013818210246925446
+      },
+      {
+       "testStart": 1764241200000,
+       "testEnd": 1766037600000,
+       "netPnl": 95.0339487749734,
+       "returnPct": 0.009503394877497339
+      },
+      {
+       "testStart": 1766041200000,
+       "testEnd": 1767837600000,
+       "netPnl": -205.38603181978033,
+       "returnPct": -0.020538603181978032
+      },
+      {
+       "testStart": 1767841200000,
+       "testEnd": 1769637600000,
+       "netPnl": 0,
+       "returnPct": 0
+      },
+      {
+       "testStart": 1769641200000,
+       "testEnd": 1771437600000,
+       "netPnl": 88.7033037984911,
+       "returnPct": 0.008870330379849111
+      },
+      {
+       "testStart": 1771441200000,
+       "testEnd": 1773237600000,
+       "netPnl": -35.15231782780211,
+       "returnPct": -0.0035152317827802106
+      }
+     ]
+    },
+    {
+     "symbol": "AVAXUSDT",
+     "datasetHash": "9edce2aaf2d52e234b01655a070b0d0cc8b00a820e0083e0946d29063d19350f",
+     "netPnl": 4.786510675836325,
+     "returnPct": 0.00047865106758363256,
+     "trades": 8,
+     "liquidations": 0,
+     "funding": -8.936050275264012,
+     "buyHold": -0.5406444265173445,
+     "folds": [
+      {
+       "testStart": 1760641200000,
+       "testEnd": 1762437600000,
+       "netPnl": 16.99002017404382,
+       "returnPct": 0.001699002017404382
+      },
+      {
+       "testStart": 1762441200000,
+       "testEnd": 1764237600000,
+       "netPnl": -16.359006695296557,
+       "returnPct": -0.0016359006695296557
+      },
+      {
+       "testStart": 1764241200000,
+       "testEnd": 1766037600000,
+       "netPnl": 58.673097180018885,
+       "returnPct": 0.005867309718001888
+      },
+      {
+       "testStart": 1766041200000,
+       "testEnd": 1767837600000,
+       "netPnl": -212.90137723513726,
+       "returnPct": -0.021290137723513725
+      },
+      {
+       "testStart": 1767841200000,
+       "testEnd": 1769637600000,
+       "netPnl": -21.617873996690832,
+       "returnPct": -0.002161787399669083
+      },
+      {
+       "testStart": 1769641200000,
+       "testEnd": 1771437600000,
+       "netPnl": 193.50456566972935,
+       "returnPct": 0.019350456566972936
+      },
+      {
+       "testStart": 1771441200000,
+       "testEnd": 1773237600000,
+       "netPnl": -13.502914420831075,
+       "returnPct": -0.0013502914420831075
+      }
+     ]
+    },
+    {
+     "symbol": "LINKUSDT",
+     "datasetHash": "5e5ce4e1609d15701ea1d11b6daf13708ac04e5e5dd91f1de9ea0865206cebf3",
+     "netPnl": -111.46938306061747,
+     "returnPct": -0.011146938306061747,
+     "trades": 8,
+     "liquidations": 0,
+     "funding": 1.324523762963536,
+     "buyHold": -0.48767107793236064,
+     "folds": [
+      {
+       "testStart": 1760641200000,
+       "testEnd": 1762437600000,
+       "netPnl": 41.80239479714692,
+       "returnPct": 0.004180239479714692
+      },
+      {
+       "testStart": 1762441200000,
+       "testEnd": 1764237600000,
+       "netPnl": 12.277519411731191,
+       "returnPct": 0.001227751941173119
+      },
+      {
+       "testStart": 1764241200000,
+       "testEnd": 1766037600000,
+       "netPnl": -181.80927810651156,
+       "returnPct": -0.018180927810651157
+      },
+      {
+       "testStart": 1766041200000,
+       "testEnd": 1767837600000,
+       "netPnl": -27.16921135553457,
+       "returnPct": -0.002716921135553457
+      },
+      {
+       "testStart": 1767841200000,
+       "testEnd": 1769637600000,
+       "netPnl": -156.0360281543508,
+       "returnPct": -0.015603602815435078
+      },
+      {
+       "testStart": 1769641200000,
+       "testEnd": 1771437600000,
+       "netPnl": 225.179007453351,
+       "returnPct": 0.0225179007453351
+      },
+      {
+       "testStart": 1771441200000,
+       "testEnd": 1773237600000,
+       "netPnl": -25.713787106449672,
+       "returnPct": -0.0025713787106449674
+      }
+     ]
+    },
+    {
+     "symbol": "XRPUSDT",
+     "datasetHash": "f2e61c0a63e3c530e4ca25b426125004561341ba3658e588c70c1009b1533a29",
+     "netPnl": -25.068349767792824,
+     "returnPct": -0.0025068349767792823,
+     "trades": 7,
+     "liquidations": 0,
+     "funding": -6.3330281313674615,
+     "buyHold": -0.4079479215419308,
+     "folds": [
+      {
+       "testStart": 1760641200000,
+       "testEnd": 1762437600000,
+       "netPnl": 0,
+       "returnPct": 0
+      },
+      {
+       "testStart": 1762441200000,
+       "testEnd": 1764237600000,
+       "netPnl": -65.43816680751661,
+       "returnPct": -0.006543816680751661
+      },
+      {
+       "testStart": 1764241200000,
+       "testEnd": 1766037600000,
+       "netPnl": 52.856057555920415,
+       "returnPct": 0.005285605755592042
+      },
+      {
+       "testStart": 1766041200000,
+       "testEnd": 1767837600000,
+       "netPnl": -80.34903297850178,
+       "returnPct": -0.008034903297850178
+      },
+      {
+       "testStart": 1767841200000,
+       "testEnd": 1769637600000,
+       "netPnl": -46.10135733466814,
+       "returnPct": -0.004610135733466814
+      },
+      {
+       "testStart": 1769641200000,
+       "testEnd": 1771437600000,
+       "netPnl": 192.12785254713708,
+       "returnPct": 0.019212785254713708
+      },
+      {
+       "testStart": 1771441200000,
+       "testEnd": 1773237600000,
+       "netPnl": -78.1637027501638,
+       "returnPct": -0.007816370275016379
+      }
+     ]
+    },
+    {
+     "symbol": "XLMUSDT",
+     "datasetHash": "24b97b4f7951c2f9d1b0de4e2754dc3453cb1e6c71306fa536c360fe1c062760",
+     "netPnl": 67.15053512379927,
+     "returnPct": 0.006715053512379927,
+     "trades": 7,
+     "liquidations": 0,
+     "funding": -4.64786519172016,
+     "buyHold": -0.49213397614818566,
+     "folds": [
+      {
+       "testStart": 1760641200000,
+       "testEnd": 1762437600000,
+       "netPnl": 34.784359642888376,
+       "returnPct": 0.0034784359642888374
+      },
+      {
+       "testStart": 1762441200000,
+       "testEnd": 1764237600000,
+       "netPnl": -16.33041116620916,
+       "returnPct": -0.001633041116620916
+      },
+      {
+       "testStart": 1764241200000,
+       "testEnd": 1766037600000,
+       "netPnl": 75.60363221865737,
+       "returnPct": 0.007560363221865736
+      },
+      {
+       "testStart": 1766041200000,
+       "testEnd": 1767837600000,
+       "netPnl": -165.0736365565881,
+       "returnPct": -0.01650736365565881
+      },
+      {
+       "testStart": 1767841200000,
+       "testEnd": 1769637600000,
+       "netPnl": -45.86111041890945,
+       "returnPct": -0.004586111041890945
+      },
+      {
+       "testStart": 1769641200000,
+       "testEnd": 1771437600000,
+       "netPnl": 184.02770140396024,
+       "returnPct": 0.018402770140396024
+      },
+      {
+       "testStart": 1771441200000,
+       "testEnd": 1773237600000,
+       "netPnl": 0,
+       "returnPct": 0
+      }
+     ]
+    },
+    {
+     "symbol": "DOGEUSDT",
+     "datasetHash": "576e3e6eb2f27219b2d1e907e367e134b779147c98fcb40deba7a12b7dac7a25",
+     "netPnl": 26.060330583886753,
+     "returnPct": 0.002606033058388675,
+     "trades": 7,
+     "liquidations": 0,
+     "funding": -0.4528429213039302,
+     "buyHold": -0.5094785485480229,
+     "folds": [
+      {
+       "testStart": 1760641200000,
+       "testEnd": 1762437600000,
+       "netPnl": 81.05283429786323,
+       "returnPct": 0.008105283429786322
+      },
+      {
+       "testStart": 1762441200000,
+       "testEnd": 1764237600000,
+       "netPnl": -36.65665899650412,
+       "returnPct": -0.003665665899650412
+      },
+      {
+       "testStart": 1764241200000,
+       "testEnd": 1766037600000,
+       "netPnl": 45.188702450070195,
+       "returnPct": 0.004518870245007019
+      },
+      {
+       "testStart": 1766041200000,
+       "testEnd": 1767837600000,
+       "netPnl": -150.1675458977261,
+       "returnPct": -0.01501675458977261
+      },
+      {
+       "testStart": 1767841200000,
+       "testEnd": 1769637600000,
+       "netPnl": -57.606006370377145,
+       "returnPct": -0.0057606006370377145
+      },
+      {
+       "testStart": 1769641200000,
+       "testEnd": 1771437600000,
+       "netPnl": 144.24900510056068,
+       "returnPct": 0.014424900510056068
+      },
+      {
+       "testStart": 1771441200000,
+       "testEnd": 1773237600000,
+       "netPnl": 0,
+       "returnPct": 0
+      }
+     ]
+    },
+    {
+     "symbol": "SOLUSDT",
+     "datasetHash": "84658e671e5afd6009d97bb9a8bd6d9c5a9eea96fccf6419a72e3771caeb947e",
+     "netPnl": -72.65572904275359,
+     "returnPct": -0.007265572904275359,
+     "trades": 8,
+     "liquidations": 0,
+     "funding": -3.0760209853485505,
+     "buyHold": -0.5429371664112456,
+     "folds": [
+      {
+       "testStart": 1760641200000,
+       "testEnd": 1762437600000,
+       "netPnl": 52.29951437046475,
+       "returnPct": 0.005229951437046475
+      },
+      {
+       "testStart": 1762441200000,
+       "testEnd": 1764237600000,
+       "netPnl": 20.80692897863628,
+       "returnPct": 0.002080692897863628
+      },
+      {
+       "testStart": 1764241200000,
+       "testEnd": 1766037600000,
+       "netPnl": 0.3631570775196451,
+       "returnPct": 0.00003631570775196451
+      },
+      {
+       "testStart": 1766041200000,
+       "testEnd": 1767837600000,
+       "netPnl": -193.39600665581384,
+       "returnPct": -0.019339600665581384
+      },
+      {
+       "testStart": 1767841200000,
+       "testEnd": 1769637600000,
+       "netPnl": -164.75795194441525,
+       "returnPct": -0.016475795194441527
+      },
+      {
+       "testStart": 1769641200000,
+       "testEnd": 1771437600000,
+       "netPnl": 281.31633419405625,
+       "returnPct": 0.028131633419405624
+      },
+      {
+       "testStart": 1771441200000,
+       "testEnd": 1773237600000,
+       "netPnl": -69.28770506320143,
+       "returnPct": -0.006928770506320143
+      }
+     ]
+    },
+    {
+     "symbol": "LTCUSDT",
+     "datasetHash": "3513ae21497dbad85d4a8136a32db67c932193f1d9874ebcc6ccb50745fd6b6b",
+     "netPnl": -164.9708152915864,
+     "returnPct": -0.01649708152915864,
+     "trades": 7,
+     "liquidations": 0,
+     "funding": 3.1369123417756946,
+     "buyHold": -0.40303063338057343,
+     "folds": [
+      {
+       "testStart": 1760641200000,
+       "testEnd": 1762437600000,
+       "netPnl": 0,
+       "returnPct": 0
+      },
+      {
+       "testStart": 1762441200000,
+       "testEnd": 1764237600000,
+       "netPnl": -224.7474023139457,
+       "returnPct": -0.02247474023139457
+      },
+      {
+       "testStart": 1764241200000,
+       "testEnd": 1766037600000,
+       "netPnl": 34.04275506130216,
+       "returnPct": 0.003404275506130216
+      },
+      {
+       "testStart": 1766041200000,
+       "testEnd": 1767837600000,
+       "netPnl": -143.7292081493797,
+       "returnPct": -0.01437292081493797
+      },
+      {
+       "testStart": 1767841200000,
+       "testEnd": 1769637600000,
+       "netPnl": 55.40581841619314,
+       "returnPct": 0.005540581841619314
+      },
+      {
+       "testStart": 1769641200000,
+       "testEnd": 1771437600000,
+       "netPnl": 167.10389247682724,
+       "returnPct": 0.016710389247682724
+      },
+      {
+       "testStart": 1771441200000,
+       "testEnd": 1773237600000,
+       "netPnl": -53.04667078258353,
+       "returnPct": -0.005304667078258354
+      }
+     ]
+    },
+    {
+     "symbol": "ETHUSDT",
+     "datasetHash": "4fb4e6e4e59449cc145eaba2368eb56d48f7d8cc20b0e1995c3013b04d189ed9",
+     "netPnl": -28.546721971828447,
+     "returnPct": -0.0028546721971828446,
+     "trades": 8,
+     "liquidations": 0,
+     "funding": -1.5836170715409694,
+     "buyHold": -0.4717922706056553,
+     "folds": [
+      {
+       "testStart": 1760641200000,
+       "testEnd": 1762437600000,
+       "netPnl": 71.22664067480218,
+       "returnPct": 0.007122664067480218
+      },
+      {
+       "testStart": 1762441200000,
+       "testEnd": 1764237600000,
+       "netPnl": -17.793223509563177,
+       "returnPct": -0.0017793223509563177
+      },
+      {
+       "testStart": 1764241200000,
+       "testEnd": 1766037600000,
+       "netPnl": -130.5906893636693,
+       "returnPct": -0.01305906893636693
+      },
+      {
+       "testStart": 1766041200000,
+       "testEnd": 1767837600000,
+       "netPnl": -4.822174378394266,
+       "returnPct": -0.00048221743783942656
+      },
+      {
+       "testStart": 1767841200000,
+       "testEnd": 1769637600000,
+       "netPnl": -175.702038622303,
+       "returnPct": -0.0175702038622303
+      },
+      {
+       "testStart": 1769641200000,
+       "testEnd": 1771437600000,
+       "netPnl": 282.99325128262535,
+       "returnPct": 0.028299325128262536
+      },
+      {
+       "testStart": 1771441200000,
+       "testEnd": 1773237600000,
+       "netPnl": -53.858488055326234,
+       "returnPct": -0.005385848805532624
+      }
+     ]
+    },
+    {
+     "symbol": "BTCUSDT",
+     "datasetHash": "7a834fa5c7e2fdfcee4a2820eef21f97b15e5e8b6bbff80e92f1e00c30da1fd2",
+     "netPnl": 150.41503398180066,
+     "returnPct": 0.015041503398180067,
+     "trades": 7,
+     "liquidations": 0,
+     "funding": 0.9057980593941153,
+     "buyHold": -0.35049171270718227,
+     "folds": [
+      {
+       "testStart": 1760641200000,
+       "testEnd": 1762437600000,
+       "netPnl": 0.160527005471522,
+       "returnPct": 0.000016052700547152197
+      },
+      {
+       "testStart": 1762441200000,
+       "testEnd": 1764237600000,
+       "netPnl": 71.21632382453754,
+       "returnPct": 0.007121632382453754
+      },
+      {
+       "testStart": 1764241200000,
+       "testEnd": 1766037600000,
+       "netPnl": 0,
+       "returnPct": 0
+      },
+      {
+       "testStart": 1766041200000,
+       "testEnd": 1767837600000,
+       "netPnl": -6.309077602867546,
+       "returnPct": -0.0006309077602867547
+      },
+      {
+       "testStart": 1767841200000,
+       "testEnd": 1769637600000,
+       "netPnl": -122.68089813312872,
+       "returnPct": -0.012268089813312871
+      },
+      {
+       "testStart": 1769641200000,
+       "testEnd": 1771437600000,
+       "netPnl": 215.82041397646026,
+       "returnPct": 0.021582041397646027
+      },
+      {
+       "testStart": 1771441200000,
+       "testEnd": 1773237600000,
+       "netPnl": -7.792255088672391,
+       "returnPct": -0.0007792255088672391
+      }
+     ]
+    }
+   ],
+   "hours": 3500,
+   "deflatedSharpe": 0.47761391931171465,
+   "checks": {
+    "POSITIVE_BASKET_PNL": false,
+    "MINIMUM_TRADES": true,
+    "BOUNDED_DRAWDOWN": true,
+    "POSITIVE_FOLDS": false,
+    "BREADTH": false,
+    "DEFLATED_SHARPE": false
+   },
+   "passed": false,
+   "failed": [
+    "POSITIVE_BASKET_PNL",
+    "POSITIVE_FOLDS",
+    "BREADTH",
+    "DEFLATED_SHARPE"
+   ]
+  }
+ }
+}

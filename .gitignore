@@ -21,3 +21,4 @@ __pycache__/
 
 # Saídas do compositor de cenário (copiar para public/office as que forem usadas)
 scripts/assets/out/
+scripts/estudos/out/
