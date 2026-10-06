@@ -1,0 +1,799 @@
+{
+ "protocol": {
+  "version": "VIDEO_HYPOTHESES_V1",
+  "declaredAt": "2026-10-06",
+  "symbols": [
+   "ZECUSDT",
+   "NEARUSDT",
+   "UNIUSDT",
+   "BCHUSDT",
+   "FILUSDT",
+   "AAVEUSDT",
+   "AVAXUSDT",
+   "LINKUSDT",
+   "XRPUSDT",
+   "XLMUSDT",
+   "DOGEUSDT",
+   "SOLUSDT",
+   "LTCUSDT",
+   "ETHUSDT",
+   "BTCUSDT"
+  ],
+  "firstBar": 1640995200000,
+  "lastBar": 1791241200000,
+  "testYears": [
+   2024,
+   2025,
+   2026
+  ],
+  "warmup": 200,
+  "costs": {
+   "initialCapital": 10000,
+   "positionFraction": 0.1,
+   "feeRate": 0.00055,
+   "slippageBps": 2
+  },
+  "stressedCosts": {
+   "feeRate": 0.0011,
+   "slippageBps": 5
+  },
+  "calendarKinds": [
+   "HOUR_OF_DAY",
+   "DAY_OF_WEEK"
+  ],
+  "screen": {
+   "version": "VIDEO_SCREEN_V1",
+   "minimumDeflatedSharpe": 0.9,
+   "minimumPositiveYears": 2,
+   "minimumCoinBreadth": 0.6,
+   "minimumStableShare": 0.5,
+   "maximumFilledShare": 0.01
+  }
+ },
+ "amendment": "EMENDA_1_H04_V2",
+ "trials": 55,
+ "provenance": {
+  "version": "SCRIPT_PROVENANCE_V1",
+  "script": "scripts/estudos/hipoteses-video.ts",
+  "codeCommit": "93acda5f260a81db946b4d0f4e4a1c66904928cd",
+  "workingTreeClean": true,
+  "uncommittedFiles": [],
+  "node": "v24.18.0"
+ },
+ "execution": "HISTORICAL_SIMULATION_OFFLINE",
+ "automaticPaperApproval": false,
+ "runAt": "2026-10-06T14:46:42.433Z",
+ "data": [
+  {
+   "symbol": "ZECUSDT",
+   "candles": 41736,
+   "filled": 0,
+   "fundings": 5217,
+   "fundingMarkFilled": 2005
+  },
+  {
+   "symbol": "NEARUSDT",
+   "candles": 41736,
+   "filled": 0,
+   "fundings": 5217,
+   "fundingMarkFilled": 2005
+  },
+  {
+   "symbol": "UNIUSDT",
+   "candles": 41736,
+   "filled": 0,
+   "fundings": 5217,
+   "fundingMarkFilled": 2005
+  },
+  {
+   "symbol": "BCHUSDT",
+   "candles": 41736,
+   "filled": 0,
+   "fundings": 5217,
+   "fundingMarkFilled": 2005
+  },
+  {
+   "symbol": "FILUSDT",
+   "candles": 41736,
+   "filled": 0,
+   "fundings": 5217,
+   "fundingMarkFilled": 2005
+  },
+  {
+   "symbol": "AAVEUSDT",
+   "candles": 41736,
+   "filled": 0,
+   "fundings": 5217,
+   "fundingMarkFilled": 2005
+  },
+  {
+   "symbol": "AVAXUSDT",
+   "candles": 41736,
+   "filled": 0,
+   "fundings": 5217,
+   "fundingMarkFilled": 2005
+  },
+  {
+   "symbol": "LINKUSDT",
+   "candles": 41736,
+   "filled": 0,
+   "fundings": 5217,
+   "fundingMarkFilled": 2005
+  },
+  {
+   "symbol": "XRPUSDT",
+   "candles": 41736,
+   "filled": 0,
+   "fundings": 5217,
+   "fundingMarkFilled": 2005
+  },
+  {
+   "symbol": "XLMUSDT",
+   "candles": 41736,
+   "filled": 0,
+   "fundings": 5217,
+   "fundingMarkFilled": 2005
+  },
+  {
+   "symbol": "DOGEUSDT",
+   "candles": 41736,
+   "filled": 0,
+   "fundings": 5217,
+   "fundingMarkFilled": 2005
+  },
+  {
+   "symbol": "SOLUSDT",
+   "candles": 41736,
+   "filled": 0,
+   "fundings": 5292,
+   "fundingMarkFilled": 2080
+  },
+  {
+   "symbol": "LTCUSDT",
+   "candles": 41736,
+   "filled": 0,
+   "fundings": 5217,
+   "fundingMarkFilled": 2005
+  },
+  {
+   "symbol": "ETHUSDT",
+   "candles": 41736,
+   "filled": 0,
+   "fundings": 5217,
+   "fundingMarkFilled": 2005
+  },
+  {
+   "symbol": "BTCUSDT",
+   "candles": 41736,
+   "filled": 0,
+   "fundings": 5217,
+   "fundingMarkFilled": 2005
+  }
+ ],
+ "trialSharpeVariance": 0.00026567506535065587,
+ "families": [
+  {
+   "family": "H03_VWAP",
+   "configs": 9,
+   "selected": {
+    "2024": "H03B_ROLL24_K2",
+    "2025": "H03B_SESSION_K2",
+    "2026": "H03B_SESSION_K2"
+   },
+   "oosReturn": 0.0012172411942945605,
+   "oosReturnStressed": 0.0011043371598835616,
+   "years": {
+    "2024": 0.0008748618973202227,
+    "2025": 0,
+    "2026": 0.00034208002419555683
+   },
+   "maxDrawdown": 0.0004988668552348141,
+   "sharpeAnnualized": 1.0156386463626816,
+   "deflatedSharpe": 0.00001535658442725074,
+   "positiveYears": 2,
+   "coinBreadth": 0.4,
+   "stableShare": 0.2222222222222222,
+   "stableByConfig": {
+    "H03A_ROLL24": -0.2862169762464011,
+    "H03A_ROLL168": -0.02808164514170597,
+    "H03A_SESSION": -0.5027545077264499,
+    "H03B_ROLL24_K1": -0.08388826754792378,
+    "H03B_ROLL24_K2": 0.00087971838292078,
+    "H03B_SESSION_K1": -0.032510538192100924,
+    "H03B_SESSION_K2": 0.0005050898963669948,
+    "H03C_TOL0.001": -0.39166135920842593,
+    "H03C_TOL0.003": -0.3889726566099364
+   },
+   "trades": 10,
+   "winRate": 0.8,
+   "expectancy": 18.25700564469997,
+   "profitFactor": 3.96428697317233,
+   "averageHoldingHours": 14.500000250000003,
+   "checks": {
+    "OOS_POSITIVE": true,
+    "COSTS_DOUBLED_POSITIVE": true,
+    "DEFLATED_SHARPE": false,
+    "POSITIVE_YEARS": true,
+    "COIN_BREADTH": false,
+    "PARAMETER_STABILITY": false
+   },
+   "verdict": "INCONCLUSIVA"
+  },
+  {
+   "family": "H04_SUPPORT_RESISTANCE",
+   "configs": 8,
+   "selected": {
+    "2024": "H04_P24_M1_H0.5",
+    "2025": "H04_P24_M1_H0.5",
+    "2026": "H04_P24_M1_H0.5"
+   },
+   "oosReturn": -0.09771626519041177,
+   "oosReturnStressed": -0.15308929424691498,
+   "years": {
+    "2024": -0.061971255669349135,
+    "2025": -0.024916175121987183,
+    "2026": -0.01352739410848014
+   },
+   "maxDrawdown": 0.1014141786061652,
+   "sharpeAnnualized": -2.847670085030953,
+   "deflatedSharpe": 0,
+   "positiveYears": 0,
+   "coinBreadth": 0,
+   "stableShare": 0,
+   "stableByConfig": {
+    "H04_P12_M1_H0.5": -0.15083510253549204,
+    "H04_P12_M1_H0.67": -0.15083510253549204,
+    "H04_P12_M2_H0.5": -0.1168961021259256,
+    "H04_P12_M2_H0.67": -0.1168961021259256,
+    "H04_P24_M1_H0.5": -0.09771626519041177,
+    "H04_P24_M1_H0.67": -0.09771626519041177,
+    "H04_P24_M2_H0.5": -0.07140960040868072,
+    "H04_P24_M2_H0.67": -0.07140960040868072
+   },
+   "trades": 5594,
+   "winRate": 0.327493743296389,
+   "expectancy": -2.4476392840394365,
+   "profitFactor": 0.7956807676078154,
+   "averageHoldingHours": 12.820164482729425,
+   "checks": {
+    "OOS_POSITIVE": false,
+    "COSTS_DOUBLED_POSITIVE": false,
+    "DEFLATED_SHARPE": false,
+    "POSITIVE_YEARS": false,
+    "COIN_BREADTH": false,
+    "PARAMETER_STABILITY": false
+   },
+   "verdict": "REJEITADA"
+  },
+  {
+   "family": "H02_MA_DEVIATION",
+   "configs": 16,
+   "selected": {
+    "2024": "H02_REVERSION_N50_VOL",
+    "2025": "H02_REVERSION_N25_VOL",
+    "2026": "H02_MOMENTUM_N50_VOL"
+   },
+   "oosReturn": -0.0015297622519160337,
+   "oosReturnStressed": -0.003038840172860602,
+   "years": {
+    "2024": -0.0016941906811483998,
+    "2025": -0.0014319435570651073,
+    "2026": 0.001598940624893519
+   },
+   "maxDrawdown": 0.010370779956508147,
+   "sharpeAnnualized": -0.11692859723937862,
+   "deflatedSharpe": 6.660250129186807e-10,
+   "positiveYears": 1,
+   "coinBreadth": 0.5333333333333333,
+   "stableShare": 0.125,
+   "stableByConfig": {
+    "H02_REVERSION_N25_0.02": -0.1209170417831883,
+    "H02_REVERSION_N25_0.03": -0.0727466450146581,
+    "H02_REVERSION_N25_0.04": -0.057513847514447436,
+    "H02_REVERSION_N25_VOL": -0.0014852658437599642,
+    "H02_REVERSION_N50_0.02": -0.06819041875661513,
+    "H02_REVERSION_N50_0.03": -0.061958531354779356,
+    "H02_REVERSION_N50_0.04": -0.054268011344242084,
+    "H02_REVERSION_N50_VOL": -0.010773400683060319,
+    "H02_MOMENTUM_N25_0.02": -0.06455570309586023,
+    "H02_MOMENTUM_N25_0.03": -0.04966135745838374,
+    "H02_MOMENTUM_N25_0.04": -0.03989295721044639,
+    "H02_MOMENTUM_N25_VOL": -0.0005105681300848763,
+    "H02_MOMENTUM_N50_0.02": -0.04378256727932617,
+    "H02_MOMENTUM_N50_0.03": -0.018214209061602427,
+    "H02_MOMENTUM_N50_0.04": 0.0008396192464557029,
+    "H02_MOMENTUM_N50_VOL": 0.008348771841125258
+   },
+   "trades": 133,
+   "winRate": 0.43609022556390975,
+   "expectancy": -1.4841263794822523,
+   "profitFactor": 0.947612578885778,
+   "averageHoldingHours": 20.586466294903953,
+   "checks": {
+    "OOS_POSITIVE": false,
+    "COSTS_DOUBLED_POSITIVE": false,
+    "DEFLATED_SHARPE": false,
+    "POSITIVE_YEARS": false,
+    "COIN_BREADTH": false,
+    "PARAMETER_STABILITY": false
+   },
+   "verdict": "REJEITADA"
+  },
+  {
+   "family": "H01_FIBONACCI",
+   "configs": 8,
+   "selected": {
+    "2024": "H01_N168_L0.382",
+    "2025": "H01_N168_L0.382",
+    "2026": "H01_N168_L0.618"
+   },
+   "oosReturn": -0.05517924519319295,
+   "oosReturnStressed": -0.08517633473036945,
+   "years": {
+    "2024": -0.011807814708474917,
+    "2025": -0.048139817255208994,
+    "2026": 0.004465094493633304
+   },
+   "maxDrawdown": 0.08186415678105718,
+   "sharpeAnnualized": -0.7083769963192372,
+   "deflatedSharpe": 6.446509992485971e-13,
+   "positiveYears": 1,
+   "coinBreadth": 0.06666666666666667,
+   "stableShare": 0,
+   "stableByConfig": {
+    "H01_N48_L0.236": -0.11249337939942261,
+    "H01_N48_L0.382": -0.13684379613365094,
+    "H01_N48_L0.5": -0.12517160168445907,
+    "H01_N48_L0.618": -0.10222897525090746,
+    "H01_N168_L0.236": -0.09822924641111663,
+    "H01_N168_L0.382": -0.0692108344201775,
+    "H01_N168_L0.5": -0.06292171491153387,
+    "H01_N168_L0.618": -0.012789990662718576
+   },
+   "trades": 2852,
+   "winRate": 0.520687237026648,
+   "expectancy": -2.878777234377245,
+   "profitFactor": 0.890606656862117,
+   "averageHoldingHours": 51.48071542221816,
+   "checks": {
+    "OOS_POSITIVE": false,
+    "COSTS_DOUBLED_POSITIVE": false,
+    "DEFLATED_SHARPE": false,
+    "POSITIVE_YEARS": false,
+    "COIN_BREADTH": false,
+    "PARAMETER_STABILITY": false
+   },
+   "verdict": "REJEITADA"
+  },
+  {
+   "family": "H05_FLAG",
+   "configs": 4,
+   "selected": {
+    "2024": "H05_I6_D0.382",
+    "2025": "H05_I6_D0.382",
+    "2026": "H05_I6_D0.382"
+   },
+   "oosReturn": -0.014400724358603734,
+   "oosReturnStressed": -0.025563130918000887,
+   "years": {
+    "2024": -0.007239347970809384,
+    "2025": -0.004247351635006336,
+    "2026": -0.0029788989310489677
+   },
+   "maxDrawdown": 0.022530544716848566,
+   "sharpeAnnualized": -0.4927883127662726,
+   "deflatedSharpe": 1.613270628197938e-11,
+   "positiveYears": 0,
+   "coinBreadth": 0.26666666666666666,
+   "stableShare": 0,
+   "stableByConfig": {
+    "H05_I6_D0.382": -0.014400724358603734,
+    "H05_I6_D0.5": -0.014693254719678972,
+    "H05_I12_D0.382": -0.02144473743287456,
+    "H05_I12_D0.5": -0.022644361759966092
+   },
+   "trades": 1001,
+   "winRate": 0.34465534465534464,
+   "expectancy": -2.1777147206678946,
+   "profitFactor": 0.8902343990888949,
+   "averageHoldingHours": 18.733266767399275,
+   "checks": {
+    "OOS_POSITIVE": false,
+    "COSTS_DOUBLED_POSITIVE": false,
+    "DEFLATED_SHARPE": false,
+    "POSITIVE_YEARS": false,
+    "COIN_BREADTH": false,
+    "PARAMETER_STABILITY": false
+   },
+   "verdict": "REJEITADA"
+  },
+  {
+   "family": "H04_V2_SUPPORT_RESISTANCE",
+   "configs": 8,
+   "selected": {
+    "2024": "H04V2_P24_M1_H0.67",
+    "2025": "H04V2_P24_M2_H0.5",
+    "2026": "H04V2_P24_M1_H0.5"
+   },
+   "oosReturn": -0.1413779865849507,
+   "oosReturnStressed": -0.25567847395774523,
+   "years": {
+    "2024": -0.06851418392828645,
+    "2025": -0.049178947194615685,
+    "2026": -0.03054649893300354
+   },
+   "maxDrawdown": 0.14318343465373207,
+   "sharpeAnnualized": -3.3484356665161483,
+   "deflatedSharpe": 0,
+   "positiveYears": 0,
+   "coinBreadth": 0,
+   "stableShare": 0,
+   "stableByConfig": {
+    "H04V2_P12_M1_H0.5": -0.19527783337833737,
+    "H04V2_P12_M1_H0.67": -0.16411528540982556,
+    "H04V2_P12_M2_H0.5": -0.19148780130197718,
+    "H04V2_P12_M2_H0.67": -0.15648077069224375,
+    "H04V2_P24_M1_H0.5": -0.126319592266526,
+    "H04V2_P24_M1_H0.67": -0.12868003082934398,
+    "H04V2_P24_M2_H0.5": -0.11853337388550134,
+    "H04V2_P24_M2_H0.67": -0.10840150104916213
+   },
+   "trades": 12619,
+   "winRate": 0.3434503526428402,
+   "expectancy": -1.5333711294233936,
+   "profitFactor": 0.8562530635507308,
+   "averageHoldingHours": 13.044536036796272,
+   "checks": {
+    "OOS_POSITIVE": false,
+    "COSTS_DOUBLED_POSITIVE": false,
+    "DEFLATED_SHARPE": false,
+    "POSITIVE_YEARS": false,
+    "COIN_BREADTH": false,
+    "PARAMETER_STABILITY": false
+   },
+   "verdict": "REJEITADA"
+  },
+  {
+   "family": "H06_CALENDAR",
+   "configs": 2,
+   "selected": {
+    "2024": "DAY_OF_WEEK",
+    "2025": "DAY_OF_WEEK",
+    "2026": "DAY_OF_WEEK"
+   },
+   "oosReturn": 0.0019602970938139563,
+   "oosReturnStressed": -0.02020842140739265,
+   "years": {
+    "2024": 0,
+    "2025": 0.010901906331776567,
+    "2026": -0.008845179915041301
+   },
+   "maxDrawdown": 0.026126725852664068,
+   "sharpeAnnualized": 0.04499272683481583,
+   "deflatedSharpe": 3.536317294550173e-9,
+   "positiveYears": 1,
+   "coinBreadth": 0.3333333333333333,
+   "stableShare": 0.5,
+   "stableByConfig": {
+    "HOUR_OF_DAY": -0.5973984206771261,
+    "DAY_OF_WEEK": 0.0019602970938137343
+   },
+   "trades": 1980,
+   "winRate": 0.4585858585858586,
+   "expectancy": -0.048789207949345076,
+   "profitFactor": 0.9961924022995557,
+   "averageHoldingHours": 24.00000027777674,
+   "checks": {
+    "OOS_POSITIVE": true,
+    "COSTS_DOUBLED_POSITIVE": false,
+    "DEFLATED_SHARPE": false,
+    "POSITIVE_YEARS": false,
+    "COIN_BREADTH": false,
+    "PARAMETER_STABILITY": true
+   },
+   "verdict": "REJEITADA"
+  }
+ ],
+ "baselines": {
+  "flat": 0,
+  "basketSameExposure": 0.1456776840138445,
+  "basketByYear": {
+   "2024": 0.9455905045114462,
+   "2025": 0.19931463764095536,
+   "2026": 0.2624786821697618
+  }
+ },
+ "holdPrediction": [
+  {
+   "pivotBars": 12,
+   "version": "V1",
+   "buckets": {
+    "SEM_HISTORICO": {
+     "hold": 11226,
+     "break": 6752,
+     "holdRate": 0.6244298587162087
+    },
+    "ABAIXO_DE_50": {
+     "hold": 0,
+     "break": 0,
+     "holdRate": null
+    },
+    "A_PARTIR_DE_50": {
+     "hold": 20585,
+     "break": 9614,
+     "holdRate": 0.6816450875856817
+    }
+   }
+  },
+  {
+   "pivotBars": 12,
+   "version": "V2",
+   "buckets": {
+    "SEM_HISTORICO": {
+     "hold": 11183,
+     "break": 6722,
+     "holdRate": 0.6245741413013125
+    },
+    "ABAIXO_DE_50": {
+     "hold": 14976,
+     "break": 11453,
+     "holdRate": 0.5666502705361535
+    },
+    "A_PARTIR_DE_50": {
+     "hold": 75309,
+     "break": 39328,
+     "holdRate": 0.6569344975880388
+    }
+   }
+  },
+  {
+   "pivotBars": 24,
+   "version": "V1",
+   "buckets": {
+    "SEM_HISTORICO": {
+     "hold": 5272,
+     "break": 3355,
+     "holdRate": 0.6111046713805495
+    },
+    "ABAIXO_DE_50": {
+     "hold": 0,
+     "break": 0,
+     "holdRate": null
+    },
+    "A_PARTIR_DE_50": {
+     "hold": 8814,
+     "break": 4453,
+     "holdRate": 0.6643551669556041
+    }
+   }
+  },
+  {
+   "pivotBars": 24,
+   "version": "V2",
+   "buckets": {
+    "SEM_HISTORICO": {
+     "hold": 5272,
+     "break": 3355,
+     "holdRate": 0.6111046713805495
+    },
+    "ABAIXO_DE_50": {
+     "hold": 7652,
+     "break": 6028,
+     "holdRate": 0.5593567251461988
+    },
+    "A_PARTIR_DE_50": {
+     "hold": 34951,
+     "break": 19059,
+     "holdRate": 0.6471209035363822
+    }
+   }
+  }
+ ],
+ "calendarTables": {
+  "HOUR_OF_DAY": [
+   {
+    "year": 2024,
+    "chosen": [
+     {
+      "bucket": 0,
+      "side": 1,
+      "trainT": 3.3175647390732554,
+      "testMean": 0.000002948736053104953,
+      "signKept": true
+     },
+     {
+      "bucket": 1,
+      "side": -1,
+      "trainT": -4.280825981612395,
+      "testMean": -0.00023176564905022412,
+      "signKept": true
+     },
+     {
+      "bucket": 4,
+      "side": 1,
+      "trainT": 3.5134712994628465,
+      "testMean": 0.0004183085563982597,
+      "signKept": true
+     },
+     {
+      "bucket": 10,
+      "side": 1,
+      "trainT": 5.357286331734264,
+      "testMean": -0.00023334729870548855,
+      "signKept": false
+     },
+     {
+      "bucket": 13,
+      "side": -1,
+      "trainT": -3.5844362067933253,
+      "testMean": -0.0005366696169013567,
+      "signKept": true
+     },
+     {
+      "bucket": 17,
+      "side": -1,
+      "trainT": -3.8110103511213516,
+      "testMean": 0.0003718258716335196,
+      "signKept": false
+     },
+     {
+      "bucket": 20,
+      "side": 1,
+      "trainT": 4.737174823320747,
+      "testMean": 0.0001602353960620354,
+      "signKept": true
+     },
+     {
+      "bucket": 21,
+      "side": -1,
+      "trainT": -5.83395132350625,
+      "testMean": 0.0011932351039956374,
+      "signKept": false
+     },
+     {
+      "bucket": 22,
+      "side": 1,
+      "trainT": 3.8252052742303535,
+      "testMean": 0.0006373424750853623,
+      "signKept": true
+     }
+    ]
+   },
+   {
+    "year": 2025,
+    "chosen": [
+     {
+      "bucket": 1,
+      "side": -1,
+      "trainT": -4.29598330017707,
+      "testMean": 0.00021667909382857206,
+      "signKept": false
+     },
+     {
+      "bucket": 3,
+      "side": 1,
+      "trainT": 4.38213997809372,
+      "testMean": 0.00003566456237261293,
+      "signKept": true
+     },
+     {
+      "bucket": 4,
+      "side": 1,
+      "trainT": 4.9037512508898935,
+      "testMean": 0.0003499963928116598,
+      "signKept": true
+     },
+     {
+      "bucket": 5,
+      "side": 1,
+      "trainT": 3.2116499154390095,
+      "testMean": -0.00015349324728023474,
+      "signKept": false
+     },
+     {
+      "bucket": 10,
+      "side": 1,
+      "trainT": 3.1928694509730846,
+      "testMean": -0.00011757204798238688,
+      "signKept": false
+     },
+     {
+      "bucket": 13,
+      "side": -1,
+      "trainT": -4.915498518627688,
+      "testMean": -0.0005675562843820765,
+      "signKept": true
+     },
+     {
+      "bucket": 20,
+      "side": 1,
+      "trainT": 4.37917749384975,
+      "testMean": -0.00023771630242713242,
+      "signKept": false
+     },
+     {
+      "bucket": 22,
+      "side": 1,
+      "trainT": 6.048262303849849,
+      "testMean": 0.0006682435817622931,
+      "signKept": true
+     }
+    ]
+   },
+   {
+    "year": 2026,
+    "chosen": [
+     {
+      "bucket": 3,
+      "side": 1,
+      "trainT": 3.94029685216684,
+      "testMean": 0.00005230019967842299,
+      "signKept": true
+     },
+     {
+      "bucket": 4,
+      "side": 1,
+      "trainT": 5.765210808659027,
+      "testMean": -0.000059593526690732637,
+      "signKept": false
+     },
+     {
+      "bucket": 13,
+      "side": -1,
+      "trainT": -6.139221058469405,
+      "testMean": -0.00030705061162531784,
+      "signKept": true
+     },
+     {
+      "bucket": 22,
+      "side": 1,
+      "trainT": 7.733771903542159,
+      "testMean": -0.00030465685443097806,
+      "signKept": false
+     }
+    ]
+   }
+  ],
+  "DAY_OF_WEEK": [
+   {
+    "year": 2024,
+    "chosen": []
+   },
+   {
+    "year": 2025,
+    "chosen": [
+     {
+      "bucket": 6,
+      "side": 1,
+      "trainT": 3.9207360253107053,
+      "testMean": 0.00015425189970470293,
+      "signKept": true
+     }
+    ]
+   },
+   {
+    "year": 2026,
+    "chosen": [
+     {
+      "bucket": 3,
+      "side": 1,
+      "trainT": 3.1613853083689296,
+      "testMean": 0.000007516653740730753,
+      "signKept": true
+     },
+     {
+      "bucket": 6,
+      "side": 1,
+      "trainT": 4.700558144832844,
+      "testMean": 0.000017746107636305745,
+      "signKept": true
+     }
+    ]
+   }
+  ]
+ },
+ "combinations": {
+  "status": "NAO_EXECUTADAS",
+  "reason": "nenhum componente foi classificado como CANDIDATA (regra do documento: combinar só o que se sustenta sozinho)"
+ }
+}
