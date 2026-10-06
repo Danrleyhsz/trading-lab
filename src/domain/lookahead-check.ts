@@ -88,3 +88,23 @@ export function findExecutionLookahead(data:PerpetualDataset,simulate:Simulation
 }
 /** Atalho para o simulador de perpétuos do laboratório. */
 export const perpetualSimulation=(config:PerpetualConfig):Simulation=>data=>backtestPerpetual(data,config).audit;
+
+/**
+ * Paridade com histórico curto (docs/FREQTRADE_FREQAI_AUDIT.md, item 2; ideia da `recursive-analysis` do Freqtrade,
+ * reimplementada). O backtest decide com todo o histórico até a vela; o piloto decide só com as últimas `liveBars`
+ * velas fechadas (liveSignalBars). Indicador recursivo (média exponencial semeada na primeira vela, contadores
+ * acumulados) dá resultados diferentes nos dois casos, e aí o piloto não reproduz o backtest. Esta verificação compara as
+ * duas decisões em cada ponto.
+ */
+export interface ShortHistoryDivergence {index:number;timestamp:number;longHistory:number;shortHistory:number}
+export function findShortHistoryDivergence(candles:readonly Candle[],decide:(closed:Candle[])=>number,liveBars:number,options:{from?:number;stride?:number}={}):{checked:number;divergences:ShortHistoryDivergence[]}{
+ if(!Number.isInteger(liveBars)||liveBars<1)throw new Error('invalid live history length');
+ const divergences:ShortHistoryDivergence[]=[];let checked=0;
+ for(const i of checkpoints(candles.length,Math.max(options.from??0,liveBars-1),options.stride??1)){
+  const longHistory=decide(candles.slice(0,i+1) as Candle[]),shortHistory=decide(candles.slice(i+1-liveBars,i+1) as Candle[]);checked++;
+  if(!Object.is(longHistory,shortHistory))divergences.push({index:i,timestamp:candles[i].timestamp,longHistory,shortHistory});
+ }
+ return {checked,divergences};
+}
+/** Decisão do laboratório nas velas fechadas recebidas, como o ciclo ao vivo e o simulador chamam. */
+export const perpetualDecision=(config:PerpetualConfig,currentQuantity=0)=>(closed:Candle[])=>perpetualDirection(closed,config,currentQuantity);

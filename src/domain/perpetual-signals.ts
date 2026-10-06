@@ -11,6 +11,11 @@ export function validTeamFilters(filters:unknown):filters is TeamFilters|undefin
  const entries=Object.entries(filters);return entries.length>0&&entries.every(([k,v])=>Object.hasOwn(TEAM_FILTER_WARMUP,k)&&v===true);
 }
 export const teamFilterWarmup=(filters?:TeamFilters)=>Math.max(0,...Object.keys(filters??{}).map(k=>TEAM_FILTER_WARMUP[k as keyof TeamFilters]));
+/**
+ * Quantas velas fechadas o piloto carrega para decidir ao vivo. É a única fonte desse número: o ciclo autônomo e o teste
+ * de paridade com histórico curto (src/domain/lookahead-check.ts) usam esta mesma função.
+ */
+export const liveSignalBars=(config:PerpetualConfig)=>Math.max(100,config.slowPeriod+2,teamFilterWarmup(config.filters)+2);
 function dailyVolatility(closes:number[],bars:number){
  const window=closes.slice(-bars-1),returns=window.slice(1).map((c,i)=>Math.log(c/window[i]));
  const mean=returns.reduce((s,r)=>s+r,0)/returns.length;return Math.sqrt(returns.reduce((s,r)=>s+(r-mean)**2,0)/returns.length)*Math.sqrt(24);
