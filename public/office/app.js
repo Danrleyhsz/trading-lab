@@ -377,7 +377,7 @@ function renderRuntime(data) {
 async function refreshOnline() {
   if (onlineBusy) return;onlineBusy = true;const version = onlineVersion;
   try {
-    const results = await Promise.allSettled([get('/market/v3'), get(financeUrl()), get('/backtests/v2/studies'), get('/paper/perpetual/status'), get('/runtime/readiness'), get('/research/jobs'),get('/paper/perpetual/preflight')]);
+    const results = await Promise.allSettled([get('/market/v3'), get(financeUrl()), get('/backtests/v2/studies'), get('/paper/perpetual/status'), get('/runtime/readiness'), get('/research/jobs'),get('/paper/perpetual/preflight'),get('/paper/momentum/forward')]);
     if (results[0].status === 'fulfilled' && version === onlineVersion) showPerpetualMarket(results[0].value);
     else if (results[0].status === 'rejected') marketUnavailable('Dados USD-M indisponíveis · preços podem estar desatualizados');
     if (results[1].status === 'fulfilled') {
@@ -396,6 +396,7 @@ async function refreshOnline() {
     } else { halted = null;q('#riskSummary').textContent = 'Estado de risco indisponível';q('#haltPaper').disabled = true;q('#onlineStatus').textContent = 'Controles indisponíveis · entre se o acesso for exigido'; }
     renderResearchJobs(results[5].status==='fulfilled' ? results[5].value : null);
     OfficePanelData.studies=results[2].status==='fulfilled'?results[2].value:null;OfficePanelData.jobs=results[5].status==='fulfilled'?results[5].value:null;OfficePanelData.readiness=results[4].status==='fulfilled'?results[4].value:null;
+    OfficePanelData.forward=results[7]?.status==='fulfilled'&&results[7].value?.scope==='FORWARD_PAPER_TRACKING_ONLY'?results[7].value:null;
     if (results[4].status==='fulfilled' && version===onlineVersion) {renderRuntime(results[4].value);screens.update({readiness:runtimeObservedAt?results[4].value:null});} else {runtimeUnavailable();screens.update({readiness:null});}
     if(results[6].status==='fulfilled'&&version===onlineVersion)renderPreflight(results[6].value);else preflightUnavailable();
   } finally { onlineBusy = false; }

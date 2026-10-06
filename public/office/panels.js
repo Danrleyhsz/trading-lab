@@ -126,14 +126,33 @@
   const grid=el('div',undefined,'hero-grid');grid.append(fund,oiCard,liq,book);
   return [coins,grid,card('24 h · moedas',heat)];
  }
+ const forwardStatus={WAITING_START:['Aguardando início','⏳',''],RUNNING:['Ao vivo','●','up'],STOPPED_BY_DRAWDOWN:['Parado: queda de 15%','■','down'],COMPLETED:['12 semanas concluídas','✓',''],DATA_UNAVAILABLE:['Dados indisponíveis','!','down']};
+ /** Acompanhamento ao vivo do momentum entre moedas (XSMOM_FORWARD_V1): só simulação, dados públicos. */
+ function forwardCard(){
+  const f=data.forward;if(!f)return null;
+  const [label,icon,cls]=forwardStatus[f.status]||[f.status,'•',''],head=el('div',undefined,'forward-head');
+  head.append(el('span',icon+' '+label,'pill '+cls),el('b','Momentum entre moedas · 28 dias · metade do tamanho'),el('small',f.verdict==='APPROVED'?'aprovado':f.verdict==='REJECTED'?'reprovado':'em andamento'));
+  const left=f.portfolio?.long??[],right=f.portfolio?.short??[],chips=(list,c)=>{const box=el('div',undefined,'coin-chips');for(const s of list)box.append(el('span',s.replace('USDT','').replace('1000',''),'coin-chip '+c));return box;};
+  const ddLimit=el('div',undefined,'limit-bar'),fill=el('span');fill.style.width=Math.min(100,(f.maxDrawdown||0)/0.15*100)+'%';ddLimit.append(fill);
+  const next=f.nextDecisionAt?Math.max(0,Date.parse(f.nextDecisionAt)-Date.now()):null;
+  const body=row(tile('Resultado',f.returnPct===null?'—':pct(f.returnPct),{cls:tone(f.netPnl),sub:f.netPnl===null?undefined:subOf(usd(f.netPnl),tone(f.netPnl)),icon:'±'}),
+   ring((f.weeksElapsed||0)/12,(f.weeksElapsed||0)+'/12','semanas',CYAN),
+   tile('Queda máxima',f.maxDrawdown===null?'—':fmt(f.maxDrawdown*100,2)+'%',{icon:'↘',sub:subOf('limite 15%','')}),
+   tile('Próxima decisão',next===null?'—':next<3600000?Math.round(next/60000)+' min':next<86400000?Math.round(next/3600000)+' h':Math.round(next/86400000)+' d',{icon:'◷'}));
+  const portfolio=el('div',undefined,'forward-portfolio');const l=el('div'),r=el('div');l.append(el('small','▲ Comprado'),chips(left,'up'));r.append(el('small','▼ Vendido'),chips(right,'down'));portfolio.append(l,r);
+  const c=card(null,head,body,ddLimit,f.curve?.length>1?candles(hourly(f.curve).reduce((days,h)=>{const d=Math.floor(h.t/86400000);const last=days.at(-1);if(last&&last.d===d){last.h=Math.max(last.h,h.h);last.l=Math.min(last.l,h.l);last.c=h.c;}else days.push({d,t:h.t,o:h.o,h:h.h,l:h.l,c:h.c});return days;},[]),640,90,{ref:10000}):empty(f.status==='WAITING_START'?'Primeira decisão: '+new Date(f.startedAt).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'}):'Curva disponível depois da primeira hora'));
+  if(f.portfolio)c.append(portfolio);
+  c.classList.add('forward-card');if(f.error)c.append(el('small','Última atualização falhou; mostrando o cálculo anterior.','hero-warn'));
+  return c;
+ }
  function researchHero(){
   const studies=Array.isArray(data.studies)?data.studies:[],runs=Array.isArray(data.runs)?data.runs:[],jobs=Array.isArray(data.jobs)?data.jobs:[];
   const done=studies.filter(s=>Number.isFinite(s.netPnl)),positive=done.filter(s=>s.netPnl>0).length,busy=jobs.filter(j=>j.status==='RUNNING'||j.status==='QUEUED').length;
   const auto=finance()?.autonomous;
-  const out=[row(tile('Estudos históricos',String(studies.length),{icon:'⚗'}),tile('Lucro × prejuízo',positive+' × '+(done.length-positive),{icon:'±'}),tile('Pesquisas',String(runs.length),{icon:'▤'}),tile('Em andamento',String(busy),{cls:busy?'up':'',icon:'⏳'}),tile('Estudo do piloto',auto?.studyId?auto.studyId.slice(0,8):'—',{sub:auto?.studyId?subOf(auto.eligible?'elegível':'não elegível',auto.eligible?'up':'down'):undefined,icon:'★'}))];
+  const out=[forwardCard(),row(tile('Estudos históricos',String(studies.length),{icon:'⚗'}),tile('Lucro × prejuízo',positive+' × '+(done.length-positive),{icon:'±'}),tile('Pesquisas',String(runs.length),{icon:'▤'}),tile('Em andamento',String(busy),{cls:busy?'up':'',icon:'⏳'}),tile('Estudo do piloto',auto?.studyId?auto.studyId.slice(0,8):'—',{sub:auto?.studyId?subOf(auto.eligible?'elegível':'não elegível',auto.eligible?'up':'down'):undefined,icon:'★'}))];
   if(runs.length)out.push(card('Pesquisas',split([{label:'Aprovadas',value:runs.filter(r=>r.status==='SCREEN_PASSED').length,color:UP},{label:'Rejeitadas',value:runs.filter(r=>r.status==='REJECTED').length,color:'#ffb547'},{label:'Falhas',value:runs.filter(r=>r.status!=='SCREEN_PASSED'&&r.status!=='REJECTED').length,color:DOWN}])));
   if(done.length)out.push(card('P&L histórico · últimos estudos',bars(done.slice(0,10).map(s=>({label:new Date(s.createdAt).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})+' · '+(s.request?.candidateSet||s.request?.bars+' velas'),value:s.netPnl,text:usd(s.netPnl),cls:tone(s.netPnl),id:s.id})),{onClick:item=>globalThis.studyDetails?.(item.id)})));
-  return out;
+  return out.filter(Boolean);
  }
  const kindIcons={OBSERVATION:'👁',DECISION:'⚖',FAILURE:'✖',LESSON:'✎',RESEARCH:'▤',PREDICTION:'◎',RISK:'✓'};
  function memoryHero(){
