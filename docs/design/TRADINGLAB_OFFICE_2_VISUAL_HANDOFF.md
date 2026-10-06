@@ -393,3 +393,20 @@ Before visual inspection/implementation, Claude must locate that exact file in t
 `docs/design/references/tradinglab-office-2-approved-reference.jpg`
 
 Do not rename/substitute/regenerate the reference. After copying it, verify the repository file opens correctly and include it in the same working branch before completing the visual audit and asset manifest.
+
+
+### FINAL REFERENCE CONFIRMATION — 2026-10-06
+
+The definitive Office 2.0 visual reference is the user-confirmed isometric TradingLab office image showing the 30th-floor HQ with visible labeled zones including HORIZON, NEXUS, RING, STRESS LAB and RISK, plus reception, lounge/convivência, kitchen, meeting/operations areas, balcony and panoramic city glazing.
+
+The source file downloaded from ChatGPT must be named exactly:
+`tradinglab-office-2-approved-reference.jpg`
+
+Claude must look for this exact filename in the Windows Downloads folder. If the downloaded file is still named `387958.jpg`, rename it to `tradinglab-office-2-approved-reference.jpg` before copying it into the repository.
+
+Canonical repository destination:
+`docs/design/references/tradinglab-office-2-approved-reference.jpg`
+
+Identity check before use: the image must visibly contain the 30º ANDAR / TRADINGLAB HQ card and the labeled HORIZON, NEXUS, RING, STRESS LAB and RISK spaces. If those elements are not present, it is the wrong image. Do not substitute any ATS-MATRIX diagram, Matrix links/assets, futuristic crypto-city image, or any other generated concept.
+
+This confirmation overrides any earlier ambiguous reference-image note. Use this image as the visual source of truth for the Office 2.0 audit, spatial specification and asset manifest.
