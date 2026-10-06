@@ -1,0 +1,719 @@
+{
+ "version": "KRONOS_AB_V1",
+ "runAt": "2026-10-06T19:21:59.113Z",
+ "scope": "OFFLINE_HISTORICAL_RESEARCH_ONLY",
+ "window": {
+  "firstEntryBar": "2025-10-24T00:00:00Z",
+  "lastBar": "2026-10-05T23:00:00Z",
+  "reason": "depois da última revisão de pesos de todos os modelos Kronos considerados (Kronos-mini 2025-09-09; ajuste BTC 1h 2025-10-20 e 4h 2025-10-23; dados de ajuste até 2025-10-18)",
+  "quarters": [
+   "2025-10-24T00:00:00Z",
+   "2026-01-24T00:00:00Z",
+   "2026-04-24T00:00:00Z",
+   "2026-07-24T00:00:00Z",
+   "2026-10-06T00:00:00Z"
+  ]
+ },
+ "datasetSha256": "07b248d2947b5f5c8bfe4a416897396481c3bb4f0e0a6878352496f16aa82518",
+ "baselineConfig": {
+  "strategy": "BREAKOUT",
+  "fastPeriod": 10,
+  "slowPeriod": 480,
+  "feeRate": 0.00055,
+  "slippageBps": 1,
+  "initialCapital": 10000,
+  "maintenanceRate": 0.01,
+  "liquidationFeeRate": 0.005,
+  "positionFraction": 0.1
+ },
+ "stressedCosts": {
+  "feeRate": 0.0011,
+  "slippageBps": 5
+ },
+ "controlReproducesBaseline": true,
+ "A": {
+  "metrics": {
+   "netPnl": 564.181367038711,
+   "grossPnl": 573.193122243254,
+   "feesPaid": 9.01175520454304,
+   "fundingCashDelta": 1.1461298669056357,
+   "maxDrawdown": 0.02077587484291308,
+   "sharpeAnnualized": 1.4785229805345506,
+   "profitFactor": 4.644941268648302,
+   "winRate": 0.75,
+   "trades": 8,
+   "turnover": 1.6385009462805522,
+   "liquidations": 0,
+   "quarters": [
+    44.7142066369106,
+    319.7157478191857,
+    123.92137380450185,
+    75.8300387781128
+   ]
+  },
+  "stressed": {
+   "netPnl": 548.3552120448421,
+   "grossPnl": 566.3665234744833,
+   "feesPaid": 18.01131142964124,
+   "fundingCashDelta": 1.152791546638086,
+   "maxDrawdown": 0.021174877773620884,
+   "sharpeAnnualized": 1.4383757520974796,
+   "profitFactor": 4.456097831191277,
+   "winRate": 0.75,
+   "trades": 8,
+   "turnover": 1.6373919481492034,
+   "liquidations": 0,
+   "quarters": [
+    40.094861142730224,
+    317.83110685958127,
+    119.9706328798311,
+    70.45861116269953
+   ]
+  }
+ },
+ "arms": [
+  {
+   "arm": "B",
+   "timeframe": "1h",
+   "status": "AVALIADO",
+   "forecasts": 448,
+   "rejected": 0,
+   "metrics": {
+    "netPnl": 117.03687385485864,
+    "grossPnl": 120.32998194825838,
+    "feesPaid": 3.293108093399742,
+    "fundingCashDelta": 6.140851111117926,
+    "maxDrawdown": 0.014571978736257074,
+    "sharpeAnnualized": 0.47970197013040067,
+    "profitFactor": 6.924437821040535,
+    "winRate": 0.6666666666666666,
+    "trades": 3,
+    "turnover": 0.5987469260726803,
+    "liquidations": 0,
+    "quarters": [
+     113.16586509216359,
+     0,
+     -19.75493327640288,
+     23.625942039097936
+    ]
+   },
+   "stressed": {
+    "netPnl": 111.34465483318127,
+    "grossPnl": 117.92958578716055,
+    "feesPaid": 6.584930953979279,
+    "fundingCashDelta": 6.142157985067802,
+    "maxDrawdown": 0.014749626316584552,
+    "sharpeAnnualized": 0.4573598014177473,
+    "profitFactor": 6.13250278397594,
+    "winRate": 0.6666666666666666,
+    "trades": 3,
+    "turnover": 0.5986300867253888,
+    "liquidations": 0,
+    "quarters": [
+     111.36745339794288,
+     0,
+     -21.69402716755758,
+     21.671228602795964
+    ]
+   },
+   "delta": {
+    "netPnl": -447.1444931838523,
+    "maxDrawdown": -0.006203896106656006,
+    "sharpeAnnualized": -0.99882101040415,
+    "trades": -5,
+    "stressedNetPnl": -437.01055721166085
+   },
+   "quality": {
+    "n": 347,
+    "directionalAccuracy": 0.5244956772334294,
+    "binomialPValue": 0.19520610073618522,
+    "maeReturn": 0.018045005889483073,
+    "rmseReturn": 0.025602417458805298,
+    "maeZeroForecast": 0.016150012650954865,
+    "rmseZeroForecast": 0.023316703310030617,
+    "persistenceAccuracy": 0.5129682997118156,
+    "alwaysUpAccuracy": 0.484149855907781,
+    "spearman": 0.03909215870650738
+   },
+   "entryDecisions": {
+    "considered": 79,
+    "allowed": 3,
+    "vetoed": 76
+   },
+   "compute": {
+    "meanSeconds": 13.284620535714286,
+    "totalSeconds": 5951.51,
+    "peakMemoryMb": 0
+   },
+   "provenance": {
+    "model": "NeoQuasar/Kronos-mini",
+    "modelRevision": "f4e68697d9d5aed55cef5c96aabc3376bcad9f81",
+    "tokenizer": "NeoQuasar/Kronos-Tokenizer-2k",
+    "tokenizerRevision": "26966d0035065a0cae0ebad7af8ece35bc1fb51c",
+    "codeCommit": "67b630e67f6a18c9e9be918d9b4337c960db1e9a",
+    "datasetSha256": "07b248d2947b5f5c8bfe4a416897396481c3bb4f0e0a6878352496f16aa82518",
+    "sampling": {
+     "T": 1,
+     "top_p": 0.9,
+     "top_k": 0,
+     "sample_count": 5,
+     "clip": 5,
+     "seed": "hora da vela final do contexto (timestamp ms / 3 600 000) módulo 2 147 483 647",
+     "torchThreads": 2
+    },
+    "forecastFileSha256": "c0a9aee3d025f9eb36c190409b596b2bc7d7680bb8e70bd04db57c7ec771ce90"
+   },
+   "checks": {
+    "HIGHER_NET_PNL": false,
+    "HIGHER_IN_3_OF_4_QUARTERS": false,
+    "HIGHER_WITH_DOUBLED_COSTS": false,
+    "DIRECTION_ABOVE_CHANCE": false
+   },
+   "incrementalValue": false
+  },
+  {
+   "arm": "B",
+   "timeframe": "4h",
+   "status": "AVALIADO",
+   "forecasts": 409,
+   "rejected": 0,
+   "metrics": {
+    "netPnl": 188.336660067931,
+    "grossPnl": 193.67766843564328,
+    "feesPaid": 5.341008367712271,
+    "fundingCashDelta": 0.8920458968189034,
+    "maxDrawdown": 0.015305734238550592,
+    "sharpeAnnualized": 0.7151991996692166,
+    "profitFactor": 2.382426766588168,
+    "winRate": 0.6,
+    "trades": 5,
+    "turnover": 0.9710924304931399,
+    "liquidations": 0,
+    "quarters": [
+     -93.76496584182678,
+     279.58561552189894,
+     67.90242629042223,
+     -65.38641590256339
+    ]
+   },
+   "stressed": {
+    "netPnl": 179.05946927511104,
+    "grossPnl": 189.73748598832375,
+    "feesPaid": 10.678016713212708,
+    "fundingCashDelta": 0.8918464881595249,
+    "maxDrawdown": 0.01548441841292637,
+    "sharpeAnnualized": 0.6806943761950107,
+    "profitFactor": 2.279777149811935,
+    "winRate": 0.6,
+    "trades": 5,
+    "turnover": 0.9707287921102461,
+    "liquidations": 0,
+    "quarters": [
+     -96.53924622870727,
+     277.7959832225006,
+     65.03153840285086,
+     -67.22880612153313
+    ]
+   },
+   "delta": {
+    "netPnl": -375.84470697077995,
+    "maxDrawdown": -0.005470140604362487,
+    "sharpeAnnualized": -0.7633237808653339,
+    "trades": -3,
+    "stressedNetPnl": -369.2957427697311
+   },
+   "quality": {
+    "n": 347,
+    "directionalAccuracy": 0.521613832853026,
+    "binomialPValue": 0.22618189063669542,
+    "maeReturn": 0.018633439680852303,
+    "rmseReturn": 0.025238238701292933,
+    "maeZeroForecast": 0.016150012650954865,
+    "rmseZeroForecast": 0.023316703310030617,
+    "persistenceAccuracy": 0.5129682997118156,
+    "alwaysUpAccuracy": 0.484149855907781,
+    "spearman": 0.032681677684920266
+   },
+   "entryDecisions": {
+    "considered": 50,
+    "allowed": 5,
+    "vetoed": 45
+   },
+   "compute": {
+    "meanSeconds": 3.9372567237163834,
+    "totalSeconds": 1610.3380000000009,
+    "peakMemoryMb": 371.2
+   },
+   "provenance": {
+    "model": "NeoQuasar/Kronos-mini",
+    "modelRevision": "f4e68697d9d5aed55cef5c96aabc3376bcad9f81",
+    "tokenizer": "NeoQuasar/Kronos-Tokenizer-2k",
+    "tokenizerRevision": "26966d0035065a0cae0ebad7af8ece35bc1fb51c",
+    "codeCommit": "67b630e67f6a18c9e9be918d9b4337c960db1e9a",
+    "datasetSha256": "b4adedb9d464fab6e317eedfb54eeb3794040129c37b5fffea8ca985ce4479d0",
+    "sampling": {
+     "T": 1,
+     "top_p": 0.9,
+     "top_k": 0,
+     "sample_count": 5,
+     "clip": 5,
+     "seed": "hora da vela final do contexto (timestamp ms / 3 600 000) módulo 2 147 483 647",
+     "torchThreads": 2
+    },
+    "forecastFileSha256": "94c791982a85d39555c97e11c972d29443ef00e33d5777fe7a701981a2dfa5a0"
+   },
+   "checks": {
+    "HIGHER_NET_PNL": false,
+    "HIGHER_IN_3_OF_4_QUARTERS": false,
+    "HIGHER_WITH_DOUBLED_COSTS": false,
+    "DIRECTION_ABOVE_CHANCE": false
+   },
+   "incrementalValue": false
+  },
+  {
+   "arm": "C",
+   "timeframe": "1h",
+   "status": "AVALIADO",
+   "forecasts": 448,
+   "rejected": 0,
+   "metrics": {
+    "netPnl": -51.255049962182966,
+    "grossPnl": -50.18214107646277,
+    "feesPaid": 1.0729088857201967,
+    "fundingCashDelta": -0.7255696586447217,
+    "maxDrawdown": 0.008683496767611619,
+    "sharpeAnnualized": -0.7504838641195124,
+    "profitFactor": 0,
+    "winRate": 0,
+    "trades": 1,
+    "turnover": 0.1950743428582176,
+    "liquidations": 0,
+    "quarters": [
+     0,
+     0,
+     -51.255049962182966,
+     0
+    ]
+   },
+   "stressed": {
+    "netPnl": -53.10827592393434,
+    "grossPnl": -50.96243647743502,
+    "feesPaid": 2.1458394464993233,
+    "fundingCashDelta": -0.7255696586447217,
+    "maxDrawdown": 0.008684319419410284,
+    "sharpeAnnualized": -0.7781493053401967,
+    "profitFactor": 0,
+    "winRate": 0,
+    "trades": 1,
+    "turnover": 0.19507631331812025,
+    "liquidations": 0,
+    "quarters": [
+     0,
+     0,
+     -53.10827592393434,
+     0
+    ]
+   },
+   "delta": {
+    "netPnl": -615.4364170008939,
+    "maxDrawdown": -0.01209237807530146,
+    "sharpeAnnualized": -2.229006844654063,
+    "trades": -7,
+    "stressedNetPnl": -601.4634879687765
+   },
+   "quality": {
+    "n": 347,
+    "directionalAccuracy": 0.4812680115273775,
+    "binomialPValue": 0.7738181093633135,
+    "maeReturn": 0.028663779906767415,
+    "rmseReturn": 0.04035913510619707,
+    "maeZeroForecast": 0.016150012650954865,
+    "rmseZeroForecast": 0.023316703310030617,
+    "persistenceAccuracy": 0.5129682997118156,
+    "alwaysUpAccuracy": 0.484149855907781,
+    "spearman": -0.046855963499318455
+   },
+   "entryDecisions": {
+    "considered": 96,
+    "allowed": 1,
+    "vetoed": 95
+   },
+   "compute": {
+    "meanSeconds": 52.78693973214279,
+    "totalSeconds": 23648.54899999997,
+    "peakMemoryMb": 912
+   },
+   "provenance": {
+    "model": "lc2004/kronos_base_model_BTCUSDT_1h_finetune",
+    "modelRevision": "eb51e682c8194a1ba7254cc4357c75819683fbaf",
+    "tokenizer": "lc2004/kronos_tokenizer_base_BTCUSDT_1h_finetune",
+    "tokenizerRevision": "b8f1c795b80231f5bdeb69dfe71fc1542d2111fc",
+    "codeCommit": "67b630e67f6a18c9e9be918d9b4337c960db1e9a",
+    "datasetSha256": "07b248d2947b5f5c8bfe4a416897396481c3bb4f0e0a6878352496f16aa82518",
+    "sampling": {
+     "T": 1,
+     "top_p": 0.9,
+     "top_k": 0,
+     "sample_count": 1,
+     "clip": 5,
+     "seed": "hora da vela final do contexto (timestamp ms / 3 600 000) módulo 2 147 483 647",
+     "torchThreads": 2
+    },
+    "forecastFileSha256": "b4570ff5995ad569b42a2539a0ad2562324d3aefc77f6a0761530e922b3ca29d"
+   },
+   "checks": {
+    "HIGHER_NET_PNL": false,
+    "HIGHER_IN_3_OF_4_QUARTERS": false,
+    "HIGHER_WITH_DOUBLED_COSTS": false,
+    "DIRECTION_ABOVE_CHANCE": false
+   },
+   "incrementalValue": false
+  },
+  {
+   "arm": "C",
+   "timeframe": "4h",
+   "status": "AVALIADO",
+   "forecasts": 409,
+   "rejected": 0,
+   "metrics": {
+    "netPnl": 388.65815287154874,
+    "grossPnl": 397.587413422146,
+    "feesPaid": 8.929260550597279,
+    "fundingCashDelta": 6.473218545722115,
+    "maxDrawdown": 0.02033373598994229,
+    "sharpeAnnualized": 1.0736198821748817,
+    "profitFactor": 3.377654793052578,
+    "winRate": 0.75,
+    "trades": 8,
+    "turnover": 1.6235019182904142,
+    "liquidations": 0,
+    "quarters": [
+     -50.73981908583664,
+     316.67751750337084,
+     104.69463295038258,
+     18.02582150363196
+    ]
+   },
+   "stressed": {
+    "netPnl": 373.04048778485776,
+    "grossPnl": 390.88697969377864,
+    "feesPaid": 17.84649190892089,
+    "fundingCashDelta": 6.473911741351186,
+    "maxDrawdown": 0.020727524520460408,
+    "sharpeAnnualized": 1.0317717139955749,
+    "profitFactor": 3.2300566995378377,
+    "winRate": 0.75,
+    "trades": 8,
+    "turnover": 1.6224083553564441,
+    "liquidations": 0,
+    "quarters": [
+     -55.400661872268756,
+     314.80808285436797,
+     101.76658037396373,
+     11.866486428794815
+    ]
+   },
+   "delta": {
+    "netPnl": -175.52321416716222,
+    "maxDrawdown": -0.0004421388529707894,
+    "sharpeAnnualized": -0.40490309835966887,
+    "trades": 0,
+    "stressedNetPnl": -175.31472425998436
+   },
+   "quality": {
+    "n": 347,
+    "directionalAccuracy": 0.49279538904899134,
+    "binomialPValue": 0.6262839658300743,
+    "maeReturn": 0.022558503939336675,
+    "rmseReturn": 0.03133422459739158,
+    "maeZeroForecast": 0.016150012650954865,
+    "rmseZeroForecast": 0.023316703310030617,
+    "persistenceAccuracy": 0.5129682997118156,
+    "alwaysUpAccuracy": 0.484149855907781,
+    "spearman": -0.010384002748005484
+   },
+   "entryDecisions": {
+    "considered": 22,
+    "allowed": 8,
+    "vetoed": 14
+   },
+   "compute": {
+    "meanSeconds": 16.99024205378975,
+    "totalSeconds": 6949.009000000007,
+    "peakMemoryMb": 971.1
+   },
+   "provenance": {
+    "model": "lc2004/kronos_base_model_BTCUSDT_4h_finetune",
+    "modelRevision": "e6c866f442cbeaf5bbbfab133465a71d2a1d102d",
+    "tokenizer": "lc2004/kronos_tokenizer_base_BTCUSDT_4h_finetune",
+    "tokenizerRevision": "a8e0a8984861056a0431c33494c2bb5689513e05",
+    "codeCommit": "67b630e67f6a18c9e9be918d9b4337c960db1e9a",
+    "datasetSha256": "b4adedb9d464fab6e317eedfb54eeb3794040129c37b5fffea8ca985ce4479d0",
+    "sampling": {
+     "T": 1,
+     "top_p": 0.9,
+     "top_k": 0,
+     "sample_count": 1,
+     "clip": 5,
+     "seed": "hora da vela final do contexto (timestamp ms / 3 600 000) módulo 2 147 483 647",
+     "torchThreads": 2
+    },
+    "forecastFileSha256": "8ecd65b34432d74a064ffa89b4b7b9d5e1e488ab66de86737f21a31f71415eb9"
+   },
+   "checks": {
+    "HIGHER_NET_PNL": false,
+    "HIGHER_IN_3_OF_4_QUARTERS": false,
+    "HIGHER_WITH_DOUBLED_COSTS": false,
+    "DIRECTION_ABOVE_CHANCE": false
+   },
+   "incrementalValue": false
+  },
+  {
+   "arm": "B1",
+   "timeframe": "1h",
+   "status": "AVALIADO",
+   "forecasts": 448,
+   "rejected": 0,
+   "metrics": {
+    "netPnl": 521.1495622344519,
+    "grossPnl": 526.5851810378713,
+    "feesPaid": 5.435618803419409,
+    "fundingCashDelta": 2.3851316953477113,
+    "maxDrawdown": 0.018847216240206795,
+    "sharpeAnnualized": 1.6238492808075031,
+    "profitFactor": 10.87724083162765,
+    "winRate": 0.8,
+    "trades": 5,
+    "turnover": 0.9882943278944379,
+    "liquidations": 0,
+    "quarters": [
+     79.74384350091168,
+     214.39622002683427,
+     69.0233967280401,
+     157.98610197866583
+    ]
+   },
+   "stressed": {
+    "netPnl": 511.5747104883976,
+    "grossPnl": 522.441726846026,
+    "feesPaid": 10.867016357628323,
+    "fundingCashDelta": 2.3901787474412606,
+    "maxDrawdown": 0.019198595525674222,
+    "sharpeAnnualized": 1.594713213520967,
+    "profitFactor": 10.36068963818439,
+    "winRate": 0.8,
+    "trades": 5,
+    "turnover": 0.987910577966211,
+    "liquidations": 0,
+    "quarters": [
+     76.98080523252247,
+     213.57940606457305,
+     64.27040542340364,
+     156.74409376789845
+    ]
+   },
+   "delta": {
+    "netPnl": -43.03180480425908,
+    "maxDrawdown": -0.001928658602706284,
+    "sharpeAnnualized": 0.14532630027295257,
+    "trades": -3,
+    "stressedNetPnl": -36.780501556444506
+   },
+   "quality": {
+    "n": 347,
+    "directionalAccuracy": 0.4956772334293948,
+    "binomialPValue": 0.5849923117572927,
+    "maeReturn": 0.01984199001718605,
+    "rmseReturn": 0.02727698428734868,
+    "maeZeroForecast": 0.016150012650954865,
+    "rmseZeroForecast": 0.023316703310030617,
+    "persistenceAccuracy": 0.5129682997118156,
+    "alwaysUpAccuracy": 0.484149855907781,
+    "spearman": 0.021264300800908038
+   },
+   "entryDecisions": {
+    "considered": 36,
+    "allowed": 5,
+    "vetoed": 31
+   },
+   "compute": {
+    "meanSeconds": 3.8903348214285702,
+    "totalSeconds": 1742.8699999999994,
+    "peakMemoryMb": 349.8
+   },
+   "provenance": {
+    "model": "NeoQuasar/Kronos-mini",
+    "modelRevision": "f4e68697d9d5aed55cef5c96aabc3376bcad9f81",
+    "tokenizer": "NeoQuasar/Kronos-Tokenizer-2k",
+    "tokenizerRevision": "26966d0035065a0cae0ebad7af8ece35bc1fb51c",
+    "codeCommit": "67b630e67f6a18c9e9be918d9b4337c960db1e9a",
+    "datasetSha256": "07b248d2947b5f5c8bfe4a416897396481c3bb4f0e0a6878352496f16aa82518",
+    "sampling": {
+     "T": 1,
+     "top_p": 0.9,
+     "top_k": 0,
+     "sample_count": 1,
+     "clip": 5,
+     "seed": "hora da vela final do contexto (timestamp ms / 3 600 000) módulo 2 147 483 647",
+     "torchThreads": 2
+    },
+    "forecastFileSha256": "6462c76d6e0c5b475a7f7f0301b8a851edbaf5a06b0d68a2b00e76443c90f7e4"
+   },
+   "checks": {
+    "HIGHER_NET_PNL": false,
+    "HIGHER_IN_3_OF_4_QUARTERS": false,
+    "HIGHER_WITH_DOUBLED_COSTS": false,
+    "DIRECTION_ABOVE_CHANCE": false
+   },
+   "incrementalValue": false
+  },
+  {
+   "arm": "B1",
+   "timeframe": "4h",
+   "status": "AVALIADO",
+   "forecasts": 409,
+   "rejected": 0,
+   "metrics": {
+    "netPnl": 422.82969874912305,
+    "grossPnl": 431.81770635513095,
+    "feesPaid": 8.988007606007912,
+    "fundingCashDelta": 1.0654983451205766,
+    "maxDrawdown": 0.022916910698585233,
+    "sharpeAnnualized": 1.1275687211802041,
+    "profitFactor": 3.684445231224217,
+    "winRate": 0.625,
+    "trades": 8,
+    "turnover": 1.6341832010923476,
+    "liquidations": 0,
+    "quarters": [
+     44.7142066369106,
+     319.7157478191857,
+     13.261103088350865,
+     45.13864120467588
+    ]
+   },
+   "stressed": {
+    "netPnl": 407.1673867095142,
+    "grossPnl": 425.1312985115261,
+    "feesPaid": 17.96391180201194,
+    "fundingCashDelta": 1.0720195544190625,
+    "maxDrawdown": 0.02331266192901841,
+    "sharpeAnnualized": 1.0870360401727763,
+    "profitFactor": 3.4927746790084853,
+    "winRate": 0.625,
+    "trades": 8,
+    "turnover": 1.6330828910919946,
+    "liquidations": 0,
+    "quarters": [
+     40.094861142730224,
+     317.83110685958127,
+     9.326188850438484,
+     39.9152298567642
+    ]
+   },
+   "delta": {
+    "netPnl": -141.3516682895879,
+    "maxDrawdown": 0.002141035855672154,
+    "sharpeAnnualized": -0.35095425935434643,
+    "trades": 0,
+    "stressedNetPnl": -141.18782533532794
+   },
+   "quality": {
+    "n": 347,
+    "directionalAccuracy": 0.484149855907781,
+    "binomialPValue": 0.7402455466567758,
+    "maeReturn": 0.0227312897533043,
+    "rmseReturn": 0.03049237311311403,
+    "maeZeroForecast": 0.016150012650954865,
+    "rmseZeroForecast": 0.023316703310030617,
+    "persistenceAccuracy": 0.5129682997118156,
+    "alwaysUpAccuracy": 0.484149855907781,
+    "spearman": -0.03831928216398539
+   },
+   "entryDecisions": {
+    "considered": 18,
+    "allowed": 8,
+    "vetoed": 10
+   },
+   "compute": {
+    "meanSeconds": 0.6166919315403425,
+    "totalSeconds": 252.2270000000001,
+    "peakMemoryMb": 326.8
+   },
+   "provenance": {
+    "model": "NeoQuasar/Kronos-mini",
+    "modelRevision": "f4e68697d9d5aed55cef5c96aabc3376bcad9f81",
+    "tokenizer": "NeoQuasar/Kronos-Tokenizer-2k",
+    "tokenizerRevision": "26966d0035065a0cae0ebad7af8ece35bc1fb51c",
+    "codeCommit": "67b630e67f6a18c9e9be918d9b4337c960db1e9a",
+    "datasetSha256": "b4adedb9d464fab6e317eedfb54eeb3794040129c37b5fffea8ca985ce4479d0",
+    "sampling": {
+     "T": 1,
+     "top_p": 0.9,
+     "top_k": 0,
+     "sample_count": 1,
+     "clip": 5,
+     "seed": "hora da vela final do contexto (timestamp ms / 3 600 000) módulo 2 147 483 647",
+     "torchThreads": 2
+    },
+    "forecastFileSha256": "850d356277c5e54aaebd6b861f758d10458cb20bf20a5780e23dab3892e6afc0"
+   },
+   "checks": {
+    "HIGHER_NET_PNL": false,
+    "HIGHER_IN_3_OF_4_QUARTERS": false,
+    "HIGHER_WITH_DOUBLED_COSTS": false,
+    "DIRECTION_ABOVE_CHANCE": false
+   },
+   "incrementalValue": false
+  },
+  {
+   "arm": "D",
+   "timeframe": "1h",
+   "status": "N/A nesta máquina: depende de mamba-ssm (CUDA/GPU NVIDIA); modelos publicados são diários"
+  },
+  {
+   "arm": "D",
+   "timeframe": "4h",
+   "status": "N/A nesta máquina: depende de mamba-ssm (CUDA/GPU NVIDIA); modelos publicados são diários"
+  }
+ ],
+ "rankings": {
+  "riskAdjusted": [
+   "B1-1h",
+   "A",
+   "B1-4h",
+   "C-4h",
+   "B-4h",
+   "B-1h",
+   "C-1h"
+  ],
+  "drawdown": [
+   "C-1h",
+   "B-1h",
+   "B-4h",
+   "B1-1h",
+   "C-4h",
+   "A",
+   "B1-4h"
+  ],
+  "robustnessQuartersPositive": [
+   "A",
+   "B1-1h",
+   "B1-4h",
+   "C-4h",
+   "B-1h",
+   "B-4h",
+   "C-1h"
+  ],
+  "computeCost": [
+   "A",
+   "B1-4h",
+   "B-4h",
+   "B1-1h",
+   "B-1h",
+   "C-4h",
+   "C-1h"
+  ]
+ },
+ "decision": "MANTER SÓ A BASE (sem evidência de valor incremental)"
+}

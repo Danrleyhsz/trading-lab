@@ -1,0 +1,18 @@
+{
+ "version": "KRONOS_AB_V1",
+ "source": "BINANCE_USDM BTCUSDT 1h (negócios) + funding, cache scripts/estudos/out/carry-BTCUSDT.json (FUNDING_CARRY_V1)",
+ "sourceCacheSha256": "3af7d2fc5c7798a1f8175a9c32d0d2aa4fa3c8036d0b6e69065abc2e6f259cce",
+ "filledHours": 0,
+ "bars1h": 41736,
+ "bars4h": 10434,
+ "entryCandidates": 102,
+ "origins": {
+  "1h": 448,
+  "4h": 409
+ },
+ "sha256": {
+  "btc-1h.json": "07b248d2947b5f5c8bfe4a416897396481c3bb4f0e0a6878352496f16aa82518",
+  "btc-4h.json": "b4adedb9d464fab6e317eedfb54eeb3794040129c37b5fffea8ca985ce4479d0",
+  "origins.json": "9d6974f222d465fad2d50bde36fbdd5b3b4f1a7582073d80996616c4ee1b5f1b"
+ }
+}
