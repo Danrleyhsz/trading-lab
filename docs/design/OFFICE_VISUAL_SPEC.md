@@ -5,7 +5,7 @@ Fonte de verdade visual: `docs/design/references/tradinglab-office-2-approved-re
 - copiada sem alteração de `Downloads/tradinglab-office-2-approved-reference.jpg` em 06/10/2026;
 - verificação de identidade: tem o cartão "30º ANDAR · TRADINGLAB HQ" e as áreas HORIZON, NEXUS, RING, STRESS LAB e RISK.
 
-Mapa de máquina: `docs/design/office-scene-map.json` (validado por `test/office-scene-map.test.ts`). Prévia: `docs/design/references/office-scene-map-preview.png`.
+Mapa de máquina: `public/office2/scene-map.json` (validado por `test/office-scene-map.test.ts`). Prévia: `docs/design/references/office-scene-map-preview.png`.
 
 **Diferença de medida:** o handoff descreve a fonte como "709 x 1536 px, portrait", mas o arquivo confirmado pelo dono é **1536 × 1024, paisagem**. Vale o arquivo, porque a confirmação final do handoff prevalece sobre as notas anteriores.
 
@@ -13,7 +13,7 @@ Mapa de máquina: `docs/design/office-scene-map.json` (validado por `test/office
 
 Limites normalizados: fração de 1536 × 1024, medidos a olho na imagem, ±0,02.
 
-| Área na referência | x | y | O que tem | Zona de produção (`office-scene-map.json`) |
+| Área na referência | x | y | O que tem | Zona de produção (`public/office2/scene-map.json`) |
 |---|---|---|---|---|
 | Barra de navegação (Início, Horizon, Nexus, Ring, Stress Lab, Risk, Configurações, data, perfil) | 0–1 | 0–0,058 | interface | L7 HTML (não é arte) |
 | Cartão "30º andar · TradingLab HQ · São Paulo" | 0,01–0,145 | 0,07–0,14 | interface | L7 HTML |
@@ -53,7 +53,7 @@ Limites normalizados: fração de 1536 × 1024, medidos a olho na imagem, ±0,02
 - **Eixos:**
   - `i` (0 a 32) cresce para baixo-direita: fundo direito com hall, recepção e elevadores.
   - `j` (0 a 24) cresce para baixo-esquerda: fachada esquerda com Horizon, Nexus e Ring.
-- **Coordenadas das zonas:** tabela `rooms` do `office-scene-map.json`, em retângulos de tiles semiabertos.
+- **Coordenadas das zonas:** tabela `rooms` do `public/office2/scene-map.json`, em retângulos de tiles semiabertos.
 
 | Zona | i | j | Módulo |
 |---|---|---|---|
@@ -117,7 +117,7 @@ Limites normalizados: fração de 1536 × 1024, medidos a olho na imagem, ±0,02
 
 ## 6. Pontos de montagem, de trabalho e de lazer
 
-Tudo isto vem do `office-scene-map.json`:
+Tudo isto vem do `public/office2/scene-map.json`:
 
 | Tipo | Itens |
 |---|---|
@@ -158,7 +158,7 @@ Luz: interior quente, exterior frio. Cada tela acesa projeta um brilho ciano no 
 |---|---|
 | `cenario-modular.png` e as 88 peças 3/4 de `assets/` | **substituir na cena 2.0**, porque a perspectiva não combina com a isométrica. **Mantidas** para o escritório atual seguir funcionando até a troca (rollback). |
 | Faixas de cidade 1852 × 82 | substituir por TL-O2-SKYLINE (outro formato) |
-| 8 folhas de personagem (frente, esquerda, direita, costas) | **reusar na F1** com mapeamento diagonal: SE usa frente, SW usa frente espelhada, NE usa costas, NW usa costas espelhadas, e a caminhada usa os quadros laterais. **Substituir na P1** por folhas isométricas (TL-O2-CHAR-*). |
+| 8 folhas de personagem (frente, esquerda, direita, costas) | **reusar na F1** com mapeamento diagonal (`Office2Iso.frame`): parado olhando para SE/SW usa a frente e para NE/NW usa as costas; caminhando, SE usa o perfil direito, SW o perfil esquerdo e NE/NW as costas; sentado usa a coluna 6 da frente (SE/SW) ou das costas (NE/NW). **Substituir na P1** por folhas isométricas (TL-O2-CHAR-*). |
 | `agent-sprites.png` | reusar (retratos nos painéis) |
 | Ícones do app | reusar |
 | Lógica de telas com dado real (`screens.js`, `desk-screens.js`) | reusar a regra; trocar os retângulos pelos `screens` do mapa |
