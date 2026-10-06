@@ -20,12 +20,16 @@ const A={metrics:tradingMetrics(baseline,base,quarters,from),stressed:tradingMet
 
 type Arm={arm:string;timeframe:'1h'|'4h';status:string;forecasts?:number;rejected?:number;metrics?:TradingMetrics;stressed?:TradingMetrics;delta?:Record<string,number|null>;quality?:ReturnType<typeof forecastQuality>;
  entryDecisions?:{considered:number;allowed:number;vetoed:number};compute?:{meanSeconds:number;totalSeconds:number;peakMemoryMb:number};provenance?:Record<string,unknown>;incrementalValue?:boolean;checks?:Record<string,boolean>};
+const declaredOrigins=JSON.parse(readFileSync('experiments/kronos/data/origins.json','utf8')) as Record<'1h'|'4h',number[]>;
+const expectedOrigins={'1h':declaredOrigins['1h'].length,'4h':declaredOrigins['4h'].length};
 const arms:Arm[]=[];
 // B1 é só sensibilidade (1 caminho, como o braço C): aparece nas tabelas, mas não entra no critério de decisão.
 for(const arm of ['B','C','B1'])for(const timeframe of ['1h','4h'] as const){
  const file=`experiments/kronos/results/forecasts-${arm}-${timeframe}.jsonl`;
  if(!existsSync(file)){arms.push({arm,timeframe,status:cfg.arms[arm].status??'SEM PREVISÕES'});continue;}
  const records:ForecastRecord[]=readFileSync(file,'utf8').split('\n').filter(Boolean).map(l=>JSON.parse(l));
+ // Só avalia um braço com todas as origens declaradas; arquivo parcial (cálculo em andamento) nunca vira resultado.
+ if(records.length<expectedOrigins[timeframe]){arms.push({arm,timeframe,status:`INCOMPLETO (${records.length}/${expectedOrigins[timeframe]} previsões)`});continue;}
  const map=new Map(records.map(r=>[r.origin,r])),log:Parameters<typeof entryFilter>[2]=[],logStressed:Parameters<typeof entryFilter>[2]=[];
  const run=runArm(data,base,entryFilter(timeframe,map,log)),runStressed=runArm(data,stressed,entryFilter(timeframe,map,logStressed));
  const metrics=tradingMetrics(run,base,quarters,from),stressedMetrics=tradingMetrics(runStressed,stressed,quarters,from);
