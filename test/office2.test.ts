@@ -62,3 +62,18 @@ test('contrato de verdade: nada sorteado nos módulos do 2.0, legenda com as 4 c
  // Sem dado de agentes, nenhum agente é desenhado (o banner diz isso).
  assert.match(app,/if\(state\.agentsReal\)syncAgents\(agents\.body\);else syncAgents\(\[\]\);/);
 });
+
+test('todo script do /office2 compila (um erro de sintaxe derruba a página inteira sem nenhum teste de lógica perceber)',()=>{
+ for(const f of readdirSync('public/office2').filter(f=>f.endsWith('.js'))){
+  assert.doesNotThrow(()=>new vm.Script(readFileSync('public/office2/'+f,'utf8'),{filename:f}),f);
+ }
+ // O app.js também precisa chegar a iniciar: com um DOM mínimo, ele registra Office2 e pede o mapa da cena.
+ const requested:string[]=[];const node=()=>new Proxy({},{get:(_t,k)=>k==='getContext'?()=>new Proxy({},{get:()=>()=>undefined}):k==='classList'?{add(){},remove(){}}:k==='style'||k==='dataset'?{}:typeof k==='string'&&['append','replaceChildren','addEventListener','setAttribute','remove','focus'].includes(k)?()=>undefined:undefined,set:()=>true});
+ const document={querySelector:()=>node(),querySelectorAll:()=>[],createElement:()=>node(),createTextNode:()=>node(),addEventListener(){},hidden:false};
+ const ctx=vm.createContext({document,globalThis:undefined as unknown,Math,Object,Array,Set,Map,Number,String,JSON,Date,Promise,Infinity,encodeURIComponent,performance:{now:()=>0},matchMedia:()=>({matches:false}),requestAnimationFrame(){},setInterval(){},devicePixelRatio:1,
+  fetch:async(url:string)=>{requested.push(url);return {ok:false,status:404,json:async()=>({})};},Image:class{},Office2Iso:{},Office2Scene:{},Office2Ring:{ACCOUNT:'evaluation:nova:usdm'},Office2Lab:{},Office2Ops:{},Office2Horizon:{}});
+ (ctx as any).globalThis=ctx;
+ vm.runInContext(readFileSync('public/office2/app.js','utf8'),ctx);
+ assert.equal(typeof (ctx as any).Office2?.focusRoom,'function');
+ assert.ok(requested.includes('/office2/scene-map.json'));
+});
