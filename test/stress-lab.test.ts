@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
 import {runStressLab,runScenario,checkInvariants,STRESS_SCENARIOS,STRESS_POLICY,type StressScenario} from '../src/application/stress-lab.js';
 import {event} from '../src/domain/events.js';
 
@@ -8,6 +9,9 @@ test('catálogo STRESS_LAB_V1: todos os cenários sobrevivem sem violar invarian
  assert.equal(a.scope,'SIMULATION');
  for(const s of a.scenarios)assert.ok(s.survived,s.id+': '+JSON.stringify({violations:s.invariantViolations,failed:s.expectations.filter(x=>!x.passed)}));
  assert.equal(a.summary.invariantViolations,0);
+ // O relatório que o Escritório 2.0 mostra (public/office2/stress-report.json) tem que ser exatamente esta rodada.
+ // Se o código do laboratório mudar, regenere com: REPORT_PATH=public/office2/stress-report.json npm run stress-lab
+ assert.equal(JSON.parse(readFileSync('public/office2/stress-report.json','utf8')).reportSha256,a.reportSha256);
  // Reprodutibilidade: rodar de novo (num subconjunto, para o teste ser rápido) dá exatamente o mesmo relatório.
  const subset=STRESS_SCENARIOS.filter(s=>['BASELINE','LOSS_LIMIT','DUPLICATE_OUT_OF_ORDER'].includes(s.id));
  assert.equal((await runStressLab(20261006,subset)).reportSha256,(await runStressLab(20261006,subset)).reportSha256);
