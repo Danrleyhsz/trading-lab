@@ -397,3 +397,9 @@ button.hbar{cursor:pointer;border-radius:6px}button.hbar:hover{background:#12223
 .config-icon{display:grid;place-items:center;width:34px;height:34px;border-radius:9px;background:#132544;color:#59e1ff;font-size:17px}
 .config-card p{margin:0;font-size:11px;color:#7f93b5}.config-card p:empty{display:none}
 .config-card button,.config-card select{width:100%}
+.forward-card{border-color:#35c9ff55;background:linear-gradient(160deg,#0d1f3a,#0a1527)}
+.forward-head{display:flex;align-items:center;gap:10px;margin-bottom:10px}.forward-head b{flex:1;color:#fff;font-size:14px}.forward-head small{color:#7f93b5;font-size:12px}
+.limit-bar{height:6px;border-radius:3px;background:#16263f;margin:10px 0;overflow:hidden}.limit-bar span{display:block;height:100%;background:linear-gradient(90deg,#22e39f,#ffb547,#ff5577)}
+.forward-portfolio{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px}.forward-portfolio small{color:#7f93b5;font-size:11px;text-transform:uppercase;letter-spacing:.05em}
+.coin-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}.coin-chip{padding:3px 9px;border-radius:999px;font-size:12px;font-weight:800}.coin-chip.up{background:#22e39f1f;color:#22e39f}.coin-chip.down{background:#ff55771f;color:#ff5577}
+.hero-warn{display:block;margin-top:8px;color:#ffb547;font-size:11px}

@@ -48,6 +48,7 @@ import {BinancePublicMarketData} from './infrastructure/binance-market-data.js';
 import {BinanceHistoricalData} from './infrastructure/binance-history.js';
 import {BinanceDerivativesData} from './infrastructure/binance-derivatives.js';
 import {BinancePerpetualHistory} from './infrastructure/binance-perpetual-history.js';
+import {ForwardMomentumTracker} from './application/forward-momentum.js';
 import {BybitPerpetualHistory,ResilientPerpetualHistory} from './infrastructure/bybit-perpetual-history.js';
 import {BinancePerpetualMarket} from './infrastructure/binance-perpetual-market.js';
 import {JsonStateStore} from './infrastructure/json-state-store.js';
@@ -143,9 +144,12 @@ for(const agent of agents.list())if(agent.status!=='IDLE')coordinator.move(agent
 await persist();const legacyMarket=new BinancePublicMarketData(process.env.MARKET_SYMBOL?.toLowerCase()||'btcusdt');await legacyMarket.connect(t=>{latest=t;accounts.mark(t.symbol,t.price);bus.publish(event('MARKET_TICK',t));});
 // Read-only wall-screen context; never feeds signals, risk or execution.
 void panorama.start().catch(()=>{});
+// Acompanhamento ao vivo do momentum entre moedas (XSMOM_FORWARD_V1): só simulação com dados públicos; nunca envia ordens.
+const forwardMomentum=new ForwardMomentumTracker(new BinancePerpetualHistory());forwardMomentum.start();
+app.get('/paper/momentum/forward',async()=>forwardMomentum.snapshot());
 await perpetualMarket.start(async quote=>{if(runtime.isDraining())return;const settlements=quote.markTime>book.cursor()&&book.fundingDue(quote.markTime)?await perpetualMarket.funding(book.cursor()+1,quote.markTime):[];await book.synchronize(quote,settlements,persist);bus.publish(event('PERPETUAL_MARKET_UPDATED',quote));if(!runtime.isDraining())await cycle.onMarket().catch(error=>app.log.warn({error},'autonomous pilot attempt failed; retry deferred'));},error=>{app.log.warn({error},'USD-M reconciliation unavailable');bus.publish(event('MARKET_DATA_FAILED',{instrument:'BINANCE_USDM:BTCUSDT',error:error.message}));});
 app.addHook('preClose',async()=>{runtime.draining();researchJobs.stopAccepting();research.stopAccepting();studies.stopAccepting();});
-app.addHook('onClose',async()=>{await researchJobs.drain();await perpetualMarket.stop();await panorama.stop();clearInterval(triggerTimer);venues.stop();await legacyMarket.disconnect();await studies.drain();await writes;if(store instanceof PostgresStateStore)await store.close();runtime.stopped();});
+app.addHook('onClose',async()=>{forwardMomentum.stop();await researchJobs.drain();await perpetualMarket.stop();await panorama.stop();clearInterval(triggerTimer);venues.stop();await legacyMarket.disconnect();await studies.drain();await writes;if(store instanceof PostgresStateStore)await store.close();runtime.stopped();});
 let closing=false;
 for(const signal of ['SIGTERM','SIGINT'] as const)process.once(signal,()=>{if(closing)return;closing=true;runtime.draining();const deadline=setTimeout(()=>{app.log.error('shutdown grace expired; incomplete durable studies restore as interrupted');process.exit(1);},30000);void app.close().then(()=>{clearTimeout(deadline);process.exit(0);}).catch(error=>{clearTimeout(deadline);app.log.error({error},'shutdown failed');process.exit(1);});});
 await app.listen({port:Number(process.env.PORT||3000),host:'0.0.0.0'});runtime.serving();
