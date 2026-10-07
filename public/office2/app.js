@@ -332,7 +332,6 @@ function placeZoneLabels(){const c=state.camera;for(const z of zoneLabels){z.nod
   state.scene=Office2Scene.create(state.map,state.iso,images);state.cache=state.scene.renderStatic(2);
   buildZoneLabels();resize();
   for(const b of D.querySelectorAll('[data-room]'))b.addEventListener('click',()=>{const id=b.dataset.room;focusRoom(id?state.map.rooms.find(r=>r.id===id):null);});
-  $('#moreZones').addEventListener('change',e=>{const r=state.map.rooms.find(x=>x.id===e.target.value);if(r)focusRoom(r);e.target.value='';});
   canvas.addEventListener('click',onClick);
   D.addEventListener('keydown',e=>{if(e.key==='Escape'&&state.focus)focusRoom(null);});
   // O painel abre e fecha ao lado da cena: o tamanho da área da cena é observado, não só o da janela.

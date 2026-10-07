@@ -10,7 +10,7 @@ body{display:flex;flex-direction:column}
 .logo{display:flex;align-items:center;gap:10px;color:var(--text);text-decoration:none;font-weight:800;letter-spacing:.04em;font-size:18px}
 .logo-mark{width:26px;height:26px;border-radius:50%;border:2px solid var(--text);background:linear-gradient(90deg,transparent 30%,var(--text) 30% 40%,transparent 40% 48%,var(--text) 48% 58%,transparent 58% 66%,var(--text) 66% 76%,transparent 76%) bottom/60% 50% no-repeat}
 nav{display:flex;gap:4px;flex-wrap:wrap;align-items:center}
-nav button,nav select{background:transparent;color:var(--text);border:1px solid transparent;border-radius:8px;padding:7px 12px;font:inherit;cursor:pointer}
+nav button,nav select{background:transparent;color:var(--text);border:1px solid transparent;border-radius:8px;padding:6px 9px;font:inherit;cursor:pointer;white-space:nowrap}
 nav button:hover,nav select:hover{background:#1a2440}
 nav button[aria-current="true"]{background:#1d2a4a;border-color:var(--line)}
 nav select{background:var(--bar)}
