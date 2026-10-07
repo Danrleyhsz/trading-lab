@@ -7,7 +7,19 @@ const officeFiles:Record<string,string> = {
   'characters/atlas.png':'image/png', 'characters/euler.png':'image/png', 'characters/nova.png':'image/png', 'characters/sentinel.png':'image/png',
   'characters/satoshi.png':'image/png', 'characters/flux.png':'image/png', 'characters/vega.png':'image/png', 'characters/oracle.png':'image/png',
 };
-export function registerOfficeAssets(app:FastifyInstance, directory=join(process.cwd(),'public','office')) {
+// Escritório 2.0 (F1, em /office2 ao lado do atual). scene-map.json é a planta canônica (docs/design/OFFICE_VISUAL_SPEC.md).
+const officeTwoFiles:Record<string,string> = {
+  'index.html':'text/html; charset=utf-8', 'style.css':'text/css; charset=utf-8', 'iso.js':'application/javascript; charset=utf-8',
+  'scene.js':'application/javascript; charset=utf-8', 'app.js':'application/javascript; charset=utf-8', 'ring.js':'application/javascript; charset=utf-8', 'lab.js':'application/javascript; charset=utf-8', 'ops.js':'application/javascript; charset=utf-8', 'horizon.js':'application/javascript; charset=utf-8', 'stress-report.json':'application/json; charset=utf-8', 'scene-map.json':'application/json; charset=utf-8',
+};
+export function registerOfficeAssets(app:FastifyInstance, directory=join(process.cwd(),'public','office'), officeTwo=join(process.cwd(),'public','office2')) {
+  app.get('/office2/*', async(req,reply) => {
+    const name=(req.params as {'*':string})['*'] || 'index.html';
+    if (!Object.hasOwn(officeTwoFiles,name)) return reply.code(404).send({error:'office asset not found'});
+    reply.type(officeTwoFiles[name]).header('X-Content-Type-Options','nosniff').header('Cache-Control','no-cache');
+    return readFile(join(officeTwo,name));
+  });
+  app.get('/office2',async(_req,reply)=>reply.redirect('/office2/'));
   app.get('/office/*', async(req,reply) => {
     const name=(req.params as {'*':string})['*'] || 'index.html';
     if (!Object.hasOwn(officeFiles,name)) return reply.code(404).send({error:'office asset not found'});

@@ -1,0 +1,141 @@
+{
+ "version": "KRONOS_AB_V1",
+ "declaredAt": "2026-10-06",
+ "scope": "OFFLINE_HISTORICAL_RESEARCH_ONLY",
+ "dataset": {
+  "source": "BINANCE_USDM BTCUSDT 1h (negócios) + funding, cache scripts/estudos/out/carry-BTCUSDT.json (FUNDING_CARRY_V1)",
+  "firstBar": "2022-01-01T00:00:00Z",
+  "lastBar": "2026-10-05T23:00:00Z",
+  "markSeries": "igual à série de negócios (mesma convenção dos estudos de histórico longo)",
+  "fourHour": "agregação de 4 velas de 1h em blocos UTC (00, 04, 08, 12, 16, 20); bloco só entra completo"
+ },
+ "window": {
+  "firstEntryBar": "2025-10-24T00:00:00Z",
+  "lastBar": "2026-10-05T23:00:00Z",
+  "reason": "depois da última revisão de pesos de todos os modelos Kronos considerados (Kronos-mini 2025-09-09; ajuste BTC 1h 2025-10-20 e 4h 2025-10-23; dados de ajuste até 2025-10-18)",
+  "quarters": [
+   "2025-10-24T00:00:00Z",
+   "2026-01-24T00:00:00Z",
+   "2026-04-24T00:00:00Z",
+   "2026-07-24T00:00:00Z",
+   "2026-10-06T00:00:00Z"
+  ]
+ },
+ "baseline": {
+  "name": "TRADINGLAB-BASELINE",
+  "description": "configuração da última janela do estudo d674cb32 (a que o piloto Nova usa), sem mudança",
+  "config": {
+   "strategy": "BREAKOUT",
+   "fastPeriod": 10,
+   "slowPeriod": 480,
+   "feeRate": 0.00055,
+   "slippageBps": 1,
+   "initialCapital": 10000,
+   "maintenanceRate": 0.01,
+   "liquidationFeeRate": 0.005,
+   "positionFraction": 0.1
+  },
+  "stressedCosts": {
+   "feeRate": 0.0011,
+   "slippageBps": 5
+  }
+ },
+ "forecast": {
+  "horizonHours": 24,
+  "timeframes": {
+   "1h": {
+    "contextCandles": 512,
+    "predLen": 24
+   },
+   "4h": {
+    "contextCandles": 512,
+    "predLen": 6
+   }
+  },
+  "sampling": {
+   "T": 1,
+   "top_p": 0.9,
+   "top_k": 0,
+   "sample_count": 5,
+   "clip": 5,
+   "seed": "hora da vela final do contexto (timestamp ms / 3 600 000) módulo 2 147 483 647",
+   "torchThreads": 2
+  },
+  "origins": {
+   "entryCandidates": "toda vela de 1h na janela em que o rompimento de 480 velas acontece no fechamento (a decisão da estratégia quando está sem posição); a previsão usa contexto que termina na vela anterior à execução",
+   "dailyGrid": "vela de 1h das 23:00 UTC (ou bloco de 4h das 20:00 UTC) de cada dia da janela; alvo = fechamento 24 h depois"
+  },
+  "derivedSignal": "retorno previsto em 24 h = fechamento previsto no fim do horizonte / último fechamento do contexto - 1"
+ },
+ "advisory": {
+  "version": "KRONOS_ENTRY_FILTER_V1",
+  "rule": "entrada na direção d só é permitida se d * retorno_previsto > 0; sem limite ajustável; fechar sempre permitido; sem previsão válida, a entrada não acontece (falha fechada) e conta como rejeição"
+ },
+ "arms": {
+  "A": {
+   "name": "TRADINGLAB-BASELINE"
+  },
+  "B": {
+   "name": "KRONOS-ORIGINAL",
+   "model": "NeoQuasar/Kronos-mini",
+   "modelRevision": "f4e68697d9d5aed55cef5c96aabc3376bcad9f81",
+   "tokenizer": "NeoQuasar/Kronos-Tokenizer-2k",
+   "tokenizerRevision": "26966d0035065a0cae0ebad7af8ece35bc1fb51c",
+   "code": "shiyu-coder/Kronos",
+   "codeCommit": "67b630e67f6a18c9e9be918d9b4337c960db1e9a",
+   "maxContext": 2048
+  },
+  "C": {
+   "name": "KRONOS-BTC-FINETUNED",
+   "status": "DECLARADO EM 2026-10-06 ANTES DE QUALQUER PREVISÃO DESTE BRAÇO",
+   "source": "Liucong-JunZi/Kronos-Btc-finetune@2eef54ed0fe0d490ae300fe86bf3b38c03637426 (pesos no Hugging Face lc2004/*)",
+   "license": "pesos MIT (cartão do modelo); o repositório de código não tem licença e por isso não é usado: só os pesos, carregados com o código oficial do Kronos",
+   "trainingData": "BTCUSDT 1h de 2023-10-19 a 2025-10-18 (arquivo de dados do repositório e registro de treino do modelo 1h); ajuste em GPU em 2025-10-19",
+   "base": "Kronos-base (102 310 592 parâmetros), contexto máximo 512",
+   "code": "shiyu-coder/Kronos",
+   "codeCommit": "67b630e67f6a18c9e9be918d9b4337c960db1e9a",
+   "maxContext": 512,
+   "timeframes": {
+    "1h": {
+     "model": "lc2004/kronos_base_model_BTCUSDT_1h_finetune",
+     "modelRevision": "eb51e682c8194a1ba7254cc4357c75819683fbaf",
+     "tokenizer": "lc2004/kronos_tokenizer_base_BTCUSDT_1h_finetune",
+     "tokenizerRevision": "b8f1c795b80231f5bdeb69dfe71fc1542d2111fc"
+    },
+    "4h": {
+     "model": "lc2004/kronos_base_model_BTCUSDT_4h_finetune",
+     "modelRevision": "e6c866f442cbeaf5bbbfab133465a71d2a1d102d",
+     "tokenizer": "lc2004/kronos_tokenizer_base_BTCUSDT_4h_finetune",
+     "tokenizerRevision": "a8e0a8984861056a0431c33494c2bb5689513e05"
+    }
+   },
+   "sampling": {
+    "sample_count": 1
+   },
+   "amendment": "EMENDA 1 (2026-10-06, antes de qualquer previsão do braço C no experimento): 1 caminho de amostragem em vez de 5. Medido: 361 s e 1 051 MB por previsão com 5 caminhos (Kronos-base, 102 M parâmetros), o que daria cerca de 70 h. Uma única previsão de medição (origem 2025-10-23 23:00, 1h) foi gerada num arquivo temporário fora do experimento e não é usada."
+  },
+  "D": {
+   "name": "CRYPTOMAMBA",
+   "status": "N/A nesta máquina: depende de mamba-ssm (CUDA/GPU NVIDIA); modelos publicados são diários"
+  },
+  "B1": {
+   "name": "KRONOS-ORIGINAL (1 caminho, sensibilidade)",
+   "model": "NeoQuasar/Kronos-mini",
+   "modelRevision": "f4e68697d9d5aed55cef5c96aabc3376bcad9f81",
+   "tokenizer": "NeoQuasar/Kronos-Tokenizer-2k",
+   "tokenizerRevision": "26966d0035065a0cae0ebad7af8ece35bc1fb51c",
+   "code": "shiyu-coder/Kronos",
+   "codeCommit": "67b630e67f6a18c9e9be918d9b4337c960db1e9a",
+   "maxContext": 2048,
+   "sampling": {
+    "sample_count": 1
+   },
+   "sensitivityOnly": true,
+   "purpose": "mesma amostragem de 1 caminho do braço C, para separar o efeito do modelo do efeito da média de caminhos; não entra no critério de decisão"
+  }
+ },
+ "decision": {
+  "incrementalValue": "o braço Kronos só mostra valor incremental se, ao mesmo tempo: (1) P&L líquido maior que o da base; (2) maior que a base em pelo menos 3 dos 4 trimestres; (3) continua maior que a base com custos dobrados; (4) acerto de direção na grade diária maior que 50% com p < 0,05 (teste binomial unilateral)",
+  "otherwise": "sem evidência de valor incremental"
+ }
+}
