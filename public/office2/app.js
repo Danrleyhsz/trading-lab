@@ -27,9 +27,8 @@
  /** Ícone da F6 (art/icones) ou nada, se o manifesto não carregou: o texto ao lado continua dizendo tudo. */
  const icon=(name,cls='ico')=>{const info=images.icons?.[name];if(!info)return null;const i=el('img',cls);i.src='/office2/art/'+info.file;i.alt='';i.decoding='async';return i;};
  const ZONE_EMBLEM={horizon:'zona-horizon',nexus:'zona-nexus',ring:'zona-ring','stress-lab':'zona-lab',risk:'zona-risk',auditoria:'zona-auditoria',diagnostico:'zona-diagnostico',backtest:'zona-backtest','hall-marca':'zona-marca'};
- // F6: arte gerada. Ao carregar, o cache estático é redesenhado (antes disso vale a cidade desenhada por código).
+ // F6: cidade gerada, desenhada como fundo em tela cheia a cada quadro (antes de carregar vale um degradê).
  images.skyline=loadImage('/office2/art/cidade-noite.jpg');
- images.skyline.onload=()=>{if(state.scene)state.cache=state.scene.renderStatic(2);};
  async function get(path){try{const r=await fetch(path,{credentials:'same-origin',headers:{accept:'application/json'}});if(!r.ok)return {ok:false,status:r.status};return {ok:true,body:await r.json()};}catch{return {ok:false,status:0};}}
  const why=res=>res.status===401||res.status===403?'sem acesso (entre pelo escritório atual)':res.status===404?'rota ainda não publicada em produção (deploy pendente)':res.status===0?'sem conexão':'indisponível (HTTP '+res.status+')';
 
@@ -215,7 +214,10 @@
  };
 
  // ---------- câmera ----------
- function overview(){const {w,h}=state.map.projection.scene,vw=viewport.clientWidth,vh=viewport.clientHeight,s=Math.min(vw/w,vh/h);return {s,x:(vw-w*s)/2,y:(vh-h*s)/2};}
+ /** Visão geral: enquadra a planta do andar (com as paredes altas e a borda da laje), não o retângulo inteiro da cena; o fundo cobre o resto. */
+ function overview(){const iso=state.iso,top=iso.project(0,0,84),left=iso.project(0,iso.H),right=iso.project(iso.W,0),bottom=iso.project(iso.W,iso.H);
+  const x0=left.x-24,x1=right.x+24,y0=top.y-16,y1=bottom.y+40,vw=viewport.clientWidth,vh=viewport.clientHeight,s=Math.min(vw/(x1-x0),vh/(y1-y0));
+  return {s,x:(vw-(x1-x0)*s)/2-x0*s,y:(vh-(y1-y0)*s)/2-y0*s};}
  function roomCamera(room){
   const t=room.tiles,pts=[[t.i0,t.j0],[t.i1,t.j0],[t.i1,t.j1],[t.i0,t.j1]].map(([i,j])=>state.iso.project(i,j));
   const cx=(Math.min(...pts.map(p=>p.x))+Math.max(...pts.map(p=>p.x)))/2,cy=(Math.min(...pts.map(p=>p.y))+Math.max(...pts.map(p=>p.y)))/2-24;
@@ -314,7 +316,7 @@ function placeZoneLabels(){const c=state.camera;for(const z of zoneLabels){z.nod
  function frame(now){
   if(state.hidden)return;stepCamera(now);
   for(const ag of state.agents.values())tickAgent(ag,now);
-  const dpr=globalThis.devicePixelRatio||1,c=state.camera;ctx.setTransform(1,0,0,1,0,0);ctx.fillStyle='#0b1426';ctx.fillRect(0,0,canvas.width,canvas.height);
+  const dpr=globalThis.devicePixelRatio||1,c=state.camera;state.scene.backdrop.draw(ctx,canvas.width,canvas.height,c,reduced?0:now,dpr);
   ctx.imageSmoothingEnabled=false;ctx.setTransform(c.s*dpr,0,0,c.s*dpr,c.x*dpr,c.y*dpr);
   state.scene.draw(ctx,state.cache,[...state.agents.values()],globalThis.OfficeSpriteSheets,charImages,screenContent());
   for(const ag of state.agents.values())placePlate(ag);placeZoneLabels();
