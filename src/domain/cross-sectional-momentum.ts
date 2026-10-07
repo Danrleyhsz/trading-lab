@@ -11,7 +11,7 @@ import {validatePerpetualDataset,type PerpetualDataset} from './perpetual-backte
  *  3. fechamento de i: marca a carteira pelo fechamento e, se for hora de rebalancear, decide as próximas posições
  *     usando só fechamentos até i.
  */
-export interface CrossSectionalConfig {lookbackHours:number;rebalanceHours:number;startBar:number;longCount:number;shortCount:number;legFraction:number;feeRate:number;slippageBps:number;initialCapital:number}
+export interface CrossSectionalConfig {lookbackHours:number;rebalanceHours:number;startBar:number;longCount:number;shortCount:number;legFraction:number;feeRate:number;slippageBps:number;initialCapital:number;maxBars?:number}
 export interface CrossSectionalResult {
  model:'CROSS_SECTIONAL_MOMENTUM_V1';execution:'HISTORICAL_SIMULATION';datasetHashes:Record<string,string>;
  equitySeries:{timestamp:number;equity:number}[];finalEquity:number;netPnl:number;maxDrawdown:number;
@@ -24,7 +24,7 @@ export function simulateCrossSectional(datasets:Record<string,PerpetualDataset>,
  if(![cfg.lookbackHours,cfg.rebalanceHours,cfg.startBar].every(v=>Number.isSafeInteger(v)&&v>0)||cfg.startBar<cfg.lookbackHours)throw new Error('invalid schedule');
  if(!(cfg.legFraction>0&&cfg.legFraction*(cfg.longCount+cfg.shortCount)<=1))throw new Error('gross exposure above 1x');
  if(!(cfg.feeRate>=0&&cfg.slippageBps>=0&&cfg.initialCapital>0))throw new Error('invalid costs');
- const datasetHashes:Record<string,string>={};for(const s of symbols)datasetHashes[s]=validatePerpetualDataset(datasets[s]);
+ const datasetHashes:Record<string,string>={};for(const s of symbols)datasetHashes[s]=validatePerpetualDataset(datasets[s],cfg.maxBars);
  const bars=datasets[symbols[0]].trade.length;
  for(const s of symbols){const t=datasets[s].trade;if(t.length!==bars||t.some((c,i)=>c.timestamp!==datasets[symbols[0]].trade[i].timestamp))throw new Error('unaligned universe: '+s);}
  if(bars<=cfg.startBar+1)throw new Error('not enough bars');
