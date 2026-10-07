@@ -6,15 +6,12 @@ Lista completa das **21 imagens** que faltam para o Escritório 2.0 (`/office2`)
 
 1. **Anexe a referência aprovada** em todo pedido: [`docs/design/references/tradinglab-office-2-approved-reference.jpg`](references/tradinglab-office-2-approved-reference.jpg).
 2. **Nos personagens, anexe também a folha atual** do agente: `public/office/characters/<nome>.png` (identidade: cabelo, roupa e cores).
-3. **Peça a proporção 3:2 (paisagem)**, de preferência 1536 × 1024. Se vier outro tamanho, tudo bem: a integração ajusta a escala.
-4. **Fundo:** o Gemini não faz fundo transparente. Por isso os pedidos usam **fundo magenta liso `#FF00FF`**, que a integração remove por código. A exceção é a **Oracle**, que usa blazer magenta: o pedido dela usa **fundo verde puro `#00FF00`**. A cidade (skyline) é opaca, sem fundo para remover.
-5. **Salve com o nome exato** indicado em cada pedido.
-6. A posição e o tamanho exatos dos objetos **não precisam ser perfeitos**: a integração recorta cada objeto automaticamente. Importam:
-   - a ordem;
-   - o espaço vazio entre os objetos;
-   - o fundo uniforme;
-   - nenhuma tela com conteúdo.
-7. Se o fundo vier com degradê, sombra ou outra cor, gere de novo pedindo "solid flat pure magenta #FF00FF background".
+3. **Peça a proporção 3:2 (paisagem)**, de preferência 1536 × 1024. Se vier outro tamanho (o Gemini costuma entregar 1264 × 848), tudo bem: a integração ajusta a escala.
+4. **Prefira PNG** se houver opção de download em PNG. JPEG funciona, mas suja um pouco as bordas do fundo.
+5. **Fundo:** o Gemini não faz fundo transparente. Os pedidos usam **fundo magenta liso `#FF00FF`**, que a integração remove por código. A exceção é a **Oracle**, que usa blazer magenta e tem **fundo verde puro `#00FF00`**. A cidade (skyline) é opaca.
+6. **Salve com o nome exato** indicado em cada pedido.
+7. A posição e o tamanho exatos dos objetos **não precisam ser perfeitos**: a integração recorta cada objeto automaticamente. Importam a ordem, o espaço vazio entre os objetos, o fundo uniforme e nenhuma tela com conteúdo.
+8. Se o fundo vier com degradê, sombra ou outra cor, gere de novo pedindo "solid flat pure magenta #FF00FF background".
 
 Contrato técnico completo (tamanhos finais, recortes, pontos de apoio): [`OFFICE_ASSET_REQUESTS.md`](OFFICE_ASSET_REQUESTS.md).
 
@@ -29,7 +26,7 @@ Contrato técnico completo (tamanhos finais, recortes, pontos de apoio): [`OFFIC
 ```text
 High-quality pixel art in the exact style of the attached reference image (TradingLab office on the 30th floor, ISOMETRIC 2:1 top-down view, night, warm interior lighting). Thin dark outlines, 3-4 tone shading, reference palette: beige floor #d9cdb4, dark carpet #2b3140, wood #8b5a2c / #c07a3c, graphite panels #2a2f3a / #3a404c, warm LED strips #ffd27a, flat navy screens #0e2150, plants #2c8a48 / #62d07a. No text, no letters, no numbers, no logos, no watermark, no people.
 
-Landscape image in 3:2 aspect ratio (ideally 1536 x 1024 px), opaque. A dense night city (Sao Paulo-like, no recognizable landmark) seen from the 30th floor, looking DOWN at about 30 degrees like the reference: rooftops and facades of skyscrapers with lit windows #ffcf6a, lit streets far below, bluish haze on the horizon, sky #0b1426 to #1a2a4a at the top. Strong detail on the LEFT, RIGHT and BOTTOM edges; the center (x 300-1236, y 230-880) will be covered by the office building, so keep it simple and darker there. No moon, no sun, no bright object in the center. No text.
+Landscape image in 3:2 aspect ratio (ideally 1536 x 1024 px), opaque. A dense night city (Sao Paulo-like, no recognizable landmark) seen from the 30th floor, looking DOWN at about 30 degrees like the reference: rooftops and facades of skyscrapers with lit windows #ffcf6a, lit streets far below, bluish haze on the horizon, sky #0b1426 to #1a2a4a at the top. ONE CONTINUOUS city across the WHOLE image, with the same density and lighting everywhere: NO dark band, NO darker rectangle, NO empty area, no vertical seams (darkening for the office building is done later by code). No moon, no sun. No text.
 ```
 
 ### Ring: mesas de operação e telão · `TL-O2-PROPS-RING`
