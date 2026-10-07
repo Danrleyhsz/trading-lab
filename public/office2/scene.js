@@ -1,6 +1,6 @@
 // Escritório 2.0 (F1): desenho da cena isométrica em canvas, a partir de public/office2/scene-map.json.
 // L0 (cidade) e L1 (pisos) vão para um cache estático; L2 a L5 (paredes, telas, móveis, agentes) são ordenados por
-// profundidade a cada quadro. Móveis e cidade são PROVISÓRIOS, desenhados por código até a arte do manifesto chegar.
+// profundidade a cada quadro. Cidade e móveis usam a arte da F6 quando carregada; o desenho por código fica como reserva.
 // Só apresentação: telas sem dado ficam apagadas (nunca um gráfico inventado).
 (() => {
  const C=Object.freeze({
@@ -41,7 +41,13 @@
    const ctx=cv.getContext('2d');ctx.imageSmoothingEnabled=false;ctx.scale(scale,scale);
    // L0 provisório: céu e prédios por código, com janelas fixas por semente (decoração, não dado).
    const sky=images?.skyline;
-   if(sky&&sky.complete&&sky.naturalWidth)ctx.drawImage(sky,0,0,w,h);else{
+   if(sky&&sky.complete&&sky.naturalWidth){
+    // Arte gerada (proporção 3:2): cobre a cena 16:9 sem distorcer, alinhada embaixo (o céu de cima pode ser cortado).
+    const s=Math.max(w/sky.naturalWidth,h/sky.naturalHeight),dw=sky.naturalWidth*s,dh=sky.naturalHeight*s;
+    ctx.imageSmoothingEnabled=true;ctx.drawImage(sky,(w-dw)/2,h-dh,dw,dh);ctx.imageSmoothingEnabled=false;
+    // Escurece o centro por código, onde fica o prédio, para a planta se destacar (a arte vem uniforme de propósito).
+    const g=ctx.createRadialGradient(w/2,h*0.55,h*0.15,w/2,h*0.55,w*0.62);g.addColorStop(0,'rgba(8,12,24,0.55)');g.addColorStop(1,'rgba(8,12,24,0.08)');ctx.fillStyle=g;ctx.fillRect(0,0,w,h);
+   }else{
     const g=ctx.createLinearGradient(0,0,0,h);g.addColorStop(0,C.sky[0]);g.addColorStop(0.6,C.sky[1]);g.addColorStop(1,C.sky[2]);ctx.fillStyle=g;ctx.fillRect(0,0,w,h);
     const rnd=Office2Iso.prng(30);
     for(let x=-20;x<w;x+=18+Math.floor(rnd()*26)){const bw=16+Math.floor(rnd()*34),top=120+Math.floor(rnd()*420);ctx.fillStyle=rnd()<0.5?'#101a30':'#0d1528';ctx.fillRect(x,top,bw,h-top);
@@ -79,10 +85,19 @@
    const minX=Math.min(...inner.map(p=>p.x)),maxX=Math.max(...inner.map(p=>p.x)),minY=Math.min(...inner.map(p=>p.y)),maxY=Math.max(...inner.map(p=>p.y));
    for(let x=minX-60;x<maxX;x+=6){ctx.beginPath();ctx.moveTo(x,maxY);ctx.lineTo(x+60,minY);ctx.stroke();}ctx.restore();
   }
-  /** Móvel PROVISÓRIO: bloco isométrico com a área ocupada e a altura do manifesto (ou a arte, se já integrada). */
+  /**
+   * Móvel: arte do manifesto (public/office2/art/manifesto.json) quando carregada; senão o bloco provisório.
+   * A arte cabe na caixa do mapa: largura do losango da área ocupada e altura `h` mais o losango; fica centrada e apoiada
+   * no canto da frente. Arte com eixo longo em i ou j é espelhada quando o móvel do mapa corre no outro eixo.
+   */
   function drawProp(ctx,p){
-   const art=images?.props?.[p.asset];
-   if(art&&art.complete&&art.naturalWidth){const anchor=P(p.tile.i,p.tile.j);ctx.drawImage(art,anchor.x-p.footprint.b*24,anchor.y-p.h);return;}
+   const art=images?.props?.[p.asset],info=images?.propInfo?.[p.asset];
+   if(art&&info&&art.complete&&art.naturalWidth){const {i,j}=p.tile,{a,b}=p.footprint;
+    const boxW=(a+b)*24,boxH=p.h+(a+b)*12,s=Math.min(boxW/info.width,boxH/info.height);
+    const cx=(P(i,j+b).x+P(i+a,j).x)/2,base=P(i+a,j+b).y+2,dw=info.width*s,dh=info.height*s;
+    const flip=(info.axis==='i'&&b>a)||(info.axis==='j'&&a>b);
+    ctx.save();ctx.imageSmoothingEnabled=true;ctx.translate(Math.round(cx),Math.round(base));if(flip)ctx.scale(-1,1);
+    ctx.drawImage(art,-dw/2,-dh,dw,dh);ctx.restore();return;}
    const {i,j}=p.tile,{a,b}=p.footprint,h=p.h,plant=p.asset.startsWith('planta')||p.asset==='jardineira',c=plant?C.plant:C.prop;
    const pad=0.08,i0=i+pad,j0=j+pad,i1=i+a-pad,j1=j+b-pad;
    poly(ctx,[P(i0,j1),P(i1,j1),P(i1,j1,h),P(i0,j1,h)],c.left,C.prop.line);

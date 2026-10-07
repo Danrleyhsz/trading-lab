@@ -1,0 +1,81 @@
+{
+ "props-ring": {"key":[252,4,252],"kind":"prop","pieces":[
+  {"name":"mesa-curva-operacoes","width":384,"axis":"none"},
+  {"name":"mesa-monitores","width":240,"axis":"none"},
+  null,
+  null,
+  {"name":"cadeira-frente","width":44,"axis":"none"},
+  {"name":"cadeira-costas","width":44,"axis":"none"}]},
+ "props-salas-1": {"key":[252,4,252],"kind":"prop","pieces":[
+  {"name":"mesa-reuniao","width":336,"axis":"j"},
+  {"name":"balcao-recepcao","width":288,"axis":"none"},
+  null,
+  {"name":"sofa","width":192,"axis":"j"},
+  {"name":"poltrona","width":80,"axis":"none"}]},
+ "props-salas-2": {"key":[252,4,252],"kind":"prop","pieces":[
+  {"name":"jardineira","width":192,"axis":"i"},
+  {"name":"planta-alta","width":60,"axis":"none"},
+  {"name":"mesa-centro","width":144,"axis":"j"},
+  {"name":"planta-baixa","width":56,"axis":"none"}]},
+ "props-lab-1": {"key":[252,4,252],"kind":"prop","pieces":[
+  {"name":"esteira","width":144,"axis":"i"},
+  {"name":"saco-pancada","width":64,"axis":"none"},
+  {"name":"rack-halteres","width":144,"axis":"i"},
+  {"name":"bancada-teste","width":150,"axis":"none"}]},
+ "props-lab-2": {"key":[252,4,252],"kind":"prop","pieces":[
+  {"name":"estante-arquivo","width":144,"axis":"j"},
+  {"name":"armarios-arquivo","width":240,"axis":"j"},
+  {"name":"rack-servidor","width":84,"axis":"none"}]},
+ "props-copa": {"key":[252,4,252],"kind":"prop","pieces":[
+  {"name":"bancada-cozinha","width":240,"axis":"none"},
+  null,
+  {"name":"geladeira","width":84,"axis":"none"},
+  {"name":"mesa-redonda","width":150,"axis":"none"},
+  null]},
+ "props-lobby": {"key":[252,4,252],"kind":"prop","pieces":[
+  null,
+  {"name":"catraca","width":96,"axis":"none"}]},
+ "icones-estagios": {"key":[252,4,252],"kind":"icon","pieces":[
+  {"name":"estagio-trader","size":64},
+  {"name":"estagio-risk","size":64},
+  {"name":"estagio-validator","size":64},
+  {"name":"estagio-execution","size":64},
+  {"name":"estagio-audit","size":64}]},
+ "emblemas-zonas-1": {"key":[252,4,252],"kind":"icon","pieces":[
+  {"name":"zona-horizon","size":32},
+  {"name":"zona-nexus","size":32},
+  {"name":"zona-ring","size":32},
+  {"name":"zona-lab","size":32},
+  {"name":"zona-risk","size":32}]},
+ "emblemas-zonas-2": {"key":[252,4,252],"kind":"icon","pieces":[
+  {"name":"zona-auditoria","size":32},
+  {"name":"zona-diagnostico","size":32},
+  {"name":"zona-backtest","size":32},
+  {"name":"zona-ordens","size":32},
+  {"name":"zona-marca","size":32}]},
+ "icones-estado-agente": {"key":[252,4,252],"kind":"icon","pieces":[
+  {"name":"estado-trabalhando","size":32},
+  {"name":"estado-aguardando","size":32},
+  {"name":"estado-bloqueado","size":32},
+  {"name":"estado-desconectado","size":32},
+  null,
+  {"name":"estado-mensagem","size":32},
+  null,
+  {"name":"estado-pausa","size":32}]},
+ "icones-cenarios-1": {"key":[252,4,252],"kind":"icon","gap":40,"pieces":[
+  {"name":"cenario-baseline","size":64},
+  {"name":"cenario-abrupt-move","size":64},
+  {"name":"cenario-volatility-spike","size":64},
+  {"name":"cenario-spread-widening","size":64},
+  {"name":"cenario-stale-quote","size":64},
+  {"name":"cenario-stale-candles","size":64},
+  {"name":"cenario-missing-candle","size":64}]},
+ "icones-cenarios-2": {"key":[252,4,252],"kind":"icon","pieces":[
+  {"name":"cenario-provider-outage","size":64},
+  {"name":"cenario-backup-venue-divergence","size":64},
+  {"name":"cenario-loss-limit","size":64},
+  {"name":"cenario-kill-switch","size":64},
+  {"name":"cenario-malformed-snapshot","size":64},
+  {"name":"cenario-duplicate-out-of-order","size":64},
+  {"name":"cenario-restart","size":64}]}
+}

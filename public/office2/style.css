@@ -29,6 +29,9 @@ nav select{background:var(--bar)}
 .labels>*{position:absolute;left:0;top:0;will-change:transform}
 .zone-label{pointer-events:auto;cursor:pointer;background:rgba(10,15,28,.82);color:var(--text);border:1px solid #3a4560;border-radius:6px;padding:3px 8px;font-weight:700;letter-spacing:.02em;white-space:nowrap}
 .zone-label:hover{border-color:var(--accent)}
+/* F6: ícones recortados (art/icones), sempre ao lado de um texto que diz o mesmo. */
+.ico{width:18px;height:18px;vertical-align:-4px;margin-right:6px;flex:none}
+.zone-label .emblem{width:14px;height:14px;vertical-align:-2px;margin-right:5px}
 .brand{color:#fff3d6;font-weight:900;letter-spacing:.08em;text-shadow:0 0 8px rgba(255,210,122,.8);font-size:18px}
 .plate{background:rgba(10,15,28,.78);color:var(--text);border-radius:4px;padding:1px 6px;font-size:11px;white-space:nowrap}
 .plate[data-truth="STATIC"]{color:var(--muted);font-style:italic}

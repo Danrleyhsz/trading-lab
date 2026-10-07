@@ -24,6 +24,12 @@
  const viewport=$('#viewport'),canvas=$('#scene'),ctx=canvas.getContext('2d'),labels=$('#labels'),panel=$('#panel');
  const loadImage=src=>{const img=new Image();img.decoding='async';img.src=src;return img;};
  const charImages={},images={props:{}};
+ /** Ícone da F6 (art/icones) ou nada, se o manifesto não carregou: o texto ao lado continua dizendo tudo. */
+ const icon=(name,cls='ico')=>{const info=images.icons?.[name];if(!info)return null;const i=el('img',cls);i.src='/office2/art/'+info.file;i.alt='';i.decoding='async';return i;};
+ const ZONE_EMBLEM={horizon:'zona-horizon',nexus:'zona-nexus',ring:'zona-ring','stress-lab':'zona-lab',risk:'zona-risk',auditoria:'zona-auditoria',diagnostico:'zona-diagnostico',backtest:'zona-backtest','hall-marca':'zona-marca'};
+ // F6: arte gerada. Ao carregar, o cache estático é redesenhado (antes disso vale a cidade desenhada por código).
+ images.skyline=loadImage('/office2/art/cidade-noite.jpg');
+ images.skyline.onload=()=>{if(state.scene)state.cache=state.scene.renderStatic(2);};
  async function get(path){try{const r=await fetch(path,{credentials:'same-origin',headers:{accept:'application/json'}});if(!r.ok)return {ok:false,status:r.status};return {ok:true,body:await r.json()};}catch{return {ok:false,status:0};}}
  const why=res=>res.status===401||res.status===403?'sem acesso (entre pelo escritório atual)':res.status===404?'rota ainda não publicada em produção (deploy pendente)':res.status===0?'sem conexão':'indisponível (HTTP '+res.status+')';
 
@@ -106,7 +112,7 @@
    const newer=Object.assign(el('button','ghost','mais recente →'),{type:'button',disabled:state.ring.index===0,onclick:()=>{state.ring.index--;renderPanel();}});
    nav.append(older,el('span','',(state.ring.index+1)+' de '+list.length+' mais recentes'),newer);box.append(nav);
    const ol=el('ol','stages');
-   for(const s of R.stages(r)){const li=el('li','stage');li.dataset.state=s.state;li.dataset.truth=s.truth;const head=el('div','stage-head');head.append(el('b','',s.label),truthChip(s.truth));li.append(head,el('span','',s.text));if(s.detail)li.append(el('small','',s.detail));ol.append(li);}
+   for(const s of R.stages(r)){const li=el('li','stage');li.dataset.state=s.state;li.dataset.truth=s.truth;const head=el('div','stage-head'),b=el('b','',s.label),ic=icon('estagio-'+s.id);if(ic)b.prepend(ic);head.append(b,truthChip(s.truth));li.append(head,el('span','',s.text));if(s.detail)li.append(el('small','',s.detail));ol.append(li);}
    box.append(ol);
    if(r.team?.length)box.append(el('p','muted','Equipe ('+r.team.length+' mensagens, consultivas): '+r.team.filter(m=>m.kind==='DEBATE').map(m=>m.summary).join(' ').slice(0,220)));
    box.append(el('p','muted','Ligação decisão → ordem por janela de tempo (lacuna L1); sem impressão digital do backend por decisão (L5).'));
@@ -117,7 +123,7 @@
    const vm=stressView();if(!vm){box.append(truthChip('UNKNOWN'),el('p','muted','Relatório do laboratório: '+(res.ok?'formato inesperado':why(res))+'.'));return;}
    box.append(simSeal('SIMULAÇÃO · mercado sintético · semente '+vm.seed),el('p','',vm.headline));
    const dl=el('dl','facts');for(const [k,v] of vm.facts)dl.append(el('dt','',k),el('dd','',v));box.append(dl);
-   const ol=el('ol','scenarios');for(const c of vm.scenarios){const li=el('li','stage');li.dataset.state=c.survived?'ok':'rejected';li.dataset.truth='SIMULATION';const head=el('div','stage-head');head.append(el('b','',c.title),el('span','muted',c.survived?'sobreviveu':'falhou'));li.append(head,el('small','',c.id+' · '+c.line));
+   const ol=el('ol','scenarios');for(const c of vm.scenarios){const li=el('li','stage');li.dataset.state=c.survived?'ok':'rejected';li.dataset.truth='SIMULATION';const head=el('div','stage-head'),t=el('b','',c.title),ic=icon('cenario-'+String(c.id).toLowerCase().replace(/_/g,'-'));if(ic)t.prepend(ic);head.append(t,el('span','muted',c.survived?'sobreviveu':'falhou'));li.append(head,el('small','',c.id+' · '+c.line));
     for(const v of c.violations)li.append(el('small','bad','invariante: '+v));for(const x of c.failed)li.append(el('small','bad','esperado: '+x));ol.append(li);}box.append(ol);
    box.append(el('p','muted','Sobreviver = manter os invariantes e os controles de risco, não ter lucro. Os preços são sintéticos: nada aqui é resultado do piloto ou do mercado. '+vm.version+' · sha256 '+vm.sha.slice(0,12)+'…'));
    const ul=el('ul');for(const t of ['O risco não tem limite de spread (entradas com spread de 2% pagam ~101 bps).','O limite de perda do piloto é checado de hora em hora: num salto de uma hora a perda passa do limite (4,35% contra 3%).','A divergência entre corretoras não é detectada (lacuna L7); só vale “dado de reserva nunca abre posição”.','Kill switch com posição aberta mantém a posição; ele só impede abrir ou aumentar.'])ul.append(el('li','',t));box.append(el('p','muted','Achados documentados (docs/STRESS_LAB.md):'),ul);
@@ -281,7 +287,7 @@
 
  // ---------- rótulos das zonas (L7) ----------
  const zoneLabels=[];
- function buildZoneLabels(){for(const r of state.map.rooms){if(r.module==='PANORAMIC_EDGE'&&r.outdoor&&r.id==='terraco-norte')continue;const n=el('button','zone-label',r.label);n.type='button';n.dataset.truth='STATIC';n.onclick=()=>focusRoom(r);labels.append(n);
+ function buildZoneLabels(){for(const r of state.map.rooms){if(r.module==='PANORAMIC_EDGE'&&r.outdoor&&r.id==='terraco-norte')continue;const n=el('button','zone-label',r.label);n.type='button';const em=ZONE_EMBLEM[r.id]&&icon(ZONE_EMBLEM[r.id],'ico emblem');if(em)n.prepend(em);n.dataset.truth='STATIC';n.onclick=()=>focusRoom(r);labels.append(n);
    const brand=r.edges?.j0==='parede-marca';if(brand){const b=el('div','brand','TRADINGLAB');b.dataset.truth='STATIC';labels.append(b);zoneLabels.push({node:b,room:r,brand:true});}
    zoneLabels.push({node:n,room:r});}}
  // Abaixo de 0,45 (celular na visão geral) os rótulos se sobrepõem: some o texto e a navegação fica na barra.
@@ -319,6 +325,9 @@ function placeZoneLabels(){const c=state.camera;for(const z of zoneLabels){z.nod
  async function start(){
   const res=await get('/office2/scene-map.json');if(!res.ok){$('#agentsStatus').hidden=false;$('#agentsStatus').textContent='Mapa da cena indisponível.';return;}
   state.map=res.body;state.iso=Office2Iso.create(state.map);
+  // F6: móveis e ícones recortados das folhas do Gemini (scripts/assets/arte-gemini.ts); sem o manifesto, ficam os blocos.
+  const art=await get('/office2/art/manifesto.json');
+  if(art.ok){images.propInfo=art.body.props;images.icons=art.body.icons;for(const [name,info] of Object.entries(art.body.props))images.props[name]=loadImage('/office2/art/'+info.file);}
   for(const id of Object.keys(globalThis.OfficeSpriteSheets??{}))charImages[id]=loadImage('/office/characters/'+id+'.png');
   state.scene=Office2Scene.create(state.map,state.iso,images);state.cache=state.scene.renderStatic(2);
   buildZoneLabels();resize();
