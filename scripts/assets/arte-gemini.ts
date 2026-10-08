@@ -2,7 +2,8 @@
 // Entrada: as folhas em PNG (o Gemini entrega JPEG; converta antes, por exemplo com System.Drawing no PowerShell).
 // Uso:  npx tsx scripts/assets/arte-gemini.ts <pasta-das-folhas-png> [pasta-de-saída=public/office2/art]
 //       npx tsx scripts/assets/arte-gemini.ts <pasta> --caixas      (só lista os objetos achados em cada folha)
-// A configuração (qual objeto vira qual peça, tamanho final, orientação) fica em arte-gemini.json, ao lado.
+//       --config=<arquivo.json> troca a configuração (padrão: arte-gemini.json, ao lado). Ex.: --config=scripts/assets/arte-gpt.json
+// A configuração diz qual objeto vira qual peça, tamanho final e orientação. Folha que já vem com fundo transparente também serve.
 import {readFileSync,writeFileSync,mkdirSync} from 'node:fs';
 import {join,dirname} from 'node:path';
 import {fileURLToPath} from 'node:url';
@@ -16,7 +17,7 @@ export interface Manifest {version:1;props:Record<string,{file:string;width:numb
 export function removeKey(img:Rgba,key:[number,number,number],cut=110):Rgba{
  const out=new Uint8Array(img.data.length),[kr,kg,kb]=key,magenta=kg<kr&&kg<kb;
  for(let p=0;p<img.width*img.height;p++){const o=p*4;let r=img.data[o],g=img.data[o+1],b=img.data[o+2];
-  if(Math.hypot(r-kr,g-kg,b-kb)<cut)continue;
+  if(img.data[o+3]<128||Math.hypot(r-kr,g-kg,b-kb)<cut)continue; // PNG já transparente (ChatGPT) ou cor-chave
   if(magenta){const m=Math.min(r,b);if(m>g){const s=m-g;r-=s;b-=s;}}else{const m=Math.max(r,b);if(g>m)g=m;}
   out[o]=r;out[o+1]=g;out[o+2]=b;out[o+3]=255;}
  return {width:img.width,height:img.height,data:out};
@@ -70,9 +71,9 @@ export function boxesOf(img:Rgba,cfg:SheetConfig){
  return {keyed,label,boxes:cfg.kind==='icon'?mergeClose(boxes,Math.round((cfg.gap??30)*img.width/2752)):boxes};
 }
 if(process.argv[1]?.endsWith('arte-gemini.ts')){
- const here=dirname(fileURLToPath(import.meta.url)),[src,outArg]=process.argv.slice(2);
+ const here=dirname(fileURLToPath(import.meta.url)),args=process.argv.slice(2),cfgArg=args.find(a=>a.startsWith('--config=')),[src,outArg]=args.filter(a=>!a.startsWith('--config='));
  if(!src)throw Error('uso: arte-gemini.ts <pasta-das-folhas-png> [pasta-de-saída | --caixas]');
- const config=JSON.parse(readFileSync(join(here,'arte-gemini.json'),'utf8')) as Record<string,SheetConfig>;
+ const config=JSON.parse(readFileSync(cfgArg?cfgArg.slice(9):join(here,'arte-gemini.json'),'utf8')) as Record<string,SheetConfig>;
  const onlyBoxes=outArg==='--caixas',out=onlyBoxes?'':outArg??'public/office2/art';
  const manifest:Manifest={version:1,props:{},icons:{}};
  for(const [sheet,cfg] of Object.entries(config)){
