@@ -12,7 +12,7 @@
   const inside=(t,i,j)=>i>=t.i0&&i<t.i1&&j>=t.j0&&j<t.j1;
   const owner=new Array(W*H).fill(null),blocked=new Array(W*H).fill(false),key=(i,j)=>j*W+i,onPlate=(i,j)=>i>=0&&j>=0&&i<W&&j<H;
   for(const r of map.rooms)for(let i=r.tiles.i0;i<r.tiles.i1;i++)for(let j=r.tiles.j0;j<r.tiles.j1;j++)owner[key(i,j)]=r.id;
-  for(const p of map.props??[])for(let i=p.tile.i;i<p.tile.i+p.footprint.a;i++)for(let j=p.tile.j;j<p.tile.j+p.footprint.b;j++)if(onPlate(i,j))blocked[key(i,j)]=true;
+  for(const p of map.props??[]){if(p.blocking===false)continue;for(let i=p.tile.i;i<p.tile.i+p.footprint.a;i++)for(let j=p.tile.j;j<p.tile.j+p.footprint.b;j++)if(onPlate(i,j))blocked[key(i,j)]=true;}
   // Portas: par (tile interno, tile externo); atravessar a borda de uma sala só por um desses pares.
   const doors=new Set(),doorList=[];
   for(const r of map.rooms)for(const d of r.doors??[]){const t=r.tiles;
@@ -53,5 +53,7 @@
   if(mode==='seated')return {row:front?0:3,col:5};
   return {row:front?0:3,col:0};
  }
- globalThis.Office2Iso=Object.freeze({create,frame,prng,DIRS});
+ /** Folha F7: frente SE, costas NE; as duas diagonais à esquerda são espelhadas em torno dos pés. */
+ function frameGpt(dir,mode,step=0){return {row:dir==='NE'||dir==='NW'?1:0,col:mode==='walk'?1+(step%4):mode==='seated'?5:0,flip:dir==='SW'||dir==='NW'};}
+ globalThis.Office2Iso=Object.freeze({create,frame,frameGpt,prng,DIRS});
 })();

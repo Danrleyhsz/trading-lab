@@ -50,11 +50,18 @@ test('a projeção 2:1 coloca a planta inteira dentro da cena de 1536 × 864, co
  assert.ok(at(0,0).y-wallHeight>=0,'parede do fundo cabe acima da laje');
 });
 
-test('móveis ficam dentro da sala, sem sobreposição, sem ocupar posto, ponto de lazer ou porta',()=>{
- const props=(map as any).props as {asset:string;room:string;tile:{i:number;j:number};footprint:{a:number;b:number};h:number}[];
+test('móveis sólidos ficam dentro da sala, sem sobreposição, postos ou portas; tapete é camada de piso',()=>{
+ const props=(map as any).props as {asset:string;room?:string;tile:{i:number;j:number};footprint:{a:number;b:number};h:number;blocking?:boolean}[];
  const room=(id:string)=>map.rooms.find(r=>r.id===id)!,taken=new Set<string>();
  for(const p of props){assert.ok(p.h>0&&p.footprint.a>0&&p.footprint.b>0,p.asset);
-  for(let i=p.tile.i;i<p.tile.i+p.footprint.a;i++)for(let j=p.tile.j;j<p.tile.j+p.footprint.b;j++){assert.ok(inside(room(p.room).tiles,i,j),p.asset+' fora de '+p.room);assert.ok(!taken.has(i+','+j),'sobreposição em '+i+','+j);taken.add(i+','+j);}}
+  if(p.blocking===false){assert.equal(p.asset,'tapete');assert.ok(p.h<=2);}
+  for(let i=p.tile.i;i<p.tile.i+p.footprint.a;i++)for(let j=p.tile.j;j<p.tile.j+p.footprint.b;j++){
+   assert.ok(i>=0&&j>=0&&i<W&&j<H,p.asset+' fora da planta');
+   if(p.room)assert.ok(inside(room(p.room).tiles,i,j),p.asset+' fora de '+p.room);
+   else assert.ok(!map.rooms.some(r=>inside(r.tiles,i,j)),p.asset+' de corredor dentro de sala');
+   if(p.blocking===false)continue;
+   assert.ok(!taken.has(i+','+j),'sobreposição em '+i+','+j);taken.add(i+','+j);
+  }}
  for(const pt of map.points)assert.ok(!taken.has(pt.tile.i+','+pt.tile.j),pt.id);
  for(const r of map.rooms)for(const d of r.doors??[]){const t=r.tiles,a=d.side==='i0'?[t.i0,d.at]:d.side==='i1'?[t.i1-1,d.at]:d.side==='j0'?[d.at,t.j0]:[d.at,t.j1-1];assert.ok(!taken.has(a.join(',')),'porta de '+r.id);}
 });

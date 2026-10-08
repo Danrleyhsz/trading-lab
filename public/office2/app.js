@@ -23,13 +23,13 @@
  const STATUS={IDLE:'parado',RESEARCHING:'pesquisando',BACKTESTING:'testando',TRADING:'operando (paper)',REVIEWING_RISK:'revisando risco',MEETING:'em reunião'};
  const state={map:null,iso:null,scene:null,cache:null,agents:new Map(),session:null,market:null,focus:null,camera:{x:0,y:0,s:1},target:null,anim:null,hidden:false};
  const viewport=$('#viewport'),canvas=$('#scene'),ctx=canvas.getContext('2d'),labels=$('#labels'),panel=$('#panel');
- const loadImage=src=>{const img=new Image();img.decoding='async';img.src=src;return img;};
- const charImages={},images={props:{}};
- /** Ícone da F6 (art/icones) ou nada, se o manifesto não carregou: o texto ao lado continua dizendo tudo. */
+ const loadImage=(src,settled)=>{const img=new Image();img.decoding='async';if(settled){img.onload=settled;img.onerror=settled;}img.src=src;return img;};
+ const charImages={},images={props:{},textures:{},characters:{}};
+ /** Ícone da arte (art/icones) ou nada, se o manifesto não carregou: o texto ao lado continua dizendo tudo. */
  const icon=(name,cls='ico')=>{const info=images.icons?.[name];if(!info)return null;const i=el('img',cls);i.src='/office2/art/'+info.file;i.alt='';i.decoding='async';return i;};
  const ZONE_EMBLEM={horizon:'zona-horizon',nexus:'zona-nexus',ring:'zona-ring','stress-lab':'zona-lab',risk:'zona-risk',auditoria:'zona-auditoria',diagnostico:'zona-diagnostico',backtest:'zona-backtest','hall-marca':'zona-marca'};
- // F6: cidade gerada, desenhada como fundo em tela cheia a cada quadro (antes de carregar vale um degradê).
- images.skyline=loadImage('/office2/art/cidade-noite.jpg');
+ // F7: cidade gerada, desenhada como fundo em tela cheia a cada quadro (antes de carregar vale um degradê).
+ images.skyline=loadImage('/office2/art/cidade-noite.png');
  async function get(path){try{const r=await fetch(path,{credentials:'same-origin',headers:{accept:'application/json'}});if(!r.ok)return {ok:false,status:r.status};return {ok:true,body:await r.json()};}catch{return {ok:false,status:0};}}
  const why=res=>res.status===401||res.status===403?'sem acesso (entre pelo escritório atual)':res.status===404?'rota ainda não publicada em produção (deploy pendente)':res.status===0?'sem conexão':'indisponível (HTTP '+res.status+')';
 
@@ -342,14 +342,20 @@ function placeZoneLabels(){const c=state.camera;for(const z of zoneLabels){z.nod
  async function start(){
   const res=await get('/office2/scene-map.json');if(!res.ok){$('#agentsStatus').hidden=false;$('#agentsStatus').textContent='Mapa da cena indisponível.';return;}
   state.map=res.body;state.iso=Office2Iso.create(state.map);
-  // F6: móveis e ícones recortados das folhas do Gemini (scripts/assets/arte-gemini.ts); sem o manifesto, ficam os blocos.
+  // F7: móveis e ícones recortados das folhas do ChatGPT; sem o manifesto, ficam os blocos.
   const art=await get('/office2/art/manifesto.json');
   if(art.ok){images.propInfo=art.body.props;images.icons=art.body.icons;for(const [name,info] of Object.entries(art.body.props))images.props[name]=loadImage('/office2/art/'+info.file);
    images.emblems={};for(const [room,name] of Object.entries(ZONE_EMBLEM))if(images.icons[name])images.emblems[room]=loadImage('/office2/art/'+images.icons[name].file);
    // Ícone em cada aba da barra (Início usa o emblema da marca).
    for(const b of D.querySelectorAll('nav [data-room]')){const ic=icon(ZONE_EMBLEM[b.dataset.room||'hall-marca']??'','ico tab');if(ic)b.prepend(ic);}}
   for(const id of Object.keys(globalThis.OfficeSpriteSheets??{}))charImages[id]=loadImage('/office/characters/'+id+'.png');
+  const frames=await get('/office2/art/personagens/quadros.json');
+  if(frames.ok){images.characterFrames=frames.body;for(const id of frames.body.ids)images.characters[id]=loadImage('/office2/art/personagens/'+id+'.png');}
+  const textureLoads=['piso-marmore','piso-madeira','carpete','deck','parede-ripada','parede-escura'].map(name=>new Promise(resolve=>{
+   images.textures[name]=loadImage('/office2/art/texturas/'+name+'.png',resolve);
+  }));
   state.scene=Office2Scene.create(state.map,state.iso,images);state.cache=state.scene.renderStatic(2);
+  Promise.all(textureLoads).then(()=>{state.cache=state.scene.renderStatic(2);});
   buildZoneLabels();resize();
   for(const b of D.querySelectorAll('[data-room]'))b.addEventListener('click',()=>{const id=b.dataset.room;focusRoom(id?state.map.rooms.find(r=>r.id===id):null);});
   canvas.addEventListener('click',onClick);

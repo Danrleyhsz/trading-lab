@@ -10,7 +10,7 @@ const map=JSON.parse(readFileSync('public/office2/scene-map.json','utf8'));
 const manifest=JSON.parse(readFileSync('public/office2/art/manifesto.json','utf8'));
 const report=JSON.parse(readFileSync('public/office2/stress-report.json','utf8'));
 
-test('arte F6: todo móvel do mapa tem peça no manifesto, todo arquivo existe e é PNG com transparência',()=>{
+test('arte F7: todo móvel do mapa tem peça no manifesto, todo arquivo existe e é PNG com transparência',()=>{
  for(const asset of new Set(map.props.map((p:any)=>p.asset)))assert.ok(manifest.props[asset as string],'sem arte: '+asset);
  for(const [name,info] of Object.entries<any>({...manifest.props,...manifest.icons})){
   const file='public/office2/art/'+info.file;assert.ok(existsSync(file),'falta '+file);
@@ -25,12 +25,12 @@ test('arte F6: ícone para os 5 estágios do Anel e para os 14 cenários do Stre
  for(const c of report.scenarios)assert.ok(manifest.icons['cenario-'+String(c.id).toLowerCase().replace(/_/g,'-')],'cenário '+c.id);
 });
 
-test('/office2/art serve só PNG de nome simples em props/ e icones/, e o manifesto; o resto é 404',async()=>{
+test('/office2/art serve PNG de nome simples nas pastas de arte e os metadados explícitos; o resto é 404',async()=>{
  const app=Fastify();registerOfficeAssets(app);
  try{
-  for(const [p,type] of [['/office2/art/manifesto.json','application/json'],['/office2/art/props/sofa.png','image/png'],['/office2/art/icones/estagio-risk.png','image/png'],['/office2/art/cidade-noite.jpg','image/jpeg']]){
+  for(const [p,type] of [['/office2/art/manifesto.json','application/json'],['/office2/art/props/sofa.png','image/png'],['/office2/art/icones/estagio-risk.png','image/png'],['/office2/art/cidade-noite.png','image/png'],['/office2/art/texturas/piso-marmore.png','image/png'],['/office2/art/personagens/vega.png','image/png'],['/office2/art/personagens/quadros.json','application/json']]){
    const r=await app.inject(p);assert.equal(r.statusCode,200,p);assert.match(String(r.headers['content-type']),new RegExp('^'+type));assert.equal(r.headers['x-content-type-options'],'nosniff');}
-  for(const p of ['/office2/art/props/nao-existe.png','/office2/art/props/..%2F..%2F..%2F.env','/office2/art/props/%2e%2e%2f%2e%2e%2fapp.js','/office2/art/props/Sofa.png','/office2/art/outros/sofa.png','/office2/art/props/sofa.svg'])
+  for(const p of ['/office2/art/props/nao-existe.png','/office2/art/props/..%2F..%2F..%2F.env','/office2/art/props/%2e%2e%2f%2e%2e%2fapp.js','/office2/art/props/Sofa.png','/office2/art/outros/sofa.png','/office2/art/props/sofa.svg','/office2/art/texturas/..%2F..%2Fscene.js','/office2/art/personagens/outros.json','/office2/art/texturas/quadros.json'])
    assert.equal((await app.inject(p)).statusCode,404,p);
  }finally{await app.close();}
 });

@@ -702,14 +702,40 @@
  ],
  "props": [
   {
-   "asset": "mesa-monitores",
+   "asset": "estacao-2-monitores",
    "room": "horizon",
    "tile": {
-    "i": 1,
+    "i": 0,
     "j": 3
    },
    "footprint": {
-    "a": 3,
+    "a": 2,
+    "b": 2
+   },
+   "h": 36
+  },
+  {
+   "asset": "estacao-2-monitores",
+   "room": "horizon",
+   "tile": {
+    "i": 3,
+    "j": 3
+   },
+   "footprint": {
+    "a": 2,
+    "b": 2
+   },
+   "h": 36
+  },
+  {
+   "asset": "estacao-2-monitores",
+   "room": "horizon",
+   "tile": {
+    "i": 6,
+    "j": 3
+   },
+   "footprint": {
+    "a": 2,
     "b": 2
    },
    "h": 36
@@ -718,27 +744,79 @@
    "asset": "mesa-monitores",
    "room": "horizon",
    "tile": {
-    "i": 5,
-    "j": 3
+    "i": 0,
+    "j": 6
    },
    "footprint": {
-    "a": 3,
+    "a": 2,
     "b": 2
    },
    "h": 36
+  },
+  {
+   "asset": "cadeira-costas",
+   "room": "horizon",
+   "tile": {
+    "i": 2,
+    "j": 7
+   },
+   "footprint": {
+    "a": 1,
+    "b": 1
+   },
+   "h": 24
+  },
+  {
+   "asset": "armario-baixo",
+   "room": "horizon",
+   "tile": {
+    "i": 5,
+    "j": 6
+   },
+   "footprint": {
+    "a": 2,
+    "b": 1
+   },
+   "h": 20
+  },
+  {
+   "asset": "ficus",
+   "room": "horizon",
+   "tile": {
+    "i": 0,
+    "j": 2
+   },
+   "footprint": {
+    "a": 1,
+    "b": 1
+   },
+   "h": 60
   },
   {
    "asset": "planta-alta",
    "room": "horizon",
    "tile": {
     "i": 8,
-    "j": 3
+    "j": 2
    },
    "footprint": {
     "a": 1,
     "b": 1
    },
    "h": 48
+  },
+  {
+   "asset": "espada",
+   "room": "horizon",
+   "tile": {
+    "i": 8,
+    "j": 7
+   },
+   "footprint": {
+    "a": 1,
+    "b": 1
+   },
+   "h": 40
   },
   {
    "asset": "mesa-reuniao",
@@ -749,74 +827,61 @@
    },
    "footprint": {
     "a": 5,
-    "b": 2
+    "b": 3
    },
-   "h": 16
+   "h": 28
   },
   {
-   "asset": "cadeira-frente",
+   "asset": "aparador",
    "room": "nexus",
    "tile": {
-    "i": 3,
-    "j": 9
+    "i": 1,
+    "j": 8
    },
    "footprint": {
-    "a": 1,
+    "a": 3,
     "b": 1
    },
-   "h": 24
-  },
-  {
-   "asset": "cadeira-frente",
-   "room": "nexus",
-   "tile": {
-    "i": 5,
-    "j": 9
-   },
-   "footprint": {
-    "a": 1,
-    "b": 1
-   },
-   "h": 24
-  },
-  {
-   "asset": "cadeira-costas",
-   "room": "nexus",
-   "tile": {
-    "i": 3,
-    "j": 12
-   },
-   "footprint": {
-    "a": 1,
-    "b": 1
-   },
-   "h": 24
-  },
-  {
-   "asset": "cadeira-costas",
-   "room": "nexus",
-   "tile": {
-    "i": 5,
-    "j": 12
-   },
-   "footprint": {
-    "a": 1,
-    "b": 1
-   },
-   "h": 24
+   "h": 22
   },
   {
    "asset": "planta-alta",
    "room": "nexus",
    "tile": {
-    "i": 8,
-    "j": 9
+    "i": 0,
+    "j": 8
    },
    "footprint": {
     "a": 1,
     "b": 1
    },
    "h": 48
+  },
+  {
+   "asset": "ficus",
+   "room": "nexus",
+   "tile": {
+    "i": 8,
+    "j": 8
+   },
+   "footprint": {
+    "a": 1,
+    "b": 1
+   },
+   "h": 60
+  },
+  {
+   "asset": "samambaia",
+   "room": "nexus",
+   "tile": {
+    "i": 0,
+    "j": 14
+   },
+   "footprint": {
+    "a": 1,
+    "b": 1
+   },
+   "h": 32
   },
   {
    "asset": "mesa-curva-operacoes",
@@ -827,6 +892,19 @@
    },
    "footprint": {
     "a": 5,
+    "b": 3
+   },
+   "h": 40
+  },
+  {
+   "asset": "mesa-curva-media",
+   "room": "ring",
+   "tile": {
+    "i": 7,
+    "j": 16
+   },
+   "footprint": {
+    "a": 4,
     "b": 3
    },
    "h": 40
@@ -839,36 +917,62 @@
     "j": 20
    },
    "footprint": {
+    "a": 4,
+    "b": 2
+   },
+   "h": 36
+  },
+  {
+   "asset": "estacao-2-monitores",
+   "room": "ring",
+   "tile": {
+    "i": 7,
+    "j": 21
+   },
+   "footprint": {
     "a": 3,
     "b": 2
    },
    "h": 36
   },
   {
-   "asset": "mesa-curva-operacoes",
+   "asset": "cadeira-costas",
    "room": "ring",
    "tile": {
-    "i": 6,
-    "j": 16
-   },
-   "footprint": {
-    "a": 5,
-    "b": 3
-   },
-   "h": 40
-  },
-  {
-   "asset": "planta-alta",
-   "room": "ring",
-   "tile": {
-    "i": 11,
+    "i": 9,
     "j": 23
    },
    "footprint": {
     "a": 1,
     "b": 1
    },
-   "h": 48
+   "h": 24
+  },
+  {
+   "asset": "totem-logo",
+   "room": "ring",
+   "tile": {
+    "i": 11,
+    "j": 15
+   },
+   "footprint": {
+    "a": 1,
+    "b": 1
+   },
+   "h": 56
+  },
+  {
+   "asset": "jardineira",
+   "room": "ring",
+   "tile": {
+    "i": 0,
+    "j": 23
+   },
+   "footprint": {
+    "a": 3,
+    "b": 1
+   },
+   "h": 32
   },
   {
    "asset": "planta-alta",
@@ -884,17 +988,95 @@
    "h": 48
   },
   {
-   "asset": "jardineira",
+   "asset": "ficus",
+   "room": "ring",
+   "tile": {
+    "i": 11,
+    "j": 23
+   },
+   "footprint": {
+    "a": 1,
+    "b": 1
+   },
+   "h": 60
+  },
+  {
+   "asset": "espada",
+   "room": "ring",
+   "tile": {
+    "i": 6,
+    "j": 15
+   },
+   "footprint": {
+    "a": 1,
+    "b": 1
+   },
+   "h": 40
+  },
+  {
+   "asset": "banco-espera",
    "room": "hall-marca",
    "tile": {
-    "i": 10,
+    "i": 9,
     "j": 1
+   },
+   "footprint": {
+    "a": 1,
+    "b": 2
+   },
+   "h": 14
+  },
+  {
+   "asset": "aparador",
+   "room": "hall-marca",
+   "tile": {
+    "i": 11,
+    "j": 0
    },
    "footprint": {
     "a": 3,
     "b": 1
    },
+   "h": 22
+  },
+  {
+   "asset": "planta-alta",
+   "room": "hall-marca",
+   "tile": {
+    "i": 9,
+    "j": 0
+   },
+   "footprint": {
+    "a": 1,
+    "b": 1
+   },
+   "h": 48
+  },
+  {
+   "asset": "samambaia",
+   "room": "hall-marca",
+   "tile": {
+    "i": 13,
+    "j": 3
+   },
+   "footprint": {
+    "a": 1,
+    "b": 1
+   },
    "h": 32
+  },
+  {
+   "asset": "espada",
+   "room": "hall-marca",
+   "tile": {
+    "i": 10,
+    "j": 3
+   },
+   "footprint": {
+    "a": 1,
+    "b": 1
+   },
+   "h": 40
   },
   {
    "asset": "balcao-recepcao",
@@ -910,6 +1092,32 @@
    "h": 28
   },
   {
+   "asset": "cadeira-costas",
+   "room": "recepcao",
+   "tile": {
+    "i": 18,
+    "j": 0
+   },
+   "footprint": {
+    "a": 1,
+    "b": 1
+   },
+   "h": 24
+  },
+  {
+   "asset": "ficus",
+   "room": "recepcao",
+   "tile": {
+    "i": 14,
+    "j": 0
+   },
+   "footprint": {
+    "a": 1,
+    "b": 1
+   },
+   "h": 60
+  },
+  {
    "asset": "planta-alta",
    "room": "recepcao",
    "tile": {
@@ -921,6 +1129,19 @@
     "b": 1
    },
    "h": 48
+  },
+  {
+   "asset": "parede-elevadores",
+   "room": "elevadores",
+   "tile": {
+    "i": 26,
+    "j": 0
+   },
+   "footprint": {
+    "a": 3,
+    "b": 1
+   },
+   "h": 72
   },
   {
    "asset": "catraca",
@@ -960,6 +1181,59 @@
     "b": 1
    },
    "h": 28
+  },
+  {
+   "asset": "planta-alta",
+   "room": "elevadores",
+   "tile": {
+    "i": 22,
+    "j": 0
+   },
+   "footprint": {
+    "a": 1,
+    "b": 1
+   },
+   "h": 48
+  },
+  {
+   "asset": "ficus",
+   "room": "elevadores",
+   "tile": {
+    "i": 31,
+    "j": 0
+   },
+   "footprint": {
+    "a": 1,
+    "b": 1
+   },
+   "h": 60
+  },
+  {
+   "asset": "banco-espera",
+   "room": "elevadores",
+   "tile": {
+    "i": 29,
+    "j": 4
+   },
+   "footprint": {
+    "a": 2,
+    "b": 1
+   },
+   "h": 14
+  },
+  {
+   "asset": "tapete",
+   "room": "convivencia",
+   "tile": {
+    "i": 12,
+    "j": 7
+   },
+   "footprint": {
+    "a": 3,
+    "b": 4
+   },
+   "h": 2,
+   "blocking": false
   },
   {
    "asset": "jardineira",
@@ -1014,17 +1288,69 @@
    "h": 24
   },
   {
-   "asset": "mesa-monitores",
+   "asset": "poltrona",
+   "room": "convivencia",
+   "tile": {
+    "i": 11,
+    "j": 10
+   },
+   "footprint": {
+    "a": 1,
+    "b": 1
+   },
+   "h": 24
+  },
+  {
+   "asset": "luminaria-chao",
+   "room": "convivencia",
+   "tile": {
+    "i": 15,
+    "j": 7
+   },
+   "footprint": {
+    "a": 1,
+    "b": 1
+   },
+   "h": 56
+  },
+  {
+   "asset": "estacao-2-monitores",
    "room": "backtest",
    "tile": {
     "i": 12,
     "j": 12
    },
    "footprint": {
-    "a": 3,
+    "a": 2,
     "b": 2
    },
    "h": 36
+  },
+  {
+   "asset": "armario-baixo",
+   "room": "backtest",
+   "tile": {
+    "i": 11,
+    "j": 12
+   },
+   "footprint": {
+    "a": 1,
+    "b": 2
+   },
+   "h": 20
+  },
+  {
+   "asset": "planta-baixa",
+   "room": "backtest",
+   "tile": {
+    "i": 11,
+    "j": 14
+   },
+   "footprint": {
+    "a": 1,
+    "b": 1
+   },
+   "h": 20
   },
   {
    "asset": "esteira",
@@ -1056,7 +1382,7 @@
    "asset": "rack-halteres",
    "room": "stress-lab",
    "tile": {
-    "i": 19,
+    "i": 18,
     "j": 9
    },
    "footprint": {
@@ -1079,6 +1405,97 @@
    "h": 32
   },
   {
+   "asset": "espada",
+   "room": "stress-lab",
+   "tile": {
+    "i": 23,
+    "j": 6
+   },
+   "footprint": {
+    "a": 1,
+    "b": 1
+   },
+   "h": 40
+  },
+  {
+   "asset": "estacao-madeira",
+   "room": "risk",
+   "tile": {
+    "i": 20,
+    "j": 12
+   },
+   "footprint": {
+    "a": 3,
+    "b": 2
+   },
+   "h": 36
+  },
+  {
+   "asset": "estacao-madeira",
+   "room": "risk",
+   "tile": {
+    "i": 20,
+    "j": 15
+   },
+   "footprint": {
+    "a": 3,
+    "b": 2
+   },
+   "h": 36
+  },
+  {
+   "asset": "cadeira-costas",
+   "room": "risk",
+   "tile": {
+    "i": 22,
+    "j": 14
+   },
+   "footprint": {
+    "a": 1,
+    "b": 1
+   },
+   "h": 24
+  },
+  {
+   "asset": "estante-arquivo",
+   "room": "risk",
+   "tile": {
+    "i": 23,
+    "j": 12
+   },
+   "footprint": {
+    "a": 2,
+    "b": 1
+   },
+   "h": 56
+  },
+  {
+   "asset": "ficus",
+   "room": "risk",
+   "tile": {
+    "i": 18,
+    "j": 16
+   },
+   "footprint": {
+    "a": 1,
+    "b": 1
+   },
+   "h": 60
+  },
+  {
+   "asset": "espada",
+   "room": "risk",
+   "tile": {
+    "i": 24,
+    "j": 16
+   },
+   "footprint": {
+    "a": 1,
+    "b": 1
+   },
+   "h": 40
+  },
+  {
    "asset": "armarios-arquivo",
    "room": "auditoria",
    "tile": {
@@ -1087,6 +1504,19 @@
    },
    "footprint": {
     "a": 4,
+    "b": 1
+   },
+   "h": 56
+  },
+  {
+   "asset": "lockers",
+   "room": "auditoria",
+   "tile": {
+    "i": 27,
+    "j": 8
+   },
+   "footprint": {
+    "a": 3,
     "b": 1
    },
    "h": 56
@@ -1105,50 +1535,24 @@
    "h": 64
   },
   {
-   "asset": "estante-arquivo",
+   "asset": "sofa-cinza",
    "room": "auditoria",
    "tile": {
-    "i": 30,
+    "i": 29,
     "j": 10
    },
    "footprint": {
     "a": 2,
     "b": 1
    },
-   "h": 56
-  },
-  {
-   "asset": "mesa-monitores",
-   "room": "risk",
-   "tile": {
-    "i": 20,
-    "j": 12
-   },
-   "footprint": {
-    "a": 3,
-    "b": 2
-   },
-   "h": 36
-  },
-  {
-   "asset": "estante-arquivo",
-   "room": "risk",
-   "tile": {
-    "i": 23,
-    "j": 12
-   },
-   "footprint": {
-    "a": 2,
-    "b": 1
-   },
-   "h": 56
+   "h": 24
   },
   {
    "asset": "planta-alta",
-   "room": "risk",
+   "room": "auditoria",
    "tile": {
-    "i": 18,
-    "j": 16
+    "i": 31,
+    "j": 11
    },
    "footprint": {
     "a": 1,
@@ -1157,24 +1561,37 @@
    "h": 48
   },
   {
-   "asset": "mesa-reuniao",
+   "asset": "mesa-reuniao-6",
    "room": "diagnostico",
    "tile": {
     "i": 27,
     "j": 15
    },
    "footprint": {
-    "a": 5,
-    "b": 2
+    "a": 4,
+    "b": 3
    },
-   "h": 16
+   "h": 28
+  },
+  {
+   "asset": "ficus",
+   "room": "diagnostico",
+   "tile": {
+    "i": 26,
+    "j": 13
+   },
+   "footprint": {
+    "a": 1,
+    "b": 1
+   },
+   "h": 60
   },
   {
    "asset": "planta-alta",
    "room": "diagnostico",
    "tile": {
-    "i": 26,
-    "j": 13
+    "i": 31,
+    "j": 18
    },
    "footprint": {
     "a": 1,
@@ -1196,6 +1613,58 @@
    "h": 40
   },
   {
+   "asset": "banqueta",
+   "room": "cozinha",
+   "tile": {
+    "i": 19,
+    "j": 18
+   },
+   "footprint": {
+    "a": 1,
+    "b": 1
+   },
+   "h": 20
+  },
+  {
+   "asset": "banqueta",
+   "room": "cozinha",
+   "tile": {
+    "i": 20,
+    "j": 18
+   },
+   "footprint": {
+    "a": 1,
+    "b": 1
+   },
+   "h": 20
+  },
+  {
+   "asset": "banqueta",
+   "room": "cozinha",
+   "tile": {
+    "i": 21,
+    "j": 18
+   },
+   "footprint": {
+    "a": 1,
+    "b": 1
+   },
+   "h": 20
+  },
+  {
+   "asset": "banqueta",
+   "room": "cozinha",
+   "tile": {
+    "i": 22,
+    "j": 18
+   },
+   "footprint": {
+    "a": 1,
+    "b": 1
+   },
+   "h": 20
+  },
+  {
    "asset": "geladeira",
    "room": "cozinha",
    "tile": {
@@ -1209,20 +1678,46 @@
    "h": 56
   },
   {
-   "asset": "mesa-redonda",
+   "asset": "planta-baixa",
+   "room": "cozinha",
+   "tile": {
+    "i": 18,
+    "j": 17
+   },
+   "footprint": {
+    "a": 1,
+    "b": 1
+   },
+   "h": 20
+  },
+  {
+   "asset": "mesa-cafe-4",
    "room": "cafe",
    "tile": {
-    "i": 15,
+    "i": 14,
     "j": 21
    },
    "footprint": {
     "a": 2,
     "b": 2
    },
-   "h": 14
+   "h": 24
   },
   {
-   "asset": "planta-baixa",
+   "asset": "mesa-cafe-4",
+   "room": "cafe",
+   "tile": {
+    "i": 16,
+    "j": 18
+   },
+   "footprint": {
+    "a": 2,
+    "b": 2
+   },
+   "h": 24
+  },
+  {
+   "asset": "samambaia",
    "room": "cafe",
    "tile": {
     "i": 14,
@@ -1232,26 +1727,52 @@
     "a": 1,
     "b": 1
    },
+   "h": 32
+  },
+  {
+   "asset": "planta-baixa",
+   "room": "cafe",
+   "tile": {
+    "i": 17,
+    "j": 23
+   },
+   "footprint": {
+    "a": 1,
+    "b": 1
+   },
    "h": 20
   },
   {
-   "asset": "sofa",
+   "asset": "sofa-externo",
    "room": "varanda",
    "tile": {
-    "i": 26,
+    "i": 25,
     "j": 21
    },
    "footprint": {
     "a": 3,
     "b": 1
    },
-   "h": 24
+   "h": 22
   },
   {
-   "asset": "mesa-centro",
+   "asset": "poltrona-externa",
    "room": "varanda",
    "tile": {
     "i": 30,
+    "j": 21
+   },
+   "footprint": {
+    "a": 1,
+    "b": 1
+   },
+   "h": 22
+  },
+  {
+   "asset": "mesa-externa",
+   "room": "varanda",
+   "tile": {
+    "i": 28,
     "j": 21
    },
    "footprint": {
@@ -1261,30 +1782,43 @@
    "h": 10
   },
   {
-   "asset": "jardineira",
+   "asset": "jardineira-capim",
    "room": "varanda",
    "tile": {
-    "i": 25,
+    "i": 24,
     "j": 23
    },
    "footprint": {
     "a": 3,
     "b": 1
    },
-   "h": 32
+   "h": 28
   },
   {
-   "asset": "planta-alta",
+   "asset": "jardineira-capim",
+   "room": "varanda",
+   "tile": {
+    "i": 29,
+    "j": 23
+   },
+   "footprint": {
+    "a": 3,
+    "b": 1
+   },
+   "h": 28
+  },
+  {
+   "asset": "jardineira-capim",
    "room": "terraco-norte",
    "tile": {
-    "i": 1,
+    "i": 0,
     "j": 0
    },
    "footprint": {
-    "a": 1,
+    "a": 3,
     "b": 1
    },
-   "h": 48
+   "h": 28
   },
   {
    "asset": "planta-alta",
@@ -1305,6 +1839,90 @@
    "tile": {
     "i": 4,
     "j": 0
+   },
+   "footprint": {
+    "a": 1,
+    "b": 1
+   },
+   "h": 20
+  },
+  {
+   "asset": "planta-baixa",
+   "tile": {
+    "i": 9,
+    "j": 7
+   },
+   "footprint": {
+    "a": 1,
+    "b": 1
+   },
+   "h": 20
+  },
+  {
+   "asset": "planta-baixa",
+   "tile": {
+    "i": 16,
+    "j": 6
+   },
+   "footprint": {
+    "a": 1,
+    "b": 1
+   },
+   "h": 20
+  },
+  {
+   "asset": "planta-baixa",
+   "tile": {
+    "i": 17,
+    "j": 10
+   },
+   "footprint": {
+    "a": 1,
+    "b": 1
+   },
+   "h": 20
+  },
+  {
+   "asset": "planta-baixa",
+   "tile": {
+    "i": 25,
+    "j": 7
+   },
+   "footprint": {
+    "a": 1,
+    "b": 1
+   },
+   "h": 20
+  },
+  {
+   "asset": "planta-baixa",
+   "tile": {
+    "i": 23,
+    "j": 22
+   },
+   "footprint": {
+    "a": 1,
+    "b": 1
+   },
+   "h": 20
+  },
+  {
+   "asset": "planta-baixa",
+   "tile": {
+    "i": 12,
+    "j": 23
+   },
+   "footprint": {
+    "a": 1,
+    "b": 1
+   },
+   "h": 20
+  },
+  {
+   "asset": "planta-baixa",
+   "tile": {
+    "i": 16,
+    "j": 16
    },
    "footprint": {
     "a": 1,

@@ -1,6 +1,6 @@
 // Escritório 2.0 (F1): desenho da cena isométrica em canvas, a partir de public/office2/scene-map.json.
 // L0 (cidade) e L1 (pisos) vão para um cache estático; L2 a L5 (paredes, telas, móveis, agentes) são ordenados por
-// profundidade a cada quadro. Cidade e móveis usam a arte da F6 quando carregada; o desenho por código fica como reserva.
+// profundidade a cada quadro. A arte F7 usa PNGs do ChatGPT; o desenho por código fica como reserva.
 // Só apresentação: telas sem dado ficam apagadas (nunca um gráfico inventado).
 (() => {
  const C=Object.freeze({
@@ -16,6 +16,19 @@
   const P=(i,j,h=0)=>iso.project(i,j,h);
   const roomById=new Map(map.rooms.map(r=>[r.id,r]));
   const poly=(ctx,pts,fill,stroke)=>{ctx.beginPath();pts.forEach((p,k)=>k?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));ctx.closePath();if(fill){ctx.fillStyle=fill;ctx.fill();}if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=1;ctx.stroke();}};
+  const patternCache=new WeakMap();
+  function texturePattern(ctx,name,wallAxis){
+   const img=images?.textures?.[name];
+   if(!img?.complete||!img.naturalWidth||typeof ctx.createPattern!=='function'||typeof DOMMatrix==='undefined')return null;
+   let patterns=patternCache.get(ctx);if(!patterns){patterns=new Map();patternCache.set(ctx,patterns);}
+   const key=name+':'+(wallAxis??'floor');if(patterns.has(key))return patterns.get(key);
+   const pattern=ctx.createPattern(img,'repeat');if(!pattern||typeof pattern.setTransform!=='function')return null;
+   const T=img.naturalWidth/(['piso-madeira','deck'].includes(name)?8:4),{origin,tile}=map.projection,hw=tile.w/2,hh=tile.h/2;
+   const matrix=wallAxis?[wallAxis==='i'?hw/T:-hw/T,hh/T,0,1,origin.x,origin.y-TALL]:[hw/T,hh/T,-hw/T,hh/T,origin.x,origin.y];
+   pattern.setTransform(new DOMMatrix(matrix));patterns.set(key,pattern);return pattern;
+  }
+  const FLOOR_TEXTURE={'piso-claro':'piso-marmore',madeira:'piso-madeira','carpete-escuro':'carpete','piso-tecnico':'carpete',deck:'deck'};
+  function wallTexture(ctx,w){return texturePattern(ctx,signAt.has([w.a.i,w.a.j,w.b.i,w.b.j].join(','))||w.room==='hall-marca'?'parede-ripada':'parede-escura',w.a.j===w.b.j?'i':'j');}
   const screenWalls=new Set(map.screens.map(s=>s.room));
   /** Altura e tipo de cada parede de fundo/frente, pela regra da OFFICE_VISUAL_SPEC.md (seção 4). */
   function wallSpec(room,side){
@@ -74,7 +87,7 @@
   function drawSignSlice(ctx,s,w){
    const len=s.to-s.from,a=P(w.a.i,w.a.j),b=P(w.b.i,w.b.j),at=P(w.a.i,w.a.j,SIGN_H),bt=P(w.b.i,w.b.j,SIGN_H);
    ctx.save();ctx.beginPath();[a,b,bt,at].forEach((p,k)=>k?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));ctx.closePath();ctx.clip();
-   poly(ctx,[a,b,bt,at],'#141924');
+   poly(ctx,[a,b,bt,at],wallTexture(ctx,w)??'#141924');poly(ctx,[a,b,bt,at],'rgba(20,25,36,0.55)');
    // Texto num plano inclinado: eixo x ao longo da parede (26,8 px por tile), eixo y vertical.
    const o=signPoint(s,0,SIGN_H),e=signPoint(s,1,SIGN_H),ux=(e.x-o.x)/26.833,uy=(e.y-o.y)/26.833,L=len*26.833;
    ctx.transform(ux,uy,0,1,o.x,o.y);
@@ -116,7 +129,8 @@
    drawFacade(ctx,left,bottom,right,H2-bottom.y+20);
    // L1: pisos por material; tiles fora das salas são circulação (piso claro).
    for(let i=0;i<W;i++)for(let j=0;j<H;j++){const r=iso.roomAt(i,j),mat=C.floor[r?.floor??'piso-claro']??C.floor['piso-claro'];
-    const pts=[P(i,j),P(i+1,j),P(i+1,j+1),P(i,j+1)];poly(ctx,pts,mat[0]);
+    const pts=[P(i,j),P(i+1,j),P(i+1,j+1),P(i,j+1)],texture=texturePattern(ctx,FLOOR_TEXTURE[r?.floor??'piso-claro']);poly(ctx,pts,texture??mat[0]);
+    if(texture)continue;
     ctx.strokeStyle=mat[1];ctx.lineWidth=0.75;ctx.beginPath();ctx.moveTo(pts[0].x,pts[0].y);ctx.lineTo(pts[1].x,pts[1].y);ctx.lineTo(pts[2].x,pts[2].y);ctx.stroke();
     if(r?.floor==='madeira'||r?.floor==='deck'){for(const f of [0.33,0.66]){const a=P(i,j+f),b=P(i+1,j+f);ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();}}}
    // Subzonas com cor de destaque na borda (Anel de decisão × Execução paper).
@@ -143,7 +157,9 @@
     if(w.h===RAIL){ctx.strokeStyle='rgba(255,210,122,0.55)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(a.x,a.y-1);ctx.lineTo(b.x,b.y-1);ctx.stroke();}return;}
    const sign=signAt.get([w.a.i,w.a.j,w.b.i,w.b.j].join(','));
    if(sign){drawSignSlice(ctx,sign,w);return;}
-   poly(ctx,[a,b,bt,at],w.a.j===w.b.j?C.wall:C.wallSide);poly(ctx,[at,bt,{x:bt.x,y:bt.y-3},{x:at.x,y:at.y-3}],C.wallCap);
+   const texture=wallTexture(ctx,w);poly(ctx,[a,b,bt,at],texture??(w.a.j===w.b.j?C.wall:C.wallSide));
+   if(texture&&w.a.j!==w.b.j)poly(ctx,[a,b,bt,at],'rgba(10,14,22,0.25)');
+   poly(ctx,[at,bt,{x:bt.x,y:bt.y-3},{x:at.x,y:at.y-3}],C.wallCap);
    // Junta entre painéis a cada tile.
    ctx.strokeStyle='rgba(10,13,20,0.55)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(at.x,at.y);ctx.stroke();
    if(w.h===TALL){ctx.strokeStyle=C.led;ctx.globalAlpha=0.7;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(at.x,at.y+5);ctx.lineTo(bt.x,bt.y+5);ctx.stroke();ctx.globalAlpha=1;}
@@ -188,6 +204,12 @@
   function drawAgent(ctx,ag,sheets,charImages){
    const sheet=sheets?.[ag.id],img=charImages?.[ag.id];const feet=P(ag.pos.i+0.5,ag.pos.j+0.5);
    ctx.fillStyle='rgba(8,11,23,0.35)';ctx.beginPath();ctx.ellipse(feet.x,feet.y,9,4,0,0,Math.PI*2);ctx.fill();
+   const modern=images?.characters?.[ag.id],frames=images?.characterFrames;
+   if(modern?.complete&&modern.naturalWidth&&frames){
+    const f=Office2Iso.frameGpt(ag.dir,ag.mode,ag.step),{w,h}=frames.cell,scale=map.projection.personHeightPx/frames.standingHeight;
+    ctx.save();ctx.globalAlpha=ag.dim?0.55:1;ctx.translate(feet.x,feet.y);if(f.flip)ctx.scale(-1,1);ctx.imageSmoothingEnabled=true;
+    ctx.drawImage(modern,f.col*w,f.row*h,w,h,-w*scale/2,-h*scale,w*scale,h*scale);ctx.restore();return;
+   }
    if(!sheet||!img||!img.complete||!img.naturalWidth)return;
    const f=Office2Iso.frame(ag.dir,ag.mode,ag.step),b=sheet.frames[f.row*6+f.col],ps=sheet.pixelScale??1,scale=map.projection.personHeightPx/(sheet.referenceHeight??b.h);
    const dw=b.w*scale,dh=b.h*scale,dx=feet.x-(b.pivotX-b.x)*scale,dy=feet.y-dh+(ag.mode==='seated'?4:0);
@@ -199,7 +221,8 @@
    const items=[];
    for(const wl of wallList)items.push({key:wl.key,draw:()=>drawWall(ctx,wl)});
    for(const s of map.screens){const r=roomById.get(s.room);items.push({key:(s.tiles.to-1)+r.tiles.j0-0.4,draw:()=>drawScreen(ctx,s,screenContent?.[s.id])});}
-   for(const p of map.props??[])items.push({key:iso.propDepth(p)+0.1,draw:()=>drawProp(ctx,p)});
+   // Tapetes ficam no chão, antes de toda a mobília, e não bloqueiam a circulação.
+   for(const p of map.props??[])if(p.blocking===false)drawProp(ctx,p);else items.push({key:iso.propDepth(p)+0.1,draw:()=>drawProp(ctx,p)});
    for(const ag of agents)items.push({key:iso.depth(ag.pos.i,ag.pos.j)+0.3,draw:()=>drawAgent(ctx,ag,sheets,charImages)});
    items.sort((x,y)=>x.key-y.key);for(const it of items)it.draw();
   }

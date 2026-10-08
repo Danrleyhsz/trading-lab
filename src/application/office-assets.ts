@@ -12,9 +12,9 @@ const officeTwoFiles:Record<string,string> = {
   'index.html':'text/html; charset=utf-8', 'style.css':'text/css; charset=utf-8', 'iso.js':'application/javascript; charset=utf-8',
   'scene.js':'application/javascript; charset=utf-8', 'app.js':'application/javascript; charset=utf-8', 'ring.js':'application/javascript; charset=utf-8', 'lab.js':'application/javascript; charset=utf-8', 'ops.js':'application/javascript; charset=utf-8', 'horizon.js':'application/javascript; charset=utf-8', 'stress-report.json':'application/json; charset=utf-8', 'scene-map.json':'application/json; charset=utf-8', 'art/cidade-noite.jpg':'image/jpeg', 'art/manifesto.json':'application/json; charset=utf-8',
 };
-/** Peças recortadas da F6 (scripts/assets/arte-gemini.ts): só PNG com nome simples dentro de art/props e art/icones. */
-const officeTwoArt=/^art\/(props|icones)\/[a-z0-9-]{1,40}\.png$/;
-function officeTwoType(name:string){return Object.hasOwn(officeTwoFiles,name)?officeTwoFiles[name]:officeTwoArt.test(name)?'image/png':null;}
+/** Arte F7: só PNG com nome simples dentro das quatro pastas de assets. Metadados e cidade são casos explícitos. */
+const officeTwoArt=/^art\/(props|icones|texturas|personagens)\/[a-z0-9-]{1,40}\.png$/;
+function officeTwoType(name:string){return name==='art/cidade-noite.png'?'image/png':name==='art/personagens/quadros.json'?'application/json; charset=utf-8':Object.hasOwn(officeTwoFiles,name)?officeTwoFiles[name]:officeTwoArt.test(name)?'image/png':null;}
 export function registerOfficeAssets(app:FastifyInstance, directory=join(process.cwd(),'public','office'), officeTwo=join(process.cwd(),'public','office2')) {
   app.get('/office2/*', async(req,reply) => {
     const name=(req.params as {'*':string})['*'] || 'index.html';

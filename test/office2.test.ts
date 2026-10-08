@@ -30,7 +30,7 @@ test('rotas A* levam da chegada a cada posto e ponto de lazer, em passos de 1 ti
   for(let k=1;k<path.length;k++){assert.equal(Math.abs(path[k].i-path[k-1].i)+Math.abs(path[k].j-path[k-1].j),1);assert.ok(api.canStep(path[k-1],path[k]),p.id+' passo proibido');}
  }
  // Uma pessoa parada no caminho bloqueia o tile; destino em móvel ou fora da planta não tem rota.
- const desk=map.props.find((p:any)=>p.room==='risk'&&p.asset==='mesa-monitores');
+ const desk=map.props.find((p:any)=>p.room==='risk'&&p.asset==='estacao-madeira');
  assert.deepEqual([...api.plan(spawn,desk.tile)],[]);assert.deepEqual([...api.plan(spawn,{i:99,j:0})],[]);
  // Atravessar a parede entre Horizon e Nexus sem porta é proibido.
  assert.equal(api.canStep({i:3,j:7},{i:3,j:8}),false);
