@@ -1,67 +1,67 @@
-# Escritório 2.0 · arte do ChatGPT (F7)
+# Escritório 2.0 · arte e revisão do ambiente (F7)
 
-Integração sobre `feat/escritorio-2-f6`, commit `71c5be1`. Os 31 PNGs fornecidos pelo usuário estão em `C:\Users\Danrley\Downloads\office2-arte-gpt`. As folhas originais de objetos e personagens permanecem fora do repositório; entram somente os recortes, as folhas normalizadas, as texturas reduzidas e o fundo da cidade.
+Revisão da integração F7 sobre `feat/escritorio-2-f6`, guiada pela [referência aprovada](references/tradinglab-office-2-approved-reference.jpg). Horizon, Nexus e Ring ficam à esquerda; hall, recepção e elevadores ao fundo; convivência no centro; áreas técnicas à direita; café, cozinha e varanda junto à fachada.
 
-## Arte integrada
+## Planta e mobiliário
 
-| Folha | Peças |
-|---|---:|
-| props-ring | 5 |
-| props-horizon | 3 |
-| props-reuniao | 4 |
-| props-recepcao | 4 |
-| props-convivencia | 5 |
-| props-stress | 4 |
-| props-risk-auditoria | 6 |
-| props-cozinha-cafe | 5 |
-| props-varanda | 4 |
-| plantas | 6 |
-| icones-estagios | 5 |
-| emblemas-zonas-1 | 5 |
-| emblemas-zonas-2 | 5 |
-| icones-estado-agente | 6 |
-| icones-cenarios-1 | 7 |
-| icones-cenarios-2 | 7 |
+A grade foi ampliada de 32×24 para **40×30 tiles**, com cena de 1920×1056 unidades. Permanecem os **16 ambientes e os 12 identificadores de módulos**, incluindo os dois setores do Ring. Há **78 peças no mapa**, mais as oito cadeiras dos postos desenhadas separadamente. O espaço adicional permite corredores, acessos e conjuntos separados de móveis.
 
-São **46 peças e 35 ícones** em `public/office2/art/manifesto.json`. A ordem e a orientação foram verificadas em mosaico; os móveis compridos sobem para a direita (`axis: j`), com espelho automático para os que correm no eixo i do mapa. As mesas curvas não recebem espelho automático (`axis: none`). Todos os arquivos de props e ícones existentes pertencem ao manifesto novo.
+`art/apoios.json` mede os contatos inferiores das 46 silhuetas. Escala uniforme e posição usam esses apoios para conter os pés na ocupação declarada, com margem de 0,18 tile; o espelhamento segue a mesma regra. O tapete é recortado no polígono do piso e permanece andável. Nexus, Diagnóstico e Café usam as cadeiras integradas das mesas, sem duplicação.
 
-As seis texturas usam 512×512 pixels, reduzidas por média de área com alfa pré-multiplicado. Pisos usam padrões na projeção 2:1, com ancoragem global para manter a continuidade entre tiles. Paredes sólidas recebem painel grafite; paredes com placas e o hall recebem madeira ripada. Os padrões são reutilizados por contexto. Quando as texturas terminam de carregar, incluindo erros, o cache estático é reconstruído. Cores e iluminação continuam disponíveis sem imagens ou APIs de padrões.
+Portas removem também o trecho da parede vizinha na mesma borda. Telas e placas respeitam as aberturas; Backtest e Stress Lab usam a parede i0, liberando o centro. Placas são pintadas no plano da parede, incluindo a marca do hall. Ao focar uma sala, paredes de outras áreas somem e sua mobília fica atenuada, permitindo conferir o ambiente e acessar seu painel.
 
-Os oito personagens têm folhas normalizadas de 1152×512: duas linhas, seis colunas, células de 192×256. Todas as poses de um personagem usam a escala da pose parada, de 240 px, e pés na base da célula. SE/NE usam frente/costas; SW/NW são espelhados em torno dos pés. A folha antiga continua como reserva durante carregamento ou erro.
+## Arte, fachada e iluminação
 
-Oracle usa chroma verde. Nos personagens, a descontaminação da cor do fundo se limita à borda: preserva o violeta de Vega/Oracle e as cores internas da roupa. O normalizador valida contagem e distribuição antes de gravar qualquer folha.
+A integração mantém **46 recortes de móveis/plantas, 35 ícones PNG, seis texturas e oito personagens com 12 poses**. Personagens usam folhas de 1152×512 e células de 192×256, com pés alinhados. Folhas antigas permanecem como reserva durante carregamento ou erro. Convivência e Recepção ganharam ícones SVG locais na barra.
 
-## Mapa e circulação
+A fachada foi reconstruída no desenho da cena: painéis de vidro azul, montantes, lajes, reflexos da cidade, salas inferiores iluminadas e contorno quente do andar. Sua altura acompanha o enquadramento e o afastamento máximo, evitando a faixa vazia no celular.
 
-O mapa passa de **47 para 95 peças**, incluindo plantas e um tapete. A meta aproximada de 110 foi ajustada ao espaço disponível, preservando todos os postos e caminhos. Backtest permanece com três peças por ser uma sala de apenas 4×3 tiles; a cadeira do posto WORK não é duplicada. Nexus usa a mesa com cadeiras integradas, sem as cadeiras soltas anteriores.
+Foram gerados **cidade-dia.png** e **cidade-entardecer.png**, PNGs opacos de 1536×1024. A cidade noturna foi o alvo de edição e a imagem aprovada, referência de estilo. Os arquivos estão em `public/office2/art/` e em `C:\Users\Danrley\Downloads\office2-arte-gpt\`. [Prompts completos e origem](OFFICE_2_F7_ILUMINACAO_PROMPTS.md).
 
-Móveis sólidos ficam dentro das salas e não se sobrepõem, cobrem portas ou pontos WORK/IDLE/SPAWN. Cada WORK tem uma mesa à sua frente, na direção declarada. Plantas de circulação ficam fora das salas. O tapete tem `blocking: false`: é desenhado antes dos móveis, permite passagem e pode ficar sob o sofá e pontos de lazer; o sofá continua bloqueando seu próprio footprint.
+O ciclo usa os horários e a preferência do primeiro escritório: dia das 7h às 17h; entardecer/amanhecer das 17h às 19h e das 5h às 7h; noite nos demais horários. O seletor permite Automática, Dia, Entardecer ou Noite. Cidade e fachada mudam juntas, com transição de 850 ms; a preferência sobrevive ao recarregamento. O carregamento tardio das texturas preserva a fase atual.
 
-Todas as rotas A* da chegada aos 16 postos/pontos de lazer permanecem válidas. Nenhum dado, estado de agente ou fluxo de execução foi acrescentado pela arte: telas sem fonte continuam UNKNOWN; dados de produção continuam protegidos.
+## Navegação, vida e funções
+
+A visão geral enquadra o andar inteiro. O foco considera paredes e espaço do painel. Há botões para aproximar, afastar e reenquadrar, além de arrastar e usar a roda do mouse. A barra tem 11 destinos principais e um seletor com os demais ambientes. No celular, os destinos principais rolam dentro da própria barra.
+
+Passeios dos personagens em pausa, reflexos, brilho e movimento ambiente são decorativos. A apresentação pausa com a aba oculta e respeita redução de movimento. O ciclo visual não altera trabalho, preços, decisões ou resultados.
+
+Módulos, rotas de leitura e fontes existentes permanecem. Fontes indisponíveis continuam UNKNOWN, com indicação explícita. Nenhum mercado, P&L, operação ou trabalho de agente foi fabricado. **Escritório anterior** mantém acesso aos painéis e ferramentas da primeira interface, cujo código não foi alterado nesta revisão.
 
 ## Reprodução
 
+Os 31 PNGs originais fornecidos pelo usuário permanecem em Downloads. O repositório contém recortes normalizados, texturas e fundos utilizados.
+
 ```powershell
-node node_modules/tsx/dist/cli.mjs scripts/assets/arte-gemini.ts C:\Users\Danrley\Downloads\office2-arte-gpt public/office2/art --config=scripts/assets/arte-gpt.json
-node node_modules/tsx/dist/cli.mjs scripts/assets/texturas-gpt.ts C:\Users\Danrley\Downloads\office2-arte-gpt
-node node_modules/tsx/dist/cli.mjs scripts/assets/personagens-gpt.ts C:\Users\Danrley\Downloads\office2-arte-gpt
+node --import tsx scripts/assets/arte-gemini.ts C:\Users\Danrley\Downloads\office2-arte-gpt public/office2/art --config=scripts/assets/arte-gpt.json
+node --import tsx scripts/assets/texturas-gpt.ts C:\Users\Danrley\Downloads\office2-arte-gpt
+node --import tsx scripts/assets/personagens-gpt.ts C:\Users\Danrley\Downloads\office2-arte-gpt
+node scripts/assets/office2-layout.mjs
+node --import tsx scripts/assets/office2-calibration.ts
 ```
 
-## Conferência visual
+O autor da planta valida limites, ocupações, portas, postos e rotas A* antes de gravar. A geração dos dois fundos está documentada à parte e não é repetida pelos scripts.
 
-Prévia local com as rotas de assets do projeto e estados iniciais do registro de agentes. Nenhum snapshot privado foi incluído. Conferidas as resoluções 1920×940, 1366×768 e 390×844, mais foco no Horizon e retorno à visão geral. Cidade contínua, móveis no chão, placas legíveis e acesso aos painéis no celular. Console sem erros ou avisos na conferência. A câmera de visão geral mantém o enquadramento próximo da F6; arrastar e focar uma zona permite ver as bordas do andar.
+## Conferência e validação
 
-![1920×940](previews/office2-f7-1920.png)
+- **Suíte completa:** 441 testes, **440 aprovados**, zero falhas e um ignorado, com `node --import tsx --test --test-concurrency=2 test/**/*.test.ts`.
+- Após o último ajuste da reserva de personagens: **25 testes direcionados aprovados**, zero falhas, cobrindo mapa, F7 e regressões desta revisão.
+- TypeScript sem erros; sintaxe de todos os scripts do Escritório 2.0 validada.
+- Novas regressões verificam apoios de móveis espelhados, câmeras com painel no desktop/celular, portas compartilhadas, foco, horários e preferência, carregamento assíncrono das texturas, extensão da fachada no celular, ícones e rotas dos três fundos.
+- Conferidos os **16 ambientes**, três iluminações, em 1920×1080, 1366×768 e 390×844. Foco, retorno e zoom conferidos no celular. Página de 390 px sem transbordamento horizontal; 11 destinos com ícone, sem imagens quebradas; console sem erros ou avisos.
 
-![1366×768](previews/office2-f7-1366.png)
+Capturas usam a prévia local com estados iniciais do registro de agentes, sem snapshots privados. A conferência cobre composição e estados exercitados; não substitui a validação das fontes de produção em sessão autenticada.
 
-![390×844](previews/office2-f7-mobile.png)
+![Noite · 1920×1080](previews/office2-f7-1920.png)
 
-## Validação
+![Dia](previews/office2-f7-dia.png)
 
-- Base F6: 426 testes aprovados, nenhum erro, um teste ignorado.
-- Escritório 2.0: 29 testes aprovados, incluindo rotas, footprints, texturas, chroma, normalização, modos e direções dos personagens, reserva de sprites e rotas de assets.
-- TypeScript e sintaxe de todos os scripts de `public/office2` conferidos.
-- Suíte completa F7: **433 testes, 432 aprovados, zero falhas e um ignorado** (`node --import tsx --test --test-concurrency=2 test/**/*.test.ts`). A execução usa dois processos simultâneos para evitar disputa de CPU no notebook. Na primeira execução com paralelismo padrão, dois testes de worker histórico atingiram o timeout; ambos passaram na repetição isolada e na suíte completa, sem alteração no domínio ou nos limites de execução.
+![Entardecer](previews/office2-f7-entardecer.png)
 
-Entrega por PR para a F6, sem merge ou deploy automático.
+![Notebook · 1366×768](previews/office2-f7-1366.png)
+
+![Celular · 390×844](previews/office2-f7-mobile.png)
+
+![Conferência dos 16 ambientes](previews/office2-f7-16-ambientes.png)
+
+Entrega no PR #100, sem merge ou deploy automático.
