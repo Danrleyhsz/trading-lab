@@ -24,17 +24,19 @@
   <button type="button" data-room="recepcao">Recepção</button>
  </nav>
  <div class="status">
+  <select id="otherRooms" aria-label="Outros ambientes"><option value="">Outros ambientes</option><option value="hall-marca">Hall TradingLab</option><option value="elevadores">Elevadores</option><option value="cozinha">Cozinha</option><option value="cafe">Café</option><option value="varanda">Varanda</option><option value="terraco-norte">Terraço norte</option></select>
   <span class="chip" id="market" data-truth="UNKNOWN">mercado: …</span>
   <span class="chip" id="session" data-truth="UNKNOWN">sessão: …</span>
-  <span class="chip dev" data-truth="STATIC" title="Cidade, móveis, ícones, texturas e personagens gerados para o Escritório 2.0">arte F7 · ChatGPT</span>
+  <label class="lighting-control">Luz <select id="lightingMode" aria-label="Iluminação do escritório" data-truth="STATIC"><option value="auto">Automática</option><option value="day">Dia</option><option value="dusk">Entardecer</option><option value="night">Noite</option></select></label>
   <div class="clock" data-truth="REAL"><span id="clockDate"></span><b id="clockTime"></b></div>
-  <a class="chip link" href="/office/">escritório atual</a>
+  <a class="chip link" href="/office/" title="Painéis e ferramentas do primeiro escritório">Escritório anterior</a>
  </div>
 </header>
 <main class="layout">
  <div class="viewport" id="viewport">
   <canvas id="scene" aria-label="Escritório TradingLab no 30º andar, visão isométrica; clique numa zona para ampliar"></canvas>
   <div class="labels" id="labels"></div>
+  <div class="view-controls" aria-label="Controles da visão"><button type="button" data-zoom="0.8" aria-label="Afastar a visão">−</button><button type="button" data-zoom="1.25" aria-label="Aproximar a visão">+</button><button type="button" id="fitView">Enquadrar</button></div>
   <div class="floor-card" data-truth="STATIC"><span class="tower" aria-hidden="true"></span><div><b>30º andar</b><span>TradingLab HQ</span></div></div>
   <p class="banner" id="agentsStatus" hidden data-truth="UNKNOWN">Agentes: sem dado (sem acesso ou rota indisponível). Nenhum agente é desenhado sem dado.</p>
   <ul class="legend" aria-label="Legenda">
@@ -45,6 +47,8 @@
 </main>
 <script src="/office/character-frames.js"></script>
 <script src="/office2/iso.js"></script>
+<script src="/office2/ambience.js"></script>
+<script src="/office2/navigation-icons.js"></script>
 <script src="/office2/scene.js"></script>
 <script src="/office2/ring.js"></script>
 <script src="/office2/lab.js"></script>

@@ -1,6 +1,6 @@
 {
- "version": "OFFICE2_SCENE_MAP_V1",
- "status": "PROPOSTA: a fase F1 confere no compositor antes de usar",
+ "version": "OFFICE2_SCENE_MAP_V2",
+ "status": "PLANTA AMPLIADA: referência aprovada, circulação e mobiliário calibrado",
  "reference": "docs/design/references/tradinglab-office-2-approved-reference.jpg",
  "projection": {
   "kind": "isometric-2:1",
@@ -10,21 +10,21 @@
   },
   "wallHeight": 72,
   "origin": {
-   "x": 672,
-   "y": 96
+   "x": 816,
+   "y": 112
   },
   "formula": "x = origin.x + (i - j) * 24 ; y = origin.y + (i + j) * 12",
   "scene": {
-   "w": 1536,
-   "h": 864
+   "w": 1920,
+   "h": 1056
   },
   "personHeightPx": 45
  },
  "grid": {
-  "i": 32,
-  "j": 24
+  "i": 40,
+  "j": 30
  },
- "note": "i cresce para baixo-direita (fundo direito: hall, recepção, elevadores); j cresce para baixo-esquerda (fachada esquerda: Horizon, Nexus, Ring). Tiles fora das salas são circulação andável. Retângulos semiabertos [i0,i1) × [j0,j1). Telas ficam na parede j0 da sala, entre os tiles from e to.",
+ "note": "i cresce para baixo-direita (fundo direito: hall, recepção, elevadores); j cresce para baixo-esquerda (fachada esquerda: Horizon, Nexus, Ring). Tiles fora das salas são circulação andável. Retângulos semiabertos [i0,i1) × [j0,j1). Telas ficam na parede indicada (j0 ou i0), entre os tiles from e to, sem atravessar portas.",
  "rooms": [
   {
    "id": "terraco-norte",
@@ -32,7 +32,7 @@
    "label": "Terraço norte",
    "tiles": {
     "i0": 0,
-    "i1": 9,
+    "i1": 12,
     "j0": 0,
     "j1": 2
    },
@@ -41,7 +41,8 @@
    "edges": {
     "i0": "guarda-corpo-vidro",
     "j0": "guarda-corpo-vidro"
-   }
+   },
+   "doors": []
   },
   {
    "id": "horizon",
@@ -49,9 +50,9 @@
    "label": "Horizon · Inteligência de mercado",
    "tiles": {
     "i0": 0,
-    "i1": 9,
+    "i1": 12,
     "j0": 2,
-    "j1": 8
+    "j1": 9
    },
    "floor": "carpete-escuro",
    "edges": {
@@ -61,11 +62,11 @@
    "doors": [
     {
      "side": "i1",
-     "at": 5
+     "at": 6
     },
     {
      "side": "j0",
-     "at": 4
+     "at": 6
     }
    ]
   },
@@ -75,9 +76,9 @@
    "label": "Nexus · Comunicação",
    "tiles": {
     "i0": 0,
-    "i1": 9,
-    "j0": 8,
-    "j1": 15
+    "i1": 12,
+    "j0": 10,
+    "j1": 18
    },
    "floor": "piso-claro",
    "edges": {
@@ -87,7 +88,7 @@
    "doors": [
     {
      "side": "i1",
-     "at": 11
+     "at": 14
     }
    ]
   },
@@ -97,9 +98,9 @@
    "label": "Ring · Sala de operações",
    "tiles": {
     "i0": 0,
-    "i1": 12,
-    "j0": 15,
-    "j1": 24
+    "i1": 14,
+    "j0": 19,
+    "j1": 30
    },
    "floor": "carpete-escuro",
    "edges": {
@@ -109,12 +110,8 @@
    },
    "doors": [
     {
-     "side": "j0",
-     "at": 10
-    },
-    {
      "side": "i1",
-     "at": 19
+     "at": 25
     }
    ],
    "subzones": [
@@ -124,9 +121,9 @@
      "label": "Anel de decisão",
      "tiles": {
       "i0": 0,
-      "i1": 6,
-      "j0": 15,
-      "j1": 24
+      "i1": 7,
+      "j0": 19,
+      "j1": 30
      },
      "accent": "#5fb6ff"
     },
@@ -135,10 +132,10 @@
      "module": "PAPER_EXECUTION",
      "label": "Execução paper",
      "tiles": {
-      "i0": 6,
-      "i1": 12,
-      "j0": 15,
-      "j1": 24
+      "i0": 7,
+      "i1": 14,
+      "j0": 19,
+      "j1": 30
      },
      "accent": "#ffd166"
     }
@@ -149,10 +146,10 @@
    "module": "MAIN_FLOOR",
    "label": "Hall TradingLab",
    "tiles": {
-    "i0": 9,
-    "i1": 14,
+    "i0": 12,
+    "i1": 19,
     "j0": 0,
-    "j1": 4
+    "j1": 5
    },
    "floor": "piso-claro",
    "edges": {
@@ -161,7 +158,7 @@
    "doors": [
     {
      "side": "j1",
-     "at": 11
+     "at": 15
     }
    ]
   },
@@ -170,10 +167,10 @@
    "module": "MAIN_FLOOR",
    "label": "Recepção",
    "tiles": {
-    "i0": 14,
-    "i1": 22,
+    "i0": 19,
+    "i1": 28,
     "j0": 0,
-    "j1": 4
+    "j1": 5
    },
    "floor": "piso-claro",
    "edges": {
@@ -182,7 +179,7 @@
    "doors": [
     {
      "side": "j1",
-     "at": 18
+     "at": 23
     }
    ]
   },
@@ -191,10 +188,10 @@
    "module": "MAIN_FLOOR",
    "label": "Elevadores",
    "tiles": {
-    "i0": 22,
-    "i1": 32,
+    "i0": 28,
+    "i1": 40,
     "j0": 0,
-    "j1": 6
+    "j1": 7
    },
    "floor": "piso-claro",
    "edges": {
@@ -203,8 +200,8 @@
    },
    "doors": [
     {
-     "side": "i0",
-     "at": 5
+     "side": "j1",
+     "at": 33
     }
    ]
   },
@@ -213,19 +210,20 @@
    "module": "IDLE_LOUNGE",
    "label": "Área de convivência",
    "tiles": {
-    "i0": 11,
-    "i1": 16,
-    "j0": 6,
-    "j1": 12
+    "i0": 15,
+    "i1": 23,
+    "j0": 7,
+    "j1": 15
    },
    "floor": "madeira",
    "edges": {
-    "j0": "parede-painel"
+    "j0": "parede-painel",
+    "i1": "divisoria-vidro"
    },
    "doors": [
     {
      "side": "i0",
-     "at": 8
+     "at": 11
     }
    ]
   },
@@ -234,22 +232,21 @@
    "module": "BACKTEST",
    "label": "Backtest · Experimentos",
    "tiles": {
-    "i0": 11,
-    "i1": 15,
-    "j0": 12,
-    "j1": 15
+    "i0": 15,
+    "i1": 23,
+    "j0": 16,
+    "j1": 22
    },
    "floor": "piso-tecnico",
    "edges": {
-    "i0": "divisoria-vidro",
-    "j0": "divisoria-vidro",
-    "i1": "divisoria-vidro",
-    "j1": "divisoria-vidro"
+    "i0": "parede-painel",
+    "j0": "aberta",
+    "i1": "divisoria-vidro"
    },
    "doors": [
     {
      "side": "i1",
-     "at": 14
+     "at": 19
     }
    ]
   },
@@ -258,20 +255,20 @@
    "module": "STRESS_LAB",
    "label": "Stress Lab · Testes",
    "tiles": {
-    "i0": 18,
-    "i1": 24,
-    "j0": 6,
-    "j1": 11
+    "i0": 25,
+    "i1": 32,
+    "j0": 7,
+    "j1": 14
    },
    "floor": "piso-tecnico",
    "edges": {
-    "j0": "parede-painel",
-    "i0": "parede-painel"
+    "i0": "parede-painel",
+    "j0": "aberta"
    },
    "doors": [
     {
-     "side": "j1",
-     "at": 20
+     "side": "i0",
+     "at": 11
     }
    ]
   },
@@ -280,20 +277,20 @@
    "module": "AUDIT_LOGS",
    "label": "Auditoria · Registros",
    "tiles": {
-    "i0": 26,
-    "i1": 32,
-    "j0": 6,
-    "j1": 12
+    "i0": 34,
+    "i1": 40,
+    "j0": 8,
+    "j1": 14
    },
    "floor": "piso-claro",
    "edges": {
     "j0": "parede-painel",
-    "i1": "parede-painel"
+    "i1": "fachada-vidro"
    },
    "doors": [
     {
      "side": "i0",
-     "at": 9
+     "at": 11
     }
    ]
   },
@@ -302,10 +299,10 @@
    "module": "RISK_CONTROL",
    "label": "Risk · Gestão de risco",
    "tiles": {
-    "i0": 18,
-    "i1": 25,
-    "j0": 12,
-    "j1": 17
+    "i0": 25,
+    "i1": 32,
+    "j0": 16,
+    "j1": 23
    },
    "floor": "carpete-escuro",
    "edges": {
@@ -315,7 +312,7 @@
    "doors": [
     {
      "side": "i0",
-     "at": 14
+     "at": 19
     }
    ]
   },
@@ -324,10 +321,10 @@
    "module": "DIAGNOSTICS",
    "label": "Diagnóstico · Linha do tempo",
    "tiles": {
-    "i0": 26,
-    "i1": 32,
-    "j0": 13,
-    "j1": 19
+    "i0": 34,
+    "i1": 40,
+    "j0": 16,
+    "j1": 23
    },
    "floor": "piso-claro",
    "edges": {
@@ -336,8 +333,8 @@
    },
    "doors": [
     {
-     "side": "j1",
-     "at": 28
+     "side": "i0",
+     "at": 19
     }
    ]
   },
@@ -346,19 +343,20 @@
    "module": "IDLE_LOUNGE",
    "label": "Cozinha",
    "tiles": {
-    "i0": 18,
-    "i1": 24,
-    "j0": 17,
-    "j1": 21
+    "i0": 25,
+    "i1": 32,
+    "j0": 25,
+    "j1": 30
    },
    "floor": "piso-claro",
    "edges": {
-    "j0": "parede-painel"
+    "j0": "parede-painel",
+    "j1": "guarda-corpo-vidro"
    },
    "doors": [
     {
-     "side": "i1",
-     "at": 18
+     "side": "i0",
+     "at": 27
     }
    ]
   },
@@ -367,19 +365,20 @@
    "module": "IDLE_LOUNGE",
    "label": "Café",
    "tiles": {
-    "i0": 14,
-    "i1": 18,
-    "j0": 18,
-    "j1": 24
+    "i0": 17,
+    "i1": 23,
+    "j0": 25,
+    "j1": 30
    },
    "floor": "piso-claro",
    "edges": {
+    "j0": "parede-painel",
     "j1": "guarda-corpo-vidro"
    },
    "doors": [
     {
-     "side": "j0",
-     "at": 15
+     "side": "i0",
+     "at": 27
     }
    ]
   },
@@ -388,10 +387,10 @@
    "module": "PANORAMIC_EDGE",
    "label": "Varanda",
    "tiles": {
-    "i0": 24,
-    "i1": 32,
-    "j0": 20,
-    "j1": 24
+    "i0": 34,
+    "i1": 40,
+    "j0": 25,
+    "j1": 30
    },
    "outdoor": true,
    "floor": "deck",
@@ -401,8 +400,8 @@
    },
    "doors": [
     {
-     "side": "j0",
-     "at": 28
+     "side": "i0",
+     "at": 27
     }
    ]
   }
@@ -413,7 +412,7 @@
    "room": "ring",
    "tile": {
     "i": 3,
-    "j": 19
+    "j": 24
    },
    "kind": "WORK",
    "agent": "nova",
@@ -423,8 +422,8 @@
    "id": "atlas",
    "room": "ring",
    "tile": {
-    "i": 2,
-    "j": 22
+    "i": 3,
+    "j": 28
    },
    "kind": "WORK",
    "agent": "atlas",
@@ -435,7 +434,7 @@
    "room": "ring",
    "tile": {
     "i": 9,
-    "j": 19
+    "j": 24
    },
    "kind": "WORK",
    "agent": "flux",
@@ -445,8 +444,8 @@
    "id": "satoshi",
    "room": "horizon",
    "tile": {
-    "i": 1,
-    "j": 5
+    "i": 3,
+    "j": 6
    },
    "kind": "WORK",
    "agent": "satoshi",
@@ -456,8 +455,8 @@
    "id": "oracle",
    "room": "horizon",
    "tile": {
-    "i": 3,
-    "j": 5
+    "i": 6,
+    "j": 6
    },
    "kind": "WORK",
    "agent": "oracle",
@@ -467,8 +466,8 @@
    "id": "vega",
    "room": "horizon",
    "tile": {
-    "i": 6,
-    "j": 5
+    "i": 9,
+    "j": 6
    },
    "kind": "WORK",
    "agent": "vega",
@@ -478,8 +477,8 @@
    "id": "sentinel",
    "room": "risk",
    "tile": {
-    "i": 21,
-    "j": 14
+    "i": 27,
+    "j": 20
    },
    "kind": "WORK",
    "agent": "sentinel",
@@ -489,8 +488,8 @@
    "id": "euler",
    "room": "backtest",
    "tile": {
-    "i": 13,
-    "j": 14
+    "i": 18,
+    "j": 19
    },
    "kind": "WORK",
    "agent": "euler",
@@ -500,8 +499,8 @@
    "id": "sofa-1",
    "room": "convivencia",
    "tile": {
-    "i": 13,
-    "j": 9
+    "i": 18,
+    "j": 11
    },
    "kind": "IDLE"
   },
@@ -509,8 +508,8 @@
    "id": "sofa-2",
    "room": "convivencia",
    "tile": {
-    "i": 14,
-    "j": 9
+    "i": 20,
+    "j": 11
    },
    "kind": "IDLE"
   },
@@ -518,8 +517,8 @@
    "id": "cafe-1",
    "room": "cafe",
    "tile": {
-    "i": 15,
-    "j": 20
+    "i": 18,
+    "j": 27
    },
    "kind": "IDLE"
   },
@@ -527,8 +526,8 @@
    "id": "cafe-2",
    "room": "cafe",
    "tile": {
-    "i": 17,
-    "j": 21
+    "i": 22,
+    "j": 28
    },
    "kind": "IDLE"
   },
@@ -536,8 +535,8 @@
    "id": "copa-1",
    "room": "cozinha",
    "tile": {
-    "i": 20,
-    "j": 19
+    "i": 27,
+    "j": 27
    },
    "kind": "IDLE"
   },
@@ -545,8 +544,8 @@
    "id": "copa-2",
    "room": "cozinha",
    "tile": {
-    "i": 21,
-    "j": 19
+    "i": 29,
+    "j": 27
    },
    "kind": "IDLE"
   },
@@ -554,8 +553,8 @@
    "id": "varanda-1",
    "room": "varanda",
    "tile": {
-    "i": 27,
-    "j": 22
+    "i": 35,
+    "j": 28
    },
    "kind": "IDLE"
   },
@@ -563,8 +562,8 @@
    "id": "varanda-2",
    "room": "varanda",
    "tile": {
-    "i": 29,
-    "j": 22
+    "i": 39,
+    "j": 28
    },
    "kind": "IDLE"
   },
@@ -572,7 +571,7 @@
    "id": "chegada",
    "room": "elevadores",
    "tile": {
-    "i": 26,
+    "i": 32,
     "j": 3
    },
    "kind": "SPAWN"
@@ -584,7 +583,7 @@
    "room": "horizon",
    "wall": "j0",
    "tiles": {
-    "from": 1,
+    "from": 0,
     "to": 5
    },
    "heightPx": 48,
@@ -596,8 +595,8 @@
    "room": "horizon",
    "wall": "j0",
    "tiles": {
-    "from": 5,
-    "to": 9
+    "from": 7,
+    "to": 12
    },
    "heightPx": 48,
    "module": "MARKET_HORIZON",
@@ -608,8 +607,8 @@
    "room": "nexus",
    "wall": "j0",
    "tiles": {
-    "from": 2,
-    "to": 8
+    "from": 1,
+    "to": 11
    },
    "heightPx": 48,
    "module": "NEXUS",
@@ -620,8 +619,8 @@
    "room": "ring",
    "wall": "j0",
    "tiles": {
-    "from": 1,
-    "to": 5
+    "from": 0,
+    "to": 7
    },
    "heightPx": 48,
    "module": "DECISION_RING",
@@ -633,7 +632,7 @@
    "wall": "j0",
    "tiles": {
     "from": 7,
-    "to": 11
+    "to": 14
    },
    "heightPx": 48,
    "module": "PAPER_EXECUTION",
@@ -642,10 +641,10 @@
   {
    "id": "stress-placar",
    "room": "stress-lab",
-   "wall": "j0",
+   "wall": "i0",
    "tiles": {
-    "from": 19,
-    "to": 23
+    "from": 7,
+    "to": 11
    },
    "heightPx": 48,
    "module": "STRESS_LAB",
@@ -656,8 +655,8 @@
    "room": "auditoria",
    "wall": "j0",
    "tiles": {
-    "from": 27,
-    "to": 31
+    "from": 34,
+    "to": 40
    },
    "heightPx": 48,
    "module": "AUDIT_LOGS",
@@ -668,8 +667,8 @@
    "room": "risk",
    "wall": "j0",
    "tiles": {
-    "from": 19,
-    "to": 23
+    "from": 25,
+    "to": 32
    },
    "heightPx": 48,
    "module": "RISK_CONTROL",
@@ -680,8 +679,8 @@
    "room": "diagnostico",
    "wall": "j0",
    "tiles": {
-    "from": 27,
-    "to": 31
+    "from": 34,
+    "to": 40
    },
    "heightPx": 48,
    "module": "DIAGNOSTICS",
@@ -690,10 +689,10 @@
   {
    "id": "backtest-estudos",
    "room": "backtest",
-   "wall": "j0",
+   "wall": "i0",
    "tiles": {
-    "from": 11,
-    "to": 15
+    "from": 16,
+    "to": 22
    },
    "heightPx": 48,
    "module": "BACKTEST",
@@ -705,11 +704,11 @@
    "asset": "estacao-2-monitores",
    "room": "horizon",
    "tile": {
-    "i": 0,
-    "j": 3
+    "i": 1,
+    "j": 4
    },
    "footprint": {
-    "a": 2,
+    "a": 3,
     "b": 2
    },
    "h": 36
@@ -718,11 +717,11 @@
    "asset": "estacao-2-monitores",
    "room": "horizon",
    "tile": {
-    "i": 3,
-    "j": 3
+    "i": 5,
+    "j": 4
    },
    "footprint": {
-    "a": 2,
+    "a": 3,
     "b": 2
    },
    "h": 36
@@ -731,53 +730,27 @@
    "asset": "estacao-2-monitores",
    "room": "horizon",
    "tile": {
-    "i": 6,
-    "j": 3
+    "i": 9,
+    "j": 4
    },
    "footprint": {
-    "a": 2,
+    "a": 3,
     "b": 2
    },
    "h": 36
-  },
-  {
-   "asset": "mesa-monitores",
-   "room": "horizon",
-   "tile": {
-    "i": 0,
-    "j": 6
-   },
-   "footprint": {
-    "a": 2,
-    "b": 2
-   },
-   "h": 36
-  },
-  {
-   "asset": "cadeira-costas",
-   "room": "horizon",
-   "tile": {
-    "i": 2,
-    "j": 7
-   },
-   "footprint": {
-    "a": 1,
-    "b": 1
-   },
-   "h": 24
   },
   {
    "asset": "armario-baixo",
    "room": "horizon",
    "tile": {
-    "i": 5,
-    "j": 6
+    "i": 1,
+    "j": 7
    },
    "footprint": {
     "a": 2,
     "b": 1
    },
-   "h": 20
+   "h": 22
   },
   {
    "asset": "ficus",
@@ -790,105 +763,92 @@
     "a": 1,
     "b": 1
    },
-   "h": 60
+   "h": 54
   },
   {
    "asset": "planta-alta",
    "room": "horizon",
    "tile": {
-    "i": 8,
+    "i": 11,
     "j": 2
    },
    "footprint": {
     "a": 1,
     "b": 1
    },
-   "h": 48
+   "h": 50
   },
   {
    "asset": "espada",
    "room": "horizon",
    "tile": {
-    "i": 8,
-    "j": 7
+    "i": 10,
+    "j": 8
    },
    "footprint": {
     "a": 1,
     "b": 1
    },
-   "h": 40
+   "h": 38
   },
   {
    "asset": "mesa-reuniao",
    "room": "nexus",
    "tile": {
     "i": 2,
-    "j": 10
+    "j": 13
    },
    "footprint": {
-    "a": 5,
-    "b": 3
+    "a": 7,
+    "b": 4
    },
-   "h": 28
+   "h": 30
   },
   {
    "asset": "aparador",
    "room": "nexus",
    "tile": {
-    "i": 1,
-    "j": 8
+    "i": 3,
+    "j": 11
    },
    "footprint": {
-    "a": 3,
-    "b": 1
+    "a": 4,
+    "b": 2
    },
-   "h": 22
+   "h": 24
   },
   {
    "asset": "planta-alta",
    "room": "nexus",
    "tile": {
-    "i": 0,
-    "j": 8
+    "i": 1,
+    "j": 11
    },
    "footprint": {
     "a": 1,
     "b": 1
    },
-   "h": 48
+   "h": 50
   },
   {
    "asset": "ficus",
    "room": "nexus",
    "tile": {
-    "i": 8,
-    "j": 8
+    "i": 10,
+    "j": 11
    },
    "footprint": {
     "a": 1,
     "b": 1
    },
-   "h": 60
-  },
-  {
-   "asset": "samambaia",
-   "room": "nexus",
-   "tile": {
-    "i": 0,
-    "j": 14
-   },
-   "footprint": {
-    "a": 1,
-    "b": 1
-   },
-   "h": 32
+   "h": 54
   },
   {
    "asset": "mesa-curva-operacoes",
    "room": "ring",
    "tile": {
-    "i": 0,
-    "j": 16
+    "i": 1,
+    "j": 21
    },
    "footprint": {
     "a": 5,
@@ -900,8 +860,8 @@
    "asset": "mesa-curva-media",
    "room": "ring",
    "tile": {
-    "i": 7,
-    "j": 16
+    "i": 8,
+    "j": 21
    },
    "footprint": {
     "a": 4,
@@ -913,8 +873,8 @@
    "asset": "mesa-monitores",
    "room": "ring",
    "tile": {
-    "i": 0,
-    "j": 20
+    "i": 1,
+    "j": 26
    },
    "footprint": {
     "a": 4,
@@ -923,37 +883,11 @@
    "h": 36
   },
   {
-   "asset": "estacao-2-monitores",
-   "room": "ring",
-   "tile": {
-    "i": 7,
-    "j": 21
-   },
-   "footprint": {
-    "a": 3,
-    "b": 2
-   },
-   "h": 36
-  },
-  {
-   "asset": "cadeira-costas",
-   "room": "ring",
-   "tile": {
-    "i": 9,
-    "j": 23
-   },
-   "footprint": {
-    "a": 1,
-    "b": 1
-   },
-   "h": 24
-  },
-  {
    "asset": "totem-logo",
    "room": "ring",
    "tile": {
-    "i": 11,
-    "j": 15
+    "i": 12,
+    "j": 20
    },
    "footprint": {
     "a": 1,
@@ -965,138 +899,86 @@
    "asset": "jardineira",
    "room": "ring",
    "tile": {
-    "i": 0,
-    "j": 23
+    "i": 1,
+    "j": 29
    },
    "footprint": {
-    "a": 3,
+    "a": 4,
     "b": 1
    },
-   "h": 32
+   "h": 30
   },
   {
    "asset": "planta-alta",
    "room": "ring",
    "tile": {
-    "i": 5,
-    "j": 23
+    "i": 10,
+    "j": 29
    },
    "footprint": {
     "a": 1,
     "b": 1
    },
-   "h": 48
+   "h": 50
   },
   {
    "asset": "ficus",
    "room": "ring",
    "tile": {
-    "i": 11,
-    "j": 23
+    "i": 13,
+    "j": 29
    },
    "footprint": {
     "a": 1,
     "b": 1
    },
-   "h": 60
+   "h": 54
   },
   {
    "asset": "espada",
    "room": "ring",
    "tile": {
-    "i": 6,
-    "j": 15
+    "i": 7,
+    "j": 20
    },
    "footprint": {
     "a": 1,
     "b": 1
    },
-   "h": 40
+   "h": 38
   },
   {
    "asset": "banco-espera",
    "room": "hall-marca",
    "tile": {
-    "i": 9,
-    "j": 1
-   },
-   "footprint": {
-    "a": 1,
-    "b": 2
-   },
-   "h": 14
-  },
-  {
-   "asset": "aparador",
-   "room": "hall-marca",
-   "tile": {
-    "i": 11,
-    "j": 0
+    "i": 14,
+    "j": 2
    },
    "footprint": {
     "a": 3,
     "b": 1
    },
-   "h": 22
+   "h": 16
   },
   {
    "asset": "planta-alta",
    "room": "hall-marca",
    "tile": {
-    "i": 9,
-    "j": 0
-   },
-   "footprint": {
-    "a": 1,
-    "b": 1
-   },
-   "h": 48
-  },
-  {
-   "asset": "samambaia",
-   "room": "hall-marca",
-   "tile": {
-    "i": 13,
-    "j": 3
-   },
-   "footprint": {
-    "a": 1,
-    "b": 1
-   },
-   "h": 32
-  },
-  {
-   "asset": "espada",
-   "room": "hall-marca",
-   "tile": {
-    "i": 10,
-    "j": 3
-   },
-   "footprint": {
-    "a": 1,
-    "b": 1
-   },
-   "h": 40
-  },
-  {
-   "asset": "balcao-recepcao",
-   "room": "recepcao",
-   "tile": {
-    "i": 16,
+    "i": 12,
     "j": 1
    },
    "footprint": {
-    "a": 4,
-    "b": 2
+    "a": 1,
+    "b": 1
    },
-   "h": 28
+   "h": 50
   },
   {
-   "asset": "cadeira-costas",
-   "room": "recepcao",
+   "asset": "planta-baixa",
+   "room": "hall-marca",
    "tile": {
     "i": 18,
-    "j": 0
+    "j": 1
    },
    "footprint": {
     "a": 1,
@@ -1105,111 +987,73 @@
    "h": 24
   },
   {
-   "asset": "ficus",
+   "asset": "balcao-recepcao",
    "room": "recepcao",
    "tile": {
-    "i": 14,
+    "i": 21,
+    "j": 1
+   },
+   "footprint": {
+    "a": 5,
+    "b": 3
+   },
+   "h": 32,
+   "flip": true
+  },
+  {
+   "asset": "cadeira-costas",
+   "room": "recepcao",
+   "tile": {
+    "i": 24,
     "j": 0
    },
    "footprint": {
     "a": 1,
     "b": 1
    },
-   "h": 60
+   "h": 26
+  },
+  {
+   "asset": "ficus",
+   "room": "recepcao",
+   "tile": {
+    "i": 19,
+    "j": 1
+   },
+   "footprint": {
+    "a": 1,
+    "b": 1
+   },
+   "h": 54
   },
   {
    "asset": "planta-alta",
    "room": "recepcao",
    "tile": {
-    "i": 21,
-    "j": 0
+    "i": 27,
+    "j": 1
    },
    "footprint": {
     "a": 1,
     "b": 1
    },
-   "h": 48
+   "h": 50
   },
   {
    "asset": "parede-elevadores",
    "room": "elevadores",
    "tile": {
-    "i": 26,
+    "i": 30,
     "j": 0
    },
    "footprint": {
-    "a": 3,
+    "a": 8,
     "b": 1
    },
-   "h": 72
+   "h": 74
   },
   {
    "asset": "catraca",
-   "room": "elevadores",
-   "tile": {
-    "i": 24,
-    "j": 2
-   },
-   "footprint": {
-    "a": 1,
-    "b": 1
-   },
-   "h": 28
-  },
-  {
-   "asset": "catraca",
-   "room": "elevadores",
-   "tile": {
-    "i": 24,
-    "j": 3
-   },
-   "footprint": {
-    "a": 1,
-    "b": 1
-   },
-   "h": 28
-  },
-  {
-   "asset": "catraca",
-   "room": "elevadores",
-   "tile": {
-    "i": 24,
-    "j": 4
-   },
-   "footprint": {
-    "a": 1,
-    "b": 1
-   },
-   "h": 28
-  },
-  {
-   "asset": "planta-alta",
-   "room": "elevadores",
-   "tile": {
-    "i": 22,
-    "j": 0
-   },
-   "footprint": {
-    "a": 1,
-    "b": 1
-   },
-   "h": 48
-  },
-  {
-   "asset": "ficus",
-   "room": "elevadores",
-   "tile": {
-    "i": 31,
-    "j": 0
-   },
-   "footprint": {
-    "a": 1,
-    "b": 1
-   },
-   "h": 60
-  },
-  {
-   "asset": "banco-espera",
    "room": "elevadores",
    "tile": {
     "i": 29,
@@ -1217,20 +1061,72 @@
    },
    "footprint": {
     "a": 2,
+    "b": 2
+   },
+   "h": 30
+  },
+  {
+   "asset": "catraca",
+   "room": "elevadores",
+   "tile": {
+    "i": 32,
+    "j": 4
+   },
+   "footprint": {
+    "a": 2,
+    "b": 2
+   },
+   "h": 30
+  },
+  {
+   "asset": "catraca",
+   "room": "elevadores",
+   "tile": {
+    "i": 35,
+    "j": 4
+   },
+   "footprint": {
+    "a": 2,
+    "b": 2
+   },
+   "h": 30
+  },
+  {
+   "asset": "planta-alta",
+   "room": "elevadores",
+   "tile": {
+    "i": 28,
+    "j": 1
+   },
+   "footprint": {
+    "a": 1,
     "b": 1
    },
-   "h": 14
+   "h": 50
+  },
+  {
+   "asset": "ficus",
+   "room": "elevadores",
+   "tile": {
+    "i": 39,
+    "j": 1
+   },
+   "footprint": {
+    "a": 1,
+    "b": 1
+   },
+   "h": 54
   },
   {
    "asset": "tapete",
    "room": "convivencia",
    "tile": {
-    "i": 12,
-    "j": 7
+    "i": 15,
+    "j": 8
    },
    "footprint": {
-    "a": 3,
-    "b": 4
+    "a": 8,
+    "b": 6
    },
    "h": 2,
    "blocking": false
@@ -1239,89 +1135,90 @@
    "asset": "jardineira",
    "room": "convivencia",
    "tile": {
-    "i": 12,
-    "j": 6
+    "i": 17,
+    "j": 7
    },
    "footprint": {
-    "a": 3,
+    "a": 4,
     "b": 1
    },
-   "h": 32
+   "h": 30
   },
   {
    "asset": "sofa",
    "room": "convivencia",
    "tile": {
-    "i": 12,
-    "j": 8
+    "i": 17,
+    "j": 9
    },
    "footprint": {
-    "a": 3,
-    "b": 1
+    "a": 4,
+    "b": 2
    },
-   "h": 24
+   "h": 28
   },
   {
    "asset": "mesa-centro",
    "room": "convivencia",
    "tile": {
-    "i": 12,
-    "j": 10
+    "i": 18,
+    "j": 12
    },
    "footprint": {
-    "a": 2,
-    "b": 1
+    "a": 3,
+    "b": 2
    },
-   "h": 10
+   "h": 12
   },
   {
    "asset": "poltrona",
    "room": "convivencia",
    "tile": {
     "i": 15,
-    "j": 10
+    "j": 12
    },
    "footprint": {
-    "a": 1,
-    "b": 1
+    "a": 2,
+    "b": 2
    },
-   "h": 24
+   "h": 28
   },
   {
    "asset": "poltrona",
    "room": "convivencia",
    "tile": {
-    "i": 11,
-    "j": 10
+    "i": 21,
+    "j": 12
    },
    "footprint": {
-    "a": 1,
-    "b": 1
+    "a": 2,
+    "b": 2
    },
-   "h": 24
+   "h": 28,
+   "flip": true
   },
   {
    "asset": "luminaria-chao",
    "room": "convivencia",
    "tile": {
-    "i": 15,
-    "j": 7
+    "i": 22,
+    "j": 8
    },
    "footprint": {
     "a": 1,
     "b": 1
    },
-   "h": 56
+   "h": 52
   },
   {
    "asset": "estacao-2-monitores",
    "room": "backtest",
    "tile": {
-    "i": 12,
-    "j": 12
+    "i": 17,
+    "j": 17
    },
    "footprint": {
-    "a": 2,
+    "a": 3,
     "b": 2
    },
    "h": 36
@@ -1330,38 +1227,51 @@
    "asset": "armario-baixo",
    "room": "backtest",
    "tile": {
-    "i": 11,
-    "j": 12
+    "i": 21,
+    "j": 17
    },
    "footprint": {
     "a": 1,
     "b": 2
    },
-   "h": 20
+   "h": 24
   },
   {
    "asset": "planta-baixa",
    "room": "backtest",
    "tile": {
-    "i": 11,
-    "j": 14
+    "i": 15,
+    "j": 17
    },
    "footprint": {
     "a": 1,
     "b": 1
    },
-   "h": 20
+   "h": 24
+  },
+  {
+   "asset": "espada",
+   "room": "backtest",
+   "tile": {
+    "i": 22,
+    "j": 21
+   },
+   "footprint": {
+    "a": 1,
+    "b": 1
+   },
+   "h": 38
   },
   {
    "asset": "esteira",
    "room": "stress-lab",
    "tile": {
-    "i": 19,
-    "j": 7
+    "i": 26,
+    "j": 9
    },
    "footprint": {
     "a": 2,
-    "b": 1
+    "b": 2
    },
    "h": 32
   },
@@ -1369,8 +1279,8 @@
    "asset": "saco-pancada",
    "room": "stress-lab",
    "tile": {
-    "i": 22,
-    "j": 7
+    "i": 30,
+    "j": 9
    },
    "footprint": {
     "a": 1,
@@ -1382,148 +1292,31 @@
    "asset": "rack-halteres",
    "room": "stress-lab",
    "tile": {
-    "i": 18,
-    "j": 9
+    "i": 26,
+    "j": 12
    },
    "footprint": {
     "a": 2,
     "b": 1
    },
-   "h": 24
+   "h": 28
   },
   {
    "asset": "bancada-teste",
    "room": "stress-lab",
    "tile": {
-    "i": 21,
-    "j": 8
+    "i": 29,
+    "j": 12
    },
    "footprint": {
     "a": 2,
-    "b": 2
+    "b": 1
    },
-   "h": 32
+   "h": 30
   },
   {
    "asset": "espada",
    "room": "stress-lab",
-   "tile": {
-    "i": 23,
-    "j": 6
-   },
-   "footprint": {
-    "a": 1,
-    "b": 1
-   },
-   "h": 40
-  },
-  {
-   "asset": "estacao-madeira",
-   "room": "risk",
-   "tile": {
-    "i": 20,
-    "j": 12
-   },
-   "footprint": {
-    "a": 3,
-    "b": 2
-   },
-   "h": 36
-  },
-  {
-   "asset": "estacao-madeira",
-   "room": "risk",
-   "tile": {
-    "i": 20,
-    "j": 15
-   },
-   "footprint": {
-    "a": 3,
-    "b": 2
-   },
-   "h": 36
-  },
-  {
-   "asset": "cadeira-costas",
-   "room": "risk",
-   "tile": {
-    "i": 22,
-    "j": 14
-   },
-   "footprint": {
-    "a": 1,
-    "b": 1
-   },
-   "h": 24
-  },
-  {
-   "asset": "estante-arquivo",
-   "room": "risk",
-   "tile": {
-    "i": 23,
-    "j": 12
-   },
-   "footprint": {
-    "a": 2,
-    "b": 1
-   },
-   "h": 56
-  },
-  {
-   "asset": "ficus",
-   "room": "risk",
-   "tile": {
-    "i": 18,
-    "j": 16
-   },
-   "footprint": {
-    "a": 1,
-    "b": 1
-   },
-   "h": 60
-  },
-  {
-   "asset": "espada",
-   "room": "risk",
-   "tile": {
-    "i": 24,
-    "j": 16
-   },
-   "footprint": {
-    "a": 1,
-    "b": 1
-   },
-   "h": 40
-  },
-  {
-   "asset": "armarios-arquivo",
-   "room": "auditoria",
-   "tile": {
-    "i": 27,
-    "j": 6
-   },
-   "footprint": {
-    "a": 4,
-    "b": 1
-   },
-   "h": 56
-  },
-  {
-   "asset": "lockers",
-   "room": "auditoria",
-   "tile": {
-    "i": 27,
-    "j": 8
-   },
-   "footprint": {
-    "a": 3,
-    "b": 1
-   },
-   "h": 56
-  },
-  {
-   "asset": "rack-servidor",
-   "room": "auditoria",
    "tile": {
     "i": 31,
     "j": 7
@@ -1532,144 +1325,92 @@
     "a": 1,
     "b": 1
    },
-   "h": 64
+   "h": 38
   },
   {
-   "asset": "sofa-cinza",
-   "room": "auditoria",
+   "asset": "estacao-madeira",
+   "room": "risk",
    "tile": {
-    "i": 29,
-    "j": 10
-   },
-   "footprint": {
-    "a": 2,
-    "b": 1
-   },
-   "h": 24
-  },
-  {
-   "asset": "planta-alta",
-   "room": "auditoria",
-   "tile": {
-    "i": 31,
-    "j": 11
-   },
-   "footprint": {
-    "a": 1,
-    "b": 1
-   },
-   "h": 48
-  },
-  {
-   "asset": "mesa-reuniao-6",
-   "room": "diagnostico",
-   "tile": {
-    "i": 27,
-    "j": 15
+    "i": 26,
+    "j": 18
    },
    "footprint": {
     "a": 4,
-    "b": 3
+    "b": 2
    },
-   "h": 28
+   "h": 36
+  },
+  {
+   "asset": "estante-arquivo",
+   "room": "risk",
+   "tile": {
+    "i": 30,
+    "j": 17
+   },
+   "footprint": {
+    "a": 1,
+    "b": 2
+   },
+   "h": 50
   },
   {
    "asset": "ficus",
-   "room": "diagnostico",
+   "room": "risk",
    "tile": {
-    "i": 26,
-    "j": 13
+    "i": 25,
+    "j": 22
    },
    "footprint": {
     "a": 1,
     "b": 1
    },
-   "h": 60
+   "h": 54
   },
   {
-   "asset": "planta-alta",
-   "room": "diagnostico",
+   "asset": "espada",
+   "room": "risk",
    "tile": {
     "i": 31,
-    "j": 18
+    "j": 22
    },
    "footprint": {
     "a": 1,
     "b": 1
+   },
+   "h": 38
+  },
+  {
+   "asset": "armarios-arquivo",
+   "room": "auditoria",
+   "tile": {
+    "i": 35,
+    "j": 9
+   },
+   "footprint": {
+    "a": 4,
+    "b": 2
    },
    "h": 48
   },
   {
-   "asset": "bancada-cozinha",
-   "room": "cozinha",
+   "asset": "lockers",
+   "room": "auditoria",
    "tile": {
-    "i": 19,
-    "j": 17
+    "i": 35,
+    "j": 12
    },
    "footprint": {
-    "a": 4,
-    "b": 1
+    "a": 3,
+    "b": 2
    },
-   "h": 40
+   "h": 46
   },
   {
-   "asset": "banqueta",
-   "room": "cozinha",
+   "asset": "rack-servidor",
+   "room": "auditoria",
    "tile": {
-    "i": 19,
-    "j": 18
-   },
-   "footprint": {
-    "a": 1,
-    "b": 1
-   },
-   "h": 20
-  },
-  {
-   "asset": "banqueta",
-   "room": "cozinha",
-   "tile": {
-    "i": 20,
-    "j": 18
-   },
-   "footprint": {
-    "a": 1,
-    "b": 1
-   },
-   "h": 20
-  },
-  {
-   "asset": "banqueta",
-   "room": "cozinha",
-   "tile": {
-    "i": 21,
-    "j": 18
-   },
-   "footprint": {
-    "a": 1,
-    "b": 1
-   },
-   "h": 20
-  },
-  {
-   "asset": "banqueta",
-   "room": "cozinha",
-   "tile": {
-    "i": 22,
-    "j": 18
-   },
-   "footprint": {
-    "a": 1,
-    "b": 1
-   },
-   "h": 20
-  },
-  {
-   "asset": "geladeira",
-   "room": "cozinha",
-   "tile": {
-    "i": 23,
-    "j": 17
+    "i": 39,
+    "j": 11
    },
    "footprint": {
     "a": 1,
@@ -1678,50 +1419,115 @@
    "h": 56
   },
   {
-   "asset": "planta-baixa",
-   "room": "cozinha",
+   "asset": "mesa-reuniao-6",
+   "room": "diagnostico",
    "tile": {
-    "i": 18,
+    "i": 35,
+    "j": 18
+   },
+   "footprint": {
+    "a": 4,
+    "b": 4
+   },
+   "h": 30
+  },
+  {
+   "asset": "planta-baixa",
+   "room": "diagnostico",
+   "tile": {
+    "i": 34,
     "j": 17
    },
    "footprint": {
     "a": 1,
     "b": 1
    },
-   "h": 20
+   "h": 24
+  },
+  {
+   "asset": "espada",
+   "room": "diagnostico",
+   "tile": {
+    "i": 39,
+    "j": 22
+   },
+   "footprint": {
+    "a": 1,
+    "b": 1
+   },
+   "h": 38
+  },
+  {
+   "asset": "bancada-cozinha",
+   "room": "cozinha",
+   "tile": {
+    "i": 26,
+    "j": 25
+   },
+   "footprint": {
+    "a": 4,
+    "b": 2
+   },
+   "h": 40
+  },
+  {
+   "asset": "banqueta",
+   "room": "cozinha",
+   "tile": {
+    "i": 26,
+    "j": 28
+   },
+   "footprint": {
+    "a": 1,
+    "b": 1
+   },
+   "h": 22
+  },
+  {
+   "asset": "banqueta",
+   "room": "cozinha",
+   "tile": {
+    "i": 28,
+    "j": 28
+   },
+   "footprint": {
+    "a": 1,
+    "b": 1
+   },
+   "h": 22
+  },
+  {
+   "asset": "geladeira",
+   "room": "cozinha",
+   "tile": {
+    "i": 31,
+    "j": 25
+   },
+   "footprint": {
+    "a": 1,
+    "b": 2
+   },
+   "h": 52
   },
   {
    "asset": "mesa-cafe-4",
    "room": "cafe",
    "tile": {
-    "i": 14,
-    "j": 21
+    "i": 19,
+    "j": 26
    },
    "footprint": {
-    "a": 2,
-    "b": 2
+    "a": 3,
+    "b": 3
    },
-   "h": 24
-  },
-  {
-   "asset": "mesa-cafe-4",
-   "room": "cafe",
-   "tile": {
-    "i": 16,
-    "j": 18
-   },
-   "footprint": {
-    "a": 2,
-    "b": 2
-   },
-   "h": 24
+   "h": 28
   },
   {
    "asset": "samambaia",
    "room": "cafe",
    "tile": {
-    "i": 14,
-    "j": 23
+    "i": 17,
+    "j": 29
    },
    "footprint": {
     "a": 1,
@@ -1730,82 +1536,69 @@
    "h": 32
   },
   {
-   "asset": "planta-baixa",
-   "room": "cafe",
-   "tile": {
-    "i": 17,
-    "j": 23
-   },
-   "footprint": {
-    "a": 1,
-    "b": 1
-   },
-   "h": 20
-  },
-  {
    "asset": "sofa-externo",
    "room": "varanda",
    "tile": {
-    "i": 25,
-    "j": 21
+    "i": 34,
+    "j": 25
    },
    "footprint": {
-    "a": 3,
-    "b": 1
+    "a": 4,
+    "b": 2
    },
-   "h": 22
+   "h": 26
   },
   {
    "asset": "poltrona-externa",
    "room": "varanda",
    "tile": {
-    "i": 30,
-    "j": 21
+    "i": 38,
+    "j": 25
    },
    "footprint": {
-    "a": 1,
-    "b": 1
+    "a": 2,
+    "b": 2
    },
-   "h": 22
+   "h": 26
   },
   {
    "asset": "mesa-externa",
    "room": "varanda",
    "tile": {
-    "i": 28,
-    "j": 21
+    "i": 36,
+    "j": 28
+   },
+   "footprint": {
+    "a": 2,
+    "b": 2
+   },
+   "h": 12
+  },
+  {
+   "asset": "jardineira-capim",
+   "room": "varanda",
+   "tile": {
+    "i": 34,
+    "j": 29
    },
    "footprint": {
     "a": 2,
     "b": 1
    },
-   "h": 10
+   "h": 26
   },
   {
    "asset": "jardineira-capim",
    "room": "varanda",
    "tile": {
-    "i": 24,
-    "j": 23
+    "i": 38,
+    "j": 29
    },
    "footprint": {
-    "a": 3,
+    "a": 2,
     "b": 1
    },
-   "h": 28
-  },
-  {
-   "asset": "jardineira-capim",
-   "room": "varanda",
-   "tile": {
-    "i": 29,
-    "j": 23
-   },
-   "footprint": {
-    "a": 3,
-    "b": 1
-   },
-   "h": 28
+   "h": 26
   },
   {
    "asset": "jardineira-capim",
@@ -1815,120 +1608,107 @@
     "j": 0
    },
    "footprint": {
-    "a": 3,
+    "a": 4,
     "b": 1
    },
-   "h": 28
+   "h": 26
   },
   {
-   "asset": "planta-alta",
+   "asset": "jardineira-capim",
    "room": "terraco-norte",
    "tile": {
-    "i": 7,
+    "i": 8,
     "j": 0
+   },
+   "footprint": {
+    "a": 4,
+    "b": 1
+   },
+   "h": 26
+  },
+  {
+   "asset": "planta-baixa",
+   "tile": {
+    "i": 13,
+    "j": 8
    },
    "footprint": {
     "a": 1,
     "b": 1
    },
-   "h": 48
-  },
-  {
-   "asset": "planta-baixa",
-   "room": "terraco-norte",
-   "tile": {
-    "i": 4,
-    "j": 0
-   },
-   "footprint": {
-    "a": 1,
-    "b": 1
-   },
-   "h": 20
+   "h": 24
   },
   {
    "asset": "planta-baixa",
    "tile": {
-    "i": 9,
+    "i": 24,
     "j": 7
    },
    "footprint": {
     "a": 1,
     "b": 1
    },
-   "h": 20
+   "h": 24
+  },
+  {
+   "asset": "planta-baixa",
+   "tile": {
+    "i": 24,
+    "j": 15
+   },
+   "footprint": {
+    "a": 1,
+    "b": 1
+   },
+   "h": 24
+  },
+  {
+   "asset": "planta-baixa",
+   "tile": {
+    "i": 33,
+    "j": 8
+   },
+   "footprint": {
+    "a": 1,
+    "b": 1
+   },
+   "h": 24
   },
   {
    "asset": "planta-baixa",
    "tile": {
     "i": 16,
-    "j": 6
+    "j": 24
    },
    "footprint": {
     "a": 1,
     "b": 1
    },
-   "h": 20
+   "h": 24
   },
   {
    "asset": "planta-baixa",
    "tile": {
-    "i": 17,
-    "j": 10
+    "i": 24,
+    "j": 24
    },
    "footprint": {
     "a": 1,
     "b": 1
    },
-   "h": 20
+   "h": 24
   },
   {
    "asset": "planta-baixa",
    "tile": {
-    "i": 25,
-    "j": 7
+    "i": 33,
+    "j": 24
    },
    "footprint": {
     "a": 1,
     "b": 1
    },
-   "h": 20
-  },
-  {
-   "asset": "planta-baixa",
-   "tile": {
-    "i": 23,
-    "j": 22
-   },
-   "footprint": {
-    "a": 1,
-    "b": 1
-   },
-   "h": 20
-  },
-  {
-   "asset": "planta-baixa",
-   "tile": {
-    "i": 12,
-    "j": 23
-   },
-   "footprint": {
-    "a": 1,
-    "b": 1
-   },
-   "h": 20
-  },
-  {
-   "asset": "planta-baixa",
-   "tile": {
-    "i": 16,
-    "j": 16
-   },
-   "footprint": {
-    "a": 1,
-    "b": 1
-   },
-   "h": 20
+   "h": 24
   }
  ]
 }

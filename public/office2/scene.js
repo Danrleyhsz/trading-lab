@@ -29,15 +29,15 @@
   }
   const FLOOR_TEXTURE={'piso-claro':'piso-marmore',madeira:'piso-madeira','carpete-escuro':'carpete','piso-tecnico':'carpete',deck:'deck'};
   function wallTexture(ctx,w){return texturePattern(ctx,signAt.has([w.a.i,w.a.j,w.b.i,w.b.j].join(','))||w.room==='hall-marca'?'parede-ripada':'parede-escura',w.a.j===w.b.j?'i':'j');}
-  const screenWalls=new Set(map.screens.map(s=>s.room));
   /** Altura e tipo de cada parede de fundo/frente, pela regra da OFFICE_VISUAL_SPEC.md (seção 4). */
   function wallSpec(room,side){
    const type=room.edges?.[side]??(side==='j0'||side==='i0'?'divisoria-baixa':null);if(!type)return null;
+   if(type==='aberta')return null;
    const plateEdge=(side==='j0'&&room.tiles.j0===0)||(side==='i0'&&room.tiles.i0===0);
    if(type==='guarda-corpo-vidro')return {type,h:RAIL,glass:true};
    if(type==='fachada-vidro')return {type,h:side==='i1'||side==='j1'?RAIL:TALL,glass:true};
    if(type==='divisoria-vidro')return {type,h:GLASS,glass:true};
-   if(type==='parede-marca'||plateEdge||(side==='j0'&&screenWalls.has(room.id)))return {type,h:TALL,glass:false};
+   if(type==='parede-marca'||(type==='parede-painel'&&side==='j0')||plateEdge||map.screens.some(s=>s.room===room.id&&s.wall===side))return {type,h:TALL,glass:false};
    return {type,h:LOW,glass:false};
   }
   const doorAt=new Set(iso.doors.map(d=>d.room+':'+d.side+':'+(d.side[0]==='i'?d.inner.j:d.inner.i)));
@@ -49,35 +49,42 @@
   // Uma borda compartilhada entre duas salas aparece uma vez (a mais alta).
   const uniq=new Map();for(const w of walls){const k=[w.a.i,w.a.j,w.b.i,w.b.j].join(',');const prev=uniq.get(k);if(!prev||w.h>prev.h)uniq.set(k,w);}
   const wallList=[...uniq.values()];
+  // Uma porta abre também o trecho da parede da sala vizinha na mesma borda.
+  for(const d of iso.doors){const a=d.inner,b=d.outer;
+   const segment=a.i===b.i?[a.i,Math.max(a.j,b.j),a.i+1,Math.max(a.j,b.j)]:[Math.max(a.i,b.i),a.j,Math.max(a.i,b.i),a.j+1];
+   uniq.delete(segment.join(','));
+  }
+  wallList.splice(0,wallList.length,...uniq.values());
   /**
    * Placas das zonas pintadas na parede de fundo (como na referência): painel escuro de 3+ tiles livres de tela e de porta,
    * com nome grande, subtítulo e emblema. Cada fatia de parede desenha o seu pedaço da placa, na própria profundidade.
    */
   const SIGN_H=70,HEAD=24,signAt=new Map(),headerAt=new Map(),signs=[];
-  for(const r of map.rooms){if(r.outdoor||r.module==='PANORAMIC_EDGE'||r.edges?.j0==='parede-marca'||r.id==='elevadores')continue;
-   const t=r.tiles,busy=new Set(map.screens.filter(s=>s.room===r.id).flatMap(s=>Array.from({length:s.tiles.to-s.tiles.from},(_,k)=>s.tiles.from+k)));
+  for(const r of map.rooms){if(r.outdoor||r.module==='PANORAMIC_EDGE'||r.id==='elevadores')continue;
+   const t=r.tiles,busyFor=side=>new Set(map.screens.filter(s=>s.room===r.id&&s.wall===side).flatMap(s=>Array.from({length:s.tiles.to-s.tiles.from},(_,k)=>s.tiles.from+k))),busy=busyFor('j0'),busyI=busyFor('i0');
    const run=(side,lo,hi,blocked)=>{let best=null,start=null;for(let k=lo;k<=hi;k++){const ok=k<hi&&!blocked(k);if(ok&&start===null)start=k;if(!ok&&start!==null){if(!best||k-start>best.to-best.from)best={side,from:start,to:k};start=null;}}return best;};
    const seg=(side,k)=>side==='j0'?[k,t.j0,k+1,t.j0]:[t.i0,k,t.i0,k+1];
-   const has=(side,k)=>{const w=uniq.get(seg(side,k).join(','));return !!w&&!w.glass;};
+   const has=(side,k)=>{const w=uniq.get(seg(side,k).join(','));return !!w&&!w.glass&&w.h>=TALL;};
    let pick=run('j0',t.i0,t.i1,k=>busy.has(k)||!has('j0',k));
-   if(!pick||pick.to-pick.from<3){const alt=run('i0',t.j0,t.j1,k=>!has('i0',k));if(alt&&alt.to-alt.from>=3&&(!pick||alt.to-alt.from>pick.to-pick.from))pick=alt;}
+   if(!pick||pick.to-pick.from<3){const alt=run('i0',t.j0,t.j1,k=>busyI.has(k)||!has('i0',k));if(alt&&alt.to-alt.from>=3&&(!pick||alt.to-alt.from>pick.to-pick.from))pick=alt;}
    if(!pick||pick.to-pick.from<3){
     // Parede de fundo tomada por telas: a placa vira uma faixa iluminada em cima delas (maior trecho sólido da parede j0).
-    const band=run('j0',t.i0,t.i1,k=>!has('j0',k));
-    if(band&&band.to-band.from>=3&&busy.size){const [title,sub]=String(r.label).split(' · ');const s={room:r.id,side:'j0',from:band.from,to:band.to,line:t.j0,title:title.toUpperCase(),sub:(sub??'').toUpperCase(),header:true};
-     signs.push(s);for(let k=s.from;k<s.to;k++)headerAt.set(seg('j0',k).join(','),s);}
+    const side=busy.size?'j0':busyI.size?'i0':null;
+    const band=side&&run(side,side==='j0'?t.i0:t.j0,side==='j0'?t.i1:t.j1,k=>!has(side,k));
+    if(band&&band.to-band.from>=3){const [title,sub]=String(r.label).split(' · ');const s={room:r.id,side,from:band.from,to:band.to,line:side==='j0'?t.j0:t.i0,title:title.toUpperCase(),sub:(sub??'').toUpperCase(),header:true};
+     signs.push(s);for(let k=s.from;k<s.to;k++)headerAt.set(seg(side,k).join(','),s);}
     continue;}
    if(pick.to-pick.from>6){const mid=Math.floor((pick.from+pick.to)/2);pick={...pick,from:mid-3,to:mid+3};}
-   const [title,sub]=String(r.label).split(' · ');
-   const s={room:r.id,module:r.module,side:pick.side,from:pick.from,to:pick.to,line:pick.side==='j0'?t.j0:t.i0,title:title.toUpperCase(),sub:(sub??'').toUpperCase()};
-   signs.push(s);for(let k=s.from;k<s.to;k++)signAt.set(seg(s.side,k).join(','),s);}
+   const [title,sub]=r.id==='hall-marca'?['TRADINGLAB','']:String(r.label).split(' · ');
+   const s={room:r.id,module:r.module,side:pick.side,from:pick.from,to:pick.to,line:pick.side==='j0'?t.j0:t.i0,title:title.toUpperCase(),sub:(sub??'').toUpperCase(),header:r.id==='cozinha'};
+   signs.push(s);for(let k=s.from;k<s.to;k++)(s.header?headerAt:signAt).set(seg(s.side,k).join(','),s);}
   /** Ponto da placa: u ao longo da parede (0 = começo da leitura), z = altura. j0 lê ao longo de +i; i0 lê subindo (de j1 para j0). */
   const signPoint=(s,u,z)=>s.side==='j0'?P(s.from+u,s.line,z):P(s.line,s.to-u,z);
   /** Faixa de placa em cima das telas: de TALL até TALL+HEAD, texto numa linha só ("HORIZON · INTELIGÊNCIA DE MERCADO"). */
   function drawHeaderSlice(ctx,s,w){
    const z0=TALL,z1=TALL+HEAD,a=P(w.a.i,w.a.j,z0),b=P(w.b.i,w.b.j,z0),bt=P(w.b.i,w.b.j,z1),at=P(w.a.i,w.a.j,z1);
    ctx.save();poly(ctx,[a,b,bt,at],'#141924');ctx.beginPath();[a,b,bt,at].forEach((p,k)=>k?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));ctx.closePath();ctx.clip();
-   const o=P(s.from,s.line,z1),e=P(s.from+1,s.line,z1),ux=(e.x-o.x)/26.833,uy=(e.y-o.y)/26.833,L=(s.to-s.from)*26.833;
+   const o=signPoint(s,0,z1),e=signPoint(s,1,z1),ux=(e.x-o.x)/26.833,uy=(e.y-o.y)/26.833,L=(s.to-s.from)*26.833;
    ctx.transform(ux,uy,0,1,o.x,o.y);ctx.fillStyle='rgba(255,210,122,0.85)';ctx.fillRect(4,HEAD-2,L-8,1);
    const emblem=images?.emblems?.[s.room];let x0=8;if(emblem&&emblem.complete&&emblem.naturalWidth){ctx.imageSmoothingEnabled=true;ctx.drawImage(emblem,x0,3,16,16);x0+=22;}
    const txt=s.title+(s.sub?'  ·  '+s.sub:'');let f=13;ctx.font=`800 ${f}px "Segoe UI",system-ui,sans-serif`;while(f>7&&(ctx.measureText(txt)?.width??0)>L-x0-8){f-=1;ctx.font=`800 ${f}px "Segoe UI",system-ui,sans-serif`;}
@@ -101,32 +108,50 @@
    ctx.restore();
    ctx.strokeStyle='#0c0f16';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(at.x,at.y);ctx.lineTo(bt.x,bt.y);ctx.stroke();
   }
-  /** Fachada de vidro do prédio abaixo da planta: um andar a cada 46 px, um painel por tile, janelas acesas por semente (decoração). */
-  function drawFacade(ctx,left,bottom,right,depth){
-   const FH=46,face=(a,b,n,base,seed,shade)=>{
-    const quad=[a,b,{x:b.x,y:b.y+depth},{x:a.x,y:a.y+depth}];poly(ctx,quad,base);const rnd=Office2Iso.prng(seed);
-    for(let f=0;f*FH<depth;f++){const y0=12+f*FH,busy=rnd(),panes=n*3;
-     ctx.strokeStyle='#2a3142';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(a.x,a.y+y0);ctx.lineTo(b.x,b.y+y0);ctx.stroke();
-     // Três vidraças por tile; cada andar tem sua própria taxa de luzes acesas (andares de escritório cheios, outros vazios).
-     for(let k=0;k<panes;k++){const u0=(k+0.14)/panes,u1=(k+0.86)/panes,x0=a.x+(b.x-a.x)*u0,x1=a.x+(b.x-a.x)*u1,ya=a.y+(b.y-a.y)*u0+y0,yb=a.y+(b.y-a.y)*u1+y0,r=rnd();
-      const fill=r<busy*0.55?`rgba(255,${200+Math.floor(rnd()*22)},${120+Math.floor(rnd()*40)},${(0.45+rnd()*0.4).toFixed(2)})`:r<busy*0.55+0.08?'rgba(159,196,232,0.28)':shade?'#0d1526':'#122038';
-      poly(ctx,[{x:x0,y:ya+6},{x:x1,y:yb+6},{x:x1,y:yb+FH-8},{x:x0,y:ya+FH-8}],fill);}}
-    // Reflexo do céu no topo do vidro e escuridão para baixo (o chão da rua some na névoa).
-    const top=Math.min(a.y,b.y),g=ctx.createLinearGradient(0,top,0,top+depth);g.addColorStop(0,'rgba(120,150,200,0.10)');g.addColorStop(0.35,'rgba(8,12,24,0.15)');g.addColorStop(1,'rgba(8,12,24,0.9)');poly(ctx,quad,g);
-    if(shade)poly(ctx,quad,'rgba(4,8,16,0.28)');
+  /** Fachada arquitetônica: módulos de vidro largos, lajes, reflexos e interiores, com geometria da planta. */
+  function drawFacade(ctx,left,bottom,right,depth,phase){
+   const palette=globalThis.Office2Ambience?.palette[phase]??{glass:'#142b47',reflection:'#4a78a9',warm:.64},FH=52;
+   const face=(a,b,n,seed,shade)=>{
+    const quad=[a,b,{x:b.x,y:b.y+depth},{x:a.x,y:a.y+depth}],rnd=Office2Iso.prng(seed),bays=Math.ceil(n/2);
+    poly(ctx,quad,palette.glass);
+    const reflection=images?.skylines?.[phase]??images?.skyline;
+    if(reflection?.complete&&reflection.naturalWidth){ctx.save();ctx.clip();ctx.globalAlpha=.16;ctx.drawImage(reflection,Math.min(a.x,b.x),Math.min(a.y,b.y),Math.abs(b.x-a.x),depth+Math.abs(b.y-a.y));ctx.restore();}
+    for(let f=0;f*FH<depth;f++){
+     const y0=14+f*FH;
+     for(let k=0;k<bays;k++){
+      const u0=(k+.06)/bays,u1=(k+.94)/bays,x0=a.x+(b.x-a.x)*u0,x1=a.x+(b.x-a.x)*u1;
+      const ya=a.y+(b.y-a.y)*u0+y0,yb=a.y+(b.y-a.y)*u1+y0,r=rnd();
+      const pane=[{x:x0,y:ya},{x:x1,y:yb},{x:x1,y:yb+FH-7},{x:x0,y:ya+FH-7}];
+      const g=ctx.createLinearGradient(x0,ya,x1,yb+FH);g.addColorStop(0,palette.reflection);g.addColorStop(.34,palette.glass);g.addColorStop(.72,shade?'#14233b':'#284766');g.addColorStop(1,palette.glass);poly(ctx,pane,g);
+      if(r<palette.warm){
+       poly(ctx,pane,'rgba(255,202,126,'+(.16+rnd()*.28).toFixed(2)+')');
+       // Bancadas e persianas atrás do vidro, decoração determinística.
+       poly(ctx,[{x:x0+2,y:ya+FH-15},{x:x1-2,y:yb+FH-15},{x:x1-2,y:yb+FH-9},{x:x0+2,y:ya+FH-9}],'rgba(10,25,42,.44)');
+      }
+      const xm=(x0+x1)/2,ym=(ya+yb)/2;
+      ctx.strokeStyle='rgba(151,185,207,.36)';ctx.lineWidth=.8;ctx.beginPath();ctx.moveTo(xm,ym);ctx.lineTo(xm,ym+FH-7);ctx.stroke();
+      ctx.strokeStyle='rgba(194,217,230,.32)';ctx.beginPath();ctx.moveTo(x0+1,ya+2);ctx.lineTo(x1-1,yb+2);ctx.stroke();
+     }
+     poly(ctx,[{x:a.x,y:a.y+y0-5},{x:b.x,y:b.y+y0-5},{x:b.x,y:b.y+y0},{x:a.x,y:a.y+y0}],shade?'#223247':'#3d5066');
+    }
+    // Reflexos verticais do entorno conservam a perspectiva e não são janelas estreitas repetidas.
+    for(let k=0;k<5;k++){const u=(k+.35)/5,v=u+.025;poly(ctx,[{x:a.x+(b.x-a.x)*u,y:a.y+(b.y-a.y)*u},{x:a.x+(b.x-a.x)*v,y:a.y+(b.y-a.y)*v},{x:a.x+(b.x-a.x)*v,y:a.y+(b.y-a.y)*v+depth},{x:a.x+(b.x-a.x)*u,y:a.y+(b.y-a.y)*u+depth}],'rgba(187,217,237,.08)');}
+    if(shade)poly(ctx,quad,'rgba(5,15,32,.17)');
+    const top=Math.min(a.y,b.y),fog=ctx.createLinearGradient(0,top,0,top+depth);fog.addColorStop(0,'rgba(7,16,30,0)');fog.addColorStop(1,'rgba(7,16,30,.82)');poly(ctx,quad,fog);
    };
-   face(left,bottom,iso.W,'#0f192c',32,false);face(bottom,right,iso.H,'#0b1322',33,true);
-   // Quina do prédio e borda da laje do 30º andar com LED quente.
-   ctx.strokeStyle='rgba(159,196,232,0.35)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(bottom.x,bottom.y);ctx.lineTo(bottom.x,bottom.y+depth);ctx.stroke();
-   poly(ctx,[left,bottom,{x:bottom.x,y:bottom.y+10},{x:left.x,y:left.y+10}],C.slabEdge);poly(ctx,[bottom,right,{x:right.x,y:right.y+10},{x:bottom.x,y:bottom.y+10}],'#222a3d');
-   ctx.strokeStyle='rgba(255,210,122,0.85)';ctx.beginPath();ctx.moveTo(left.x,left.y+9);ctx.lineTo(bottom.x,bottom.y+9);ctx.lineTo(right.x,right.y+9);ctx.stroke();
+   face(left,bottom,iso.W,32,false);face(bottom,right,iso.H,33,true);
+   poly(ctx,[left,bottom,{x:bottom.x,y:bottom.y+10},{x:left.x,y:left.y+10}],'#52657c');
+   poly(ctx,[bottom,right,{x:right.x,y:right.y+10},{x:bottom.x,y:bottom.y+10}],'#344b65');
+   ctx.strokeStyle='rgba(215,230,245,.7)';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(bottom.x,bottom.y+10);ctx.lineTo(bottom.x,bottom.y+depth);ctx.stroke();
+   ctx.strokeStyle='rgba(255,210,122,.85)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(left.x,left.y+8);ctx.lineTo(bottom.x,bottom.y+8);ctx.lineTo(right.x,right.y+8);ctx.stroke();
   }
   /** Cache estático em 2×: fachada, pisos e luz do teto. O céu e a cidade são o fundo em tela cheia (backdrop). */
-  function renderStatic(scale=2){
-   const {w,h}=map.projection.scene,H2=h+DROP,cv=typeof OffscreenCanvas!=='undefined'?new OffscreenCanvas(w*scale,H2*scale):Object.assign(document.createElement('canvas'),{width:w*scale,height:H2*scale});
+  function renderStatic(scale=2,phase='night',height=0){
+   const {w,h}=map.projection.scene,H2=Math.max(h+DROP,height),cv=typeof OffscreenCanvas!=='undefined'?new OffscreenCanvas(w*scale,H2*scale):Object.assign(document.createElement('canvas'),{width:w*scale,height:H2*scale});
+   cv.worldHeight=H2;
    const ctx=cv.getContext('2d');ctx.imageSmoothingEnabled=false;ctx.scale(scale,scale);
    const W=iso.W,H=iso.H,left=P(0,H),bottom=P(W,H),right=P(W,0);
-   drawFacade(ctx,left,bottom,right,H2-bottom.y+20);
+   drawFacade(ctx,left,bottom,right,H2-bottom.y+20,phase);
    // L1: pisos por material; tiles fora das salas são circulação (piso claro).
    for(let i=0;i<W;i++)for(let j=0;j<H;j++){const r=iso.roomAt(i,j),mat=C.floor[r?.floor??'piso-claro']??C.floor['piso-claro'];
     const pts=[P(i,j),P(i+1,j),P(i+1,j+1),P(i,j+1)],texture=texturePattern(ctx,FLOOR_TEXTURE[r?.floor??'piso-claro']);poly(ctx,pts,texture??mat[0]);
@@ -167,8 +192,8 @@
   }
   /** Tela de parede: apagada e listrada quando não há dado (UNKNOWN); o conteúdo real entra nas fases F2–F5. */
   function drawScreen(ctx,s,content){
-   const r=roomById.get(s.room),J=r.tiles.j0,bottom=12;
-   const pts=[P(s.tiles.from+0.15,J,bottom+s.heightPx),P(s.tiles.to-0.15,J,bottom+s.heightPx),P(s.tiles.to-0.15,J,bottom),P(s.tiles.from+0.15,J,bottom)];
+   const r=roomById.get(s.room),J=r.tiles.j0,I=r.tiles.i0,bottom=12;
+   const pts=s.wall==='i0'?[P(I,s.tiles.to-.15,bottom+s.heightPx),P(I,s.tiles.from+.15,bottom+s.heightPx),P(I,s.tiles.from+.15,bottom),P(I,s.tiles.to-.15,bottom)]:[P(s.tiles.from+0.15,J,bottom+s.heightPx),P(s.tiles.to-0.15,J,bottom+s.heightPx),P(s.tiles.to-0.15,J,bottom),P(s.tiles.from+0.15,J,bottom)];
    poly(ctx,pts,C.screenFrame);const inner=pts.map((p,k)=>({x:p.x+(k===0||k===3?2:-2),y:p.y+(k<2?2:-2)}));poly(ctx,inner,C.screenOff);
    // Conteúdo real desenhado por cima; se a função disser que não há dado (false), a tela volta a ficar apagada.
    if(content&&content(ctx,inner)!==false)return;
@@ -182,15 +207,22 @@
    * no canto da frente. Arte com eixo longo em i ou j é espelhada quando o móvel do mapa corre no outro eixo.
    */
   function drawProp(ctx,p){
+   if(p.blocking===false){
+    // Peças de chão usam o losango completo; os apoios inferiores de uma peça alta não se aplicam a um tapete.
+    const {i,j}=p.tile,{a,b}=p.footprint,pad=.18,pts=[P(i+pad,j+pad),P(i+a-pad,j+pad),P(i+a-pad,j+b-pad),P(i+pad,j+b-pad)];
+    ctx.save();poly(ctx,pts,'#b98d52');ctx.clip();
+    const art=images?.props?.[p.asset];if(art?.complete&&art.naturalWidth){const xs=pts.map(p=>p.x),ys=pts.map(p=>p.y);ctx.drawImage(art,Math.min(...xs),Math.min(...ys),Math.max(...xs)-Math.min(...xs),Math.max(...ys)-Math.min(...ys));}
+    ctx.restore();poly(ctx,pts,null,'#ead7a7');
+    poly(ctx,[P(i+.4,j+.4),P(i+a-.4,j+.4),P(i+a-.4,j+b-.4),P(i+.4,j+b-.4)],null,'#ead7a7');return;
+   }
    const art=images?.props?.[p.asset],info=images?.propInfo?.[p.asset];
    if(art&&info&&art.complete&&art.naturalWidth){const {i,j}=p.tile,{a,b}=p.footprint;
-    const boxW=(a+b)*24,boxH=p.h+(a+b)*12,s=Math.min(boxW/info.width,boxH/info.height);
-    const cx=(P(i,j+b).x+P(i+a,j).x)/2,base=P(i+a,j+b).y+2,dw=info.width*s,dh=info.height*s;
-    const flip=(info.axis==='i'&&b>a)||(info.axis==='j'&&a>b);
+    const place=iso.propPlacement(p,info,images?.supports?.[p.asset]),{s,flip}=place;
+    const cx=place.x,base=place.y,dw=info.width*s,dh=info.height*s;
     // Luz de LED do balcão no chão à frente (decoração).
     if(GLOW_FLOOR.has(p.asset)){const g=ctx.createRadialGradient(cx,base-4,2,cx,base-4,dw*0.6);g.addColorStop(0,'rgba(255,196,110,0.28)');g.addColorStop(1,'rgba(255,196,110,0)');ctx.save();ctx.globalCompositeOperation='lighter';ctx.fillStyle=g;ctx.fillRect(cx-dw*0.6,base-4-dw*0.3,dw*1.2,dw*0.6);ctx.restore();}
-    ctx.save();ctx.imageSmoothingEnabled=true;ctx.translate(Math.round(cx),Math.round(base));if(flip)ctx.scale(-1,1);
-    ctx.drawImage(art,-dw/2,-dh,dw,dh);ctx.restore();
+    ctx.save();ctx.imageSmoothingEnabled=true;ctx.translate(cx,base);if(flip)ctx.scale(-1,1);
+    ctx.drawImage(art,place.dx,place.dy,dw,dh);ctx.restore();
     // Monitores ligados, sem conteúdo: só o brilho azulado da tela (decoração; nenhum gráfico inventado).
     if(GLOW_SCREEN.has(p.asset)){const y=base-dh*0.78,g=ctx.createRadialGradient(cx,y,2,cx,y,dw*0.55);g.addColorStop(0,'rgba(95,182,255,0.26)');g.addColorStop(1,'rgba(95,182,255,0)');ctx.save();ctx.globalCompositeOperation='lighter';ctx.fillStyle=g;ctx.fillRect(cx-dw*0.55,y-dw*0.3,dw*1.1,dw*0.6);ctx.restore();}
     return;}
@@ -207,24 +239,26 @@
    const modern=images?.characters?.[ag.id],frames=images?.characterFrames;
    if(modern?.complete&&modern.naturalWidth&&frames){
     const f=Office2Iso.frameGpt(ag.dir,ag.mode,ag.step),{w,h}=frames.cell,scale=map.projection.personHeightPx/frames.standingHeight;
-    ctx.save();ctx.globalAlpha=ag.dim?0.55:1;ctx.translate(feet.x,feet.y);if(f.flip)ctx.scale(-1,1);ctx.imageSmoothingEnabled=true;
+    ctx.save();ctx.globalAlpha*=ag.dim?0.55:1;ctx.translate(feet.x,feet.y);if(f.flip)ctx.scale(-1,1);ctx.imageSmoothingEnabled=true;
     ctx.drawImage(modern,f.col*w,f.row*h,w,h,-w*scale/2,-h*scale,w*scale,h*scale);ctx.restore();return;
    }
    if(!sheet||!img||!img.complete||!img.naturalWidth)return;
    const f=Office2Iso.frame(ag.dir,ag.mode,ag.step),b=sheet.frames[f.row*6+f.col],ps=sheet.pixelScale??1,scale=map.projection.personHeightPx/(sheet.referenceHeight??b.h);
    const dw=b.w*scale,dh=b.h*scale,dx=feet.x-(b.pivotX-b.x)*scale,dy=feet.y-dh+(ag.mode==='seated'?4:0);
-   ctx.globalAlpha=ag.dim?0.55:1;ctx.drawImage(img,b.x*ps,b.y*ps,b.w*ps,b.h*ps,Math.round(dx),Math.round(dy),Math.round(dw),Math.round(dh));ctx.globalAlpha=1;
+   ctx.save();ctx.globalAlpha*=ag.dim?0.55:1;ctx.drawImage(img,b.x*ps,b.y*ps,b.w*ps,b.h*ps,Math.round(dx),Math.round(dy),Math.round(dw),Math.round(dh));ctx.restore();
   }
   /** Um quadro: cache estático + itens ordenados por profundidade. */
-  function draw(ctx,cache,agents,sheets,charImages,screenContent){
-   const {w,h}=map.projection.scene;ctx.drawImage(cache,0,0,w,h+DROP);
+  function draw(ctx,cache,agents,sheets,charImages,screenContent,focus=null,oldCache=null,progress=1){
+   const {w,h}=map.projection.scene;ctx.drawImage(cache,0,0,w,cache.worldHeight??h+DROP);if(oldCache){ctx.save();ctx.globalAlpha=1-progress;ctx.drawImage(oldCache,0,0,w,oldCache.worldHeight??h+DROP);ctx.restore();}
    const items=[];
-   for(const wl of wallList)items.push({key:wl.key,draw:()=>drawWall(ctx,wl)});
-   for(const s of map.screens){const r=roomById.get(s.room);items.push({key:(s.tiles.to-1)+r.tiles.j0-0.4,draw:()=>drawScreen(ctx,s,screenContent?.[s.id])});}
+   for(const wl of wallList)items.push({key:wl.key,room:wl.room,wall:true,draw:()=>drawWall(ctx,wl)});
+   for(const s of map.screens){const r=roomById.get(s.room);items.push({key:(s.tiles.to-1)+(s.wall==='i0'?r.tiles.i0:r.tiles.j0)-0.4,room:s.room,wall:true,draw:()=>drawScreen(ctx,s,screenContent?.[s.id])});}
    // Tapetes ficam no chão, antes de toda a mobília, e não bloqueiam a circulação.
-   for(const p of map.props??[])if(p.blocking===false)drawProp(ctx,p);else items.push({key:iso.propDepth(p)+0.1,draw:()=>drawProp(ctx,p)});
-   for(const ag of agents)items.push({key:iso.depth(ag.pos.i,ag.pos.j)+0.3,draw:()=>drawAgent(ctx,ag,sheets,charImages)});
-   items.sort((x,y)=>x.key-y.key);for(const it of items)it.draw();
+   for(const p of map.props??[])if(p.blocking===false)drawProp(ctx,p);else items.push({key:iso.propDepth(p)+0.1,room:p.room,draw:()=>drawProp(ctx,p)});
+   // Cadeiras dos postos são decoração sobre tiles andáveis, com os mesmos apoios das peças normais.
+   for(const p of map.points.filter(p=>p.kind==='WORK'))items.push({key:iso.depth(p.tile.i,p.tile.j)+.2,room:p.room,draw:()=>drawProp(ctx,{asset:'cadeira-costas',tile:p.tile,footprint:{a:1,b:1},h:26})});
+   for(const ag of agents)items.push({key:iso.depth(ag.pos.i,ag.pos.j)+0.3,room:iso.roomAt(Math.round(ag.pos.i),Math.round(ag.pos.j))?.id,draw:()=>drawAgent(ctx,ag,sheets,charImages)});
+   items.sort((x,y)=>x.key-y.key);for(const it of items){if(focus&&it.wall&&it.room!==focus)continue;ctx.save();if(focus&&it.room!==focus)ctx.globalAlpha=.22;it.draw();ctx.restore();}
   }
   return {renderStatic,draw,walls:wallList,signs:signs.map(s=>s.room),backdrop:createBackdrop(images)};
  }
@@ -244,16 +278,17 @@
    const rnd=Office2Iso.prng(40),out=[];for(let k=0;k<Math.min(260,cand.length);k++){const p=cand[Math.floor(rnd()*cand.length)];out.push({u:p[0],v:p[1],phase:rnd()*Math.PI*2,period:6+rnd()*18});}
    return out;
   }
-  function draw(ctx,W,H,cam,t,dpr){
-   ctx.setTransform(1,0,0,1,0,0);const sky=images?.skyline;
+  function draw(ctx,W,H,cam,t,dpr,phase='night',transition){
+   ctx.setTransform(1,0,0,1,0,0);const sky=images?.skylines?.[phase]??images?.skyline;
    if(!(sky&&sky.complete&&sky.naturalWidth)){const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,C.sky[0]);g.addColorStop(0.6,C.sky[1]);g.addColorStop(1,C.sky[2]);ctx.fillStyle=g;ctx.fillRect(0,0,W,H);return;}
    // Cobre a tela com 8% de folga; o fundo anda 4% do que a câmera anda (profundidade).
    const s=Math.max(W/sky.naturalWidth,H/sky.naturalHeight)*1.08,dw=sky.naturalWidth*s,dh=sky.naturalHeight*s;
    const px=Math.max(W-dw,Math.min(0,(W-dw)/2+cam.x*dpr*0.04)),py=Math.max(H-dh,Math.min(0,(H-dh)/2+cam.y*dpr*0.04));
    ctx.imageSmoothingEnabled=true;ctx.drawImage(sky,px,py,dw,dh);
-   if(!lights)lights=sample(sky);
+   if(transition){const old=images?.skylines?.[transition.from];if(old?.complete&&old.naturalWidth){ctx.globalAlpha=1-transition.progress;ctx.drawImage(old,px,py,dw,dh);ctx.globalAlpha=1;}}
+   if(!lights&&images?.skyline?.complete&&images.skyline.naturalWidth)lights=sample(images.skyline);
    const win=Math.max(2,4*s);
-   for(const L of lights){const k=0.5+0.5*Math.sin(t/1000*2*Math.PI/L.period+L.phase),x=px+L.u*dw-win/2,y=py+L.v*dh-win/2;
+   for(const L of phase==='night'?(lights??[]):[]){const k=0.5+0.5*Math.sin(t/1000*2*Math.PI/L.period+L.phase),x=px+L.u*dw-win/2,y=py+L.v*dh-win/2;
     if(k<0.22){ctx.fillStyle=`rgba(12,18,32,${((0.22-k)/0.22*0.9).toFixed(3)})`;ctx.fillRect(x,y,win,win*1.3);}
     else if(k>0.9){ctx.fillStyle=`rgba(255,226,160,${((k-0.9)/0.1*0.6).toFixed(3)})`;ctx.fillRect(x-1,y-1,win+2,win*1.3+2);}}
    // Névoa: três manchas claras atravessando devagar.
@@ -263,7 +298,7 @@
    const cyc=50000,ph=(t%cyc)/cyc;
    if(ph<0.55){const u=ph/0.55,x=-20*dpr+u*(W+40*dpr),y=H*(0.07+u*0.04),z=2*dpr;ctx.fillStyle='rgba(235,240,255,0.9)';ctx.fillRect(x,y,z,z);if(Math.floor(t/600)%2===0){ctx.fillStyle='rgba(255,70,70,0.95)';ctx.fillRect(x-5*dpr,y+dpr,z,z);}}
    // Vinheta: escurece o meio, onde fica o prédio, para a planta se destacar.
-   const g=ctx.createRadialGradient(W/2,H*0.55,Math.min(W,H)*0.2,W/2,H*0.55,Math.max(W,H)*0.75);g.addColorStop(0,'rgba(8,12,24,0.45)');g.addColorStop(1,'rgba(8,12,24,0.12)');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+   const g=ctx.createRadialGradient(W/2,H*0.55,Math.min(W,H)*0.2,W/2,H*0.55,Math.max(W,H)*0.75);g.addColorStop(0,phase==='night'?'rgba(8,12,24,.24)':'rgba(8,12,24,.08)');g.addColorStop(1,'rgba(8,12,24,.06)');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
   }
   return {draw};
  }

@@ -39,10 +39,10 @@ test('os 8 agentes têm posto de trabalho, os pontos ficam dentro das salas e as
  const room=(id:string)=>map.rooms.find(r=>r.id===id)!;
  assert.deepEqual(map.points.filter(p=>p.agent).map(p=>p.agent).sort(),['atlas','euler','flux','nova','oracle','satoshi','sentinel','vega']);
  for(const p of map.points)assert.ok(inside(room(p.room).tiles,p.tile.i,p.tile.j),p.id);
- for(const s of map.screens){const t=room(s.room).tiles;assert.equal(s.wall,'j0');assert.ok(s.tiles.from>=t.i0&&s.tiles.to<=t.i1&&s.tiles.from<s.tiles.to,s.id);assert.ok(['REAL','SIMULATION'].includes(s.truth),s.id);}
+ for(const s of map.screens){const t=room(s.room).tiles;assert.ok(['j0','i0'].includes(s.wall));const lo=s.wall==='j0'?t.i0:t.j0,hi=s.wall==='j0'?t.i1:t.j1;assert.ok(s.tiles.from>=lo&&s.tiles.to<=hi&&s.tiles.from<s.tiles.to,s.id);assert.ok(['REAL','SIMULATION'].includes(s.truth),s.id);}
 });
 
-test('a projeção 2:1 coloca a planta inteira dentro da cena de 1536 × 864, com espaço para as paredes',()=>{
+test('a projeção 2:1 coloca a planta inteira dentro da cena declarada, com espaço para as paredes',()=>{
  const {tile,origin,scene,wallHeight}=map.projection,at=(i:number,j:number)=>({x:origin.x+(i-j)*tile.w/2,y:origin.y+(i+j)*tile.h/2});
  assert.equal(tile.w,tile.h*2);
  const corners=[at(0,0),at(W,0),at(W,H),at(0,H)];

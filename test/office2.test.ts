@@ -33,7 +33,8 @@ test('rotas A* levam da chegada a cada posto e ponto de lazer, em passos de 1 ti
  const desk=map.props.find((p:any)=>p.room==='risk'&&p.asset==='estacao-madeira');
  assert.deepEqual([...api.plan(spawn,desk.tile)],[]);assert.deepEqual([...api.plan(spawn,{i:99,j:0})],[]);
  // Atravessar a parede entre Horizon e Nexus sem porta é proibido.
- assert.equal(api.canStep({i:3,j:7},{i:3,j:8}),false);
+ const hz=map.rooms.find((r:any)=>r.id==='horizon');
+ assert.equal(api.canStep({i:3,j:hz.tiles.j1-1},{i:3,j:hz.tiles.j1}),false);
 });
 
 test('projeção e quadros: tile volta do pixel, e a folha atual é usada com a regra declarada para as 4 diagonais',()=>{

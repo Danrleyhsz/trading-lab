@@ -15,14 +15,15 @@ test('F7: móveis sólidos dentro das salas, sem sobreposição, portas e pontos
   for(let i=p.tile.i;i<p.tile.i+p.footprint.a;i++)for(let j=p.tile.j;j<p.tile.j+p.footprint.b;j++){
    if(room)assert.ok(i>=room.tiles.i0&&i<room.tiles.i1&&j>=room.tiles.j0&&j<room.tiles.j1,p.asset+' fora da sala');
    else assert.equal(iso.roomAt(i,j),null,'planta de corredor dentro de sala');
-   assert.ok(!doors.some((d:any)=>d.i===i&&d.j===j),'porta: '+p.asset);
    if(p.blocking===false){assert.equal(p.asset,'tapete');continue;}
+   assert.ok(!doors.some((d:any)=>d.i===i&&d.j===j),'porta: '+p.asset);
    assert.ok(!map.points.some((d:any)=>d.tile.i===i&&d.tile.j===j),'ponto: '+p.asset);
    const key=i+','+j;assert.ok(!used.has(key),'sobreposição: '+key);used.add(key);
   }
  }
- assert.ok(iso.walkable(13,9),'ponto IDLE em cima do tapete continua livre');
- assert.ok(!iso.walkable(13,8),'sofá bloqueia mesmo em cima do tapete');
+ const lounge=map.points.find((p:any)=>p.kind==='IDLE'&&p.room==='convivencia'),sofa=map.props.find((p:any)=>p.asset==='sofa');
+ assert.ok(iso.walkable(lounge.tile.i,lounge.tile.j),'ponto IDLE em cima do tapete continua livre');
+ assert.ok(!iso.walkable(sofa.tile.i,sofa.tile.j),'sofá bloqueia mesmo em cima do tapete');
  for(const p of map.points.filter((p:any)=>p.kind==='WORK')){
   const d=runtime().Office2Iso.DIRS[p.facing],i=p.tile.i+d.di,j=p.tile.j+d.dj;
   assert.ok(map.props.some((prop:any)=>prop.room===p.room&&/^(mesa-|estacao-)/.test(prop.asset)&&i>=prop.tile.i&&i<prop.tile.i+prop.footprint.a&&j>=prop.tile.j&&j<prop.tile.j+prop.footprint.b),'sem mesa diante de '+p.id);

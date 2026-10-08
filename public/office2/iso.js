@@ -40,7 +40,17 @@
   /** Ordem de profundidade: maior soma i+j fica na frente; móveis usam o canto da frente da área ocupada. */
   const depth=(i,j)=>i+j;
   const propDepth=p=>depth(p.tile.i+p.footprint.a-1,p.tile.j+p.footprint.b-1);
+  /** Apoios medidos na silhueta: escala uniforme, contatos contidos no piso e margem em todos os lados. */
+  function propPlacement(p,info,support){
+   const {i,j}=p.tile,{a,b}=p.footprint,flip=p.flip??((info.axis==='i'&&b>a)||(info.axis==='j'&&a>b));
+   const center=project(i+a/2,j+b/2),pad=.18;
+   if(!support){const s=Math.min((a+b-2*pad)*hw/info.width,(p.h+(a+b)*hh)/info.height);return {s,flip,x:center.x,y:project(i+a-pad,j+b-pad).y,dx:-info.width*s/2,dy:-info.height*s};}
+   const A=flip?support.j1-support.j0:support.i1-support.i0,B=flip?support.i1-support.i0:support.j1-support.j0;
+   const s=Math.min((a-2*pad)/Math.max(.01,A),(b-2*pad)/Math.max(.01,B),(p.h+(a+b)*hh)/info.height);
+   return {s,flip,x:center.x,y:center.y,dx:-support.cx*s,dy:-support.cy*s};
+  }
   return {W,H,project,unproject,roomAt,walkable,canStep,plan,direction,depth,propDepth,doors:doorList,
+   propPlacement,
    tileAt:(x,y)=>{const t=unproject(x,y),i=Math.floor(t.i),j=Math.floor(t.j);return onPlate(i,j)?{i,j}:null;}};
  }
  /**
@@ -55,5 +65,10 @@
  }
  /** Folha F7: frente SE, costas NE; as duas diagonais à esquerda são espelhadas em torno dos pés. */
  function frameGpt(dir,mode,step=0){return {row:dir==='NE'||dir==='NW'?1:0,col:mode==='walk'?1+(step%4):mode==='seated'?5:0,flip:dir==='SW'||dir==='NW'};}
- globalThis.Office2Iso=Object.freeze({create,frame,frameGpt,prng,DIRS});
+ /** Enquadra todos os cantos com margens, inclusive ao abrir o painel em uma tela pequena. */
+ function fit(bounds,width,height,maxScale=3,pad=24){
+  const s=Math.max(.01,Math.min(maxScale,Math.max(1,width-pad*2)/(bounds.x1-bounds.x0),Math.max(1,height-pad*2)/(bounds.y1-bounds.y0)));
+  return {s,x:width/2-(bounds.x0+bounds.x1)*s/2,y:height/2-(bounds.y0+bounds.y1)*s/2};
+ }
+ globalThis.Office2Iso=Object.freeze({create,frame,frameGpt,prng,DIRS,fit});
 })();
