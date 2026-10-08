@@ -31,6 +31,8 @@ nav select{background:var(--bar)}
 .zone-label:hover{border-color:var(--accent)}
 /* F6: ícones recortados (art/icones), sempre ao lado de um texto que diz o mesmo. */
 .ico{width:18px;height:18px;vertical-align:-4px;margin-right:6px;flex:none}
+.zone-label.on-wall{opacity:0;pointer-events:none}
+nav .ico.tab{width:16px;height:16px;vertical-align:-3px;margin-right:6px}
 .zone-label .emblem{width:14px;height:14px;vertical-align:-2px;margin-right:5px}
 .brand{color:#fff3d6;font-weight:900;letter-spacing:.08em;text-shadow:0 0 8px rgba(255,210,122,.8);font-size:18px}
 .plate{background:rgba(10,15,28,.78);color:var(--text);border-radius:4px;padding:1px 6px;font-size:11px;white-space:nowrap}

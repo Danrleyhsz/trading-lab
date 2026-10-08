@@ -3,6 +3,7 @@
 (() => {
  const D=globalThis.document;if(!D)return;
  const $=s=>D.querySelector(s),el=(tag,cls,text)=>{const n=D.createElement(tag);if(cls)n.className=cls;if(text!==undefined)n.textContent=text;return n;};
+ const CLOSE=1.22; // visão geral um pouco mais perto que "caber inteiro", como a referência; o resto se vê arrastando
  const reduced=globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches??false;
  // Fonte prevista e fase de cada módulo (OFFICE_BACKEND_VISUAL_MAP.md). Na F1 os painéis ainda não leem esses dados.
  const MODULES={
@@ -216,8 +217,10 @@
  // ---------- câmera ----------
  /** Visão geral: enquadra a planta do andar (com as paredes altas e a borda da laje), não o retângulo inteiro da cena; o fundo cobre o resto. */
  function overview(){const iso=state.iso,top=iso.project(0,0,84),left=iso.project(0,iso.H),right=iso.project(iso.W,0),bottom=iso.project(iso.W,iso.H);
-  const x0=left.x-24,x1=right.x+24,y0=top.y-16,y1=bottom.y+40,vw=viewport.clientWidth,vh=viewport.clientHeight,s=Math.min(vw/(x1-x0),vh/(y1-y0));
-  return {s,x:(vw-(x1-x0)*s)/2-x0*s,y:(vh-(y1-y0)*s)/2-y0*s};}
+  const x0=left.x-24,x1=right.x+24,y0=top.y-16,y1=bottom.y+40,vw=viewport.clientWidth,vh=viewport.clientHeight;
+  // Ancorada no alto: o fundo das salas de cima fica inteiro e o que sobra cai na fachada, como na referência.
+  const s=Math.min(vw/(x1-x0),vh/(y1-y0))*CLOSE,cx=(x0+x1)/2,fit=(y1-y0)*s<=vh;
+  return {s,x:vw/2-cx*s,y:fit?(vh-(y1-y0)*s)/2-y0*s:12-y0*s};}
  function roomCamera(room){
   const t=room.tiles,pts=[[t.i0,t.j0],[t.i1,t.j0],[t.i1,t.j1],[t.i0,t.j1]].map(([i,j])=>state.iso.project(i,j));
   const cx=(Math.min(...pts.map(p=>p.x))+Math.max(...pts.map(p=>p.x)))/2,cy=(Math.min(...pts.map(p=>p.y))+Math.max(...pts.map(p=>p.y)))/2-24;
@@ -291,6 +294,8 @@
  const zoneLabels=[];
  function buildZoneLabels(){for(const r of state.map.rooms){if(r.module==='PANORAMIC_EDGE'&&r.outdoor&&r.id==='terraco-norte')continue;const n=el('button','zone-label',r.label);n.type='button';const em=ZONE_EMBLEM[r.id]&&icon(ZONE_EMBLEM[r.id],'ico emblem');if(em)n.prepend(em);n.dataset.truth='STATIC';n.onclick=()=>focusRoom(r);labels.append(n);
    const brand=r.edges?.j0==='parede-marca';if(brand){const b=el('div','brand','TRADINGLAB');b.dataset.truth='STATIC';labels.append(b);zoneLabels.push({node:b,room:r,brand:true});}
+   // Zona com placa na parede: a etiqueta flutuante some da vista (continua no DOM para leitor de tela e teclado).
+   if(state.scene.signs.includes(r.id))n.classList.add('on-wall');
    zoneLabels.push({node:n,room:r});}}
  // Abaixo de 0,45 (celular na visão geral) os rótulos se sobrepõem: some o texto e a navegação fica na barra.
 const tiny=()=>state.camera.s<0.45;
@@ -322,19 +327,33 @@ function placeZoneLabels(){const c=state.camera;for(const z of zoneLabels){z.nod
   for(const ag of state.agents.values())placePlate(ag);placeZoneLabels();
   requestAnimationFrame(frame);
  }
- function onClick(ev){const r=canvas.getBoundingClientRect(),c=state.camera,x=(ev.clientX-r.left-c.x)/c.s,y=(ev.clientY-r.top-c.y)/c.s;const t=state.iso.tileAt(x,y);const room=t&&state.iso.roomAt(t.i,t.j);if(room)focusRoom(room);else if(state.focus)focusRoom(null);}
+ /** Arrastar move a visão; a roda aproxima no ponto do mouse. Um arrasto não conta como clique numa sala. */
+ const drag={on:false,moved:false,x:0,y:0};
+ function clampCamera(c){const iso=state.iso,vw=viewport.clientWidth,vh=viewport.clientHeight,l=iso.project(0,iso.H).x,r=iso.project(iso.W,0).x,t=iso.project(0,0,84).y,b=iso.project(iso.W,iso.H).y+60;
+  c.x=Math.min(vw*0.5-l*c.s,Math.max(vw*0.5-r*c.s,c.x));c.y=Math.min(vh*0.5-t*c.s,Math.max(vh*0.5-b*c.s,c.y));return c;}
+ function onPointer(ev){if(ev.type==='pointerdown'){drag.on=true;drag.moved=false;drag.x=ev.clientX;drag.y=ev.clientY;return;}
+  if(ev.type==='pointermove'&&drag.on){const dx=ev.clientX-drag.x,dy=ev.clientY-drag.y;if(!drag.moved&&Math.hypot(dx,dy)<5)return;drag.moved=true;drag.x=ev.clientX;drag.y=ev.clientY;state.anim=null;
+   state.camera=clampCamera({...state.camera,x:state.camera.x+dx,y:state.camera.y+dy});canvas.style.cursor='grabbing';return;}
+  if(ev.type==='pointerup'||ev.type==='pointercancel'){drag.on=false;canvas.style.cursor='';}}
+ function onWheel(ev){ev.preventDefault();const r=canvas.getBoundingClientRect(),c=state.camera,mx=ev.clientX-r.left,my=ev.clientY-r.top,min=overview().s*0.75,s=Math.min(3,Math.max(min,c.s*Math.exp(-ev.deltaY*0.0015)));
+  state.anim=null;state.camera=clampCamera({s,x:mx-(mx-c.x)*s/c.s,y:my-(my-c.y)*s/c.s});}
+ function onClick(ev){if(drag.moved){drag.moved=false;return;}const r=canvas.getBoundingClientRect(),c=state.camera,x=(ev.clientX-r.left-c.x)/c.s,y=(ev.clientY-r.top-c.y)/c.s;const t=state.iso.tileAt(x,y);const room=t&&state.iso.roomAt(t.i,t.j);if(room)focusRoom(room);else if(state.focus)focusRoom(null);}
 
  async function start(){
   const res=await get('/office2/scene-map.json');if(!res.ok){$('#agentsStatus').hidden=false;$('#agentsStatus').textContent='Mapa da cena indisponível.';return;}
   state.map=res.body;state.iso=Office2Iso.create(state.map);
   // F6: móveis e ícones recortados das folhas do Gemini (scripts/assets/arte-gemini.ts); sem o manifesto, ficam os blocos.
   const art=await get('/office2/art/manifesto.json');
-  if(art.ok){images.propInfo=art.body.props;images.icons=art.body.icons;for(const [name,info] of Object.entries(art.body.props))images.props[name]=loadImage('/office2/art/'+info.file);}
+  if(art.ok){images.propInfo=art.body.props;images.icons=art.body.icons;for(const [name,info] of Object.entries(art.body.props))images.props[name]=loadImage('/office2/art/'+info.file);
+   images.emblems={};for(const [room,name] of Object.entries(ZONE_EMBLEM))if(images.icons[name])images.emblems[room]=loadImage('/office2/art/'+images.icons[name].file);
+   // Ícone em cada aba da barra (Início usa o emblema da marca).
+   for(const b of D.querySelectorAll('nav [data-room]')){const ic=icon(ZONE_EMBLEM[b.dataset.room||'hall-marca']??'','ico tab');if(ic)b.prepend(ic);}}
   for(const id of Object.keys(globalThis.OfficeSpriteSheets??{}))charImages[id]=loadImage('/office/characters/'+id+'.png');
   state.scene=Office2Scene.create(state.map,state.iso,images);state.cache=state.scene.renderStatic(2);
   buildZoneLabels();resize();
   for(const b of D.querySelectorAll('[data-room]'))b.addEventListener('click',()=>{const id=b.dataset.room;focusRoom(id?state.map.rooms.find(r=>r.id===id):null);});
   canvas.addEventListener('click',onClick);
+  for(const t of ['pointerdown','pointermove','pointerup','pointercancel'])canvas.addEventListener(t,onPointer);canvas.addEventListener('wheel',onWheel,{passive:false});
   D.addEventListener('keydown',e=>{if(e.key==='Escape'&&state.focus)focusRoom(null);});
   // O painel abre e fecha ao lado da cena: o tamanho da área da cena é observado, não só o da janela.
   if(globalThis.ResizeObserver)new ResizeObserver(()=>resize()).observe(viewport);else globalThis.addEventListener('resize',resize);

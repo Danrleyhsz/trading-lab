@@ -11,6 +11,7 @@
   prop:{top:'#8d93a3',left:'#5f6575',right:'#4a4f5d',line:'#1b2133'},plant:{top:'#62d07a',left:'#2c8a48',right:'#24703b'},
  });
  const TALL=72,LOW=24,RAIL=30,GLASS=48,DROP=720;
+ const GLOW_SCREEN=new Set(['mesa-monitores','mesa-curva-operacoes']),GLOW_FLOOR=new Set(['balcao-recepcao','bancada-cozinha']);
  function create(map,iso,images){
   const P=(i,j,h=0)=>iso.project(i,j,h);
   const roomById=new Map(map.rooms.map(r=>[r.id,r]));
@@ -35,6 +36,58 @@
   // Uma borda compartilhada entre duas salas aparece uma vez (a mais alta).
   const uniq=new Map();for(const w of walls){const k=[w.a.i,w.a.j,w.b.i,w.b.j].join(',');const prev=uniq.get(k);if(!prev||w.h>prev.h)uniq.set(k,w);}
   const wallList=[...uniq.values()];
+  /**
+   * Placas das zonas pintadas na parede de fundo (como na referência): painel escuro de 3+ tiles livres de tela e de porta,
+   * com nome grande, subtítulo e emblema. Cada fatia de parede desenha o seu pedaço da placa, na própria profundidade.
+   */
+  const SIGN_H=70,HEAD=24,signAt=new Map(),headerAt=new Map(),signs=[];
+  for(const r of map.rooms){if(r.outdoor||r.module==='PANORAMIC_EDGE'||r.edges?.j0==='parede-marca'||r.id==='elevadores')continue;
+   const t=r.tiles,busy=new Set(map.screens.filter(s=>s.room===r.id).flatMap(s=>Array.from({length:s.tiles.to-s.tiles.from},(_,k)=>s.tiles.from+k)));
+   const run=(side,lo,hi,blocked)=>{let best=null,start=null;for(let k=lo;k<=hi;k++){const ok=k<hi&&!blocked(k);if(ok&&start===null)start=k;if(!ok&&start!==null){if(!best||k-start>best.to-best.from)best={side,from:start,to:k};start=null;}}return best;};
+   const seg=(side,k)=>side==='j0'?[k,t.j0,k+1,t.j0]:[t.i0,k,t.i0,k+1];
+   const has=(side,k)=>{const w=uniq.get(seg(side,k).join(','));return !!w&&!w.glass;};
+   let pick=run('j0',t.i0,t.i1,k=>busy.has(k)||!has('j0',k));
+   if(!pick||pick.to-pick.from<3){const alt=run('i0',t.j0,t.j1,k=>!has('i0',k));if(alt&&alt.to-alt.from>=3&&(!pick||alt.to-alt.from>pick.to-pick.from))pick=alt;}
+   if(!pick||pick.to-pick.from<3){
+    // Parede de fundo tomada por telas: a placa vira uma faixa iluminada em cima delas (maior trecho sólido da parede j0).
+    const band=run('j0',t.i0,t.i1,k=>!has('j0',k));
+    if(band&&band.to-band.from>=3&&busy.size){const [title,sub]=String(r.label).split(' · ');const s={room:r.id,side:'j0',from:band.from,to:band.to,line:t.j0,title:title.toUpperCase(),sub:(sub??'').toUpperCase(),header:true};
+     signs.push(s);for(let k=s.from;k<s.to;k++)headerAt.set(seg('j0',k).join(','),s);}
+    continue;}
+   if(pick.to-pick.from>6){const mid=Math.floor((pick.from+pick.to)/2);pick={...pick,from:mid-3,to:mid+3};}
+   const [title,sub]=String(r.label).split(' · ');
+   const s={room:r.id,module:r.module,side:pick.side,from:pick.from,to:pick.to,line:pick.side==='j0'?t.j0:t.i0,title:title.toUpperCase(),sub:(sub??'').toUpperCase()};
+   signs.push(s);for(let k=s.from;k<s.to;k++)signAt.set(seg(s.side,k).join(','),s);}
+  /** Ponto da placa: u ao longo da parede (0 = começo da leitura), z = altura. j0 lê ao longo de +i; i0 lê subindo (de j1 para j0). */
+  const signPoint=(s,u,z)=>s.side==='j0'?P(s.from+u,s.line,z):P(s.line,s.to-u,z);
+  /** Faixa de placa em cima das telas: de TALL até TALL+HEAD, texto numa linha só ("HORIZON · INTELIGÊNCIA DE MERCADO"). */
+  function drawHeaderSlice(ctx,s,w){
+   const z0=TALL,z1=TALL+HEAD,a=P(w.a.i,w.a.j,z0),b=P(w.b.i,w.b.j,z0),bt=P(w.b.i,w.b.j,z1),at=P(w.a.i,w.a.j,z1);
+   ctx.save();poly(ctx,[a,b,bt,at],'#141924');ctx.beginPath();[a,b,bt,at].forEach((p,k)=>k?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));ctx.closePath();ctx.clip();
+   const o=P(s.from,s.line,z1),e=P(s.from+1,s.line,z1),ux=(e.x-o.x)/26.833,uy=(e.y-o.y)/26.833,L=(s.to-s.from)*26.833;
+   ctx.transform(ux,uy,0,1,o.x,o.y);ctx.fillStyle='rgba(255,210,122,0.85)';ctx.fillRect(4,HEAD-2,L-8,1);
+   const emblem=images?.emblems?.[s.room];let x0=8;if(emblem&&emblem.complete&&emblem.naturalWidth){ctx.imageSmoothingEnabled=true;ctx.drawImage(emblem,x0,3,16,16);x0+=22;}
+   const txt=s.title+(s.sub?'  ·  '+s.sub:'');let f=13;ctx.font=`800 ${f}px "Segoe UI",system-ui,sans-serif`;while(f>7&&(ctx.measureText(txt)?.width??0)>L-x0-8){f-=1;ctx.font=`800 ${f}px "Segoe UI",system-ui,sans-serif`;}
+   ctx.fillStyle='#f4f7ff';ctx.shadowColor='rgba(220,235,255,0.5)';ctx.shadowBlur=5;ctx.textBaseline='middle';ctx.fillText(txt,x0,HEAD/2);ctx.restore();
+   ctx.strokeStyle='#0c0f16';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(at.x,at.y);ctx.lineTo(bt.x,bt.y);ctx.stroke();
+  }
+  function drawSignSlice(ctx,s,w){
+   const len=s.to-s.from,a=P(w.a.i,w.a.j),b=P(w.b.i,w.b.j),at=P(w.a.i,w.a.j,SIGN_H),bt=P(w.b.i,w.b.j,SIGN_H);
+   ctx.save();ctx.beginPath();[a,b,bt,at].forEach((p,k)=>k?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));ctx.closePath();ctx.clip();
+   poly(ctx,[a,b,bt,at],'#141924');
+   // Texto num plano inclinado: eixo x ao longo da parede (26,8 px por tile), eixo y vertical.
+   const o=signPoint(s,0,SIGN_H),e=signPoint(s,1,SIGN_H),ux=(e.x-o.x)/26.833,uy=(e.y-o.y)/26.833,L=len*26.833;
+   ctx.transform(ux,uy,0,1,o.x,o.y);
+   ctx.fillStyle='rgba(255,210,122,0.85)';ctx.fillRect(4,3,L-8,1.2);
+   const emblem=images?.emblems?.[s.room];let x0=10;
+   if(emblem&&emblem.complete&&emblem.naturalWidth){ctx.imageSmoothingEnabled=true;ctx.drawImage(emblem,x0,16,24,24);x0+=30;}
+   const fit=(txt,size,max,weight)=>{let f=size;ctx.font=`${weight} ${f}px "Segoe UI",system-ui,sans-serif`;while(f>7&&(ctx.measureText(txt)?.width??0)>max){f-=1;ctx.font=`${weight} ${f}px "Segoe UI",system-ui,sans-serif`;}return f;};
+   ctx.textBaseline='alphabetic';ctx.shadowColor='rgba(220,235,255,0.55)';ctx.shadowBlur=6;ctx.fillStyle='#f4f7ff';
+   const tf=fit(s.title,20,L-x0-8,800);ctx.fillText(s.title,x0,18+tf);ctx.shadowBlur=0;
+   if(s.sub){ctx.fillStyle='#b9c6dd';fit(s.sub,9,L-x0-8,700);ctx.fillText(s.sub,x0,18+tf+13);}
+   ctx.restore();
+   ctx.strokeStyle='#0c0f16';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(at.x,at.y);ctx.lineTo(bt.x,bt.y);ctx.stroke();
+  }
   /** Fachada de vidro do prédio abaixo da planta: um andar a cada 46 px, um painel por tile, janelas acesas por semente (decoração). */
   function drawFacade(ctx,left,bottom,right,depth){
    const FH=46,face=(a,b,n,base,seed,shade)=>{
@@ -68,8 +121,13 @@
     if(r?.floor==='madeira'||r?.floor==='deck'){for(const f of [0.33,0.66]){const a=P(i,j+f),b=P(i+1,j+f);ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();}}}
    // Subzonas com cor de destaque na borda (Anel de decisão × Execução paper).
    for(const r of map.rooms)for(const s of r.subzones??[]){const t=s.tiles;ctx.globalAlpha=0.9;poly(ctx,[P(t.i0,t.j0),P(t.i1,t.j0),P(t.i1,t.j1),P(t.i0,t.j1)],null,s.accent);ctx.globalAlpha=1;}
-   // Luz quente do teto: uma poça de luz por sala coberta (decoração; deixa o andar com cara de noite iluminada).
+   // Piso claro polido: meia-luz na metade de cima de cada placa e um reflexo diagonal largo (decoração).
    ctx.globalCompositeOperation='lighter';
+   for(let i=0;i<W;i++)for(let j=0;j<H;j++){const r=iso.roomAt(i,j);if((r?.floor??'piso-claro')!=='piso-claro')continue;
+    poly(ctx,[P(i,j),P(i+1,j),P(i+0.5,j+0.5)],'rgba(255,240,215,0.07)');}
+   for(let k=0;k<5;k++){const a=P(4+k*6,0),b=P(4+k*6,H);const g=ctx.createLinearGradient(a.x-30,a.y,a.x+30,a.y);g.addColorStop(0,'rgba(255,245,230,0)');g.addColorStop(0.5,'rgba(255,245,230,0.035)');g.addColorStop(1,'rgba(255,245,230,0)');
+    ctx.fillStyle=g;ctx.beginPath();ctx.moveTo(a.x-30,a.y);ctx.lineTo(a.x+30,a.y);ctx.lineTo(b.x+30,b.y);ctx.lineTo(b.x-30,b.y);ctx.closePath();ctx.fill();}
+   // Luz quente do teto: uma poça de luz por sala coberta (decoração; deixa o andar com cara de noite iluminada).
    for(const r of map.rooms){if(r.outdoor)continue;const t=r.tiles,c=P((t.i0+t.i1)/2,(t.j0+t.j1)/2),rx=((t.i1-t.i0)+(t.j1-t.j0))*12;
     const g=ctx.createRadialGradient(c.x,c.y,0,c.x,c.y,rx);g.addColorStop(0,'rgba(255,186,110,0.20)');g.addColorStop(0.6,'rgba(255,186,110,0.07)');g.addColorStop(1,'rgba(255,186,110,0)');
     ctx.save();ctx.translate(c.x,c.y);ctx.scale(1,0.5);ctx.translate(-c.x,-c.y);ctx.fillStyle=g;ctx.beginPath();ctx.arc(c.x,c.y,rx,0,Math.PI*2);ctx.fill();ctx.restore();}
@@ -79,9 +137,17 @@
   function drawWall(ctx,w){
    const a=P(w.a.i,w.a.j),b=P(w.b.i,w.b.j),at=P(w.a.i,w.a.j,w.h),bt=P(w.b.i,w.b.j,w.h);
    if(w.glass){poly(ctx,[a,b,bt,at],C.glass);ctx.strokeStyle=C.glassLine;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(at.x,at.y);ctx.lineTo(bt.x,bt.y);ctx.stroke();
-    if(w.h===RAIL){ctx.strokeStyle='rgba(255,210,122,0.55)';ctx.beginPath();ctx.moveTo(a.x,a.y-1);ctx.lineTo(b.x,b.y-1);ctx.stroke();}return;}
+    // Moldura preta: montante no começo de cada vidraça e corrimão/travessa por cima (como a referência).
+    ctx.strokeStyle='#0d1118';ctx.lineWidth=1.6;ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(at.x,at.y-1);ctx.stroke();
+    ctx.lineWidth=w.h===RAIL?2.2:1.6;ctx.beginPath();ctx.moveTo(at.x,at.y-1);ctx.lineTo(bt.x,bt.y-1);ctx.stroke();
+    if(w.h===RAIL){ctx.strokeStyle='rgba(255,210,122,0.55)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(a.x,a.y-1);ctx.lineTo(b.x,b.y-1);ctx.stroke();}return;}
+   const sign=signAt.get([w.a.i,w.a.j,w.b.i,w.b.j].join(','));
+   if(sign){drawSignSlice(ctx,sign,w);return;}
    poly(ctx,[a,b,bt,at],w.a.j===w.b.j?C.wall:C.wallSide);poly(ctx,[at,bt,{x:bt.x,y:bt.y-3},{x:at.x,y:at.y-3}],C.wallCap);
+   // Junta entre painéis a cada tile.
+   ctx.strokeStyle='rgba(10,13,20,0.55)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(at.x,at.y);ctx.stroke();
    if(w.h===TALL){ctx.strokeStyle=C.led;ctx.globalAlpha=0.7;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(at.x,at.y+5);ctx.lineTo(bt.x,bt.y+5);ctx.stroke();ctx.globalAlpha=1;}
+   const header=headerAt.get([w.a.i,w.a.j,w.b.i,w.b.j].join(','));if(header)drawHeaderSlice(ctx,header,w);
   }
   /** Tela de parede: apagada e listrada quando não há dado (UNKNOWN); o conteúdo real entra nas fases F2–F5. */
   function drawScreen(ctx,s,content){
@@ -105,8 +171,13 @@
     const boxW=(a+b)*24,boxH=p.h+(a+b)*12,s=Math.min(boxW/info.width,boxH/info.height);
     const cx=(P(i,j+b).x+P(i+a,j).x)/2,base=P(i+a,j+b).y+2,dw=info.width*s,dh=info.height*s;
     const flip=(info.axis==='i'&&b>a)||(info.axis==='j'&&a>b);
+    // Luz de LED do balcão no chão à frente (decoração).
+    if(GLOW_FLOOR.has(p.asset)){const g=ctx.createRadialGradient(cx,base-4,2,cx,base-4,dw*0.6);g.addColorStop(0,'rgba(255,196,110,0.28)');g.addColorStop(1,'rgba(255,196,110,0)');ctx.save();ctx.globalCompositeOperation='lighter';ctx.fillStyle=g;ctx.fillRect(cx-dw*0.6,base-4-dw*0.3,dw*1.2,dw*0.6);ctx.restore();}
     ctx.save();ctx.imageSmoothingEnabled=true;ctx.translate(Math.round(cx),Math.round(base));if(flip)ctx.scale(-1,1);
-    ctx.drawImage(art,-dw/2,-dh,dw,dh);ctx.restore();return;}
+    ctx.drawImage(art,-dw/2,-dh,dw,dh);ctx.restore();
+    // Monitores ligados, sem conteúdo: só o brilho azulado da tela (decoração; nenhum gráfico inventado).
+    if(GLOW_SCREEN.has(p.asset)){const y=base-dh*0.78,g=ctx.createRadialGradient(cx,y,2,cx,y,dw*0.55);g.addColorStop(0,'rgba(95,182,255,0.26)');g.addColorStop(1,'rgba(95,182,255,0)');ctx.save();ctx.globalCompositeOperation='lighter';ctx.fillStyle=g;ctx.fillRect(cx-dw*0.55,y-dw*0.3,dw*1.1,dw*0.6);ctx.restore();}
+    return;}
    const {i,j}=p.tile,{a,b}=p.footprint,h=p.h,plant=p.asset.startsWith('planta')||p.asset==='jardineira',c=plant?C.plant:C.prop;
    const pad=0.08,i0=i+pad,j0=j+pad,i1=i+a-pad,j1=j+b-pad;
    poly(ctx,[P(i0,j1),P(i1,j1),P(i1,j1,h),P(i0,j1,h)],c.left,C.prop.line);
@@ -132,7 +203,7 @@
    for(const ag of agents)items.push({key:iso.depth(ag.pos.i,ag.pos.j)+0.3,draw:()=>drawAgent(ctx,ag,sheets,charImages)});
    items.sort((x,y)=>x.key-y.key);for(const it of items)it.draw();
   }
-  return {renderStatic,draw,walls:wallList,backdrop:createBackdrop(images)};
+  return {renderStatic,draw,walls:wallList,signs:signs.map(s=>s.room),backdrop:createBackdrop(images)};
  }
  /**
   * Fundo em tela cheia, em coordenadas de tela: a cidade gerada cobre toda a área (sem faixas pretas), com paralaxe leve.

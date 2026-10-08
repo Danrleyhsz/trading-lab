@@ -163,43 +163,43 @@
   },
   "zona-horizon": {
    "file": "icones/zona-horizon.png",
-   "size": 32
+   "size": 64
   },
   "zona-nexus": {
    "file": "icones/zona-nexus.png",
-   "size": 32
+   "size": 64
   },
   "zona-ring": {
    "file": "icones/zona-ring.png",
-   "size": 32
+   "size": 64
   },
   "zona-lab": {
    "file": "icones/zona-lab.png",
-   "size": 32
+   "size": 64
   },
   "zona-risk": {
    "file": "icones/zona-risk.png",
-   "size": 32
+   "size": 64
   },
   "zona-auditoria": {
    "file": "icones/zona-auditoria.png",
-   "size": 32
+   "size": 64
   },
   "zona-diagnostico": {
    "file": "icones/zona-diagnostico.png",
-   "size": 32
+   "size": 64
   },
   "zona-backtest": {
    "file": "icones/zona-backtest.png",
-   "size": 32
+   "size": 64
   },
   "zona-ordens": {
    "file": "icones/zona-ordens.png",
-   "size": 32
+   "size": 64
   },
   "zona-marca": {
    "file": "icones/zona-marca.png",
-   "size": 32
+   "size": 64
   },
   "estado-trabalhando": {
    "file": "icones/estado-trabalhando.png",

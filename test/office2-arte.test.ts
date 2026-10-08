@@ -53,3 +53,11 @@ test('recorte chroma: fundo magenta some, borda perde o tom magenta, objetos cru
  assert.equal(mergeClose(boxes,50).length,1);
  const small=resize(keyed,20,10);assert.equal(small.width,20);assert.ok(small.data.some((v,i)=>i%4===3&&v>0));
 });
+
+test('placas nas paredes: as zonas principais ganham placa (no painel livre ou em faixa sobre as telas), e a varanda não',async()=>{
+ const vm=await import('node:vm');const context=vm.createContext({Math,Object,Array,Set,Map,Number,String,JSON,Infinity});
+ vm.runInContext(readFileSync('public/office2/iso.js','utf8'),context);vm.runInContext(readFileSync('public/office2/scene.js','utf8'),context);
+ const scene=(context as any).Office2Scene.create(map,(context as any).Office2Iso.create(map),{});
+ for(const id of ['horizon','nexus','ring','risk','stress-lab','auditoria','diagnostico','recepcao','convivencia','cozinha','cafe'])assert.ok(scene.signs.includes(id),'sem placa: '+id);
+ assert.ok(!scene.signs.includes('varanda')&&!scene.signs.includes('terraco-norte'));
+});
