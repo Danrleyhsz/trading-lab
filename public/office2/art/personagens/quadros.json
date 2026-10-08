@@ -1,0 +1,17 @@
+{
+ "cell": {
+  "w": 192,
+  "h": 256
+ },
+ "standingHeight": 240,
+ "ids": [
+  "atlas",
+  "euler",
+  "flux",
+  "nova",
+  "oracle",
+  "satoshi",
+  "sentinel",
+  "vega"
+ ]
+}

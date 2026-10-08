@@ -14,11 +14,16 @@ export interface PieceConfig {name:string;width?:number;size?:number;axis?:'i'|'
 export interface Manifest {version:1;props:Record<string,{file:string;width:number;height:number;axis:'i'|'j'|'none'}>;icons:Record<string,{file:string;size:number}>}
 
 /** Fundo chroma: perto da cor-chave vira transparente; a borda perde o tom da chave (despill) e fica opaca (pixel art sem meio-tom). */
-export function removeKey(img:Rgba,key:[number,number,number],cut=110):Rgba{
+export function removeKey(img:Rgba,key:[number,number,number],cut=110,edgeOnly=false):Rgba{
  const out=new Uint8Array(img.data.length),[kr,kg,kb]=key,magenta=kg<kr&&kg<kb;
+ const isBackground=(p:number)=>img.data[p*4+3]<128||Math.hypot(img.data[p*4]-kr,img.data[p*4+1]-kg,img.data[p*4+2]-kb)<cut;
  for(let p=0;p<img.width*img.height;p++){const o=p*4;let r=img.data[o],g=img.data[o+1],b=img.data[o+2];
-  if(img.data[o+3]<128||Math.hypot(r-kr,g-kg,b-kb)<cut)continue; // PNG já transparente (ChatGPT) ou cor-chave
-  if(magenta){const m=Math.min(r,b);if(m>g){const s=m-g;r-=s;b-=s;}}else{const m=Math.max(r,b);if(g>m)g=m;}
+  if(isBackground(p))continue; // PNG já transparente (ChatGPT) ou cor-chave
+  // Nos personagens, violeta e verde também são cores da roupa: descontamina só a borda junto ao fundo.
+  const x=p%img.width,y=Math.floor(p/img.width),edge=!edgeOnly||
+   (x>0&&isBackground(p-1))||(x<img.width-1&&isBackground(p+1))||
+   (y>0&&isBackground(p-img.width))||(y<img.height-1&&isBackground(p+img.width));
+  if(edge){if(magenta){const m=Math.min(r,b);if(m>g){const s=m-g;r-=s;b-=s;}}else{const m=Math.max(r,b);if(g>m)g=m;}}
   out[o]=r;out[o+1]=g;out[o+2]=b;out[o+3]=255;}
  return {width:img.width,height:img.height,data:out};
 }
