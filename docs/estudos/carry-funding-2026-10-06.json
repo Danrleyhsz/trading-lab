@@ -1,0 +1,269 @@
+{
+ "protocol": {
+  "version": "FUNDING_CARRY_V1",
+  "declaredAt": "2026-10-06",
+  "symbols": [
+   "ZECUSDT",
+   "NEARUSDT",
+   "UNIUSDT",
+   "BCHUSDT",
+   "FILUSDT",
+   "AAVEUSDT",
+   "AVAXUSDT",
+   "LINKUSDT",
+   "XRPUSDT",
+   "XLMUSDT",
+   "DOGEUSDT",
+   "SOLUSDT",
+   "LTCUSDT",
+   "ETHUSDT",
+   "BTCUSDT"
+  ],
+  "firstBar": 1640995200000,
+  "lastBar": 1791241200000,
+  "fundingFrom": 1640304000000,
+  "rule": {
+   "rebalanceHours": 168,
+   "signalHours": 168,
+   "maxPositions": 5,
+   "positionFraction": 0.1,
+   "entryMinimumFunding": 0.00105,
+   "exitFunding": 0,
+   "minimumCashToShortNotional": 0.5,
+   "spotFeeRate": 0.001,
+   "perpFeeRate": 0.00055,
+   "slippageBps": 2,
+   "maintenanceRate": 0.01,
+   "initialCapital": 10000
+  },
+  "screen": {
+   "version": "FUNDING_CARRY_SCREEN_V1",
+   "maximumFilledShare": 0.01,
+   "maximumDrawdown": 0.15,
+   "minimumPositiveYears": 4,
+   "sharpeBenchmarkAnnual": 1,
+   "minimumProbability": 0.9
+  }
+ },
+ "model": "FUNDING_CARRY_V1",
+ "marketHashes": {
+  "AAVEUSDT": "c4cc2bb94ce9253bb41ea6e5c233a3803b0bcaec6c27bf2bcd47a8a5e7d160be",
+  "AVAXUSDT": "df5687e57d28b04c33e3b0e535f163c8bc25b947631c94f1d7bc9ab39104d0e6",
+  "BCHUSDT": "e0971437a2110bc4eef0c86fccc179802d8386bb98bc40ef934c27415bbe9dea",
+  "BTCUSDT": "0bafa7f156599cdb8dc321bc7cb3796b1febae74b5fdb11d55beceffb822c881",
+  "DOGEUSDT": "a5a08f31b934886e073475e1a4d8650a6fd94a4eb9ca2c8dd361250925ebf20d",
+  "ETHUSDT": "175101080278c420f963d2a43908b263bd2136f2fbb195333b03bb0521eb6e7a",
+  "FILUSDT": "0bd3306a68917383cd13554faa767764969b18a0ec3b7861ad8e3f3eb3c8ab4a",
+  "LINKUSDT": "7cfab1543b5d598bce5dc037a95c0049a31d29faa7640b71e579c3ccda455eba",
+  "LTCUSDT": "340ddde05c5af4af78b49b7ac6cfbda7c51e060db83bf5b9bae3d86a4954e1a9",
+  "NEARUSDT": "98f53807ed9dbb3d91db8c60c06e4a762f308f62f963e9063b6b636affdee226",
+  "SOLUSDT": "95547e4fc3de370ee090387581cc6476e241d84bd4499eabca8f455928328308",
+  "UNIUSDT": "ab23d95a4264b7f237e98068c8ca31a9fedbe322ca7f8c535e568c8729588897",
+  "XLMUSDT": "589ebd623f755d67652444242a7700ca841de80ed9c491c8f462c89bafec6866",
+  "XRPUSDT": "0aaf46ac985684de375d2c217182fc9e15b5e1b28806a780d8b20e1705a58009",
+  "ZECUSDT": "e3848c293ebee014af909cfa0e7d304c4ec4988bd27a77cc577aeb53a980ce90"
+ },
+ "finalEquity": 10659.824433480924,
+ "netPnl": 659.8244334809242,
+ "maxDrawdown": 0.008312166679622424,
+ "feesPaid": 112.72221337443312,
+ "fundingReceived": 814.8145708106728,
+ "basisPnl": -42.26792395531544,
+ "entries": 42,
+ "exits": 37,
+ "investedHours": 17281,
+ "positionHours": 82205,
+ "minimumMarginRatio": -0.003959530341460888,
+ "liquidatedAt": 1703206800000,
+ "execution": "HISTORICAL_SIMULATION_OFFLINE",
+ "automaticPaperApproval": false,
+ "runAt": "2026-10-06T04:27:40.242Z",
+ "symbols": [
+  "ZECUSDT",
+  "NEARUSDT",
+  "UNIUSDT",
+  "BCHUSDT",
+  "FILUSDT",
+  "AAVEUSDT",
+  "AVAXUSDT",
+  "LINKUSDT",
+  "XRPUSDT",
+  "XLMUSDT",
+  "DOGEUSDT",
+  "SOLUSDT",
+  "LTCUSDT",
+  "ETHUSDT",
+  "BTCUSDT"
+ ],
+ "failures": [],
+ "quality": {
+  "ZECUSDT": {
+   "spotFilled": 1,
+   "perpFilled": 0,
+   "fundingMarkFilled": 2029,
+   "fundings": 5241
+  },
+  "NEARUSDT": {
+   "spotFilled": 1,
+   "perpFilled": 0,
+   "fundingMarkFilled": 2029,
+   "fundings": 5241
+  },
+  "UNIUSDT": {
+   "spotFilled": 1,
+   "perpFilled": 0,
+   "fundingMarkFilled": 2029,
+   "fundings": 5241
+  },
+  "BCHUSDT": {
+   "spotFilled": 1,
+   "perpFilled": 0,
+   "fundingMarkFilled": 2029,
+   "fundings": 5241
+  },
+  "FILUSDT": {
+   "spotFilled": 1,
+   "perpFilled": 0,
+   "fundingMarkFilled": 2029,
+   "fundings": 5241
+  },
+  "AAVEUSDT": {
+   "spotFilled": 1,
+   "perpFilled": 0,
+   "fundingMarkFilled": 2029,
+   "fundings": 5241
+  },
+  "AVAXUSDT": {
+   "spotFilled": 1,
+   "perpFilled": 0,
+   "fundingMarkFilled": 2029,
+   "fundings": 5241
+  },
+  "LINKUSDT": {
+   "spotFilled": 1,
+   "perpFilled": 0,
+   "fundingMarkFilled": 2029,
+   "fundings": 5241
+  },
+  "XRPUSDT": {
+   "spotFilled": 1,
+   "perpFilled": 0,
+   "fundingMarkFilled": 2029,
+   "fundings": 5241
+  },
+  "XLMUSDT": {
+   "spotFilled": 1,
+   "perpFilled": 0,
+   "fundingMarkFilled": 2029,
+   "fundings": 5241
+  },
+  "DOGEUSDT": {
+   "spotFilled": 1,
+   "perpFilled": 0,
+   "fundingMarkFilled": 2029,
+   "fundings": 5241
+  },
+  "SOLUSDT": {
+   "spotFilled": 1,
+   "perpFilled": 0,
+   "fundingMarkFilled": 2104,
+   "fundings": 5316
+  },
+  "LTCUSDT": {
+   "spotFilled": 1,
+   "perpFilled": 0,
+   "fundingMarkFilled": 2029,
+   "fundings": 5241
+  },
+  "ETHUSDT": {
+   "spotFilled": 1,
+   "perpFilled": 0,
+   "fundingMarkFilled": 2029,
+   "fundings": 5241
+  },
+  "BTCUSDT": {
+   "spotFilled": 1,
+   "perpFilled": 0,
+   "fundingMarkFilled": 2029,
+   "fundings": 5241
+  }
+ },
+ "returnPct": 0.06598244334809242,
+ "annualizedReturn": 0.03291862072537022,
+ "years": {
+  "2022": {
+   "returnPct": 0.014493858182788033,
+   "maxDrawdown": 0.003606637479996566
+  },
+  "2023": {
+   "returnPct": 0.05075297868981998,
+   "maxDrawdown": 0.008312166679622424
+  }
+ },
+ "positiveYears": 2,
+ "sharpeAnnualized": 1.7814408289136783,
+ "probabilitySharpeAboveOne": 0.8625808320093351,
+ "investedShare": 0.9999421363268141,
+ "averagePositions": 4.75668325425298,
+ "weeksHeldBySymbol": {
+  "AAVEUSDT": 78,
+  "AVAXUSDT": 14,
+  "BCHUSDT": 12,
+  "FILUSDT": 42,
+  "LINKUSDT": 93,
+  "UNIUSDT": 64,
+  "ZECUSDT": 42,
+  "NEARUSDT": 15,
+  "BTCUSDT": 27,
+  "XRPUSDT": 10,
+  "XLMUSDT": 20,
+  "DOGEUSDT": 64,
+  "LTCUSDT": 9
+ },
+ "marketCorrelation": -0.04872151395629296,
+ "buyHold": 0.2697880214914675,
+ "decisionCount": 103,
+ "lastDecision": {
+  "timestamp": 1702684800000,
+  "held": [
+   "AAVEUSDT",
+   "FILUSDT",
+   "LINKUSDT",
+   "NEARUSDT",
+   "ZECUSDT"
+  ],
+  "opened": [],
+  "closed": [],
+  "signals": {
+   "AAVEUSDT": 0.0020641900000000005,
+   "AVAXUSDT": 0.0034538399999999993,
+   "BCHUSDT": 0.0027663199999999988,
+   "BTCUSDT": 0.0028178299999999995,
+   "DOGEUSDT": 0.0038325499999999975,
+   "ETHUSDT": 0.0030320499999999992,
+   "FILUSDT": 0.004889879999999998,
+   "LINKUSDT": 0.0033638399999999977,
+   "LTCUSDT": 0.0028807800000000003,
+   "NEARUSDT": 0.0042830099999999986,
+   "SOLUSDT": 0.003631699999999999,
+   "UNIUSDT": 0.0039763,
+   "XLMUSDT": 0.002725369999999999,
+   "XRPUSDT": 0.0035537999999999976,
+   "ZECUSDT": 0.004779239999999999
+  }
+ },
+ "checks": {
+  "DATA_QUALITY": true,
+  "NO_LIQUIDATION": false,
+  "POSITIVE_PNL": true,
+  "BOUNDED_DRAWDOWN": true,
+  "POSITIVE_YEARS": false,
+  "SHARPE_ABOVE_ONE": false
+ },
+ "passed": false,
+ "failed": [
+  "NO_LIQUIDATION",
+  "POSITIVE_YEARS",
+  "SHARPE_ABOVE_ONE"
+ ]
+}

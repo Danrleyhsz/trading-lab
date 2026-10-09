@@ -58,3 +58,14 @@ test('runtime admission blocks signal retrieval until actual service recovery',a
  await cycle.onMarket();assert.equal(calls,0);assert.equal(book.status().autonomousCursor,null);assert.equal(memories.list().length,0);
  admitted=true;await cycle.onMarket();assert.equal(calls,1);assert.equal(book.list()[0].fills,1);assert.equal(book.status().autonomousCursor,closed);
 });
+test('espera do candle (próximo piloto): antes do prazo não lê nem decide; depois decide uma vez; padrão 0 não muda nada',async()=>{
+ assert.throws(()=>new AutonomousPerpetualCycle(true,'x',new PerpetualStudies({load:async()=>dataset()},[eligible()]),new PerpetualPaperBook(new EventBus()),{load:async()=>dataset()},async()=>{},new MemoryStore(),new EventBus(),async()=>{},()=>now,()=>true,{settleMs:400000}),/settle/);
+ // Hora seguinte à do fixture (o estudo continua elegível), com candles até a hora que acabou de fechar.
+ const hour=Math.floor(now/3600000)*3600000+3600000;let clock=hour+30000,calls=0;const shifted=()=>{const d=dataset();for(const c of [...d.trade,...d.mark])c.timestamp+=3600000;return d;};const source={load:async()=>{calls++;return shifted();}},bus=new EventBus(),book=new PerpetualPaperBook(bus,undefined,()=>clock);book.ensureEvaluation('nova',1000);
+ await book.synchronize({instrument:'BINANCE_USDM:BTCUSDT',symbol:'BTCUSDT',bid:199,ask:199.1,markPrice:199,indexPrice:199,fundingRate:0.001,nextFundingTime:now+28800000,bookTime:clock,markTime:clock,receivedAt:clock},[],async()=>{});
+ const cycle=new AutonomousPerpetualCycle(true,'controlled-study',new PerpetualStudies(source,[eligible()]),book,source,async()=>{},new MemoryStore(),bus,async()=>{},()=>clock,()=>true,{settleMs:60000});
+ assert.equal(cycle.status().settleSeconds,60);
+ await cycle.onMarket();assert.equal(calls,0,'30 s depois da virada: ainda espera');
+ clock=hour+61000;await book.synchronize({instrument:'BINANCE_USDM:BTCUSDT',symbol:'BTCUSDT',bid:199,ask:199.1,markPrice:199,indexPrice:199,fundingRate:0.001,nextFundingTime:now+28800000,bookTime:clock,markTime:clock,receivedAt:clock},[],async()=>{});
+ await cycle.onMarket();assert.equal(calls,1);assert.equal(book.list()[0].fills,1);await cycle.onMarket();assert.equal(calls,1,'nunca decide duas vezes a mesma hora');
+});

@@ -1,5 +1,14 @@
 # Trading Lab — Project State
 
+## State on 2026-10-09 (read this first)
+
+- **Production** (https://trading-lab-x0yh.onrender.com): commit `08bcfd0`, deployed by the owner's delegate through the Render dashboard on 2026-10-09. Release pins: `CONTINUOUS_RELEASE_COMMIT=08bcfd0…` and `CONTINUOUS_RELEASE_BACKEND` = the backend fingerprint read from `/paper/perpetual/preflight` (`850def3d…`). The service restarts on every deploy; a deploy costs at most one hourly pilot decision.
+- **Office 2.0** (`/office2/`, F6+F7+F8, PRs #100–#102): modular 44×33 plan assembled from separate pieces (see docs/design/OFFICE_2_F8_PLANTA.md). The previous office stays at `/office/`. Making `/office2/` the default entry is an open product decision.
+- **Pilot** (Nova, study d674cb32, BREAKOUT 480 h, BTCUSDT paper): 100 hourly decisions, all flat, 0 trades, pilot P&L 0 (report start-equity fix: #103). Final verdict is due when the study stops being eligible, around 2026-10-11 22:02 UTC; the provisional verdict is `INSUFFICIENT_EVIDENCE`. Pre-declared next step (docs/PILOT_EVALUATION_PROTOCOL.md): do not extend; re-screen.
+- **Next-pilot screening** is declared in docs/PROTOCOLO_TRIAGEM_PILOTO_2.md (`TRIAGEM_PILOTO_2_V1`, two studies: control and Vega filter; expected outcome: none eligible). The two studies must be created in production by an authenticated session **after** the pilot's final verdict; `scripts/estudos/triagem-piloto-2.ts` then applies the declared criteria to the saved study and robustness JSON. Do not create extra studies: each new configuration raises the deflated-Sharpe bar permanently.
+- **Settle option** (#64, merged, default 0): `CONTINUOUS_SIGNAL_SETTLE_SECONDS`; set to 60 only together with a new pilot. Not deployed yet; the first deploy after it will change the backend fingerprint again.
+- Read production only through `work/prod-read.mjs` (GET, read-only token from the Windows user environment) with `MSYS_NO_PATHCONV=1`.
+
 ## Current draft
 
 Journal-based bounded research admissions, interruption recovery and compact original-result cards are prepared without enabling trading or AI. See docs/RESEARCH_JOBS.md; deployment and hosted restart acceptance remain separate.
