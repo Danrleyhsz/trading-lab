@@ -639,8 +639,8 @@
    "id": "cafe-2",
    "room": "cafe",
    "tile": {
-    "i": 19,
-    "j": 30
+    "i": 17,
+    "j": 32
    },
    "kind": "IDLE"
   },
@@ -1662,11 +1662,11 @@
    "room": "stress-lab",
    "tile": {
     "i": 30,
-    "j": 15
+    "j": 14
    },
    "footprint": {
-    "a": 2,
-    "b": 1
+    "a": 3,
+    "b": 2
    },
    "h": 30
   },
@@ -1675,7 +1675,7 @@
    "room": "stress-lab",
    "tile": {
     "i": 32,
-    "j": 16
+    "j": 12
    },
    "footprint": {
     "a": 1,
@@ -1798,6 +1798,21 @@
    "flip": true
   },
   {
+   "asset": "estante-arquivo",
+   "room": "backtest",
+   "tile": {
+    "i": 15,
+    "j": 22
+   },
+   "footprint": {
+    "a": 1,
+    "b": 2
+   },
+   "h": 50,
+   "wall": "i0",
+   "flip": false
+  },
+  {
    "asset": "planta-baixa",
    "room": "backtest",
    "tile": {
@@ -1894,11 +1909,41 @@
    "flip": true
   },
   {
-   "asset": "planta-baixa",
+   "asset": "armario-baixo",
    "room": "diagnostico",
    "tile": {
     "i": 36,
     "j": 21
+   },
+   "footprint": {
+    "a": 2,
+    "b": 1
+   },
+   "h": 22,
+   "wall": "j0",
+   "flip": true
+  },
+  {
+   "asset": "estante-arquivo",
+   "room": "diagnostico",
+   "tile": {
+    "i": 36,
+    "j": 22
+   },
+   "footprint": {
+    "a": 1,
+    "b": 2
+   },
+   "h": 50,
+   "wall": "i0",
+   "flip": false
+  },
+  {
+   "asset": "planta-baixa",
+   "room": "diagnostico",
+   "tile": {
+    "i": 36,
+    "j": 26
    },
    "footprint": {
     "a": 1,
@@ -1938,14 +1983,29 @@
    "asset": "mesa-cafe-4",
    "room": "cafe",
    "tile": {
-    "i": 20,
-    "j": 29
+    "i": 19,
+    "j": 30
    },
    "footprint": {
     "a": 3,
     "b": 3
    },
    "h": 28
+  },
+  {
+   "asset": "aparador",
+   "room": "cafe",
+   "tile": {
+    "i": 15,
+    "j": 30
+   },
+   "footprint": {
+    "a": 2,
+    "b": 3
+   },
+   "h": 24,
+   "wall": "i0",
+   "flip": false
   },
   {
    "asset": "samambaia",
@@ -1964,7 +2024,7 @@
    "asset": "planta-baixa",
    "room": "cafe",
    "tile": {
-    "i": 15,
+    "i": 18,
     "j": 32
    },
    "footprint": {
