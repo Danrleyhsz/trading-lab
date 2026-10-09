@@ -1,0 +1,427 @@
+{
+ "protocol": {
+  "version": "HOLDOUT_2021_V1",
+  "declaredAt": "2026-10-09",
+  "symbols": [
+   "ZECUSDT",
+   "NEARUSDT",
+   "UNIUSDT",
+   "BCHUSDT",
+   "FILUSDT",
+   "AAVEUSDT",
+   "AVAXUSDT",
+   "LINKUSDT",
+   "XRPUSDT",
+   "XLMUSDT",
+   "DOGEUSDT",
+   "SOLUSDT",
+   "LTCUSDT",
+   "ETHUSDT",
+   "BTCUSDT"
+  ],
+  "firstBar": 1604361600000,
+  "lastBar": 1640991600000,
+  "firstDecisionBar": 1606780800000,
+  "rule": {
+   "lookbackHours": 672,
+   "rebalanceHours": 168,
+   "longCount": 5,
+   "shortCount": 5,
+   "legFraction": 0.05,
+   "feeRate": 0.00055,
+   "slippageBps": 2,
+   "initialCapital": 10000,
+   "maxBars": 60000
+  },
+  "gate": {
+   "maximumDrawdown": 0.15,
+   "maximumMarketCorrelation": 0.3,
+   "maximumFilledShare": 0.01
+  },
+  "measured": {
+   "feeRate": 0.0005,
+   "slippageBps": 1
+  },
+  "bootstrap": {
+   "draws": 10000,
+   "blockWeeks": 4,
+   "seed": 20201201
+  }
+ },
+ "protocolCommit": "3e2c66d47d6690753500dc76398798e77f1fa34e",
+ "execution": "HISTORICAL_SIMULATION_OFFLINE",
+ "automaticPaperApproval": false,
+ "runAt": "2026-10-09T20:02:03.209Z",
+ "symbols": [
+  "ZECUSDT",
+  "NEARUSDT",
+  "UNIUSDT",
+  "BCHUSDT",
+  "FILUSDT",
+  "AAVEUSDT",
+  "AVAXUSDT",
+  "LINKUSDT",
+  "XRPUSDT",
+  "XLMUSDT",
+  "DOGEUSDT",
+  "SOLUSDT",
+  "LTCUSDT",
+  "ETHUSDT",
+  "BTCUSDT"
+ ],
+ "period": {
+  "from": "2020-12-01T00:00:00.000Z",
+  "to": "2021-12-31T23:00:00.000Z"
+ },
+ "quality": {
+  "ZECUSDT": {
+   "filled": 0,
+   "share": 0,
+   "fundingMarkFilled": 1272
+  },
+  "NEARUSDT": {
+   "filled": 0,
+   "share": 0,
+   "fundingMarkFilled": 1272
+  },
+  "UNIUSDT": {
+   "filled": 0,
+   "share": 0,
+   "fundingMarkFilled": 1272
+  },
+  "BCHUSDT": {
+   "filled": 0,
+   "share": 0,
+   "fundingMarkFilled": 1272
+  },
+  "FILUSDT": {
+   "filled": 0,
+   "share": 0,
+   "fundingMarkFilled": 1272
+  },
+  "AAVEUSDT": {
+   "filled": 0,
+   "share": 0,
+   "fundingMarkFilled": 1272
+  },
+  "AVAXUSDT": {
+   "filled": 0,
+   "share": 0,
+   "fundingMarkFilled": 1272
+  },
+  "LINKUSDT": {
+   "filled": 0,
+   "share": 0,
+   "fundingMarkFilled": 1272
+  },
+  "XRPUSDT": {
+   "filled": 0,
+   "share": 0,
+   "fundingMarkFilled": 1272
+  },
+  "XLMUSDT": {
+   "filled": 0,
+   "share": 0,
+   "fundingMarkFilled": 1272
+  },
+  "DOGEUSDT": {
+   "filled": 0,
+   "share": 0,
+   "fundingMarkFilled": 1272
+  },
+  "SOLUSDT": {
+   "filled": 0,
+   "share": 0,
+   "fundingMarkFilled": 1272
+  },
+  "LTCUSDT": {
+   "filled": 0,
+   "share": 0,
+   "fundingMarkFilled": 1272
+  },
+  "ETHUSDT": {
+   "filled": 0,
+   "share": 0,
+   "fundingMarkFilled": 1272
+  },
+  "BTCUSDT": {
+   "filled": 0,
+   "share": 0,
+   "fundingMarkFilled": 1272
+  }
+ },
+ "weeklyCorrelation": {
+  "momentumVsCarry": 0.014729584682965586,
+  "comboVsMomentum": 0.6262039648809153,
+  "comboVsCarry": 0.7887963109316224
+ },
+ "results": [
+  {
+   "id": "XSMOM_L28",
+   "label": "Momentum 28 dias",
+   "verdict": "NAO_CONFIRMADA",
+   "failed": [
+    "BOUNDED_DRAWDOWN"
+   ],
+   "checks": {
+    "DATA_QUALITY": true,
+    "POSITIVE_PNL": true,
+    "BOUNDED_DRAWDOWN": false,
+    "DOUBLED_COSTS_POSITIVE": true,
+    "MARKET_NEUTRAL": true
+   },
+   "netPnl": 3329.3618492988644,
+   "returnPct": 0.3329361849298864,
+   "maxDrawdown": 0.15988905816462562,
+   "sharpeAnnualized": 1.3220288039550256,
+   "marketCorrelation": 0.11907619722370688,
+   "doubledPnl": 3108.2565126928093,
+   "measuredPnl": 3374.011019775253,
+   "measuredDoubledPnl": 3196.271935443443,
+   "feesPaid": 152.875184187272,
+   "fundingCashDelta": 52.25733708653155,
+   "turnover": 27.795488034049438,
+   "decisions": 57,
+   "closedLegs": 187,
+   "buyHold": 0.8369933492282593,
+   "halves": {
+    "first": {
+     "returnPct": 0.2548149654357743,
+     "maxDrawdown": 0.14522244379508376
+    },
+    "second": {
+     "returnPct": 0.06225716272596582,
+     "maxDrawdown": 0.11607807096876932
+    }
+   },
+   "periods": {
+    "2020-12": {
+     "returnPct": 0.05473101095900912,
+     "maxDrawdown": 0.020793424998795773
+    },
+    "2021-T1": {
+     "returnPct": 0.19129626289899715,
+     "maxDrawdown": 0.14522244379508376
+    },
+    "2021-T2": {
+     "returnPct": -0.001338758575475718,
+     "maxDrawdown": 0.10460196402565114
+    },
+    "2021-T3": {
+     "returnPct": 0.11410066276176734,
+     "maxDrawdown": 0.07130363846743704
+    },
+    "2021-T4": {
+     "returnPct": -0.04653394596075866,
+     "maxDrawdown": 0.10237062343005776
+    }
+   },
+   "bootstrap": {
+    "p05": -0.06745046248303621,
+    "median": 0.32875814677528803,
+    "p95": 0.9136381208489974,
+    "negativeShare": 0.0948
+   },
+   "inSample": {
+    "returnPct": 0.5704345947460518,
+    "maxDrawdown": 0.20531314295906256,
+    "sharpeAnnualized": 0.8826540862307398
+   },
+   "datasetHashes": {
+    "AAVEUSDT": "01f7bdb03f4e60af2666c88e333456f1261ee01780fa22a89e9d0a049d538bb3",
+    "AVAXUSDT": "81b0c1f79ef9f542c7e43c4ce4f0d3a504b54f0d1b8ec817458e0840854a6da7",
+    "BCHUSDT": "3a8b00f9e09a9e3f9b4638b1db6e095f47c0ff20ae15fb68867602aea12cd82f",
+    "BTCUSDT": "537d56b51bb7b36a268a0d686e8f5bbdced712783971d811d9831c67fc5d4fa5",
+    "DOGEUSDT": "bec44a9c74c2517115febad2637b31d814db1ebd86ebec8c7a5813ffbfe9956d",
+    "ETHUSDT": "644a543f379d3c52e53004eb39f0e50cde88532c89c48716dafaddeb2b0a49c9",
+    "FILUSDT": "bf5121ad689f4691f8af7abe49ab10b97a5aecdc7c2a2a4c9575b6a2df618253",
+    "LINKUSDT": "f436675fcbc62010984798609f07c5e81e8f852dfc11ce0818fa64b5989597f6",
+    "LTCUSDT": "061979d618859ba1faf7a6e565cea3eaf310395e0e39e3b24fbdcf0a2f3bac5c",
+    "NEARUSDT": "ee0944c0fd1684876e2cb06aad4060a98935ac10f30cc7140b9939faf0cd56e8",
+    "SOLUSDT": "13e6740f257bc43a9509163cbca4c8a615c9e111ab3a6d2bfafa047a46133cc7",
+    "UNIUSDT": "68454d226dbe41ead5a022626fd6d57ecb29cc155e998430ebed2fa9190575d4",
+    "XLMUSDT": "00b6175d91e883956d6c685695ac4cefd8d4a366a9498b8ec0956a446ab7d4b6",
+    "XRPUSDT": "ec58ba4eaf1e49f1d211d65b7b053df4c7eee34218b07c4099b8481b3b73574b",
+    "ZECUSDT": "703184d6cb16ea885db61e048664d42bf8b32877f1dd82ff00e1556e81b7e6d8"
+   }
+  },
+  {
+   "id": "XS_CARRY_V1",
+   "label": "Carry entre moedas",
+   "verdict": "NAO_CONFIRMADA",
+   "failed": [
+    "BOUNDED_DRAWDOWN"
+   ],
+   "checks": {
+    "DATA_QUALITY": true,
+    "POSITIVE_PNL": true,
+    "BOUNDED_DRAWDOWN": false,
+    "DOUBLED_COSTS_POSITIVE": true,
+    "MARKET_NEUTRAL": true
+   },
+   "netPnl": 2010.6683850186291,
+   "returnPct": 0.2010668385018629,
+   "maxDrawdown": 0.3250273227996002,
+   "sharpeAnnualized": 0.6559336396858066,
+   "marketCorrelation": -0.020951887902656112,
+   "doubledPnl": 1774.3788099336998,
+   "measuredPnl": 2058.4686717221393,
+   "measuredDoubledPnl": 1868.3548443692998,
+   "feesPaid": 178.54457106943286,
+   "fundingCashDelta": 782.7451049102783,
+   "turnover": 32.46264928535139,
+   "decisions": 57,
+   "closedLegs": 231,
+   "buyHold": 0.8369933492282593,
+   "halves": {
+    "first": {
+     "returnPct": 0.25393084185902315,
+     "maxDrawdown": 0.25828642456454587
+    },
+    "second": {
+     "returnPct": -0.04215862756735955,
+     "maxDrawdown": 0.1523683703698686
+    }
+   },
+   "periods": {
+    "2020-12": {
+     "returnPct": -0.04068247274404824,
+     "maxDrawdown": 0.06230082555948313
+    },
+    "2021-T1": {
+     "returnPct": 0.6173412786379711,
+     "maxDrawdown": 0.24811778581749833
+    },
+    "2021-T2": {
+     "returnPct": -0.1918173288813133,
+     "maxDrawdown": 0.24919404668374046
+    },
+    "2021-T3": {
+     "returnPct": -0.09907032236545854,
+     "maxDrawdown": 0.1523683703698686
+    },
+    "2021-T4": {
+     "returnPct": 0.06316996343990455,
+     "maxDrawdown": 0.06097836192853834
+    }
+   },
+   "bootstrap": {
+    "p05": -0.34207506327018844,
+    "median": 0.16051046471855002,
+    "p95": 1.2423176705201984,
+    "negativeShare": 0.3341
+   },
+   "inSample": {
+    "returnPct": 0.3876519524260217,
+    "maxDrawdown": 0.14909077630682033,
+    "sharpeAnnualized": 0.7293973851671681
+   },
+   "datasetHashes": {
+    "AAVEUSDT": "01f7bdb03f4e60af2666c88e333456f1261ee01780fa22a89e9d0a049d538bb3",
+    "AVAXUSDT": "81b0c1f79ef9f542c7e43c4ce4f0d3a504b54f0d1b8ec817458e0840854a6da7",
+    "BCHUSDT": "3a8b00f9e09a9e3f9b4638b1db6e095f47c0ff20ae15fb68867602aea12cd82f",
+    "BTCUSDT": "537d56b51bb7b36a268a0d686e8f5bbdced712783971d811d9831c67fc5d4fa5",
+    "DOGEUSDT": "bec44a9c74c2517115febad2637b31d814db1ebd86ebec8c7a5813ffbfe9956d",
+    "ETHUSDT": "644a543f379d3c52e53004eb39f0e50cde88532c89c48716dafaddeb2b0a49c9",
+    "FILUSDT": "bf5121ad689f4691f8af7abe49ab10b97a5aecdc7c2a2a4c9575b6a2df618253",
+    "LINKUSDT": "f436675fcbc62010984798609f07c5e81e8f852dfc11ce0818fa64b5989597f6",
+    "LTCUSDT": "061979d618859ba1faf7a6e565cea3eaf310395e0e39e3b24fbdcf0a2f3bac5c",
+    "NEARUSDT": "ee0944c0fd1684876e2cb06aad4060a98935ac10f30cc7140b9939faf0cd56e8",
+    "SOLUSDT": "13e6740f257bc43a9509163cbca4c8a615c9e111ab3a6d2bfafa047a46133cc7",
+    "UNIUSDT": "68454d226dbe41ead5a022626fd6d57ecb29cc155e998430ebed2fa9190575d4",
+    "XLMUSDT": "00b6175d91e883956d6c685695ac4cefd8d4a366a9498b8ec0956a446ab7d4b6",
+    "XRPUSDT": "ec58ba4eaf1e49f1d211d65b7b053df4c7eee34218b07c4099b8481b3b73574b",
+    "ZECUSDT": "703184d6cb16ea885db61e048664d42bf8b32877f1dd82ff00e1556e81b7e6d8"
+   }
+  },
+  {
+   "id": "COMBO_CARRY_MOM_V1",
+   "label": "Carry + momentum",
+   "verdict": "NAO_CONFIRMADA",
+   "failed": [
+    "BOUNDED_DRAWDOWN"
+   ],
+   "checks": {
+    "DATA_QUALITY": true,
+    "POSITIVE_PNL": true,
+    "BOUNDED_DRAWDOWN": false,
+    "DOUBLED_COSTS_POSITIVE": true,
+    "MARKET_NEUTRAL": true
+   },
+   "netPnl": 2961.229058383078,
+   "returnPct": 0.2961229058383078,
+   "maxDrawdown": 0.17377780143998844,
+   "sharpeAnnualized": 1.222340425859955,
+   "marketCorrelation": 0.050444720545438526,
+   "doubledPnl": 2787.1369359807104,
+   "measuredPnl": 2996.3192767487144,
+   "measuredDoubledPnl": 2856.502625217905,
+   "feesPaid": 125.11814773130331,
+   "fundingCashDelta": 417.09958463670796,
+   "turnover": 22.74875413296422,
+   "decisions": 57,
+   "closedLegs": 211,
+   "buyHold": 0.8369933492282593,
+   "halves": {
+    "first": {
+     "returnPct": 0.27608512840197696,
+     "maxDrawdown": 0.15687195320346292
+    },
+    "second": {
+     "returnPct": 0.015702539736846433,
+     "maxDrawdown": 0.0772215870808729
+    }
+   },
+   "periods": {
+    "2020-12": {
+     "returnPct": 0.00711122049401558,
+     "maxDrawdown": 0.02796944274270985
+    },
+    "2021-T1": {
+     "returnPct": 0.4013520509568782,
+     "maxDrawdown": 0.15687195320346292
+    },
+    "2021-T2": {
+     "returnPct": -0.09581986903428541,
+     "maxDrawdown": 0.12272383404420417
+    },
+    "2021-T3": {
+     "returnPct": 0.00667891088138961,
+     "maxDrawdown": 0.0772215870808729
+    },
+    "2021-T4": {
+     "returnPct": 0.008963760696602208,
+     "maxDrawdown": 0.04420308628301095
+    }
+   },
+   "bootstrap": {
+    "p05": -0.08994225778257214,
+    "median": 0.261971147460885,
+    "p95": 0.9198659429477942,
+    "negativeShare": 0.1336
+   },
+   "inSample": {
+    "returnPct": 0.5243279793227137,
+    "maxDrawdown": 0.10444693504065161,
+    "sharpeAnnualized": 1.2153836449415827
+   },
+   "datasetHashes": {
+    "AAVEUSDT": "01f7bdb03f4e60af2666c88e333456f1261ee01780fa22a89e9d0a049d538bb3",
+    "AVAXUSDT": "81b0c1f79ef9f542c7e43c4ce4f0d3a504b54f0d1b8ec817458e0840854a6da7",
+    "BCHUSDT": "3a8b00f9e09a9e3f9b4638b1db6e095f47c0ff20ae15fb68867602aea12cd82f",
+    "BTCUSDT": "537d56b51bb7b36a268a0d686e8f5bbdced712783971d811d9831c67fc5d4fa5",
+    "DOGEUSDT": "bec44a9c74c2517115febad2637b31d814db1ebd86ebec8c7a5813ffbfe9956d",
+    "ETHUSDT": "644a543f379d3c52e53004eb39f0e50cde88532c89c48716dafaddeb2b0a49c9",
+    "FILUSDT": "bf5121ad689f4691f8af7abe49ab10b97a5aecdc7c2a2a4c9575b6a2df618253",
+    "LINKUSDT": "f436675fcbc62010984798609f07c5e81e8f852dfc11ce0818fa64b5989597f6",
+    "LTCUSDT": "061979d618859ba1faf7a6e565cea3eaf310395e0e39e3b24fbdcf0a2f3bac5c",
+    "NEARUSDT": "ee0944c0fd1684876e2cb06aad4060a98935ac10f30cc7140b9939faf0cd56e8",
+    "SOLUSDT": "13e6740f257bc43a9509163cbca4c8a615c9e111ab3a6d2bfafa047a46133cc7",
+    "UNIUSDT": "68454d226dbe41ead5a022626fd6d57ecb29cc155e998430ebed2fa9190575d4",
+    "XLMUSDT": "00b6175d91e883956d6c685695ac4cefd8d4a366a9498b8ec0956a446ab7d4b6",
+    "XRPUSDT": "ec58ba4eaf1e49f1d211d65b7b053df4c7eee34218b07c4099b8481b3b73574b",
+    "ZECUSDT": "703184d6cb16ea885db61e048664d42bf8b32877f1dd82ff00e1556e81b7e6d8"
+   }
+  }
+ ]
+}
