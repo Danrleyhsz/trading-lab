@@ -557,7 +557,7 @@
    "id": "nova",
    "room": "ring",
    "tile": {
-    "i": 2,
+    "i": 1,
     "j": 26
    },
    "kind": "WORK",
@@ -579,7 +579,7 @@
    "id": "atlas",
    "room": "ring",
    "tile": {
-    "i": 4,
+    "i": 3,
     "j": 26
    },
    "kind": "WORK",
@@ -1370,7 +1370,7 @@
    "asset": "mesa-curva-operacoes",
    "room": "ring",
    "tile": {
-    "i": 1,
+    "i": 0,
     "j": 23
    },
    "footprint": {

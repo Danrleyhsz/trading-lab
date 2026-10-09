@@ -299,7 +299,8 @@
    // Cadeiras dos postos são decoração sobre tiles andáveis, com os mesmos apoios das peças normais.
    for(const p of map.points.filter(p=>p.kind==='WORK'))items.push({key:iso.depth(p.tile.i,p.tile.j)+.2,room:p.room,prop:true,draw:()=>drawProp(ctx,{asset:'cadeira-costas',tile:p.tile,footprint:{a:1,b:1},h:26})});
    for(const ag of agents)items.push({key:iso.depth(ag.pos.i,ag.pos.j)+0.3,room:iso.roomAt(Math.round(ag.pos.i),Math.round(ag.pos.j))?.id,draw:()=>drawAgent(ctx,ag,sheets,charImages)});
-   items.sort((x,y)=>x.key-y.key);for(const it of items){if(focus&&(it.wall||it.prop)&&it.room!==focus)continue;ctx.save();if(focus&&it.room!==focus)ctx.globalAlpha=.22;if(it.fade)ctx.globalAlpha*=.3;it.draw();ctx.restore();}
+   items.sort((x,y)=>x.key-y.key);// Em foco, as paredes das outras salas somem e os móveis delas ficam como "fantasmas" (22% de opacidade): dão contexto sem competir com a sala.
+   for(const it of items){if(focus&&it.wall&&it.room!==focus)continue;ctx.save();if(focus&&it.room!==focus)ctx.globalAlpha=.22;if(it.fade)ctx.globalAlpha*=.3;it.draw();ctx.restore();}
   }
   const topY=Math.min(...wallList.map(w=>P(w.a.i,w.a.j,w.h+HEAD).y));
   return {renderStatic,draw,topY,walls:wallList,posts:postList.map(p=>({i:p.i,j:p.j,h:p.h,door:p.door})),signs:signs.map(s=>s.room),backdrop:createBackdrop(images)};
