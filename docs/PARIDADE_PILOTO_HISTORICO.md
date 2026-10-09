@@ -48,3 +48,12 @@ leituras iguais do último candle. Isso muda o momento da decisão do piloto, en
 
 - não foi aplicado ao piloto em curso (regras pré-declaradas);
 - fica proposto como regra versionada para o próximo piloto, com a sua aprovação.
+
+## Correção aprovada pelo dono (05/10/2026): esperar o candle assentar
+
+- Nova opção do ciclo `settleMs`, ligada pela variável `CONTINUOUS_SIGNAL_SETTLE_SECONDS` no Render
+  (inteiro de 0 a 300). Com 60, o piloto só lê o candle e decide 60 s depois da virada da hora.
+- Padrão 0: o piloto em curso não muda.
+- No próximo piloto, configurar `CONTINUOUS_SIGNAL_SETTLE_SECONDS=60` junto com o estudo novo, como regra declarada.
+- O valor aparece em `settleSeconds` no status do ciclo. A conferência de paridade mostra o atraso real de cada
+  decisão (`decisionLatencySeconds`), para confirmar que a espera funcionou.
