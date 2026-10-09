@@ -96,3 +96,12 @@ test('F8: móveis com frente ficam de costas para uma parede de trás, com a ori
  // as telas de dados ficam acima dos móveis baixos: faixa de 22 a 70 px
  assert.match(readFileSync('public/office2/scene.js','utf8'),/bottom=22;/);
 });
+
+test('F8: nenhuma arte sai minúscula: a largura final de cada móvel é pelo menos 45% do losango da pegada',()=>{
+ const manifest=JSON.parse(readFileSync('public/office2/art/manifesto.json','utf8')).props,supports=JSON.parse(readFileSync('public/office2/art/apoios.json','utf8')).supports;
+ const iso=runtime().Office2Iso.create(map);
+ for(const p of map.props.filter((p:any)=>p.blocking!==false)){
+  const info=manifest[p.asset],place=iso.propPlacement(p,info,supports[p.asset]),largura=info.width*place.s,losango=(p.footprint.a+p.footprint.b)*24;
+  assert.ok(largura>=0.45*losango,`${p.asset} (${p.tile.i},${p.tile.j}) sai a ${Math.round(largura)} px, só ${Math.round(100*largura/losango)}% do losango`);
+ }
+});
