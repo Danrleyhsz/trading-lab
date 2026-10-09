@@ -29,17 +29,10 @@
   }
   const FLOOR_TEXTURE={'piso-claro':'piso-marmore',madeira:'piso-madeira','carpete-escuro':'carpete','piso-tecnico':'carpete',deck:'deck'};
   function wallTexture(ctx,w){return texturePattern(ctx,signAt.has([w.a.i,w.a.j,w.b.i,w.b.j].join(','))||w.room==='hall-marca'?'parede-ripada':'parede-escura',w.a.j===w.b.j?'i':'j');}
-  /** Altura e tipo de cada parede de fundo/frente, pela regra da OFFICE_VISUAL_SPEC.md (seção 4). */
-  function wallSpec(room,side){
-   const type=room.edges?.[side]??(side==='j0'||side==='i0'?'divisoria-baixa':null);if(!type)return null;
-   if(type==='aberta')return null;
-   const plateEdge=(side==='j0'&&room.tiles.j0===0)||(side==='i0'&&room.tiles.i0===0);
-   if(type==='guarda-corpo-vidro')return {type,h:RAIL,glass:true};
-   if(type==='fachada-vidro')return {type,h:side==='i1'||side==='j1'?RAIL:TALL,glass:true};
-   if(type==='divisoria-vidro')return {type,h:GLASS,glass:true};
-   if(type==='parede-marca'||(type==='parede-painel'&&side==='j0')||plateEdge||map.screens.some(s=>s.room===room.id&&s.wall===side))return {type,h:TALL,glass:false};
-   return {type,h:LOW,glass:false};
-  }
+  /** Altura e tipo de cada borda declarada na planta (cada sala diz o tipo de parede de cada lado; sem tipo, não há parede). */
+  const EDGE={'parede-painel':{h:TALL,glass:false},'parede-marca':{h:TALL,glass:false},'fachada-vidro':{h:TALL,glass:true},'divisoria-vidro':{h:GLASS,glass:true},
+   'divisoria-vidro-baixa':{h:RAIL,glass:true},'guarda-corpo-vidro':{h:RAIL,glass:true},'divisoria-baixa':{h:LOW,glass:false}};
+  function wallSpec(room,side){const type=room.edges?.[side],spec=type&&EDGE[type];return spec?{type,...spec}:null;}
   const doorAt=new Set(iso.doors.map(d=>d.room+':'+d.side+':'+(d.side[0]==='i'?d.inner.j:d.inner.i)));
   /** Segmentos de parede, um por tile de borda, com chave de profundidade (iso.depth da borda − 0,5). */
   const walls=[];
@@ -55,6 +48,21 @@
    uniq.delete(segment.join(','));
   }
   wallList.splice(0,wallList.length,...uniq.values());
+  /** Montantes: coluna escura em cada ponta livre de parede, em cada canto e nos dois lados de cada porta (luz âmbar no batente). */
+  const posts=new Map();
+  const addPost=(i,j,h,room,tag,door)=>{const k=i+','+j,p=posts.get(k)??{i,j,room,h:0,heights:new Set(),tags:new Set(),n:0,door:false};
+   p.h=Math.max(p.h,h);p.heights.add(h);p.tags.add(tag);p.n+=1;p.door=p.door||!!door;posts.set(k,p);};
+  for(const w of wallList){const tag=w.a.j===w.b.j?'i':'j';addPost(w.a.i,w.a.j,w.h,w.room,tag);addPost(w.b.i,w.b.j,w.h,w.room,tag);}
+  for(const d of iso.doors){const r=roomById.get(d.room),spec=wallSpec(r,d.side);if(!spec)continue;const t=r.tiles;
+   const [pa,pb]=d.side[0]==='j'?[[d.inner.i,d.side==='j0'?t.j0:t.j1],[d.inner.i+1,d.side==='j0'?t.j0:t.j1]]:[[d.side==='i0'?t.i0:t.i1,d.inner.j],[d.side==='i0'?t.i0:t.i1,d.inner.j+1]];
+   addPost(pa[0],pa[1],spec.h,d.room,'door',true);addPost(pb[0],pb[1],spec.h,d.room,'door',true);}
+  const postList=[...posts.values()].filter(p=>p.door||p.n===1||p.tags.size>1||p.heights.size>1);
+  function drawPost(ctx,p){
+   const b=P(p.i,p.j),t=P(p.i,p.j,p.h);ctx.fillStyle='#0a0e16';ctx.fillRect(b.x-1.7,t.y-2.5,3.4,b.y-t.y+2.5);
+   ctx.fillStyle='rgba(120,135,160,0.55)';ctx.fillRect(b.x-1.7,t.y-2.5,1,b.y-t.y+2.5);
+   if(p.door&&p.h>=GLASS){ctx.fillStyle='rgba(255,208,128,0.95)';ctx.fillRect(b.x+1.7,t.y+3,1.2,b.y-t.y-6);
+    ctx.fillStyle='rgba(255,190,100,0.10)';ctx.fillRect(b.x+2.9,t.y+3,4,b.y-t.y-6);}
+  }
   /**
    * Placas das zonas pintadas na parede de fundo (como na referência): painel escuro de 3+ tiles livres de tela e de porta,
    * com nome grande, subtítulo e emblema. Cada fatia de parede desenha o seu pedaço da placa, na própria profundidade.
@@ -124,15 +132,17 @@
       const pane=[{x:x0,y:ya},{x:x1,y:yb},{x:x1,y:yb+FH-7},{x:x0,y:ya+FH-7}];
       const g=ctx.createLinearGradient(x0,ya,x1,yb+FH);g.addColorStop(0,palette.reflection);g.addColorStop(.34,palette.glass);g.addColorStop(.72,shade?'#14233b':'#284766');g.addColorStop(1,palette.glass);poly(ctx,pane,g);
       if(r<palette.warm){
-       poly(ctx,pane,'rgba(255,202,126,'+(.16+rnd()*.28).toFixed(2)+')');
-       // Bancadas e persianas atrás do vidro, decoração determinística.
-       poly(ctx,[{x:x0+2,y:ya+FH-15},{x:x1-2,y:yb+FH-15},{x:x1-2,y:yb+FH-9},{x:x0+2,y:ya+FH-9}],'rgba(10,25,42,.44)');
-      }
+       const top=Math.min(ya,yb),wg=ctx.createLinearGradient(0,top,0,top+FH+Math.abs(yb-ya));wg.addColorStop(0,'rgba(255,228,172,.66)');wg.addColorStop(.55,'rgba(255,186,106,.44)');wg.addColorStop(1,'rgba(255,148,66,.26)');poly(ctx,pane,wg);
+       // luz de teto no alto da vidraça e bancada escura ao fundo (decoração determinística; sem pessoas)
+       poly(ctx,[{x:x0+2,y:ya+3},{x:x1-2,y:yb+3},{x:x1-2,y:yb+5},{x:x0+2,y:ya+5}],'rgba(255,248,226,.8)');
+       poly(ctx,[{x:x0+2,y:ya+FH-17},{x:x1-2,y:yb+FH-17},{x:x1-2,y:yb+FH-9},{x:x0+2,y:ya+FH-9}],'rgba(44,24,12,.5)');
+      }else if(r<palette.warm+.16)poly(ctx,pane,'rgba(176,210,255,.2)');
       const xm=(x0+x1)/2,ym=(ya+yb)/2;
       ctx.strokeStyle='rgba(151,185,207,.36)';ctx.lineWidth=.8;ctx.beginPath();ctx.moveTo(xm,ym);ctx.lineTo(xm,ym+FH-7);ctx.stroke();
       ctx.strokeStyle='rgba(194,217,230,.32)';ctx.beginPath();ctx.moveTo(x0+1,ya+2);ctx.lineTo(x1-1,yb+2);ctx.stroke();
      }
      poly(ctx,[{x:a.x,y:a.y+y0-5},{x:b.x,y:b.y+y0-5},{x:b.x,y:b.y+y0},{x:a.x,y:a.y+y0}],shade?'#223247':'#3d5066');
+     ctx.strokeStyle='rgba(255,206,130,.28)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(a.x,a.y+y0+.5);ctx.lineTo(b.x,b.y+y0+.5);ctx.stroke();
     }
     // Reflexos verticais do entorno conservam a perspectiva e não são janelas estreitas repetidas.
     for(let k=0;k<5;k++){const u=(k+.35)/5,v=u+.025;poly(ctx,[{x:a.x+(b.x-a.x)*u,y:a.y+(b.y-a.y)*u},{x:a.x+(b.x-a.x)*v,y:a.y+(b.y-a.y)*v},{x:a.x+(b.x-a.x)*v,y:a.y+(b.y-a.y)*v+depth},{x:a.x+(b.x-a.x)*u,y:a.y+(b.y-a.y)*u+depth}],'rgba(187,217,237,.08)');}
@@ -160,12 +170,22 @@
     if(r?.floor==='madeira'||r?.floor==='deck'){for(const f of [0.33,0.66]){const a=P(i,j+f),b=P(i+1,j+f);ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();}}}
    // Subzonas com cor de destaque na borda (Anel de decisão × Execução paper).
    for(const r of map.rooms)for(const s of r.subzones??[]){const t=s.tiles;ctx.globalAlpha=0.9;poly(ctx,[P(t.i0,t.j0),P(t.i1,t.j0),P(t.i1,t.j1),P(t.i0,t.j1)],null,s.accent);ctx.globalAlpha=1;}
+   // Corredores: tom quente por cima do mármore; junto de cada parede alta maciça, sombra suave no chão da sala.
+   ctx.globalCompositeOperation='multiply';
+   for(let i=0;i<W;i++)for(let j=0;j<H;j++)if(!iso.roomAt(i,j)){const c=[P(i-.02,j-.02),P(i+1.02,j-.02),P(i+1.02,j+1.02),P(i-.02,j+1.02)];poly(ctx,c,'#e9cda2');}
+   ctx.globalCompositeOperation='source-over';
+   for(const w of wallList){if(w.glass||w.h<TALL)continue;const alongI=w.a.j===w.b.j;
+    for(const [d,al] of [[.45,.22],[.9,.12],[1.4,.06]]){const q=alongI?[P(w.a.i,w.a.j),P(w.b.i,w.b.j),P(w.b.i,w.b.j+d),P(w.a.i,w.a.j+d)]:[P(w.a.i,w.a.j),P(w.b.i,w.b.j),P(w.b.i+d,w.b.j),P(w.a.i+d,w.a.j)];poly(ctx,q,'rgba(6,8,16,'+al+')');}}
    // Piso claro polido: meia-luz na metade de cima de cada placa e um reflexo diagonal largo (decoração).
    ctx.globalCompositeOperation='lighter';
    for(let i=0;i<W;i++)for(let j=0;j<H;j++){const r=iso.roomAt(i,j);if((r?.floor??'piso-claro')!=='piso-claro')continue;
     poly(ctx,[P(i,j),P(i+1,j),P(i+0.5,j+0.5)],'rgba(255,240,215,0.07)');}
    for(let k=0;k<5;k++){const a=P(4+k*6,0),b=P(4+k*6,H);const g=ctx.createLinearGradient(a.x-30,a.y,a.x+30,a.y);g.addColorStop(0,'rgba(255,245,230,0)');g.addColorStop(0.5,'rgba(255,245,230,0.035)');g.addColorStop(1,'rgba(255,245,230,0)');
     ctx.fillStyle=g;ctx.beginPath();ctx.moveTo(a.x-30,a.y);ctx.lineTo(a.x+30,a.y);ctx.lineTo(b.x+30,b.y);ctx.lineTo(b.x-30,b.y);ctx.closePath();ctx.fill();}
+   // Luminárias de teto nos corredores: retículo regular de focos de luz quente.
+   for(let i=0;i<W;i++)for(let j=0;j<H;j++){if(iso.roomAt(i,j)||i%5!==2||j%5!==3)continue;const c=P(i+.5,j+.5),r=46;
+    const g=ctx.createRadialGradient(c.x,c.y,0,c.x,c.y,r);g.addColorStop(0,'rgba(255,214,160,0.20)');g.addColorStop(1,'rgba(255,214,160,0)');
+    ctx.save();ctx.translate(c.x,c.y);ctx.scale(1,0.5);ctx.translate(-c.x,-c.y);ctx.fillStyle=g;ctx.beginPath();ctx.arc(c.x,c.y,r,0,Math.PI*2);ctx.fill();ctx.restore();}
    // Luz quente do teto: uma poça de luz por sala coberta (decoração; deixa o andar com cara de noite iluminada).
    for(const r of map.rooms){if(r.outdoor)continue;const t=r.tiles,c=P((t.i0+t.i1)/2,(t.j0+t.j1)/2),rx=((t.i1-t.i0)+(t.j1-t.j0))*12;
     const g=ctx.createRadialGradient(c.x,c.y,0,c.x,c.y,rx);g.addColorStop(0,'rgba(255,186,110,0.20)');g.addColorStop(0.6,'rgba(255,186,110,0.07)');g.addColorStop(1,'rgba(255,186,110,0)');
@@ -173,21 +193,36 @@
    ctx.globalCompositeOperation='source-over';
    return cv;
   }
+  /** Vidro: película azulada com brilho diagonal, montantes pretos a cada tile, travessa grossa em cima e rodapé escuro. */
+  function drawGlass(ctx,w,a,b,at,bt){
+   poly(ctx,[a,b,bt,at],'rgba(135,188,240,0.13)');
+   poly(ctx,[at,bt,P(w.b.i,w.b.j,w.h*.62),P(w.a.i,w.a.j,w.h*.62)],'rgba(175,215,255,0.10)');
+   // brilho: faixa diagonal fina em cada vidraça
+   const u0=.18,u1=.34,lerp=(p,q,t)=>({x:p.x+(q.x-p.x)*t,y:p.y+(q.y-p.y)*t});
+   poly(ctx,[lerp(a,b,u0),lerp(a,b,u1),lerp(at,bt,u1),lerp(at,bt,u0)],'rgba(235,246,255,0.10)');
+   const foot=P(w.a.i,w.a.j,4),footB=P(w.b.i,w.b.j,4);
+   poly(ctx,[a,b,footB,foot],'#0d1118');
+   ctx.strokeStyle='#0d1118';ctx.lineWidth=1.6;ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(at.x,at.y-1);ctx.stroke();
+   ctx.lineWidth=w.h===RAIL?2.6:2;ctx.beginPath();ctx.moveTo(at.x,at.y-1);ctx.lineTo(bt.x,bt.y-1);ctx.stroke();
+   ctx.strokeStyle='rgba(205,225,245,0.5)';ctx.lineWidth=.8;ctx.beginPath();ctx.moveTo(at.x,at.y-2.2);ctx.lineTo(bt.x,bt.y-2.2);ctx.stroke();
+   if(w.h===RAIL){ctx.strokeStyle='rgba(255,210,122,0.7)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(a.x,a.y-4.5);ctx.lineTo(b.x,b.y-4.5);ctx.stroke();}
+  }
   function drawWall(ctx,w){
    const a=P(w.a.i,w.a.j),b=P(w.b.i,w.b.j),at=P(w.a.i,w.a.j,w.h),bt=P(w.b.i,w.b.j,w.h);
-   if(w.glass){poly(ctx,[a,b,bt,at],C.glass);ctx.strokeStyle=C.glassLine;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(at.x,at.y);ctx.lineTo(bt.x,bt.y);ctx.stroke();
-    // Moldura preta: montante no começo de cada vidraça e corrimão/travessa por cima (como a referência).
-    ctx.strokeStyle='#0d1118';ctx.lineWidth=1.6;ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(at.x,at.y-1);ctx.stroke();
-    ctx.lineWidth=w.h===RAIL?2.2:1.6;ctx.beginPath();ctx.moveTo(at.x,at.y-1);ctx.lineTo(bt.x,bt.y-1);ctx.stroke();
-    if(w.h===RAIL){ctx.strokeStyle='rgba(255,210,122,0.55)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(a.x,a.y-1);ctx.lineTo(b.x,b.y-1);ctx.stroke();}return;}
-   const sign=signAt.get([w.a.i,w.a.j,w.b.i,w.b.j].join(','));
-   if(sign){drawSignSlice(ctx,sign,w);return;}
-   const texture=wallTexture(ctx,w);poly(ctx,[a,b,bt,at],texture??(w.a.j===w.b.j?C.wall:C.wallSide));
-   if(texture&&w.a.j!==w.b.j)poly(ctx,[a,b,bt,at],'rgba(10,14,22,0.25)');
+   if(w.glass){drawGlass(ctx,w,a,b,at,bt);return;}
+   const alongI=w.a.j===w.b.j,sign=signAt.get([w.a.i,w.a.j,w.b.i,w.b.j].join(','));
+   if(sign){drawSignSlice(ctx,sign,w);}
+   else{
+    const texture=wallTexture(ctx,w);poly(ctx,[a,b,bt,at],texture??(alongI?C.wall:C.wallSide));
+    if(texture&&!alongI)poly(ctx,[a,b,bt,at],'rgba(10,14,22,0.25)');
+    // rodapé escuro e junta entre painéis a cada tile
+    poly(ctx,[a,b,P(w.b.i,w.b.j,5),P(w.a.i,w.a.j,5)],'rgba(6,8,13,0.55)');
+    ctx.strokeStyle='rgba(10,13,20,0.55)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(at.x,at.y);ctx.stroke();
+    if(w.h===TALL){ctx.strokeStyle=C.led;ctx.globalAlpha=0.7;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(at.x,at.y+5);ctx.lineTo(bt.x,bt.y+5);ctx.stroke();ctx.globalAlpha=1;}
+   }
+   // tampo da parede: faixa clara com fio de luz por cima
    poly(ctx,[at,bt,{x:bt.x,y:bt.y-3},{x:at.x,y:at.y-3}],C.wallCap);
-   // Junta entre painéis a cada tile.
-   ctx.strokeStyle='rgba(10,13,20,0.55)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(at.x,at.y);ctx.stroke();
-   if(w.h===TALL){ctx.strokeStyle=C.led;ctx.globalAlpha=0.7;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(at.x,at.y+5);ctx.lineTo(bt.x,bt.y+5);ctx.stroke();ctx.globalAlpha=1;}
+   ctx.strokeStyle='rgba(205,215,232,0.45)';ctx.lineWidth=.8;ctx.beginPath();ctx.moveTo(at.x,at.y-3);ctx.lineTo(bt.x,bt.y-3);ctx.stroke();
    const header=headerAt.get([w.a.i,w.a.j,w.b.i,w.b.j].join(','));if(header)drawHeaderSlice(ctx,header,w);
   }
   /** Tela de parede: apagada e listrada quando não há dado (UNKNOWN); o conteúdo real entra nas fases F2–F5. */
@@ -251,16 +286,22 @@
   function draw(ctx,cache,agents,sheets,charImages,screenContent,focus=null,oldCache=null,progress=1){
    const {w,h}=map.projection.scene;ctx.drawImage(cache,0,0,w,cache.worldHeight??h+DROP);if(oldCache){ctx.save();ctx.globalAlpha=1-progress;ctx.drawImage(oldCache,0,0,w,oldCache.worldHeight??h+DROP);ctx.restore();}
    const items=[];
-   for(const wl of wallList)items.push({key:wl.key,room:wl.room,wall:true,draw:()=>drawWall(ctx,wl)});
+   const seen=[];for(const ag of agents){const f=ag.visual??P(ag.pos.i+.5,ag.pos.j+.5);seen.push({key:iso.depth(ag.pos.i,ag.pos.j)+.3,x0:f.x-16,x1:f.x+16,y0:f.y-52,y1:f.y+6});}
+   const covers=(x0,x1,y0,y1,key)=>seen.some(r=>key>r.key&&x1>r.x0&&x0<r.x1&&y1>r.y0&&y0<r.y1);
+   for(const wl of wallList){const a=P(wl.a.i,wl.a.j),b=P(wl.b.i,wl.b.j),top=P(wl.a.i,wl.a.j,wl.h).y,bt=P(wl.b.i,wl.b.j,wl.h).y;
+    const fade=!wl.glass&&covers(Math.min(a.x,b.x),Math.max(a.x,b.x),Math.min(top,bt),Math.max(a.y,b.y),wl.key);
+    items.push({key:wl.key,room:wl.room,wall:true,fade,draw:()=>drawWall(ctx,wl)});}
+   for(const pt of postList)items.push({key:pt.i+pt.j-.4,room:pt.room,wall:true,draw:()=>drawPost(ctx,pt)});
    for(const s of map.screens){const r=roomById.get(s.room);items.push({key:(s.tiles.to-1)+(s.wall==='i0'?r.tiles.i0:r.tiles.j0)-0.4,room:s.room,wall:true,draw:()=>drawScreen(ctx,s,screenContent?.[s.id])});}
    // Tapetes ficam no chão, antes de toda a mobília, e não bloqueiam a circulação.
    for(const p of map.props??[])if(p.blocking===false)drawProp(ctx,p);else items.push({key:iso.propDepth(p)+0.1,room:p.room,draw:()=>drawProp(ctx,p)});
    // Cadeiras dos postos são decoração sobre tiles andáveis, com os mesmos apoios das peças normais.
    for(const p of map.points.filter(p=>p.kind==='WORK'))items.push({key:iso.depth(p.tile.i,p.tile.j)+.2,room:p.room,draw:()=>drawProp(ctx,{asset:'cadeira-costas',tile:p.tile,footprint:{a:1,b:1},h:26})});
    for(const ag of agents)items.push({key:iso.depth(ag.pos.i,ag.pos.j)+0.3,room:iso.roomAt(Math.round(ag.pos.i),Math.round(ag.pos.j))?.id,draw:()=>drawAgent(ctx,ag,sheets,charImages)});
-   items.sort((x,y)=>x.key-y.key);for(const it of items){if(focus&&it.wall&&it.room!==focus)continue;ctx.save();if(focus&&it.room!==focus)ctx.globalAlpha=.22;it.draw();ctx.restore();}
+   items.sort((x,y)=>x.key-y.key);for(const it of items){if(focus&&it.wall&&it.room!==focus)continue;ctx.save();if(focus&&it.room!==focus)ctx.globalAlpha=.22;if(it.fade)ctx.globalAlpha*=.3;it.draw();ctx.restore();}
   }
-  return {renderStatic,draw,walls:wallList,signs:signs.map(s=>s.room),backdrop:createBackdrop(images)};
+  const topY=Math.min(...wallList.map(w=>P(w.a.i,w.a.j,w.h+HEAD).y));
+  return {renderStatic,draw,topY,walls:wallList,posts:postList.map(p=>({i:p.i,j:p.j,h:p.h,door:p.door})),signs:signs.map(s=>s.room),backdrop:createBackdrop(images)};
  }
  /**
   * Fundo em tela cheia, em coordenadas de tela: a cidade gerada cobre toda a área (sem faixas pretas), com paralaxe leve.

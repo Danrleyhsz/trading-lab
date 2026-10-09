@@ -222,7 +222,7 @@
  // ---------- câmera ----------
  /** Visão geral: enquadra a planta do andar (com as paredes altas e a borda da laje), não o retângulo inteiro da cena; o fundo cobre o resto. */
  function overview(){const iso=state.iso,top=iso.project(0,0,102),left=iso.project(0,iso.H),right=iso.project(iso.W,0),bottom=iso.project(iso.W,iso.H);
-  const bounds={x0:left.x-12,x1:right.x+12,y0:top.y-12,y1:bottom.y+72},c=Office2Iso.fit(bounds,viewport.clientWidth,viewport.clientHeight,2,16);
+  const bounds={x0:left.x-12,x1:right.x+12,y0:(state.scene?.topY??top.y)-14,y1:bottom.y+24},c=Office2Iso.fit(bounds,viewport.clientWidth,viewport.clientHeight,2,16);
   if(viewport.clientWidth<600)c.y=Math.min(c.y,88-bounds.y0*c.s);return c;}
  function roomCamera(room){const t=room.tiles,pts=[[t.i0,t.j0],[t.i1,t.j0],[t.i1,t.j1],[t.i0,t.j1]].map(([i,j])=>state.iso.project(i,j));
   return Office2Iso.fit({x0:Math.min(...pts.map(p=>p.x))-32,x1:Math.max(...pts.map(p=>p.x))+32,y0:Math.min(...pts.map(p=>p.y))-112,y1:Math.max(...pts.map(p=>p.y))+30},viewport.clientWidth,viewport.clientHeight,2.6,32);}
@@ -345,7 +345,7 @@ function placeZoneLabels(){const c=state.camera;for(const z of zoneLabels){z.nod
  }
  /** Arrastar move a visão; a roda aproxima no ponto do mouse. Um arrasto não conta como clique numa sala. */
  const drag={on:false,moved:false,x:0,y:0};
- function clampCamera(c){const iso=state.iso,vw=viewport.clientWidth,vh=viewport.clientHeight,l=iso.project(0,iso.H).x,r=iso.project(iso.W,0).x,t=iso.project(0,0,84).y,b=iso.project(iso.W,iso.H).y+60;
+ function clampCamera(c){const iso=state.iso,vw=viewport.clientWidth,vh=viewport.clientHeight,l=iso.project(0,iso.H).x,r=iso.project(iso.W,0).x,t=state.scene?.topY??iso.project(0,0,84).y,b=iso.project(iso.W,iso.H).y+60;
   c.x=Math.min(vw*0.5-l*c.s,Math.max(vw*0.5-r*c.s,c.x));c.y=Math.min(vh*0.5-t*c.s,Math.max(vh*0.5-b*c.s,c.y));return c;}
  function onPointer(ev){if(ev.type==='pointerdown'){drag.on=true;drag.moved=false;drag.x=ev.clientX;drag.y=ev.clientY;return;}
   if(ev.type==='pointermove'&&drag.on){const dx=ev.clientX-drag.x,dy=ev.clientY-drag.y;if(!drag.moved&&Math.hypot(dx,dy)<5)return;drag.moved=true;drag.x=ev.clientX;drag.y=ev.clientY;state.anim=null;
@@ -385,6 +385,8 @@ function placeZoneLabels(){const c=state.camera;for(const z of zoneLabels){z.nod
   if(globalThis.ResizeObserver)new ResizeObserver(()=>resize()).observe(viewport);else globalThis.addEventListener('resize',resize);
   D.addEventListener('visibilitychange',()=>{state.hidden=D.hidden;if(!D.hidden)requestAnimationFrame(frame);});
   clock();setInterval(clock,15000);await refresh();setInterval(refresh,15000);
+  // Endereço #sala (ex.: /office2/#ring) abre direto na sala.
+  const wanted=state.map.rooms.find(r=>r.id===decodeURIComponent((globalThis.location?.hash??'').slice(1)));if(wanted)focusRoom(wanted);
   requestAnimationFrame(frame);
  }
  globalThis.Office2={state,focusRoom,MODULES};
