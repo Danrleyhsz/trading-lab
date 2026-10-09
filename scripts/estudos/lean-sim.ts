@@ -9,6 +9,8 @@ const HOUR=3600000;
 export interface LeanData {
  symbols:string[];            // em ordem alfabética (localeCompare), a mesma dos desempates de simulateBlend
  timestamps:Float64Array;
+ /** Índice global da primeira vela de cada moeda; se ausente, todas começam em 0 e têm o comprimento total. As séries podem ser mais curtas. */
+ first?:Int32Array;
  open:Float64Array[];
  close:Float64Array[];
  volume:Float64Array[];
@@ -25,7 +27,9 @@ export interface LeanResult {
  equitySeries:{timestamp:number;equity:number}[];finalEquity:number;netPnl:number;maxDrawdown:number;feesPaid:number;fundingCashDelta:number;
  tradedNotional:number;closedLegs:number;rebalances:{timestamp:number;long:string[];short:string[]}[];datasetHashes:Record<string,string>;
 }
-export const leanMomentum=(lookback:number)=>(d:LeanData,i:number)=>Float64Array.from(d.close,c=>c[i]/c[i-lookback]-1);
+/** Preço no índice global `i` de uma série que começa em `first`: zero antes de existir, último valor depois de acabar (deslistagem). */
+export const px=(a:Float64Array,first:number,i:number)=>i<first?0:(i-first<a.length?a[i-first]:a[a.length-1]);
+export const leanMomentum=(lookback:number)=>(d:LeanData,i:number)=>Float64Array.from(d.close,(c,s)=>{const f=d.first?.[s]??0;return px(c,f,i)/px(c,f,i-lookback)-1;});
 
 export function toLean(datasets:Record<string,PerpetualDataset>):LeanData{
  const symbols=Object.keys(datasets).sort((a,b)=>a.localeCompare(b)),n=datasets[symbols[0]].trade.length;
@@ -46,12 +50,12 @@ export function addSymbol(d:LeanData,symbol:string,one:PerpetualDataset){
 /** Recorte das primeiras `bars` velas (e do funding até a última delas). */
 export function sliceLean(d:LeanData,bars:number):LeanData{
  const stop=d.timestamps[bars-1]+HOUR;
- return {symbols:d.symbols,timestamps:d.timestamps.slice(0,bars),open:d.open.map(a=>a.slice(0,bars)),close:d.close.map(a=>a.slice(0,bars)),volume:d.volume.map(a=>a.slice(0,bars)),
+ return {symbols:d.symbols,first:d.first,timestamps:d.timestamps.slice(0,bars),open:d.open.map((a,k)=>a.slice(0,Math.max(0,bars-(d.first?.[k]??0)))),close:d.close.map((a,k)=>a.slice(0,Math.max(0,bars-(d.first?.[k]??0)))),volume:d.volume.map((a,k)=>a.slice(0,Math.max(0,bars-(d.first?.[k]??0)))),
   funding:d.funding.map(f=>f.filter(x=>x.timestamp<stop))};
 }
 export function subset(d:LeanData,keep:string[]):LeanData{
  const idx=d.symbols.map((s,k)=>keep.includes(s)?k:-1).filter(k=>k>=0);
- return {symbols:idx.map(k=>d.symbols[k]),timestamps:d.timestamps,open:idx.map(k=>d.open[k]),close:idx.map(k=>d.close[k]),volume:idx.map(k=>d.volume[k]),funding:idx.map(k=>d.funding[k])};
+ return {symbols:idx.map(k=>d.symbols[k]),first:d.first?Int32Array.from(idx,k=>d.first![k]):undefined,timestamps:d.timestamps,open:idx.map(k=>d.open[k]),close:idx.map(k=>d.close[k]),volume:idx.map(k=>d.volume[k]),funding:idx.map(k=>d.funding[k])};
 }
 
 export function simulateLean(d:LeanData,cfg:BlendConfig,books:LeanBook[]):LeanResult{
@@ -69,7 +73,7 @@ export function simulateLean(d:LeanData,cfg:BlendConfig,books:LeanBook[]):LeanRe
   if(pending){
    for(let s=0;s<S;s++){
     const current=qty[s],target=pending[s],delta=target-current;if(Math.abs(delta)<1e-15)continue;
-    const price=d.open[s][i]*(1+Math.sign(delta)*slip),fee=Math.abs(delta)*price*cfg.feeRate;
+    const price=px(d.open[s],d.first?.[s]??0,i)*(1+Math.sign(delta)*slip),fee=Math.abs(delta)*price*cfg.feeRate;
     cash-=delta*price+fee;fees+=fee;traded+=Math.abs(delta)*price;
     if(current!==0&&(target===0||Math.sign(target)!==Math.sign(current)))closedLegs++;
     qty[s]=target;
@@ -81,7 +85,7 @@ export function simulateLean(d:LeanData,cfg:BlendConfig,books:LeanBook[]):LeanRe
    while(k<list.length&&list[k].timestamp<t+HOUR){const f=list[k];if(f.timestamp>=t){const q=qty[s];if(q){const delta=-q*f.markPrice*f.rate;cash+=delta;funding+=delta;}}k++;}
    fundingIndex[s]=k;
   }
-  let equity=cash;for(let s=0;s<S;s++)equity+=qty[s]*d.close[s][i];
+  let equity=cash;for(let s=0;s<S;s++)if(qty[s]!==0)equity+=qty[s]*px(d.close[s],d.first?.[s]??0,i);
   if(i>=cfg.startBar){equitySeries.push({timestamp:t,equity});peak=Math.max(peak,equity);maxDrawdown=Math.max(maxDrawdown,peak>0?1-equity/peak:0);}
   if(i>=cfg.startBar&&(i-cfg.startBar)%cfg.rebalanceHours===0&&i+1<bars){
    pending=new Float64Array(S);let record:{long:string[];short:string[]}|null=null;
@@ -90,8 +94,8 @@ export function simulateLean(d:LeanData,cfg:BlendConfig,books:LeanBook[]):LeanRe
     if(pool.length<book.longCount+book.shortCount)throw new Error('eligible universe smaller than the portfolio');
     const score=book.score(d,i),ranked=pool.map(s=>({s,r:score[s]})).sort((a,b)=>b.r-a.r||symbols[a.s].localeCompare(symbols[b.s]));
     const long=ranked.slice(0,book.longCount).map(x=>x.s),short=ranked.slice(-book.shortCount).map(x=>x.s),notional=book.legFraction*equity;
-    for(const s of long)pending[s]+=notional/d.close[s][i];
-    for(const s of short)pending[s]-=notional/d.close[s][i];
+    for(const s of long)pending[s]+=notional/px(d.close[s],d.first?.[s]??0,i);
+    for(const s of short)pending[s]-=notional/px(d.close[s],d.first?.[s]??0,i);
     if(books.length===1)record={long:long.map(s=>symbols[s]),short:short.map(s=>symbols[s])};
    }
    const p=pending;

@@ -45,3 +45,18 @@ test('metricsShim, addSymbol, subset e sliceLean preservam os números',()=>{
  const sub=subset(lean,symbols.slice(0,4));assert.equal(sub.symbols.length,4);
  const cut=sliceLean(lean,1000);assert.equal(cut.timestamps.length,1000);assert.ok(cut.funding[0].every(f=>f.timestamp<lean.timestamps[999]+H));
 });
+
+test('séries com início tardio e fim antecipado dão o mesmo resultado que as séries completas preenchidas (zero antes, último preço depois)',()=>{
+ const d=universe(symbols,1500),lean=toLean(d),bars=1500;
+ // Moedas 0 a 2 só passam a existir na vela 300; moedas 3 e 4 acabam na vela 1100; as demais ficam completas.
+ const firstOf=(k:number)=>k<=2?300:0,lastOf=(k:number)=>k===3||k===4?1100:bars-1;
+ const padded={...lean,open:lean.open.map((a,k)=>Float64Array.from(a,(v,i)=>i<firstOf(k)?0:i>lastOf(k)?a[lastOf(k)]:v)),close:lean.close.map((a,k)=>Float64Array.from(a,(v,i)=>i<firstOf(k)?0:i>lastOf(k)?a[lastOf(k)]:v)),first:undefined};
+ const span={...lean,first:Int32Array.from(lean.symbols,(_,k)=>firstOf(k)),open:lean.open.map((a,k)=>a.slice(firstOf(k),lastOf(k)+1)),close:lean.close.map((a,k)=>a.slice(firstOf(k),lastOf(k)+1))};
+ // Só moedas vivas entram no universo, como o estudo faz: o filtro de elegibilidade exclui as que ainda não existem ou já acabaram.
+ const alive=(i:number)=>new Set(lean.symbols.map((_,k)=>k).filter(k=>i>=firstOf(k)+240&&i<=lastOf(k)));
+ const book=[{score:leanMomentum(240),legFraction:0.05,longCount:3,shortCount:3,eligible:(_d:any,i:number)=>alive(i)}];
+ const a=simulateLean(padded as any,cfg,book),b=simulateLean(span as any,cfg,book);
+ assert.deepEqual(b.equitySeries,a.equitySeries);assert.equal(b.closedLegs,a.closedLegs);assert.ok(b.rebalances.length>5);
+ // Há decisões em que as moedas que acabaram ainda estão na carteira e são zeradas no último preço, sem NaN.
+ assert.ok(b.equitySeries.every(p=>Number.isFinite(p.equity)));
+});
