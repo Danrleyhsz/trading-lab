@@ -1,0 +1,3298 @@
+{
+ "protocol": "PIT_COMPLETO_V1",
+ "generatedAt": "2026-10-09T22:02:45.101Z",
+ "rule": {
+  "listedUntil": "2025-09-30T00:00:00.000Z",
+  "statuses": [
+   "TRADING",
+   "SETTLING"
+  ],
+  "excludedBaseAssets": [
+   "USDC",
+   "TUSD",
+   "FDUSD",
+   "BUSD",
+   "USDP",
+   "DAI",
+   "EUR",
+   "AEUR",
+   "XUSD",
+   "RLUSD",
+   "USD1"
+  ]
+ },
+ "count": 543,
+ "byStatus": {
+  "TRADING": 418,
+  "SETTLING": 125
+ },
+ "byListingYear": {
+  "2019": 3,
+  "2020": 66,
+  "2021": 45,
+  "2022": 19,
+  "2023": 95,
+  "2024": 129,
+  "2025": 186
+ },
+ "pool": [
+  {
+   "symbol": "0GUSDT",
+   "baseAsset": "0G",
+   "status": "TRADING",
+   "onboardDate": "2025-09-17"
+  },
+  {
+   "symbol": "1000000BOBUSDT",
+   "baseAsset": "1000000BOB",
+   "status": "SETTLING",
+   "onboardDate": "2025-06-05"
+  },
+  {
+   "symbol": "1000000MOGUSDT",
+   "baseAsset": "1000000MOG",
+   "status": "TRADING",
+   "onboardDate": "2024-11-07"
+  },
+  {
+   "symbol": "1000BONKUSDT",
+   "baseAsset": "1000BONK",
+   "status": "TRADING",
+   "onboardDate": "2023-11-22"
+  },
+  {
+   "symbol": "1000CATUSDT",
+   "baseAsset": "1000CAT",
+   "status": "TRADING",
+   "onboardDate": "2024-10-21"
+  },
+  {
+   "symbol": "1000CHEEMSUSDT",
+   "baseAsset": "1000CHEEMS",
+   "status": "TRADING",
+   "onboardDate": "2024-11-25"
+  },
+  {
+   "symbol": "1000FLOKIUSDT",
+   "baseAsset": "1000FLOKI",
+   "status": "TRADING",
+   "onboardDate": "2023-05-06"
+  },
+  {
+   "symbol": "1000LUNCUSDT",
+   "baseAsset": "1000LUNC",
+   "status": "TRADING",
+   "onboardDate": "2022-09-08"
+  },
+  {
+   "symbol": "1000PEPEUSDT",
+   "baseAsset": "1000PEPE",
+   "status": "TRADING",
+   "onboardDate": "2023-05-05"
+  },
+  {
+   "symbol": "1000RATSUSDT",
+   "baseAsset": "1000RATS",
+   "status": "TRADING",
+   "onboardDate": "2023-12-15"
+  },
+  {
+   "symbol": "1000SATSUSDT",
+   "baseAsset": "1000SATS",
+   "status": "TRADING",
+   "onboardDate": "2023-12-12"
+  },
+  {
+   "symbol": "1000SHIBUSDT",
+   "baseAsset": "1000SHIB",
+   "status": "TRADING",
+   "onboardDate": "2021-05-10"
+  },
+  {
+   "symbol": "1000WHYUSDT",
+   "baseAsset": "1000WHY",
+   "status": "SETTLING",
+   "onboardDate": "2024-11-25"
+  },
+  {
+   "symbol": "1000XECUSDT",
+   "baseAsset": "1000XEC",
+   "status": "TRADING",
+   "onboardDate": "2021-09-16"
+  },
+  {
+   "symbol": "1000XUSDT",
+   "baseAsset": "1000X",
+   "status": "SETTLING",
+   "onboardDate": "2024-11-13"
+  },
+  {
+   "symbol": "1INCHUSDT",
+   "baseAsset": "1INCH",
+   "status": "TRADING",
+   "onboardDate": "2020-12-25"
+  },
+  {
+   "symbol": "1MBABYDOGEUSDT",
+   "baseAsset": "1MBABYDOGE",
+   "status": "TRADING",
+   "onboardDate": "2024-09-16"
+  },
+  {
+   "symbol": "A2ZUSDT",
+   "baseAsset": "A2Z",
+   "status": "SETTLING",
+   "onboardDate": "2025-07-30"
+  },
+  {
+   "symbol": "AAVEUSDT",
+   "baseAsset": "AAVE",
+   "status": "TRADING",
+   "onboardDate": "2020-10-16"
+  },
+  {
+   "symbol": "ACEUSDT",
+   "baseAsset": "ACE",
+   "status": "TRADING",
+   "onboardDate": "2023-12-18"
+  },
+  {
+   "symbol": "ACHUSDT",
+   "baseAsset": "ACH",
+   "status": "TRADING",
+   "onboardDate": "2023-02-21"
+  },
+  {
+   "symbol": "ACTUSDT",
+   "baseAsset": "ACT",
+   "status": "TRADING",
+   "onboardDate": "2024-11-11"
+  },
+  {
+   "symbol": "ACXUSDT",
+   "baseAsset": "ACX",
+   "status": "SETTLING",
+   "onboardDate": "2024-12-06"
+  },
+  {
+   "symbol": "ADAUSDT",
+   "baseAsset": "ADA",
+   "status": "TRADING",
+   "onboardDate": "2020-01-31"
+  },
+  {
+   "symbol": "AEROUSDT",
+   "baseAsset": "AERO",
+   "status": "TRADING",
+   "onboardDate": "2024-12-04"
+  },
+  {
+   "symbol": "AEVOUSDT",
+   "baseAsset": "AEVO",
+   "status": "TRADING",
+   "onboardDate": "2024-03-13"
+  },
+  {
+   "symbol": "AGIXUSDT",
+   "baseAsset": "AGIX",
+   "status": "SETTLING",
+   "onboardDate": "2023-02-15"
+  },
+  {
+   "symbol": "AGLDUSDT",
+   "baseAsset": "AGLD",
+   "status": "TRADING",
+   "onboardDate": "2023-07-29"
+  },
+  {
+   "symbol": "AGTUSDT",
+   "baseAsset": "AGT",
+   "status": "TRADING",
+   "onboardDate": "2025-05-20"
+  },
+  {
+   "symbol": "AI16ZUSDT",
+   "baseAsset": "AI16Z",
+   "status": "SETTLING",
+   "onboardDate": "2025-01-02"
+  },
+  {
+   "symbol": "AINUSDT",
+   "baseAsset": "AIN",
+   "status": "TRADING",
+   "onboardDate": "2025-07-10"
+  },
+  {
+   "symbol": "AIOTUSDT",
+   "baseAsset": "AIOT",
+   "status": "TRADING",
+   "onboardDate": "2025-04-30"
+  },
+  {
+   "symbol": "AIOUSDT",
+   "baseAsset": "AIO",
+   "status": "TRADING",
+   "onboardDate": "2025-08-13"
+  },
+  {
+   "symbol": "AIUSDT",
+   "baseAsset": "AI",
+   "status": "SETTLING",
+   "onboardDate": "2024-01-08"
+  },
+  {
+   "symbol": "AIXBTUSDT",
+   "baseAsset": "AIXBT",
+   "status": "TRADING",
+   "onboardDate": "2024-12-20"
+  },
+  {
+   "symbol": "AKEUSDT",
+   "baseAsset": "AKE",
+   "status": "TRADING",
+   "onboardDate": "2025-09-26"
+  },
+  {
+   "symbol": "AKTUSDT",
+   "baseAsset": "AKT",
+   "status": "TRADING",
+   "onboardDate": "2024-11-18"
+  },
+  {
+   "symbol": "ALCHUSDT",
+   "baseAsset": "ALCH",
+   "status": "TRADING",
+   "onboardDate": "2025-01-07"
+  },
+  {
+   "symbol": "ALGOUSDT",
+   "baseAsset": "ALGO",
+   "status": "TRADING",
+   "onboardDate": "2020-06-16"
+  },
+  {
+   "symbol": "ALICEUSDT",
+   "baseAsset": "ALICE",
+   "status": "TRADING",
+   "onboardDate": "2021-03-15"
+  },
+  {
+   "symbol": "ALPACAUSDT",
+   "baseAsset": "ALPACA",
+   "status": "SETTLING",
+   "onboardDate": "2024-08-22"
+  },
+  {
+   "symbol": "ALPHAUSDT",
+   "baseAsset": "ALPHA",
+   "status": "SETTLING",
+   "onboardDate": "2020-11-23"
+  },
+  {
+   "symbol": "ALPINEUSDT",
+   "baseAsset": "ALPINE",
+   "status": "TRADING",
+   "onboardDate": "2025-05-06"
+  },
+  {
+   "symbol": "ALTUSDT",
+   "baseAsset": "ALT",
+   "status": "TRADING",
+   "onboardDate": "2024-01-25"
+  },
+  {
+   "symbol": "AMBUSDT",
+   "baseAsset": "AMB",
+   "status": "SETTLING",
+   "onboardDate": "2023-03-29"
+  },
+  {
+   "symbol": "ANIMEUSDT",
+   "baseAsset": "ANIME",
+   "status": "TRADING",
+   "onboardDate": "2025-01-23"
+  },
+  {
+   "symbol": "ANKRUSDT",
+   "baseAsset": "ANKR",
+   "status": "TRADING",
+   "onboardDate": "2021-01-25"
+  },
+  {
+   "symbol": "APEUSDT",
+   "baseAsset": "APE",
+   "status": "TRADING",
+   "onboardDate": "2022-03-17"
+  },
+  {
+   "symbol": "API3USDT",
+   "baseAsset": "API3",
+   "status": "TRADING",
+   "onboardDate": "2022-02-21"
+  },
+  {
+   "symbol": "APTUSDT",
+   "baseAsset": "APT",
+   "status": "TRADING",
+   "onboardDate": "2022-10-18"
+  },
+  {
+   "symbol": "ARBUSDT",
+   "baseAsset": "ARB",
+   "status": "TRADING",
+   "onboardDate": "2023-03-23"
+  },
+  {
+   "symbol": "ARCUSDT",
+   "baseAsset": "ARC",
+   "status": "TRADING",
+   "onboardDate": "2025-01-17"
+  },
+  {
+   "symbol": "ARIAUSDT",
+   "baseAsset": "ARIA",
+   "status": "TRADING",
+   "onboardDate": "2025-09-03"
+  },
+  {
+   "symbol": "ARKMUSDT",
+   "baseAsset": "ARKM",
+   "status": "TRADING",
+   "onboardDate": "2023-07-28"
+  },
+  {
+   "symbol": "ARKUSDT",
+   "baseAsset": "ARK",
+   "status": "TRADING",
+   "onboardDate": "2023-09-19"
+  },
+  {
+   "symbol": "ARPAUSDT",
+   "baseAsset": "ARPA",
+   "status": "TRADING",
+   "onboardDate": "2021-10-18"
+  },
+  {
+   "symbol": "ARUSDT",
+   "baseAsset": "AR",
+   "status": "TRADING",
+   "onboardDate": "2021-09-28"
+  },
+  {
+   "symbol": "ASRUSDT",
+   "baseAsset": "ASR",
+   "status": "TRADING",
+   "onboardDate": "2025-05-06"
+  },
+  {
+   "symbol": "ASTERUSDT",
+   "baseAsset": "ASTER",
+   "status": "TRADING",
+   "onboardDate": "2025-09-19"
+  },
+  {
+   "symbol": "ASTRUSDT",
+   "baseAsset": "ASTR",
+   "status": "TRADING",
+   "onboardDate": "2023-02-13"
+  },
+  {
+   "symbol": "ATAUSDT",
+   "baseAsset": "ATA",
+   "status": "SETTLING",
+   "onboardDate": "2021-08-30"
+  },
+  {
+   "symbol": "ATHUSDT",
+   "baseAsset": "ATH",
+   "status": "TRADING",
+   "onboardDate": "2025-04-02"
+  },
+  {
+   "symbol": "ATOMUSDT",
+   "baseAsset": "ATOM",
+   "status": "TRADING",
+   "onboardDate": "2020-02-07"
+  },
+  {
+   "symbol": "AUCTIONUSDT",
+   "baseAsset": "AUCTION",
+   "status": "TRADING",
+   "onboardDate": "2023-12-15"
+  },
+  {
+   "symbol": "AUSDT",
+   "baseAsset": "A",
+   "status": "TRADING",
+   "onboardDate": "2025-05-28"
+  },
+  {
+   "symbol": "AVAAIUSDT",
+   "baseAsset": "AVAAI",
+   "status": "TRADING",
+   "onboardDate": "2025-01-17"
+  },
+  {
+   "symbol": "AVAUSDT",
+   "baseAsset": "AVA",
+   "status": "TRADING",
+   "onboardDate": "2024-12-13"
+  },
+  {
+   "symbol": "AVAXUSDT",
+   "baseAsset": "AVAX",
+   "status": "TRADING",
+   "onboardDate": "2020-09-23"
+  },
+  {
+   "symbol": "AVNTUSDT",
+   "baseAsset": "AVNT",
+   "status": "TRADING",
+   "onboardDate": "2025-09-09"
+  },
+  {
+   "symbol": "AWEUSDT",
+   "baseAsset": "AWE",
+   "status": "TRADING",
+   "onboardDate": "2025-05-21"
+  },
+  {
+   "symbol": "AXLUSDT",
+   "baseAsset": "AXL",
+   "status": "TRADING",
+   "onboardDate": "2024-03-01"
+  },
+  {
+   "symbol": "AXSUSDT",
+   "baseAsset": "AXS",
+   "status": "TRADING",
+   "onboardDate": "2020-11-20"
+  },
+  {
+   "symbol": "B2USDT",
+   "baseAsset": "B2",
+   "status": "TRADING",
+   "onboardDate": "2025-05-06"
+  },
+  {
+   "symbol": "B3USDT",
+   "baseAsset": "B3",
+   "status": "SETTLING",
+   "onboardDate": "2025-02-13"
+  },
+  {
+   "symbol": "BABYUSDT",
+   "baseAsset": "BABY",
+   "status": "TRADING",
+   "onboardDate": "2025-04-05"
+  },
+  {
+   "symbol": "BADGERUSDT",
+   "baseAsset": "BADGER",
+   "status": "SETTLING",
+   "onboardDate": "2023-11-09"
+  },
+  {
+   "symbol": "BAKEUSDT",
+   "baseAsset": "BAKE",
+   "status": "SETTLING",
+   "onboardDate": "2021-05-18"
+  },
+  {
+   "symbol": "BALUSDT",
+   "baseAsset": "BAL",
+   "status": "SETTLING",
+   "onboardDate": "2020-09-01"
+  },
+  {
+   "symbol": "BANANAS31USDT",
+   "baseAsset": "BANANAS31",
+   "status": "TRADING",
+   "onboardDate": "2025-03-22"
+  },
+  {
+   "symbol": "BANANAUSDT",
+   "baseAsset": "BANANA",
+   "status": "TRADING",
+   "onboardDate": "2024-08-15"
+  },
+  {
+   "symbol": "BANDUSDT",
+   "baseAsset": "BAND",
+   "status": "TRADING",
+   "onboardDate": "2020-07-29"
+  },
+  {
+   "symbol": "BANKUSDT",
+   "baseAsset": "BANK",
+   "status": "TRADING",
+   "onboardDate": "2025-04-18"
+  },
+  {
+   "symbol": "BANUSDT",
+   "baseAsset": "BAN",
+   "status": "TRADING",
+   "onboardDate": "2024-11-18"
+  },
+  {
+   "symbol": "BARDUSDT",
+   "baseAsset": "BARD",
+   "status": "TRADING",
+   "onboardDate": "2025-09-18"
+  },
+  {
+   "symbol": "BASUSDT",
+   "baseAsset": "BAS",
+   "status": "TRADING",
+   "onboardDate": "2025-08-26"
+  },
+  {
+   "symbol": "BATUSDT",
+   "baseAsset": "BAT",
+   "status": "TRADING",
+   "onboardDate": "2020-02-13"
+  },
+  {
+   "symbol": "BBUSDT",
+   "baseAsset": "BB",
+   "status": "TRADING",
+   "onboardDate": "2024-05-13"
+  },
+  {
+   "symbol": "BCHUSDT",
+   "baseAsset": "BCH",
+   "status": "TRADING",
+   "onboardDate": "2019-12-19"
+  },
+  {
+   "symbol": "BEAMXUSDT",
+   "baseAsset": "BEAMX",
+   "status": "TRADING",
+   "onboardDate": "2023-11-17"
+  },
+  {
+   "symbol": "BELUSDT",
+   "baseAsset": "BEL",
+   "status": "TRADING",
+   "onboardDate": "2020-11-18"
+  },
+  {
+   "symbol": "BERAUSDT",
+   "baseAsset": "BERA",
+   "status": "TRADING",
+   "onboardDate": "2025-02-06"
+  },
+  {
+   "symbol": "BICOUSDT",
+   "baseAsset": "BICO",
+   "status": "TRADING",
+   "onboardDate": "2023-09-28"
+  },
+  {
+   "symbol": "BIDUSDT",
+   "baseAsset": "BID",
+   "status": "SETTLING",
+   "onboardDate": "2025-03-20"
+  },
+  {
+   "symbol": "BIGTIMEUSDT",
+   "baseAsset": "BIGTIME",
+   "status": "TRADING",
+   "onboardDate": "2023-10-12"
+  },
+  {
+   "symbol": "BIOUSDT",
+   "baseAsset": "BIO",
+   "status": "TRADING",
+   "onboardDate": "2025-01-03"
+  },
+  {
+   "symbol": "BLESSUSDT",
+   "baseAsset": "BLESS",
+   "status": "TRADING",
+   "onboardDate": "2025-09-23"
+  },
+  {
+   "symbol": "BLURUSDT",
+   "baseAsset": "BLUR",
+   "status": "TRADING",
+   "onboardDate": "2023-04-27"
+  },
+  {
+   "symbol": "BLZUSDT",
+   "baseAsset": "BLZ",
+   "status": "SETTLING",
+   "onboardDate": "2020-09-17"
+  },
+  {
+   "symbol": "BMTUSDT",
+   "baseAsset": "BMT",
+   "status": "TRADING",
+   "onboardDate": "2025-03-17"
+  },
+  {
+   "symbol": "BNBUSDT",
+   "baseAsset": "BNB",
+   "status": "TRADING",
+   "onboardDate": "2020-02-10"
+  },
+  {
+   "symbol": "BNTUSDT",
+   "baseAsset": "BNT",
+   "status": "TRADING",
+   "onboardDate": "2023-08-10"
+  },
+  {
+   "symbol": "BNXUSDT",
+   "baseAsset": "BNX",
+   "status": "SETTLING",
+   "onboardDate": "2023-02-22"
+  },
+  {
+   "symbol": "BOMEUSDT",
+   "baseAsset": "BOME",
+   "status": "TRADING",
+   "onboardDate": "2024-03-16"
+  },
+  {
+   "symbol": "BONDUSDT",
+   "baseAsset": "BOND",
+   "status": "SETTLING",
+   "onboardDate": "2023-10-15"
+  },
+  {
+   "symbol": "BRETTUSDT",
+   "baseAsset": "BRETT",
+   "status": "TRADING",
+   "onboardDate": "2024-08-20"
+  },
+  {
+   "symbol": "BROCCOLI714USDT",
+   "baseAsset": "BROCCOLI714",
+   "status": "TRADING",
+   "onboardDate": "2025-03-21"
+  },
+  {
+   "symbol": "BROCCOLIF3BUSDT",
+   "baseAsset": "BROCCOLIF3B",
+   "status": "TRADING",
+   "onboardDate": "2025-03-21"
+  },
+  {
+   "symbol": "BRUSDT",
+   "baseAsset": "BR",
+   "status": "TRADING",
+   "onboardDate": "2025-03-21"
+  },
+  {
+   "symbol": "BSVUSDT",
+   "baseAsset": "BSV",
+   "status": "TRADING",
+   "onboardDate": "2023-10-20"
+  },
+  {
+   "symbol": "BSWUSDT",
+   "baseAsset": "BSW",
+   "status": "SETTLING",
+   "onboardDate": "2024-09-05"
+  },
+  {
+   "symbol": "BTCUSDT",
+   "baseAsset": "BTC",
+   "status": "TRADING",
+   "onboardDate": "2019-09-08"
+  },
+  {
+   "symbol": "BTRUSDT",
+   "baseAsset": "BTR",
+   "status": "TRADING",
+   "onboardDate": "2025-08-27"
+  },
+  {
+   "symbol": "BULLAUSDT",
+   "baseAsset": "BULLA",
+   "status": "TRADING",
+   "onboardDate": "2025-07-04"
+  },
+  {
+   "symbol": "BUSDT",
+   "baseAsset": "B",
+   "status": "TRADING",
+   "onboardDate": "2025-05-22"
+  },
+  {
+   "symbol": "C98USDT",
+   "baseAsset": "C98",
+   "status": "TRADING",
+   "onboardDate": "2021-08-23"
+  },
+  {
+   "symbol": "CAKEUSDT",
+   "baseAsset": "CAKE",
+   "status": "TRADING",
+   "onboardDate": "2023-11-02"
+  },
+  {
+   "symbol": "CARVUSDT",
+   "baseAsset": "CARV",
+   "status": "TRADING",
+   "onboardDate": "2025-08-07"
+  },
+  {
+   "symbol": "CATIUSDT",
+   "baseAsset": "CATI",
+   "status": "TRADING",
+   "onboardDate": "2024-09-20"
+  },
+  {
+   "symbol": "CELOUSDT",
+   "baseAsset": "CELO",
+   "status": "TRADING",
+   "onboardDate": "2021-09-26"
+  },
+  {
+   "symbol": "CELRUSDT",
+   "baseAsset": "CELR",
+   "status": "TRADING",
+   "onboardDate": "2021-03-29"
+  },
+  {
+   "symbol": "CETUSUSDT",
+   "baseAsset": "CETUS",
+   "status": "TRADING",
+   "onboardDate": "2024-11-06"
+  },
+  {
+   "symbol": "CFXUSDT",
+   "baseAsset": "CFX",
+   "status": "TRADING",
+   "onboardDate": "2023-02-19"
+  },
+  {
+   "symbol": "CGPTUSDT",
+   "baseAsset": "CGPT",
+   "status": "TRADING",
+   "onboardDate": "2024-12-20"
+  },
+  {
+   "symbol": "CHESSUSDT",
+   "baseAsset": "CHESS",
+   "status": "SETTLING",
+   "onboardDate": "2024-08-29"
+  },
+  {
+   "symbol": "CHILLGUYUSDT",
+   "baseAsset": "CHILLGUY",
+   "status": "TRADING",
+   "onboardDate": "2024-11-27"
+  },
+  {
+   "symbol": "CHRUSDT",
+   "baseAsset": "CHR",
+   "status": "TRADING",
+   "onboardDate": "2021-03-12"
+  },
+  {
+   "symbol": "CHZUSDT",
+   "baseAsset": "CHZ",
+   "status": "TRADING",
+   "onboardDate": "2021-01-21"
+  },
+  {
+   "symbol": "CKBUSDT",
+   "baseAsset": "CKB",
+   "status": "TRADING",
+   "onboardDate": "2023-02-27"
+  },
+  {
+   "symbol": "COAIUSDT",
+   "baseAsset": "COAI",
+   "status": "TRADING",
+   "onboardDate": "2025-09-25"
+  },
+  {
+   "symbol": "COMBOUSDT",
+   "baseAsset": "COMBO",
+   "status": "SETTLING",
+   "onboardDate": "2023-06-02"
+  },
+  {
+   "symbol": "COMPUSDT",
+   "baseAsset": "COMP",
+   "status": "TRADING",
+   "onboardDate": "2020-06-30"
+  },
+  {
+   "symbol": "COOKIEUSDT",
+   "baseAsset": "COOKIE",
+   "status": "TRADING",
+   "onboardDate": "2025-01-07"
+  },
+  {
+   "symbol": "COSUSDT",
+   "baseAsset": "COS",
+   "status": "SETTLING",
+   "onboardDate": "2024-09-30"
+  },
+  {
+   "symbol": "COTIUSDT",
+   "baseAsset": "COTI",
+   "status": "TRADING",
+   "onboardDate": "2021-03-09"
+  },
+  {
+   "symbol": "COWUSDT",
+   "baseAsset": "COW",
+   "status": "TRADING",
+   "onboardDate": "2024-11-06"
+  },
+  {
+   "symbol": "CROSSUSDT",
+   "baseAsset": "CROSS",
+   "status": "TRADING",
+   "onboardDate": "2025-07-10"
+  },
+  {
+   "symbol": "CRVUSDT",
+   "baseAsset": "CRV",
+   "status": "TRADING",
+   "onboardDate": "2020-09-01"
+  },
+  {
+   "symbol": "CTKUSDT",
+   "baseAsset": "CTK",
+   "status": "TRADING",
+   "onboardDate": "2025-04-30"
+  },
+  {
+   "symbol": "CTSIUSDT",
+   "baseAsset": "CTSI",
+   "status": "TRADING",
+   "onboardDate": "2021-10-25"
+  },
+  {
+   "symbol": "CUDISUSDT",
+   "baseAsset": "CUDIS",
+   "status": "SETTLING",
+   "onboardDate": "2025-08-20"
+  },
+  {
+   "symbol": "CUSDT",
+   "baseAsset": "C",
+   "status": "TRADING",
+   "onboardDate": "2025-07-15"
+  },
+  {
+   "symbol": "CVCUSDT",
+   "baseAsset": "CVC",
+   "status": "TRADING",
+   "onboardDate": "2025-05-16"
+  },
+  {
+   "symbol": "CVXUSDT",
+   "baseAsset": "CVX",
+   "status": "TRADING",
+   "onboardDate": "2025-07-23"
+  },
+  {
+   "symbol": "CYBERUSDT",
+   "baseAsset": "CYBER",
+   "status": "TRADING",
+   "onboardDate": "2023-08-21"
+  },
+  {
+   "symbol": "DAMUSDT",
+   "baseAsset": "DAM",
+   "status": "SETTLING",
+   "onboardDate": "2025-08-18"
+  },
+  {
+   "symbol": "DARUSDT",
+   "baseAsset": "DAR",
+   "status": "SETTLING",
+   "onboardDate": "2022-04-28"
+  },
+  {
+   "symbol": "DASHUSDT",
+   "baseAsset": "DASH",
+   "status": "TRADING",
+   "onboardDate": "2020-02-04"
+  },
+  {
+   "symbol": "DEEPUSDT",
+   "baseAsset": "DEEP",
+   "status": "TRADING",
+   "onboardDate": "2025-04-22"
+  },
+  {
+   "symbol": "DEGENUSDT",
+   "baseAsset": "DEGEN",
+   "status": "SETTLING",
+   "onboardDate": "2024-11-15"
+  },
+  {
+   "symbol": "DEGOUSDT",
+   "baseAsset": "DEGO",
+   "status": "SETTLING",
+   "onboardDate": "2024-12-13"
+  },
+  {
+   "symbol": "DENTUSDT",
+   "baseAsset": "DENT",
+   "status": "SETTLING",
+   "onboardDate": "2021-03-23"
+  },
+  {
+   "symbol": "DEXEUSDT",
+   "baseAsset": "DEXE",
+   "status": "TRADING",
+   "onboardDate": "2024-12-24"
+  },
+  {
+   "symbol": "DFUSDT",
+   "baseAsset": "DF",
+   "status": "SETTLING",
+   "onboardDate": "2024-12-30"
+  },
+  {
+   "symbol": "DGBUSDT",
+   "baseAsset": "DGB",
+   "status": "SETTLING",
+   "onboardDate": "2021-04-19"
+  },
+  {
+   "symbol": "DIAUSDT",
+   "baseAsset": "DIA",
+   "status": "TRADING",
+   "onboardDate": "2024-10-02"
+  },
+  {
+   "symbol": "DMCUSDT",
+   "baseAsset": "DMC",
+   "status": "SETTLING",
+   "onboardDate": "2025-06-24"
+  },
+  {
+   "symbol": "DODOXUSDT",
+   "baseAsset": "DODOX",
+   "status": "TRADING",
+   "onboardDate": "2023-08-08"
+  },
+  {
+   "symbol": "DOGEUSDT",
+   "baseAsset": "DOGE",
+   "status": "TRADING",
+   "onboardDate": "2020-07-10"
+  },
+  {
+   "symbol": "DOGSUSDT",
+   "baseAsset": "DOGS",
+   "status": "TRADING",
+   "onboardDate": "2024-08-26"
+  },
+  {
+   "symbol": "DOLOUSDT",
+   "baseAsset": "DOLO",
+   "status": "TRADING",
+   "onboardDate": "2025-05-01"
+  },
+  {
+   "symbol": "DOODUSDT",
+   "baseAsset": "DOOD",
+   "status": "TRADING",
+   "onboardDate": "2025-05-09"
+  },
+  {
+   "symbol": "DOTUSDT",
+   "baseAsset": "DOT",
+   "status": "TRADING",
+   "onboardDate": "2020-08-22"
+  },
+  {
+   "symbol": "DRIFTUSDT",
+   "baseAsset": "DRIFT",
+   "status": "TRADING",
+   "onboardDate": "2024-11-08"
+  },
+  {
+   "symbol": "DUSDT",
+   "baseAsset": "D",
+   "status": "SETTLING",
+   "onboardDate": "2025-01-09"
+  },
+  {
+   "symbol": "DUSKUSDT",
+   "baseAsset": "DUSK",
+   "status": "TRADING",
+   "onboardDate": "2022-01-06"
+  },
+  {
+   "symbol": "DYDXUSDT",
+   "baseAsset": "DYDX",
+   "status": "TRADING",
+   "onboardDate": "2021-09-09"
+  },
+  {
+   "symbol": "DYMUSDT",
+   "baseAsset": "DYM",
+   "status": "TRADING",
+   "onboardDate": "2024-02-07"
+  },
+  {
+   "symbol": "EDUUSDT",
+   "baseAsset": "EDU",
+   "status": "TRADING",
+   "onboardDate": "2023-04-28"
+  },
+  {
+   "symbol": "EGLDUSDT",
+   "baseAsset": "EGLD",
+   "status": "TRADING",
+   "onboardDate": "2020-09-14"
+  },
+  {
+   "symbol": "EIGENUSDT",
+   "baseAsset": "EIGEN",
+   "status": "TRADING",
+   "onboardDate": "2024-10-01"
+  },
+  {
+   "symbol": "ENAUSDT",
+   "baseAsset": "ENA",
+   "status": "TRADING",
+   "onboardDate": "2024-04-02"
+  },
+  {
+   "symbol": "ENJUSDT",
+   "baseAsset": "ENJ",
+   "status": "TRADING",
+   "onboardDate": "2020-09-29"
+  },
+  {
+   "symbol": "ENSUSDT",
+   "baseAsset": "ENS",
+   "status": "TRADING",
+   "onboardDate": "2021-11-29"
+  },
+  {
+   "symbol": "EPICUSDT",
+   "baseAsset": "EPIC",
+   "status": "TRADING",
+   "onboardDate": "2025-03-13"
+  },
+  {
+   "symbol": "EPTUSDT",
+   "baseAsset": "EPT",
+   "status": "SETTLING",
+   "onboardDate": "2025-04-21"
+  },
+  {
+   "symbol": "ERAUSDT",
+   "baseAsset": "ERA",
+   "status": "TRADING",
+   "onboardDate": "2025-07-17"
+  },
+  {
+   "symbol": "ESPORTSUSDT",
+   "baseAsset": "ESPORTS",
+   "status": "TRADING",
+   "onboardDate": "2025-07-29"
+  },
+  {
+   "symbol": "ETCUSDT",
+   "baseAsset": "ETC",
+   "status": "TRADING",
+   "onboardDate": "2020-01-16"
+  },
+  {
+   "symbol": "ETHFIUSDT",
+   "baseAsset": "ETHFI",
+   "status": "TRADING",
+   "onboardDate": "2024-03-18"
+  },
+  {
+   "symbol": "ETHUSDT",
+   "baseAsset": "ETH",
+   "status": "TRADING",
+   "onboardDate": "2019-11-27"
+  },
+  {
+   "symbol": "ETHWUSDT",
+   "baseAsset": "ETHW",
+   "status": "TRADING",
+   "onboardDate": "2023-11-28"
+  },
+  {
+   "symbol": "FARTCOINUSDT",
+   "baseAsset": "FARTCOIN",
+   "status": "TRADING",
+   "onboardDate": "2024-12-20"
+  },
+  {
+   "symbol": "FETUSDT",
+   "baseAsset": "FET",
+   "status": "TRADING",
+   "onboardDate": "2023-01-15"
+  },
+  {
+   "symbol": "FFUSDT",
+   "baseAsset": "FF",
+   "status": "TRADING",
+   "onboardDate": "2025-09-29"
+  },
+  {
+   "symbol": "FHEUSDT",
+   "baseAsset": "FHE",
+   "status": "TRADING",
+   "onboardDate": "2025-04-12"
+  },
+  {
+   "symbol": "FIDAUSDT",
+   "baseAsset": "FIDA",
+   "status": "TRADING",
+   "onboardDate": "2024-09-19"
+  },
+  {
+   "symbol": "FILUSDT",
+   "baseAsset": "FIL",
+   "status": "TRADING",
+   "onboardDate": "2020-10-16"
+  },
+  {
+   "symbol": "FIOUSDT",
+   "baseAsset": "FIO",
+   "status": "SETTLING",
+   "onboardDate": "2024-09-20"
+  },
+  {
+   "symbol": "FISUSDT",
+   "baseAsset": "FIS",
+   "status": "SETTLING",
+   "onboardDate": "2025-04-25"
+  },
+  {
+   "symbol": "FLMUSDT",
+   "baseAsset": "FLM",
+   "status": "SETTLING",
+   "onboardDate": "2020-09-29"
+  },
+  {
+   "symbol": "FLOCKUSDT",
+   "baseAsset": "FLOCK",
+   "status": "TRADING",
+   "onboardDate": "2025-09-09"
+  },
+  {
+   "symbol": "FLOWUSDT",
+   "baseAsset": "FLOW",
+   "status": "TRADING",
+   "onboardDate": "2022-02-09"
+  },
+  {
+   "symbol": "FLUIDUSDT",
+   "baseAsset": "FLUID",
+   "status": "TRADING",
+   "onboardDate": "2025-09-24"
+  },
+  {
+   "symbol": "FLUXUSDT",
+   "baseAsset": "FLUX",
+   "status": "TRADING",
+   "onboardDate": "2024-09-03"
+  },
+  {
+   "symbol": "FORMUSDT",
+   "baseAsset": "FORM",
+   "status": "TRADING",
+   "onboardDate": "2025-03-19"
+  },
+  {
+   "symbol": "FORTHUSDT",
+   "baseAsset": "FORTH",
+   "status": "SETTLING",
+   "onboardDate": "2025-04-08"
+  },
+  {
+   "symbol": "FTMUSDT",
+   "baseAsset": "FTM",
+   "status": "SETTLING",
+   "onboardDate": "2020-09-24"
+  },
+  {
+   "symbol": "FTTUSDT",
+   "baseAsset": "FTT",
+   "status": "SETTLING",
+   "onboardDate": "2022-04-14"
+  },
+  {
+   "symbol": "FUNUSDT",
+   "baseAsset": "FUN",
+   "status": "SETTLING",
+   "onboardDate": "2025-03-31"
+  },
+  {
+   "symbol": "FUSDT",
+   "baseAsset": "F",
+   "status": "TRADING",
+   "onboardDate": "2025-06-18"
+  },
+  {
+   "symbol": "FXSUSDT",
+   "baseAsset": "FXS",
+   "status": "SETTLING",
+   "onboardDate": "2023-01-19"
+  },
+  {
+   "symbol": "GALAUSDT",
+   "baseAsset": "GALA",
+   "status": "TRADING",
+   "onboardDate": "2021-09-17"
+  },
+  {
+   "symbol": "GASUSDT",
+   "baseAsset": "GAS",
+   "status": "TRADING",
+   "onboardDate": "2023-10-25"
+  },
+  {
+   "symbol": "GHSTUSDT",
+   "baseAsset": "GHST",
+   "status": "SETTLING",
+   "onboardDate": "2024-09-23"
+  },
+  {
+   "symbol": "GLMRUSDT",
+   "baseAsset": "GLMR",
+   "status": "SETTLING",
+   "onboardDate": "2023-09-26"
+  },
+  {
+   "symbol": "GLMUSDT",
+   "baseAsset": "GLM",
+   "status": "TRADING",
+   "onboardDate": "2024-02-22"
+  },
+  {
+   "symbol": "GMTUSDT",
+   "baseAsset": "GMT",
+   "status": "TRADING",
+   "onboardDate": "2022-03-14"
+  },
+  {
+   "symbol": "GMXUSDT",
+   "baseAsset": "GMX",
+   "status": "TRADING",
+   "onboardDate": "2023-02-16"
+  },
+  {
+   "symbol": "GOATUSDT",
+   "baseAsset": "GOAT",
+   "status": "TRADING",
+   "onboardDate": "2024-10-24"
+  },
+  {
+   "symbol": "GPSUSDT",
+   "baseAsset": "GPS",
+   "status": "TRADING",
+   "onboardDate": "2025-02-17"
+  },
+  {
+   "symbol": "GRASSUSDT",
+   "baseAsset": "GRASS",
+   "status": "TRADING",
+   "onboardDate": "2024-11-08"
+  },
+  {
+   "symbol": "GRIFFAINUSDT",
+   "baseAsset": "GRIFFAIN",
+   "status": "TRADING",
+   "onboardDate": "2025-01-02"
+  },
+  {
+   "symbol": "GRTUSDT",
+   "baseAsset": "GRT",
+   "status": "TRADING",
+   "onboardDate": "2020-12-18"
+  },
+  {
+   "symbol": "GTCUSDT",
+   "baseAsset": "GTC",
+   "status": "TRADING",
+   "onboardDate": "2021-03-15"
+  },
+  {
+   "symbol": "GUNUSDT",
+   "baseAsset": "GUN",
+   "status": "TRADING",
+   "onboardDate": "2025-03-31"
+  },
+  {
+   "symbol": "GUSDT",
+   "baseAsset": "G",
+   "status": "TRADING",
+   "onboardDate": "2024-08-15"
+  },
+  {
+   "symbol": "HAEDALUSDT",
+   "baseAsset": "HAEDAL",
+   "status": "TRADING",
+   "onboardDate": "2025-05-01"
+  },
+  {
+   "symbol": "HANAUSDT",
+   "baseAsset": "HANA",
+   "status": "TRADING",
+   "onboardDate": "2025-09-26"
+  },
+  {
+   "symbol": "HBARUSDT",
+   "baseAsset": "HBAR",
+   "status": "TRADING",
+   "onboardDate": "2021-03-17"
+  },
+  {
+   "symbol": "HEIUSDT",
+   "baseAsset": "HEI",
+   "status": "TRADING",
+   "onboardDate": "2025-02-13"
+  },
+  {
+   "symbol": "HEMIUSDT",
+   "baseAsset": "HEMI",
+   "status": "TRADING",
+   "onboardDate": "2025-08-29"
+  },
+  {
+   "symbol": "HFTUSDT",
+   "baseAsset": "HFT",
+   "status": "SETTLING",
+   "onboardDate": "2023-04-05"
+  },
+  {
+   "symbol": "HIFIUSDT",
+   "baseAsset": "HIFI",
+   "status": "SETTLING",
+   "onboardDate": "2023-09-16"
+  },
+  {
+   "symbol": "HIGHUSDT",
+   "baseAsset": "HIGH",
+   "status": "SETTLING",
+   "onboardDate": "2023-02-03"
+  },
+  {
+   "symbol": "HIPPOUSDT",
+   "baseAsset": "HIPPO",
+   "status": "SETTLING",
+   "onboardDate": "2024-11-13"
+  },
+  {
+   "symbol": "HIVEUSDT",
+   "baseAsset": "HIVE",
+   "status": "TRADING",
+   "onboardDate": "2024-12-23"
+  },
+  {
+   "symbol": "HMSTRUSDT",
+   "baseAsset": "HMSTR",
+   "status": "TRADING",
+   "onboardDate": "2024-09-26"
+  },
+  {
+   "symbol": "HOLOUSDT",
+   "baseAsset": "HOLO",
+   "status": "TRADING",
+   "onboardDate": "2025-09-11"
+  },
+  {
+   "symbol": "HOMEUSDT",
+   "baseAsset": "HOME",
+   "status": "TRADING",
+   "onboardDate": "2025-06-10"
+  },
+  {
+   "symbol": "HOOKUSDT",
+   "baseAsset": "HOOK",
+   "status": "SETTLING",
+   "onboardDate": "2023-01-19"
+  },
+  {
+   "symbol": "HOTUSDT",
+   "baseAsset": "HOT",
+   "status": "TRADING",
+   "onboardDate": "2021-03-30"
+  },
+  {
+   "symbol": "HUMAUSDT",
+   "baseAsset": "HUMA",
+   "status": "TRADING",
+   "onboardDate": "2025-05-26"
+  },
+  {
+   "symbol": "HUSDT",
+   "baseAsset": "H",
+   "status": "TRADING",
+   "onboardDate": "2025-06-25"
+  },
+  {
+   "symbol": "HYPERUSDT",
+   "baseAsset": "HYPER",
+   "status": "TRADING",
+   "onboardDate": "2025-04-22"
+  },
+  {
+   "symbol": "HYPEUSDT",
+   "baseAsset": "HYPE",
+   "status": "TRADING",
+   "onboardDate": "2025-05-30"
+  },
+  {
+   "symbol": "ICNTUSDT",
+   "baseAsset": "ICNT",
+   "status": "TRADING",
+   "onboardDate": "2025-07-03"
+  },
+  {
+   "symbol": "ICPUSDT",
+   "baseAsset": "ICP",
+   "status": "TRADING",
+   "onboardDate": "2021-07-30"
+  },
+  {
+   "symbol": "ICXUSDT",
+   "baseAsset": "ICX",
+   "status": "SETTLING",
+   "onboardDate": "2020-09-15"
+  },
+  {
+   "symbol": "IDEXUSDT",
+   "baseAsset": "IDEX",
+   "status": "SETTLING",
+   "onboardDate": "2023-05-02"
+  },
+  {
+   "symbol": "IDOLUSDT",
+   "baseAsset": "IDOL",
+   "status": "TRADING",
+   "onboardDate": "2025-07-04"
+  },
+  {
+   "symbol": "IDUSDT",
+   "baseAsset": "ID",
+   "status": "TRADING",
+   "onboardDate": "2023-03-23"
+  },
+  {
+   "symbol": "ILVUSDT",
+   "baseAsset": "ILV",
+   "status": "TRADING",
+   "onboardDate": "2023-11-10"
+  },
+  {
+   "symbol": "IMXUSDT",
+   "baseAsset": "IMX",
+   "status": "TRADING",
+   "onboardDate": "2022-02-10"
+  },
+  {
+   "symbol": "INITUSDT",
+   "baseAsset": "INIT",
+   "status": "TRADING",
+   "onboardDate": "2025-04-16"
+  },
+  {
+   "symbol": "INJUSDT",
+   "baseAsset": "INJ",
+   "status": "TRADING",
+   "onboardDate": "2022-08-16"
+  },
+  {
+   "symbol": "INUSDT",
+   "baseAsset": "IN",
+   "status": "TRADING",
+   "onboardDate": "2025-08-07"
+  },
+  {
+   "symbol": "IOSTUSDT",
+   "baseAsset": "IOST",
+   "status": "TRADING",
+   "onboardDate": "2020-02-21"
+  },
+  {
+   "symbol": "IOTAUSDT",
+   "baseAsset": "IOTA",
+   "status": "TRADING",
+   "onboardDate": "2020-02-12"
+  },
+  {
+   "symbol": "IOTXUSDT",
+   "baseAsset": "IOTX",
+   "status": "TRADING",
+   "onboardDate": "2021-08-11"
+  },
+  {
+   "symbol": "IOUSDT",
+   "baseAsset": "IO",
+   "status": "TRADING",
+   "onboardDate": "2024-06-11"
+  },
+  {
+   "symbol": "IPUSDT",
+   "baseAsset": "IP",
+   "status": "SETTLING",
+   "onboardDate": "2025-02-13"
+  },
+  {
+   "symbol": "JASMYUSDT",
+   "baseAsset": "JASMY",
+   "status": "TRADING",
+   "onboardDate": "2022-04-19"
+  },
+  {
+   "symbol": "JELLYJELLYUSDT",
+   "baseAsset": "JELLYJELLY",
+   "status": "TRADING",
+   "onboardDate": "2025-03-26"
+  },
+  {
+   "symbol": "JOEUSDT",
+   "baseAsset": "JOE",
+   "status": "TRADING",
+   "onboardDate": "2023-03-28"
+  },
+  {
+   "symbol": "JSTUSDT",
+   "baseAsset": "JST",
+   "status": "TRADING",
+   "onboardDate": "2025-04-28"
+  },
+  {
+   "symbol": "JTOUSDT",
+   "baseAsset": "JTO",
+   "status": "TRADING",
+   "onboardDate": "2023-12-08"
+  },
+  {
+   "symbol": "JUPUSDT",
+   "baseAsset": "JUP",
+   "status": "TRADING",
+   "onboardDate": "2024-01-31"
+  },
+  {
+   "symbol": "KAIAUSDT",
+   "baseAsset": "KAIA",
+   "status": "TRADING",
+   "onboardDate": "2024-12-04"
+  },
+  {
+   "symbol": "KAITOUSDT",
+   "baseAsset": "KAITO",
+   "status": "TRADING",
+   "onboardDate": "2025-02-20"
+  },
+  {
+   "symbol": "KASUSDT",
+   "baseAsset": "KAS",
+   "status": "TRADING",
+   "onboardDate": "2023-11-17"
+  },
+  {
+   "symbol": "KAVAUSDT",
+   "baseAsset": "KAVA",
+   "status": "TRADING",
+   "onboardDate": "2020-07-28"
+  },
+  {
+   "symbol": "KDAUSDT",
+   "baseAsset": "KDA",
+   "status": "SETTLING",
+   "onboardDate": "2024-09-18"
+  },
+  {
+   "symbol": "KERNELUSDT",
+   "baseAsset": "KERNEL",
+   "status": "TRADING",
+   "onboardDate": "2025-04-14"
+  },
+  {
+   "symbol": "KEYUSDT",
+   "baseAsset": "KEY",
+   "status": "SETTLING",
+   "onboardDate": "2023-05-23"
+  },
+  {
+   "symbol": "KLAYUSDT",
+   "baseAsset": "KLAY",
+   "status": "SETTLING",
+   "onboardDate": "2021-10-11"
+  },
+  {
+   "symbol": "KMNOUSDT",
+   "baseAsset": "KMNO",
+   "status": "TRADING",
+   "onboardDate": "2024-12-20"
+  },
+  {
+   "symbol": "KNCUSDT",
+   "baseAsset": "KNC",
+   "status": "TRADING",
+   "onboardDate": "2020-06-22"
+  },
+  {
+   "symbol": "KOMAUSDT",
+   "baseAsset": "KOMA",
+   "status": "TRADING",
+   "onboardDate": "2024-12-10"
+  },
+  {
+   "symbol": "KSMUSDT",
+   "baseAsset": "KSM",
+   "status": "TRADING",
+   "onboardDate": "2020-10-14"
+  },
+  {
+   "symbol": "LAUSDT",
+   "baseAsset": "LA",
+   "status": "TRADING",
+   "onboardDate": "2025-06-05"
+  },
+  {
+   "symbol": "LAYERUSDT",
+   "baseAsset": "LAYER",
+   "status": "TRADING",
+   "onboardDate": "2025-02-11"
+  },
+  {
+   "symbol": "LDOUSDT",
+   "baseAsset": "LDO",
+   "status": "TRADING",
+   "onboardDate": "2022-09-21"
+  },
+  {
+   "symbol": "LEVERUSDT",
+   "baseAsset": "LEVER",
+   "status": "SETTLING",
+   "onboardDate": "2023-03-29"
+  },
+  {
+   "symbol": "LIGHTUSDT",
+   "baseAsset": "LIGHT",
+   "status": "TRADING",
+   "onboardDate": "2025-09-27"
+  },
+  {
+   "symbol": "LINAUSDT",
+   "baseAsset": "LINA",
+   "status": "SETTLING",
+   "onboardDate": "2021-03-17"
+  },
+  {
+   "symbol": "LINEAUSDT",
+   "baseAsset": "LINEA",
+   "status": "TRADING",
+   "onboardDate": "2025-09-01"
+  },
+  {
+   "symbol": "LINKUSDT",
+   "baseAsset": "LINK",
+   "status": "TRADING",
+   "onboardDate": "2020-01-17"
+  },
+  {
+   "symbol": "LISTAUSDT",
+   "baseAsset": "LISTA",
+   "status": "TRADING",
+   "onboardDate": "2024-06-20"
+  },
+  {
+   "symbol": "LOKAUSDT",
+   "baseAsset": "LOKA",
+   "status": "SETTLING",
+   "onboardDate": "2024-09-24"
+  },
+  {
+   "symbol": "LOOMUSDT",
+   "baseAsset": "LOOM",
+   "status": "SETTLING",
+   "onboardDate": "2023-10-11"
+  },
+  {
+   "symbol": "LPTUSDT",
+   "baseAsset": "LPT",
+   "status": "TRADING",
+   "onboardDate": "2021-11-10"
+  },
+  {
+   "symbol": "LQTYUSDT",
+   "baseAsset": "LQTY",
+   "status": "TRADING",
+   "onboardDate": "2023-03-08"
+  },
+  {
+   "symbol": "LRCUSDT",
+   "baseAsset": "LRC",
+   "status": "SETTLING",
+   "onboardDate": "2020-10-19"
+  },
+  {
+   "symbol": "LSKUSDT",
+   "baseAsset": "LSK",
+   "status": "TRADING",
+   "onboardDate": "2024-01-25"
+  },
+  {
+   "symbol": "LTCUSDT",
+   "baseAsset": "LTC",
+   "status": "TRADING",
+   "onboardDate": "2020-01-09"
+  },
+  {
+   "symbol": "LUMIAUSDT",
+   "baseAsset": "LUMIA",
+   "status": "TRADING",
+   "onboardDate": "2024-12-18"
+  },
+  {
+   "symbol": "LUNA2USDT",
+   "baseAsset": "LUNA2",
+   "status": "TRADING",
+   "onboardDate": "2022-09-09"
+  },
+  {
+   "symbol": "MAGICUSDT",
+   "baseAsset": "MAGIC",
+   "status": "TRADING",
+   "onboardDate": "2023-01-23"
+  },
+  {
+   "symbol": "MANAUSDT",
+   "baseAsset": "MANA",
+   "status": "TRADING",
+   "onboardDate": "2021-03-14"
+  },
+  {
+   "symbol": "MANTAUSDT",
+   "baseAsset": "MANTA",
+   "status": "TRADING",
+   "onboardDate": "2024-01-18"
+  },
+  {
+   "symbol": "MASKUSDT",
+   "baseAsset": "MASK",
+   "status": "TRADING",
+   "onboardDate": "2021-07-16"
+  },
+  {
+   "symbol": "MAVIAUSDT",
+   "baseAsset": "MAVIA",
+   "status": "TRADING",
+   "onboardDate": "2025-03-26"
+  },
+  {
+   "symbol": "MAVUSDT",
+   "baseAsset": "MAV",
+   "status": "TRADING",
+   "onboardDate": "2023-06-29"
+  },
+  {
+   "symbol": "MBOXUSDT",
+   "baseAsset": "MBOX",
+   "status": "SETTLING",
+   "onboardDate": "2024-08-28"
+  },
+  {
+   "symbol": "MDTUSDT",
+   "baseAsset": "MDT",
+   "status": "SETTLING",
+   "onboardDate": "2023-06-30"
+  },
+  {
+   "symbol": "MELANIAUSDT",
+   "baseAsset": "MELANIA",
+   "status": "TRADING",
+   "onboardDate": "2025-01-20"
+  },
+  {
+   "symbol": "MEMEFIUSDT",
+   "baseAsset": "MEMEFI",
+   "status": "SETTLING",
+   "onboardDate": "2025-04-25"
+  },
+  {
+   "symbol": "MEMEUSDT",
+   "baseAsset": "MEME",
+   "status": "TRADING",
+   "onboardDate": "2023-11-03"
+  },
+  {
+   "symbol": "MERLUSDT",
+   "baseAsset": "MERL",
+   "status": "TRADING",
+   "onboardDate": "2025-05-29"
+  },
+  {
+   "symbol": "METISUSDT",
+   "baseAsset": "METIS",
+   "status": "TRADING",
+   "onboardDate": "2024-03-12"
+  },
+  {
+   "symbol": "MEUSDT",
+   "baseAsset": "ME",
+   "status": "TRADING",
+   "onboardDate": "2024-12-10"
+  },
+  {
+   "symbol": "MEWUSDT",
+   "baseAsset": "MEW",
+   "status": "TRADING",
+   "onboardDate": "2024-06-17"
+  },
+  {
+   "symbol": "MILKUSDT",
+   "baseAsset": "MILK",
+   "status": "SETTLING",
+   "onboardDate": "2025-05-06"
+  },
+  {
+   "symbol": "MINAUSDT",
+   "baseAsset": "MINA",
+   "status": "TRADING",
+   "onboardDate": "2023-02-03"
+  },
+  {
+   "symbol": "MIRAUSDT",
+   "baseAsset": "MIRA",
+   "status": "TRADING",
+   "onboardDate": "2025-09-26"
+  },
+  {
+   "symbol": "MITOUSDT",
+   "baseAsset": "MITO",
+   "status": "TRADING",
+   "onboardDate": "2025-08-28"
+  },
+  {
+   "symbol": "MKRUSDT",
+   "baseAsset": "MKR",
+   "status": "SETTLING",
+   "onboardDate": "2020-08-13"
+  },
+  {
+   "symbol": "MLNUSDT",
+   "baseAsset": "MLN",
+   "status": "SETTLING",
+   "onboardDate": "2025-03-31"
+  },
+  {
+   "symbol": "MOCAUSDT",
+   "baseAsset": "MOCA",
+   "status": "TRADING",
+   "onboardDate": "2024-12-16"
+  },
+  {
+   "symbol": "MOODENGUSDT",
+   "baseAsset": "MOODENG",
+   "status": "TRADING",
+   "onboardDate": "2024-10-25"
+  },
+  {
+   "symbol": "MORPHOUSDT",
+   "baseAsset": "MORPHO",
+   "status": "TRADING",
+   "onboardDate": "2024-11-27"
+  },
+  {
+   "symbol": "MOVEUSDT",
+   "baseAsset": "MOVE",
+   "status": "TRADING",
+   "onboardDate": "2024-12-09"
+  },
+  {
+   "symbol": "MOVRUSDT",
+   "baseAsset": "MOVR",
+   "status": "TRADING",
+   "onboardDate": "2023-12-26"
+  },
+  {
+   "symbol": "MTLUSDT",
+   "baseAsset": "MTL",
+   "status": "TRADING",
+   "onboardDate": "2021-03-31"
+  },
+  {
+   "symbol": "MUBARAKUSDT",
+   "baseAsset": "MUBARAK",
+   "status": "TRADING",
+   "onboardDate": "2025-03-17"
+  },
+  {
+   "symbol": "MUSDT",
+   "baseAsset": "M",
+   "status": "TRADING",
+   "onboardDate": "2025-07-07"
+  },
+  {
+   "symbol": "MYROUSDT",
+   "baseAsset": "MYRO",
+   "status": "SETTLING",
+   "onboardDate": "2024-03-05"
+  },
+  {
+   "symbol": "MYXUSDT",
+   "baseAsset": "MYX",
+   "status": "TRADING",
+   "onboardDate": "2025-06-18"
+  },
+  {
+   "symbol": "NAORISUSDT",
+   "baseAsset": "NAORIS",
+   "status": "TRADING",
+   "onboardDate": "2025-07-31"
+  },
+  {
+   "symbol": "NEARUSDT",
+   "baseAsset": "NEAR",
+   "status": "TRADING",
+   "onboardDate": "2020-10-15"
+  },
+  {
+   "symbol": "NEIROETHUSDT",
+   "baseAsset": "NEIROETH",
+   "status": "SETTLING",
+   "onboardDate": "2024-09-06"
+  },
+  {
+   "symbol": "NEIROUSDT",
+   "baseAsset": "NEIRO",
+   "status": "TRADING",
+   "onboardDate": "2024-09-16"
+  },
+  {
+   "symbol": "NEOUSDT",
+   "baseAsset": "NEO",
+   "status": "TRADING",
+   "onboardDate": "2020-02-17"
+  },
+  {
+   "symbol": "NEWTUSDT",
+   "baseAsset": "NEWT",
+   "status": "TRADING",
+   "onboardDate": "2025-06-19"
+  },
+  {
+   "symbol": "NFPUSDT",
+   "baseAsset": "NFP",
+   "status": "SETTLING",
+   "onboardDate": "2023-12-27"
+  },
+  {
+   "symbol": "NILUSDT",
+   "baseAsset": "NIL",
+   "status": "TRADING",
+   "onboardDate": "2025-03-24"
+  },
+  {
+   "symbol": "NKNUSDT",
+   "baseAsset": "NKN",
+   "status": "SETTLING",
+   "onboardDate": "2021-04-08"
+  },
+  {
+   "symbol": "NMRUSDT",
+   "baseAsset": "NMR",
+   "status": "TRADING",
+   "onboardDate": "2023-06-22"
+  },
+  {
+   "symbol": "NOTUSDT",
+   "baseAsset": "NOT",
+   "status": "TRADING",
+   "onboardDate": "2024-05-16"
+  },
+  {
+   "symbol": "NTRNUSDT",
+   "baseAsset": "NTRN",
+   "status": "SETTLING",
+   "onboardDate": "2023-11-14"
+  },
+  {
+   "symbol": "NULSUSDT",
+   "baseAsset": "NULS",
+   "status": "SETTLING",
+   "onboardDate": "2024-08-26"
+  },
+  {
+   "symbol": "NXPCUSDT",
+   "baseAsset": "NXPC",
+   "status": "TRADING",
+   "onboardDate": "2025-05-15"
+  },
+  {
+   "symbol": "OBOLUSDT",
+   "baseAsset": "OBOL",
+   "status": "SETTLING",
+   "onboardDate": "2025-05-07"
+  },
+  {
+   "symbol": "OCEANUSDT",
+   "baseAsset": "OCEAN",
+   "status": "SETTLING",
+   "onboardDate": "2020-11-03"
+  },
+  {
+   "symbol": "OGNUSDT",
+   "baseAsset": "OGN",
+   "status": "TRADING",
+   "onboardDate": "2021-03-31"
+  },
+  {
+   "symbol": "OGUSDT",
+   "baseAsset": "OG",
+   "status": "TRADING",
+   "onboardDate": "2025-05-12"
+  },
+  {
+   "symbol": "OLUSDT",
+   "baseAsset": "OL",
+   "status": "SETTLING",
+   "onboardDate": "2025-06-25"
+  },
+  {
+   "symbol": "OMGUSDT",
+   "baseAsset": "OMG",
+   "status": "SETTLING",
+   "onboardDate": "2020-07-02"
+  },
+  {
+   "symbol": "OMNIUSDT",
+   "baseAsset": "OMNI",
+   "status": "SETTLING",
+   "onboardDate": "2024-04-17"
+  },
+  {
+   "symbol": "OMUSDT",
+   "baseAsset": "OM",
+   "status": "SETTLING",
+   "onboardDate": "2024-02-13"
+  },
+  {
+   "symbol": "ONDOUSDT",
+   "baseAsset": "ONDO",
+   "status": "TRADING",
+   "onboardDate": "2024-01-20"
+  },
+  {
+   "symbol": "ONEUSDT",
+   "baseAsset": "ONE",
+   "status": "TRADING",
+   "onboardDate": "2021-03-17"
+  },
+  {
+   "symbol": "ONGUSDT",
+   "baseAsset": "ONG",
+   "status": "TRADING",
+   "onboardDate": "2023-11-27"
+  },
+  {
+   "symbol": "ONTUSDT",
+   "baseAsset": "ONT",
+   "status": "TRADING",
+   "onboardDate": "2020-02-11"
+  },
+  {
+   "symbol": "OPENUSDT",
+   "baseAsset": "OPEN",
+   "status": "TRADING",
+   "onboardDate": "2025-09-08"
+  },
+  {
+   "symbol": "OPUSDT",
+   "baseAsset": "OP",
+   "status": "TRADING",
+   "onboardDate": "2022-06-01"
+  },
+  {
+   "symbol": "ORBSUSDT",
+   "baseAsset": "ORBS",
+   "status": "SETTLING",
+   "onboardDate": "2023-10-17"
+  },
+  {
+   "symbol": "ORCAUSDT",
+   "baseAsset": "ORCA",
+   "status": "TRADING",
+   "onboardDate": "2024-12-06"
+  },
+  {
+   "symbol": "ORDERUSDT",
+   "baseAsset": "ORDER",
+   "status": "TRADING",
+   "onboardDate": "2025-09-26"
+  },
+  {
+   "symbol": "ORDIUSDT",
+   "baseAsset": "ORDI",
+   "status": "TRADING",
+   "onboardDate": "2023-11-07"
+  },
+  {
+   "symbol": "OXTUSDT",
+   "baseAsset": "OXT",
+   "status": "SETTLING",
+   "onboardDate": "2023-08-11"
+  },
+  {
+   "symbol": "PARTIUSDT",
+   "baseAsset": "PARTI",
+   "status": "TRADING",
+   "onboardDate": "2025-03-25"
+  },
+  {
+   "symbol": "PAXGUSDT",
+   "baseAsset": "PAXG",
+   "status": "TRADING",
+   "onboardDate": "2025-03-27"
+  },
+  {
+   "symbol": "PENDLEUSDT",
+   "baseAsset": "PENDLE",
+   "status": "TRADING",
+   "onboardDate": "2023-07-28"
+  },
+  {
+   "symbol": "PENGUUSDT",
+   "baseAsset": "PENGU",
+   "status": "TRADING",
+   "onboardDate": "2024-12-17"
+  },
+  {
+   "symbol": "PEOPLEUSDT",
+   "baseAsset": "PEOPLE",
+   "status": "TRADING",
+   "onboardDate": "2021-12-23"
+  },
+  {
+   "symbol": "PERPUSDT",
+   "baseAsset": "PERP",
+   "status": "SETTLING",
+   "onboardDate": "2023-03-05"
+  },
+  {
+   "symbol": "PHAUSDT",
+   "baseAsset": "PHA",
+   "status": "TRADING",
+   "onboardDate": "2024-12-30"
+  },
+  {
+   "symbol": "PHBUSDT",
+   "baseAsset": "PHB",
+   "status": "SETTLING",
+   "onboardDate": "2023-02-15"
+  },
+  {
+   "symbol": "PIPPINUSDT",
+   "baseAsset": "PIPPIN",
+   "status": "TRADING",
+   "onboardDate": "2025-01-24"
+  },
+  {
+   "symbol": "PIXELUSDT",
+   "baseAsset": "PIXEL",
+   "status": "TRADING",
+   "onboardDate": "2024-02-19"
+  },
+  {
+   "symbol": "PLAYUSDT",
+   "baseAsset": "PLAY",
+   "status": "TRADING",
+   "onboardDate": "2025-07-31"
+  },
+  {
+   "symbol": "PLUMEUSDT",
+   "baseAsset": "PLUME",
+   "status": "TRADING",
+   "onboardDate": "2025-03-21"
+  },
+  {
+   "symbol": "PNUTUSDT",
+   "baseAsset": "PNUT",
+   "status": "TRADING",
+   "onboardDate": "2024-11-11"
+  },
+  {
+   "symbol": "POLUSDT",
+   "baseAsset": "POL",
+   "status": "TRADING",
+   "onboardDate": "2024-09-13"
+  },
+  {
+   "symbol": "POLYXUSDT",
+   "baseAsset": "POLYX",
+   "status": "TRADING",
+   "onboardDate": "2023-10-25"
+  },
+  {
+   "symbol": "PONKEUSDT",
+   "baseAsset": "PONKE",
+   "status": "SETTLING",
+   "onboardDate": "2024-11-04"
+  },
+  {
+   "symbol": "POPCATUSDT",
+   "baseAsset": "POPCAT",
+   "status": "TRADING",
+   "onboardDate": "2024-08-22"
+  },
+  {
+   "symbol": "PORT3USDT",
+   "baseAsset": "PORT3",
+   "status": "SETTLING",
+   "onboardDate": "2025-06-04"
+  },
+  {
+   "symbol": "PORTALUSDT",
+   "baseAsset": "PORTAL",
+   "status": "TRADING",
+   "onboardDate": "2024-02-29"
+  },
+  {
+   "symbol": "POWRUSDT",
+   "baseAsset": "POWR",
+   "status": "TRADING",
+   "onboardDate": "2023-10-27"
+  },
+  {
+   "symbol": "PROMPTUSDT",
+   "baseAsset": "PROMPT",
+   "status": "SETTLING",
+   "onboardDate": "2025-04-11"
+  },
+  {
+   "symbol": "PROMUSDT",
+   "baseAsset": "PROM",
+   "status": "TRADING",
+   "onboardDate": "2025-01-15"
+  },
+  {
+   "symbol": "PROVEUSDT",
+   "baseAsset": "PROVE",
+   "status": "TRADING",
+   "onboardDate": "2025-08-05"
+  },
+  {
+   "symbol": "PTBUSDT",
+   "baseAsset": "PTB",
+   "status": "TRADING",
+   "onboardDate": "2025-09-03"
+  },
+  {
+   "symbol": "PUFFERUSDT",
+   "baseAsset": "PUFFER",
+   "status": "SETTLING",
+   "onboardDate": "2025-06-04"
+  },
+  {
+   "symbol": "PUMPBTCUSDT",
+   "baseAsset": "PUMPBTC",
+   "status": "SETTLING",
+   "onboardDate": "2025-06-13"
+  },
+  {
+   "symbol": "PUMPUSDT",
+   "baseAsset": "PUMP",
+   "status": "TRADING",
+   "onboardDate": "2025-07-10"
+  },
+  {
+   "symbol": "PUNDIXUSDT",
+   "baseAsset": "PUNDIX",
+   "status": "TRADING",
+   "onboardDate": "2025-04-30"
+  },
+  {
+   "symbol": "PYTHUSDT",
+   "baseAsset": "PYTH",
+   "status": "TRADING",
+   "onboardDate": "2023-11-22"
+  },
+  {
+   "symbol": "QNTUSDT",
+   "baseAsset": "QNT",
+   "status": "TRADING",
+   "onboardDate": "2022-10-18"
+  },
+  {
+   "symbol": "QTUMUSDT",
+   "baseAsset": "QTUM",
+   "status": "TRADING",
+   "onboardDate": "2020-02-20"
+  },
+  {
+   "symbol": "QUICKUSDT",
+   "baseAsset": "QUICK",
+   "status": "SETTLING",
+   "onboardDate": "2024-09-06"
+  },
+  {
+   "symbol": "QUSDT",
+   "baseAsset": "Q",
+   "status": "TRADING",
+   "onboardDate": "2025-09-02"
+  },
+  {
+   "symbol": "RADUSDT",
+   "baseAsset": "RAD",
+   "status": "SETTLING",
+   "onboardDate": "2023-05-09"
+  },
+  {
+   "symbol": "RAREUSDT",
+   "baseAsset": "RARE",
+   "status": "TRADING",
+   "onboardDate": "2024-08-15"
+  },
+  {
+   "symbol": "RAYSOLUSDT",
+   "baseAsset": "RAYSOL",
+   "status": "TRADING",
+   "onboardDate": "2024-12-10"
+  },
+  {
+   "symbol": "RAYUSDT",
+   "baseAsset": "RAY",
+   "status": "SETTLING",
+   "onboardDate": "2021-08-18"
+  },
+  {
+   "symbol": "RDNTUSDT",
+   "baseAsset": "RDNT",
+   "status": "SETTLING",
+   "onboardDate": "2023-04-04"
+  },
+  {
+   "symbol": "REDUSDT",
+   "baseAsset": "RED",
+   "status": "TRADING",
+   "onboardDate": "2025-03-06"
+  },
+  {
+   "symbol": "REEFUSDT",
+   "baseAsset": "REEF",
+   "status": "SETTLING",
+   "onboardDate": "2021-01-25"
+  },
+  {
+   "symbol": "REIUSDT",
+   "baseAsset": "REI",
+   "status": "SETTLING",
+   "onboardDate": "2024-09-27"
+  },
+  {
+   "symbol": "RENDERUSDT",
+   "baseAsset": "RENDER",
+   "status": "TRADING",
+   "onboardDate": "2024-07-26"
+  },
+  {
+   "symbol": "RENUSDT",
+   "baseAsset": "REN",
+   "status": "SETTLING",
+   "onboardDate": "2020-10-13"
+  },
+  {
+   "symbol": "RESOLVUSDT",
+   "baseAsset": "RESOLV",
+   "status": "TRADING",
+   "onboardDate": "2025-06-10"
+  },
+  {
+   "symbol": "REZUSDT",
+   "baseAsset": "REZ",
+   "status": "TRADING",
+   "onboardDate": "2024-04-30"
+  },
+  {
+   "symbol": "RIFUSDT",
+   "baseAsset": "RIF",
+   "status": "TRADING",
+   "onboardDate": "2023-10-21"
+  },
+  {
+   "symbol": "RLCUSDT",
+   "baseAsset": "RLC",
+   "status": "TRADING",
+   "onboardDate": "2020-07-31"
+  },
+  {
+   "symbol": "RONINUSDT",
+   "baseAsset": "RONIN",
+   "status": "TRADING",
+   "onboardDate": "2024-02-06"
+  },
+  {
+   "symbol": "ROSEUSDT",
+   "baseAsset": "ROSE",
+   "status": "TRADING",
+   "onboardDate": "2021-12-31"
+  },
+  {
+   "symbol": "RPLUSDT",
+   "baseAsset": "RPL",
+   "status": "TRADING",
+   "onboardDate": "2024-09-09"
+  },
+  {
+   "symbol": "RSRUSDT",
+   "baseAsset": "RSR",
+   "status": "TRADING",
+   "onboardDate": "2020-10-19"
+  },
+  {
+   "symbol": "RUNEUSDT",
+   "baseAsset": "RUNE",
+   "status": "TRADING",
+   "onboardDate": "2020-09-04"
+  },
+  {
+   "symbol": "RVNUSDT",
+   "baseAsset": "RVN",
+   "status": "TRADING",
+   "onboardDate": "2021-02-23"
+  },
+  {
+   "symbol": "SAFEUSDT",
+   "baseAsset": "SAFE",
+   "status": "TRADING",
+   "onboardDate": "2024-10-25"
+  },
+  {
+   "symbol": "SAGAUSDT",
+   "baseAsset": "SAGA",
+   "status": "TRADING",
+   "onboardDate": "2024-04-09"
+  },
+  {
+   "symbol": "SAHARAUSDT",
+   "baseAsset": "SAHARA",
+   "status": "TRADING",
+   "onboardDate": "2025-06-26"
+  },
+  {
+   "symbol": "SANDUSDT",
+   "baseAsset": "SAND",
+   "status": "TRADING",
+   "onboardDate": "2021-01-18"
+  },
+  {
+   "symbol": "SANTOSUSDT",
+   "baseAsset": "SANTOS",
+   "status": "TRADING",
+   "onboardDate": "2024-10-28"
+  },
+  {
+   "symbol": "SAPIENUSDT",
+   "baseAsset": "SAPIEN",
+   "status": "TRADING",
+   "onboardDate": "2025-08-20"
+  },
+  {
+   "symbol": "SCRTUSDT",
+   "baseAsset": "SCRT",
+   "status": "SETTLING",
+   "onboardDate": "2024-11-21"
+  },
+  {
+   "symbol": "SCRUSDT",
+   "baseAsset": "SCR",
+   "status": "TRADING",
+   "onboardDate": "2024-10-22"
+  },
+  {
+   "symbol": "SCUSDT",
+   "baseAsset": "SC",
+   "status": "SETTLING",
+   "onboardDate": "2021-04-12"
+  },
+  {
+   "symbol": "SEIUSDT",
+   "baseAsset": "SEI",
+   "status": "TRADING",
+   "onboardDate": "2023-08-17"
+  },
+  {
+   "symbol": "SFPUSDT",
+   "baseAsset": "SFP",
+   "status": "TRADING",
+   "onboardDate": "2021-02-24"
+  },
+  {
+   "symbol": "SHELLUSDT",
+   "baseAsset": "SHELL",
+   "status": "TRADING",
+   "onboardDate": "2025-02-17"
+  },
+  {
+   "symbol": "SIGNUSDT",
+   "baseAsset": "SIGN",
+   "status": "TRADING",
+   "onboardDate": "2025-04-28"
+  },
+  {
+   "symbol": "SIRENUSDT",
+   "baseAsset": "SIREN",
+   "status": "TRADING",
+   "onboardDate": "2025-03-22"
+  },
+  {
+   "symbol": "SKATEUSDT",
+   "baseAsset": "SKATE",
+   "status": "SETTLING",
+   "onboardDate": "2025-06-09"
+  },
+  {
+   "symbol": "SKLUSDT",
+   "baseAsset": "SKL",
+   "status": "TRADING",
+   "onboardDate": "2020-08-24"
+  },
+  {
+   "symbol": "SKYAIUSDT",
+   "baseAsset": "SKYAI",
+   "status": "TRADING",
+   "onboardDate": "2025-05-13"
+  },
+  {
+   "symbol": "SKYUSDT",
+   "baseAsset": "SKY",
+   "status": "TRADING",
+   "onboardDate": "2025-09-09"
+  },
+  {
+   "symbol": "SLERFUSDT",
+   "baseAsset": "SLERF",
+   "status": "SETTLING",
+   "onboardDate": "2024-11-21"
+  },
+  {
+   "symbol": "SLPUSDT",
+   "baseAsset": "SLP",
+   "status": "TRADING",
+   "onboardDate": "2025-07-23"
+  },
+  {
+   "symbol": "SNTUSDT",
+   "baseAsset": "SNT",
+   "status": "SETTLING",
+   "onboardDate": "2023-11-02"
+  },
+  {
+   "symbol": "SNXUSDT",
+   "baseAsset": "SNX",
+   "status": "TRADING",
+   "onboardDate": "2020-08-14"
+  },
+  {
+   "symbol": "SOLUSDT",
+   "baseAsset": "SOL",
+   "status": "TRADING",
+   "onboardDate": "2020-09-14"
+  },
+  {
+   "symbol": "SOLVUSDT",
+   "baseAsset": "SOLV",
+   "status": "TRADING",
+   "onboardDate": "2025-01-17"
+  },
+  {
+   "symbol": "SOMIUSDT",
+   "baseAsset": "SOMI",
+   "status": "TRADING",
+   "onboardDate": "2025-08-25"
+  },
+  {
+   "symbol": "SONICUSDT",
+   "baseAsset": "SONIC",
+   "status": "TRADING",
+   "onboardDate": "2025-01-08"
+  },
+  {
+   "symbol": "SOONUSDT",
+   "baseAsset": "SOON",
+   "status": "TRADING",
+   "onboardDate": "2025-05-23"
+  },
+  {
+   "symbol": "SOPHUSDT",
+   "baseAsset": "SOPH",
+   "status": "TRADING",
+   "onboardDate": "2025-05-28"
+  },
+  {
+   "symbol": "SPELLUSDT",
+   "baseAsset": "SPELL",
+   "status": "TRADING",
+   "onboardDate": "2022-09-05"
+  },
+  {
+   "symbol": "SPKUSDT",
+   "baseAsset": "SPK",
+   "status": "TRADING",
+   "onboardDate": "2025-06-17"
+  },
+  {
+   "symbol": "SPXUSDT",
+   "baseAsset": "SPX",
+   "status": "TRADING",
+   "onboardDate": "2024-12-10"
+  },
+  {
+   "symbol": "SQDUSDT",
+   "baseAsset": "SQD",
+   "status": "TRADING",
+   "onboardDate": "2025-06-11"
+  },
+  {
+   "symbol": "SSVUSDT",
+   "baseAsset": "SSV",
+   "status": "TRADING",
+   "onboardDate": "2023-02-23"
+  },
+  {
+   "symbol": "STBLUSDT",
+   "baseAsset": "STBL",
+   "status": "TRADING",
+   "onboardDate": "2025-09-17"
+  },
+  {
+   "symbol": "STEEMUSDT",
+   "baseAsset": "STEEM",
+   "status": "TRADING",
+   "onboardDate": "2023-11-08"
+  },
+  {
+   "symbol": "STGUSDT",
+   "baseAsset": "STG",
+   "status": "SETTLING",
+   "onboardDate": "2022-08-24"
+  },
+  {
+   "symbol": "STMXUSDT",
+   "baseAsset": "STMX",
+   "status": "SETTLING",
+   "onboardDate": "2021-03-17"
+  },
+  {
+   "symbol": "STORJUSDT",
+   "baseAsset": "STORJ",
+   "status": "SETTLING",
+   "onboardDate": "2020-09-16"
+  },
+  {
+   "symbol": "STOUSDT",
+   "baseAsset": "STO",
+   "status": "TRADING",
+   "onboardDate": "2025-04-12"
+  },
+  {
+   "symbol": "STPTUSDT",
+   "baseAsset": "STPT",
+   "status": "SETTLING",
+   "onboardDate": "2023-10-18"
+  },
+  {
+   "symbol": "STRAXUSDT",
+   "baseAsset": "STRAX",
+   "status": "SETTLING",
+   "onboardDate": "2023-10-11"
+  },
+  {
+   "symbol": "STRKUSDT",
+   "baseAsset": "STRK",
+   "status": "TRADING",
+   "onboardDate": "2024-02-20"
+  },
+  {
+   "symbol": "STXUSDT",
+   "baseAsset": "STX",
+   "status": "TRADING",
+   "onboardDate": "2023-02-20"
+  },
+  {
+   "symbol": "SUIUSDT",
+   "baseAsset": "SUI",
+   "status": "TRADING",
+   "onboardDate": "2023-05-03"
+  },
+  {
+   "symbol": "SUNUSDT",
+   "baseAsset": "SUN",
+   "status": "TRADING",
+   "onboardDate": "2024-08-22"
+  },
+  {
+   "symbol": "SUPERUSDT",
+   "baseAsset": "SUPER",
+   "status": "TRADING",
+   "onboardDate": "2023-11-26"
+  },
+  {
+   "symbol": "SUSDT",
+   "baseAsset": "S",
+   "status": "TRADING",
+   "onboardDate": "2025-01-16"
+  },
+  {
+   "symbol": "SUSHIUSDT",
+   "baseAsset": "SUSHI",
+   "status": "TRADING",
+   "onboardDate": "2020-09-04"
+  },
+  {
+   "symbol": "SWARMSUSDT",
+   "baseAsset": "SWARMS",
+   "status": "TRADING",
+   "onboardDate": "2025-01-07"
+  },
+  {
+   "symbol": "SWELLUSDT",
+   "baseAsset": "SWELL",
+   "status": "SETTLING",
+   "onboardDate": "2024-11-08"
+  },
+  {
+   "symbol": "SXTUSDT",
+   "baseAsset": "SXT",
+   "status": "TRADING",
+   "onboardDate": "2025-05-02"
+  },
+  {
+   "symbol": "SYNUSDT",
+   "baseAsset": "SYN",
+   "status": "TRADING",
+   "onboardDate": "2024-08-16"
+  },
+  {
+   "symbol": "SYRUPUSDT",
+   "baseAsset": "SYRUP",
+   "status": "TRADING",
+   "onboardDate": "2025-05-07"
+  },
+  {
+   "symbol": "SYSUSDT",
+   "baseAsset": "SYS",
+   "status": "SETTLING",
+   "onboardDate": "2024-08-19"
+  },
+  {
+   "symbol": "TACUSDT",
+   "baseAsset": "TAC",
+   "status": "TRADING",
+   "onboardDate": "2025-07-15"
+  },
+  {
+   "symbol": "TAGUSDT",
+   "baseAsset": "TAG",
+   "status": "TRADING",
+   "onboardDate": "2025-07-25"
+  },
+  {
+   "symbol": "TAIKOUSDT",
+   "baseAsset": "TAIKO",
+   "status": "TRADING",
+   "onboardDate": "2025-06-11"
+  },
+  {
+   "symbol": "TAKEUSDT",
+   "baseAsset": "TAKE",
+   "status": "TRADING",
+   "onboardDate": "2025-09-03"
+  },
+  {
+   "symbol": "TANSSIUSDT",
+   "baseAsset": "TANSSI",
+   "status": "SETTLING",
+   "onboardDate": "2025-07-09"
+  },
+  {
+   "symbol": "TAOUSDT",
+   "baseAsset": "TAO",
+   "status": "TRADING",
+   "onboardDate": "2024-04-11"
+  },
+  {
+   "symbol": "TAUSDT",
+   "baseAsset": "TA",
+   "status": "TRADING",
+   "onboardDate": "2025-07-21"
+  },
+  {
+   "symbol": "THETAUSDT",
+   "baseAsset": "THETA",
+   "status": "TRADING",
+   "onboardDate": "2020-05-27"
+  },
+  {
+   "symbol": "THEUSDT",
+   "baseAsset": "THE",
+   "status": "TRADING",
+   "onboardDate": "2024-11-27"
+  },
+  {
+   "symbol": "TIAUSDT",
+   "baseAsset": "TIA",
+   "status": "TRADING",
+   "onboardDate": "2023-10-31"
+  },
+  {
+   "symbol": "TLMUSDT",
+   "baseAsset": "TLM",
+   "status": "TRADING",
+   "onboardDate": "2023-03-29"
+  },
+  {
+   "symbol": "TNSRUSDT",
+   "baseAsset": "TNSR",
+   "status": "TRADING",
+   "onboardDate": "2024-04-08"
+  },
+  {
+   "symbol": "TOKENUSDT",
+   "baseAsset": "TOKEN",
+   "status": "SETTLING",
+   "onboardDate": "2023-11-03"
+  },
+  {
+   "symbol": "TONUSDT",
+   "baseAsset": "TON",
+   "status": "SETTLING",
+   "onboardDate": "2024-03-01"
+  },
+  {
+   "symbol": "TOSHIUSDT",
+   "baseAsset": "TOSHI",
+   "status": "TRADING",
+   "onboardDate": "2025-09-17"
+  },
+  {
+   "symbol": "TOWNSUSDT",
+   "baseAsset": "TOWNS",
+   "status": "TRADING",
+   "onboardDate": "2025-08-05"
+  },
+  {
+   "symbol": "TRADOORUSDT",
+   "baseAsset": "TRADOOR",
+   "status": "TRADING",
+   "onboardDate": "2025-09-19"
+  },
+  {
+   "symbol": "TRBUSDT",
+   "baseAsset": "TRB",
+   "status": "TRADING",
+   "onboardDate": "2020-09-03"
+  },
+  {
+   "symbol": "TREEUSDT",
+   "baseAsset": "TREE",
+   "status": "TRADING",
+   "onboardDate": "2025-07-29"
+  },
+  {
+   "symbol": "TROYUSDT",
+   "baseAsset": "TROY",
+   "status": "SETTLING",
+   "onboardDate": "2024-10-31"
+  },
+  {
+   "symbol": "TRUMPUSDT",
+   "baseAsset": "TRUMP",
+   "status": "TRADING",
+   "onboardDate": "2025-01-18"
+  },
+  {
+   "symbol": "TRUUSDT",
+   "baseAsset": "TRU",
+   "status": "SETTLING",
+   "onboardDate": "2023-03-06"
+  },
+  {
+   "symbol": "TRXUSDT",
+   "baseAsset": "TRX",
+   "status": "TRADING",
+   "onboardDate": "2020-01-15"
+  },
+  {
+   "symbol": "TSTUSDT",
+   "baseAsset": "TST",
+   "status": "TRADING",
+   "onboardDate": "2025-02-09"
+  },
+  {
+   "symbol": "TURBOUSDT",
+   "baseAsset": "TURBO",
+   "status": "TRADING",
+   "onboardDate": "2024-05-30"
+  },
+  {
+   "symbol": "TUSDT",
+   "baseAsset": "T",
+   "status": "TRADING",
+   "onboardDate": "2023-01-31"
+  },
+  {
+   "symbol": "TUTUSDT",
+   "baseAsset": "TUT",
+   "status": "TRADING",
+   "onboardDate": "2025-03-20"
+  },
+  {
+   "symbol": "TWTUSDT",
+   "baseAsset": "TWT",
+   "status": "TRADING",
+   "onboardDate": "2023-11-03"
+  },
+  {
+   "symbol": "UBUSDT",
+   "baseAsset": "UB",
+   "status": "TRADING",
+   "onboardDate": "2025-09-12"
+  },
+  {
+   "symbol": "UMAUSDT",
+   "baseAsset": "UMA",
+   "status": "TRADING",
+   "onboardDate": "2023-05-09"
+  },
+  {
+   "symbol": "UNFIUSDT",
+   "baseAsset": "UNFI",
+   "status": "SETTLING",
+   "onboardDate": "2021-02-09"
+  },
+  {
+   "symbol": "UNIUSDT",
+   "baseAsset": "UNI",
+   "status": "TRADING",
+   "onboardDate": "2020-09-18"
+  },
+  {
+   "symbol": "USELESSUSDT",
+   "baseAsset": "USELESS",
+   "status": "TRADING",
+   "onboardDate": "2025-08-15"
+  },
+  {
+   "symbol": "USTCUSDT",
+   "baseAsset": "USTC",
+   "status": "TRADING",
+   "onboardDate": "2023-11-27"
+  },
+  {
+   "symbol": "USUALUSDT",
+   "baseAsset": "USUAL",
+   "status": "TRADING",
+   "onboardDate": "2024-12-18"
+  },
+  {
+   "symbol": "UXLINKUSDT",
+   "baseAsset": "UXLINK",
+   "status": "SETTLING",
+   "onboardDate": "2024-09-15"
+  },
+  {
+   "symbol": "VANAUSDT",
+   "baseAsset": "VANA",
+   "status": "TRADING",
+   "onboardDate": "2024-12-16"
+  },
+  {
+   "symbol": "VANRYUSDT",
+   "baseAsset": "VANRY",
+   "status": "SETTLING",
+   "onboardDate": "2024-03-13"
+  },
+  {
+   "symbol": "VELODROMEUSDT",
+   "baseAsset": "VELODROME",
+   "status": "TRADING",
+   "onboardDate": "2024-12-13"
+  },
+  {
+   "symbol": "VELVETUSDT",
+   "baseAsset": "VELVET",
+   "status": "TRADING",
+   "onboardDate": "2025-07-15"
+  },
+  {
+   "symbol": "VETUSDT",
+   "baseAsset": "VET",
+   "status": "TRADING",
+   "onboardDate": "2020-02-14"
+  },
+  {
+   "symbol": "VICUSDT",
+   "baseAsset": "VIC",
+   "status": "SETTLING",
+   "onboardDate": "2025-03-12"
+  },
+  {
+   "symbol": "VIDTUSDT",
+   "baseAsset": "VIDT",
+   "status": "SETTLING",
+   "onboardDate": "2024-08-23"
+  },
+  {
+   "symbol": "VINEUSDT",
+   "baseAsset": "VINE",
+   "status": "SETTLING",
+   "onboardDate": "2025-01-24"
+  },
+  {
+   "symbol": "VIRTUALUSDT",
+   "baseAsset": "VIRTUAL",
+   "status": "TRADING",
+   "onboardDate": "2024-12-10"
+  },
+  {
+   "symbol": "VOXELUSDT",
+   "baseAsset": "VOXEL",
+   "status": "SETTLING",
+   "onboardDate": "2024-08-20"
+  },
+  {
+   "symbol": "VTHOUSDT",
+   "baseAsset": "VTHO",
+   "status": "TRADING",
+   "onboardDate": "2025-01-22"
+  },
+  {
+   "symbol": "VVVUSDT",
+   "baseAsset": "VVV",
+   "status": "TRADING",
+   "onboardDate": "2025-01-29"
+  },
+  {
+   "symbol": "WALUSDT",
+   "baseAsset": "WAL",
+   "status": "TRADING",
+   "onboardDate": "2025-03-27"
+  },
+  {
+   "symbol": "WAVESUSDT",
+   "baseAsset": "WAVES",
+   "status": "SETTLING",
+   "onboardDate": "2020-08-12"
+  },
+  {
+   "symbol": "WAXPUSDT",
+   "baseAsset": "WAXP",
+   "status": "TRADING",
+   "onboardDate": "2023-10-18"
+  },
+  {
+   "symbol": "WCTUSDT",
+   "baseAsset": "WCT",
+   "status": "TRADING",
+   "onboardDate": "2025-04-15"
+  },
+  {
+   "symbol": "WIFUSDT",
+   "baseAsset": "WIF",
+   "status": "TRADING",
+   "onboardDate": "2024-01-18"
+  },
+  {
+   "symbol": "WLDUSDT",
+   "baseAsset": "WLD",
+   "status": "TRADING",
+   "onboardDate": "2023-07-24"
+  },
+  {
+   "symbol": "WLFIUSDT",
+   "baseAsset": "WLFI",
+   "status": "TRADING",
+   "onboardDate": "2025-08-23"
+  },
+  {
+   "symbol": "WOOUSDT",
+   "baseAsset": "WOO",
+   "status": "TRADING",
+   "onboardDate": "2022-04-07"
+  },
+  {
+   "symbol": "WUSDT",
+   "baseAsset": "W",
+   "status": "TRADING",
+   "onboardDate": "2024-04-03"
+  },
+  {
+   "symbol": "XAIUSDT",
+   "baseAsset": "XAI",
+   "status": "TRADING",
+   "onboardDate": "2024-01-09"
+  },
+  {
+   "symbol": "XANUSDT",
+   "baseAsset": "XAN",
+   "status": "TRADING",
+   "onboardDate": "2025-09-29"
+  },
+  {
+   "symbol": "XCNUSDT",
+   "baseAsset": "XCN",
+   "status": "SETTLING",
+   "onboardDate": "2025-04-11"
+  },
+  {
+   "symbol": "XEMUSDT",
+   "baseAsset": "XEM",
+   "status": "SETTLING",
+   "onboardDate": "2021-03-02"
+  },
+  {
+   "symbol": "XLMUSDT",
+   "baseAsset": "XLM",
+   "status": "TRADING",
+   "onboardDate": "2020-01-20"
+  },
+  {
+   "symbol": "XMRUSDT",
+   "baseAsset": "XMR",
+   "status": "TRADING",
+   "onboardDate": "2020-02-03"
+  },
+  {
+   "symbol": "XNYUSDT",
+   "baseAsset": "XNY",
+   "status": "TRADING",
+   "onboardDate": "2025-08-13"
+  },
+  {
+   "symbol": "XPINUSDT",
+   "baseAsset": "XPIN",
+   "status": "TRADING",
+   "onboardDate": "2025-09-12"
+  },
+  {
+   "symbol": "XPLUSDT",
+   "baseAsset": "XPL",
+   "status": "TRADING",
+   "onboardDate": "2025-08-22"
+  },
+  {
+   "symbol": "XRPUSDT",
+   "baseAsset": "XRP",
+   "status": "TRADING",
+   "onboardDate": "2020-01-06"
+  },
+  {
+   "symbol": "XTZUSDT",
+   "baseAsset": "XTZ",
+   "status": "TRADING",
+   "onboardDate": "2020-02-06"
+  },
+  {
+   "symbol": "XVGUSDT",
+   "baseAsset": "XVG",
+   "status": "TRADING",
+   "onboardDate": "2023-07-05"
+  },
+  {
+   "symbol": "XVSUSDT",
+   "baseAsset": "XVS",
+   "status": "TRADING",
+   "onboardDate": "2023-04-12"
+  },
+  {
+   "symbol": "YALAUSDT",
+   "baseAsset": "YALA",
+   "status": "SETTLING",
+   "onboardDate": "2025-08-07"
+  },
+  {
+   "symbol": "YFIUSDT",
+   "baseAsset": "YFI",
+   "status": "TRADING",
+   "onboardDate": "2020-08-31"
+  },
+  {
+   "symbol": "YGGUSDT",
+   "baseAsset": "YGG",
+   "status": "TRADING",
+   "onboardDate": "2023-08-05"
+  },
+  {
+   "symbol": "ZECUSDT",
+   "baseAsset": "ZEC",
+   "status": "TRADING",
+   "onboardDate": "2020-02-05"
+  },
+  {
+   "symbol": "ZENUSDT",
+   "baseAsset": "ZEN",
+   "status": "TRADING",
+   "onboardDate": "2020-11-24"
+  },
+  {
+   "symbol": "ZEREBROUSDT",
+   "baseAsset": "ZEREBRO",
+   "status": "TRADING",
+   "onboardDate": "2025-01-02"
+  },
+  {
+   "symbol": "ZETAUSDT",
+   "baseAsset": "ZETA",
+   "status": "TRADING",
+   "onboardDate": "2024-02-02"
+  },
+  {
+   "symbol": "ZILUSDT",
+   "baseAsset": "ZIL",
+   "status": "TRADING",
+   "onboardDate": "2020-06-18"
+  },
+  {
+   "symbol": "ZKCUSDT",
+   "baseAsset": "ZKC",
+   "status": "TRADING",
+   "onboardDate": "2025-09-15"
+  },
+  {
+   "symbol": "ZKJUSDT",
+   "baseAsset": "ZKJ",
+   "status": "SETTLING",
+   "onboardDate": "2025-05-13"
+  },
+  {
+   "symbol": "ZKUSDT",
+   "baseAsset": "ZK",
+   "status": "TRADING",
+   "onboardDate": "2024-06-17"
+  },
+  {
+   "symbol": "ZORAUSDT",
+   "baseAsset": "ZORA",
+   "status": "TRADING",
+   "onboardDate": "2025-07-25"
+  },
+  {
+   "symbol": "ZRCUSDT",
+   "baseAsset": "ZRC",
+   "status": "SETTLING",
+   "onboardDate": "2025-07-29"
+  },
+  {
+   "symbol": "ZROUSDT",
+   "baseAsset": "ZRO",
+   "status": "TRADING",
+   "onboardDate": "2024-06-20"
+  },
+  {
+   "symbol": "ZRXUSDT",
+   "baseAsset": "ZRX",
+   "status": "TRADING",
+   "onboardDate": "2020-06-24"
+  }
+ ]
+}
