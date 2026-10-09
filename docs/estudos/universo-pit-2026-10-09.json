@@ -1,0 +1,428 @@
+{
+ "protocol": {
+  "version": "PIT_UNIVERSO_V1",
+  "declaredAt": "2026-10-09",
+  "universeSize": 15,
+  "refreshHours": 672,
+  "volumeWindowHours": 672,
+  "firstDecisionBar": 1640995200000,
+  "rule": {
+   "lookbackHours": 672,
+   "rebalanceHours": 168,
+   "longCount": 5,
+   "shortCount": 5,
+   "legFraction": 0.025,
+   "feeRate": 0.00055,
+   "slippageBps": 2,
+   "initialCapital": 10000,
+   "maxBars": 60000
+  },
+  "gate": {
+   "maximumDrawdown": 0.15,
+   "minimumPositiveYears": 3,
+   "maximumMarketCorrelation": 0.3,
+   "maximumFilledShare": 0.01,
+   "trials": 17
+  },
+  "split": "2024-07-01T00:00:00.000Z"
+ },
+ "protocolCommit": "1bbfd6a28338ac618bdf6ac266e625b17d132e30",
+ "execution": "HISTORICAL_SIMULATION_OFFLINE",
+ "automaticPaperApproval": false,
+ "runAt": "2026-10-09T21:16:30.712Z",
+ "pool": {
+  "count": 59,
+  "originals": 15,
+  "others": 44,
+  "dropped": [
+   {
+    "symbol": "ICPUSDT",
+    "reason": "sem vela inicial"
+   }
+  ]
+ },
+ "engine": "scripts/estudos/lean-sim.ts (conferido contra simulateBlend em teste e contra o controle publicado)",
+ "verdict": "NAO_VALIDADA",
+ "checks": {
+  "DATA_QUALITY": true,
+  "POSITIVE_PNL": true,
+  "BOUNDED_DRAWDOWN": true,
+  "POSITIVE_YEARS": false,
+  "DOUBLED_COSTS_POSITIVE": true,
+  "MARKET_NEUTRAL": true,
+  "BOTH_HALVES_POSITIVE": false
+ },
+ "failed": [
+  "POSITIVE_YEARS",
+  "BOTH_HALVES_POSITIVE"
+ ],
+ "pit15": {
+  "netPnl": 565.601243881405,
+  "returnPct": 0.0565601243881405,
+  "maxDrawdown": 0.11576234489757076,
+  "sharpeAnnualized": 0.22562275694033262,
+  "marketCorrelation": -0.059931792954265276,
+  "years": {
+   "2022": {
+    "returnPct": 0.0058567199106593915,
+    "maxDrawdown": 0.05713658563853585,
+    "partial": false
+   },
+   "2023": {
+    "returnPct": 0.1267106184802833,
+    "maxDrawdown": 0.06124965969078289,
+    "partial": false
+   },
+   "2024": {
+    "returnPct": -0.0207195829213086,
+    "maxDrawdown": 0.07049112393754275,
+    "partial": false
+   },
+   "2025": {
+    "returnPct": -0.010935489780449337,
+    "maxDrawdown": 0.037566629097496196,
+    "partial": false
+   },
+   "2026": {
+    "returnPct": -0.03747056742868071,
+    "maxDrawdown": 0.0618604953698354,
+    "partial": true
+   }
+  },
+  "positiveYears": 2,
+  "doubledPnl": 187.73963734472454,
+  "halves": {
+   "first": {
+    "pnl": 852.9914732212164,
+    "returnPct": 0.08529914732212163,
+    "maxDrawdown": 0.08282661865314622
+   },
+   "second": {
+    "pnl": -287.3902293398114,
+    "returnPct": -0.0264802778154688,
+    "maxDrawdown": 0.0994315349900795
+   }
+  },
+  "decisions": 249,
+  "closedLegs": 893,
+  "turnover": 51.05441059431736,
+  "feesPaid": 280.7992582687454,
+  "fundingCashDelta": 593.0070716396121,
+  "buyHold": -0.8254146586642236,
+  "deflatedSharpe": 0.000017565176763434387,
+  "fullSize": {
+   "returnPct": 0.09871477615137919,
+   "maxDrawdown": 0.2240416835502964,
+   "sharpeAnnualized": 0.22717667053298193
+  },
+  "drawdownRatio": 0.5167000312760219,
+  "weeklyCorrelationWithOriginals": 0.6172487625104999
+ },
+ "variants": [
+  {
+   "label": "PIT com 10 moedas",
+   "returnPct": 0.05351317556574923,
+   "maxDrawdown": 0.08771765332831583,
+   "sharpeAnnualized": 0.23959515720507632,
+   "positiveYears": 3,
+   "years": {
+    "2022": {
+     "returnPct": 0.0034912477553550314,
+     "maxDrawdown": 0.0457283919505832,
+     "partial": false
+    },
+    "2023": {
+     "returnPct": 0.0660735200651612,
+     "maxDrawdown": 0.0357323029935519,
+     "partial": false
+    },
+    "2024": {
+     "returnPct": -0.03573256324952223,
+     "maxDrawdown": 0.06634520501321317,
+     "partial": false
+    },
+    "2025": {
+     "returnPct": 0.025331717362269135,
+     "maxDrawdown": 0.0282057319773662,
+     "partial": false
+    },
+    "2026": {
+     "returnPct": -0.003958729960814034,
+     "maxDrawdown": 0.04130843878833579,
+     "partial": true
+    }
+   },
+   "marketCorrelation": -0.08283123639669954,
+   "closedLegs": 723,
+   "turnover": 40.86626132799718
+  },
+  {
+   "label": "PIT com 20 moedas",
+   "returnPct": 0.1407946570661974,
+   "maxDrawdown": 0.12793786109320737,
+   "sharpeAnnualized": 0.45365596278737913,
+   "positiveYears": 3,
+   "years": {
+    "2022": {
+     "returnPct": -0.006460453235106023,
+     "maxDrawdown": 0.06813413934176382,
+     "partial": false
+    },
+    "2023": {
+     "returnPct": 0.14036558716429415,
+     "maxDrawdown": 0.05406270737210905,
+     "partial": false
+    },
+    "2024": {
+     "returnPct": 0.030277315413380856,
+     "maxDrawdown": 0.051717434097184545,
+     "partial": false
+    },
+    "2025": {
+     "returnPct": 0.014955585448907405,
+     "maxDrawdown": 0.08155112300262413,
+     "partial": false
+    },
+    "2026": {
+     "returnPct": -0.03710919076987684,
+     "maxDrawdown": 0.06379800199055419,
+     "partial": true
+    }
+   },
+   "marketCorrelation": -0.06491524003315,
+   "closedLegs": 983,
+   "turnover": 57.43894231033178
+  },
+  {
+   "label": "PIT com 30 moedas",
+   "returnPct": 0.18297803782696864,
+   "maxDrawdown": 0.14915085743385792,
+   "sharpeAnnualized": 0.4976455650639296,
+   "positiveYears": 4,
+   "years": {
+    "2022": {
+     "returnPct": 0.026682510690356542,
+     "maxDrawdown": 0.06910149442195712,
+     "partial": false
+    },
+    "2023": {
+     "returnPct": 0.10885866448424952,
+     "maxDrawdown": 0.06495730316387882,
+     "partial": false
+    },
+    "2024": {
+     "returnPct": 0.023988417465445888,
+     "maxDrawdown": 0.05721383336201158,
+     "partial": false
+    },
+    "2025": {
+     "returnPct": 0.05680162943229461,
+     "maxDrawdown": 0.09367660683657686,
+     "partial": false
+    },
+    "2026": {
+     "returnPct": -0.03976881747377026,
+     "maxDrawdown": 0.07299866621350537,
+     "partial": true
+    }
+   },
+   "marketCorrelation": -0.06136655565115284,
+   "closedLegs": 1077,
+   "turnover": 63.41737044072
+  },
+  {
+   "label": "PIT só entre as 44 outras",
+   "returnPct": 0.04403023226565001,
+   "maxDrawdown": 0.12494138824469159,
+   "sharpeAnnualized": 0.16568253247825063,
+   "positiveYears": 3,
+   "years": {
+    "2022": {
+     "returnPct": -0.026998504515526434,
+     "maxDrawdown": 0.07664643798034709,
+     "partial": false
+    },
+    "2023": {
+     "returnPct": 0.06471795905392774,
+     "maxDrawdown": 0.08627519119876892,
+     "partial": false
+    },
+    "2024": {
+     "returnPct": 0.026643042765323477,
+     "maxDrawdown": 0.05463379216387476,
+     "partial": false
+    },
+    "2025": {
+     "returnPct": 0.011653773880574647,
+     "maxDrawdown": 0.06632078593958013,
+     "partial": false
+    },
+    "2026": {
+     "returnPct": -0.029683060752807355,
+     "maxDrawdown": 0.06225097108849387,
+     "partial": true
+    }
+   },
+   "marketCorrelation": -0.0807851501733259,
+   "closedLegs": 904,
+   "turnover": 49.55262064169706
+  },
+  {
+   "label": "Universo fixo de 59 (sem filtro)",
+   "returnPct": 0.21162811211750596,
+   "maxDrawdown": 0.191890099778662,
+   "sharpeAnnualized": 0.47982621891795707,
+   "positiveYears": 3,
+   "years": {
+    "2022": {
+     "returnPct": -0.003744356958487849,
+     "maxDrawdown": 0.08920677393127086,
+     "partial": false
+    },
+    "2023": {
+     "returnPct": 0.08180705581746839,
+     "maxDrawdown": 0.10645646768244155,
+     "partial": false
+    },
+    "2024": {
+     "returnPct": 0.10188358409213238,
+     "maxDrawdown": 0.07854937664877071,
+     "partial": false
+    },
+    "2025": {
+     "returnPct": 0.14320343397251545,
+     "maxDrawdown": 0.09271034081050833,
+     "partial": false
+    },
+    "2026": {
+     "returnPct": -0.10753847167464003,
+     "maxDrawdown": 0.16286543965822087,
+     "partial": true
+    }
+   },
+   "marketCorrelation": -0.043542353882814654,
+   "closedLegs": 1192,
+   "turnover": 70.40344650186289
+  },
+  {
+   "label": "15 originais fixas (referência)",
+   "returnPct": 0.2640656445364957,
+   "maxDrawdown": 0.10798548297919541,
+   "sharpeAnnualized": 0.8834760574315046,
+   "positiveYears": 4,
+   "years": {
+    "2022": {
+     "returnPct": 0.0418491232739262,
+     "maxDrawdown": 0.03854429913696411,
+     "partial": false
+    },
+    "2023": {
+     "returnPct": 0.13848172871909847,
+     "maxDrawdown": 0.03850404267671248,
+     "partial": false
+    },
+    "2024": {
+     "returnPct": 0.011276332142054812,
+     "maxDrawdown": 0.044520834752405536,
+     "partial": false
+    },
+    "2025": {
+     "returnPct": 0.07506212559728498,
+     "maxDrawdown": 0.06608660428965951,
+     "partial": false
+    },
+    "2026": {
+     "returnPct": -0.019753439321498978,
+     "maxDrawdown": 0.050946472912311136,
+     "partial": true
+    }
+   },
+   "marketCorrelation": -0.028623292637534846,
+   "closedLegs": 783,
+   "turnover": 49.97257196203244
+  }
+ ],
+ "composition": {
+  "2022": {
+   "refreshes": 14,
+   "shareOriginals": 0.5190476190476191
+  },
+  "2023": {
+   "refreshes": 13,
+   "shareOriginals": 0.5948717948717949
+  },
+  "2024": {
+   "refreshes": 13,
+   "shareOriginals": 0.6820512820512821
+  },
+  "2025": {
+   "refreshes": 13,
+   "shareOriginals": 0.7333333333333333
+  },
+  "2026": {
+   "refreshes": 10,
+   "shareOriginals": 0.7866666666666666
+  }
+ },
+ "datasetHashes": {
+  "AAVEUSDT": "5c75caf4d74efe6153c47c9e5b188cc35f34acfcf2a7e60c1f0513360e792ef9",
+  "AVAXUSDT": "f76076da2b7e6dffd1d7dbcbb4755a6f33891b604c09f435cda5b1e9220ee78a",
+  "BCHUSDT": "1ac8e19392409f0bd4869d60ed847f2710969db5085ee8ef54b2a11b0fa10309",
+  "BTCUSDT": "a6756b85f3d38f119f54d5463fae2e211b3b4dad70b2fe49298a767e9e51cb3f",
+  "DOGEUSDT": "1f6b9e3c6f93fda50693dac022547b5701f4c826746c4ea4339ba4403b82431f",
+  "ETHUSDT": "f6678a6d21be22ee7909269c2998aacc9557ee82d06bb4d0983fcdc0bb56a9d5",
+  "FILUSDT": "d6859e338f81578af9086664342fa3718e7db1053449cc9803174f96cf57602c",
+  "LINKUSDT": "20c32307840788975be244299dd494898d306e6d1fc7afce282354542cd9e5e6",
+  "LTCUSDT": "21a62f5c1ce3fbfa16ee086fff727d956e8576ff7f270bc6690fd4d9cefeed8e",
+  "NEARUSDT": "c4418d34590e1766b4aa28a7a874b1d2a9a5083a3eb9457e77cbf9f0692ab0c0",
+  "SOLUSDT": "3c74a9c67af35b5efde186d51f78f24bb4794d4ba65d23f7bde7472bb99a8c2e",
+  "UNIUSDT": "8ab5a79322a81874b5b65d2c80b34b9ae099b88fa8654a82c5845a2bc7cb2f3e",
+  "XLMUSDT": "325dec8c4f2a539e910422168d2ab9eeb8942e83f34005de1cae1032b33e1b9c",
+  "XRPUSDT": "e630685f5e889cb5e6b781b9e26dca8ba9dbee1028cdc752c1e8df8e5fe189f4",
+  "ZECUSDT": "379584390df97a543757720dab716d7809d8732f1dccabee23097f8c2a86acc8",
+  "RLCUSDT": "2a50974b715fade6ddf365cf1a424bcd21e6e51b54b11d3f91e7563e83ab62da",
+  "OGNUSDT": "d999187bb2d734d698ad74e655eb50c01423805b7c20e416f3626dcccab3a7a2",
+  "BNBUSDT": "2fc0c0e95cf3514fe31f1a75d79f02dfb88ddfb6ac98343d5be88cad8b183d06",
+  "ADAUSDT": "1b8290499979d8398f888ead422f99039dea43b5c6f85c5e2ab3095a8153995c",
+  "SANDUSDT": "1d242246f636faa8fbf6e47c1394a08cc5f2ecc344137d39ff8ea8a4e6dd44bd",
+  "ATOMUSDT": "4879ef4e67deb8ba279b755d9df955574cc92ee6c7e3c95fc53502a97024abec",
+  "DOTUSDT": "96c4d7dd4f06e1d58dde62a8dc5731c6996fe314b2ecb9d942ff1e70bf1ab626",
+  "SKLUSDT": "1bb89d5555a8a96db8f654d8e7f379e5a7d45696875eeb75cdf56b316f9206d3",
+  "GTCUSDT": "ba25a88d87fd3594e01409ec0c46ff4231daccb7f8f93dad7d8533f951cb6270",
+  "CTSIUSDT": "80acec64f10bfafffdca160422fb2d84512ed858a428d8d6993ff45f7d590bfc",
+  "BATUSDT": "dafacf0307d77c4764802405e1e7a7da93c521e076d02aa9b2bec24c10c5fc69",
+  "CRVUSDT": "76eace02e18e980e12f088d6b80633931273783f8b31d4749bc1ca2e21e0f21c",
+  "XMRUSDT": "a21a12d8776de96360352a17fc47a73d8025e644d4d01ab0d8f95a39e5bce674",
+  "HBARUSDT": "98fd4fa07529f4477085c4a6e81dd8ab9b8f345754ca0485b1a5341b499b3540",
+  "ALGOUSDT": "0d11bc9eca5982048559aa86298753f6582d936c6c684bb5064dea3ab3f66040",
+  "TRXUSDT": "9aa6d8638b7a8bb331196cf891960a275e295bfa6a33fbfb7bbcee93afdc78d0",
+  "1000SHIBUSDT": "c7ad531e35c251cf13c690150be10ffac847cfe8ddadc8fdfae73f5ce0d44bb8",
+  "DASHUSDT": "bc9dcaaea2663bbd276f516c097c4946486e3029c1e0e9b98755db01ab4f1100",
+  "ETCUSDT": "cd7cf17b8cfbccbaaf4d76f22aec2500b7264d26b08331fc272431cb76b06fc2",
+  "ONEUSDT": "e2275e941362b8a7a332f1ce3e4689f44c5642ecb4ab46db93e99d2007dcb03d",
+  "VETUSDT": "8ed03215c75f0b2f31794df53bf6295bd6423e9d330ed2f5b7d8dccede09938c",
+  "GALAUSDT": "0cf0d66f43bfde6d4eee9b67bd72007e5895703c5b552e5e46186a33a29ae72b",
+  "ARUSDT": "0c3c3ce123c54e115c597b5c09288f309e52a12528c2c790c154e078f69ef332",
+  "ONTUSDT": "b08bafd9d2e0687e178748b2cc311e96e9339c6b56572a1f4c3e5c6b33fb5c70",
+  "LPTUSDT": "feb100e8ba1a24856d0cd2f140b835d1ebd9ed730cb4c5e62906e866f3b6674b",
+  "AXSUSDT": "50353d1378266977dd59ed4e5afe406e971689b1230fbe39de0f1e4af5aec965",
+  "TRBUSDT": "11c3c28c2a776f4cab520565ffee42d380d52771f89dda283e0650a556774f71",
+  "ZENUSDT": "1bb1847c717dcce7112597656ec6273fb9932006c56aa1cf3a3db76be14777f0",
+  "MANAUSDT": "6006fd1f9a2c3015fff3d44396a4e43a6152ea21dd45a882aac4a944c5940d88",
+  "COTIUSDT": "873e8dab9d3431fd71644d9c626a7f6fa2051fedda6604b087e2a7f7a0ea1f90",
+  "COMPUSDT": "47e3bc788e6520db9e476aa14a5e8699a8e5e77a2c99baa88c8eba59b94cdc76",
+  "RUNEUSDT": "f136148214cb4fd94cb2edd925fd96e575eccfa90dd5a27fd622dd2e7174b48b",
+  "ENJUSDT": "ebb55aa611701a30049d00e95c1a8e4c89529b041f91f081555bc60b4b0662c1",
+  "DYDXUSDT": "739b7d87e1fc2b7dac58b30a94a0b9a0e1bf152da96e405ffca566543dbc2d0c",
+  "CHZUSDT": "4f56ae30387a15f5ad0d837319ce02cbf5c7d7381e3a962a227292c3da743683",
+  "EGLDUSDT": "65128a4fd27575a04981c87cd2168106b12e84859213194b202887a6b9832612",
+  "KAVAUSDT": "b0af2f143eaa7b718572dca60f311d8a47edd2fd075d34b30850e17cb6613939",
+  "CHRUSDT": "557d60573ee81e204ce0eb060e35970171cf05d0fbf6b0ba843d3433b9a9972e",
+  "ENSUSDT": "16192f7e237ae9dbaa8ef66af733935a3868db47ac26016b08d51a3b029c3643",
+  "ALICEUSDT": "17e0e558dbaa8b2d0407777fae3ae05a55148c964d372fb0cd5f73050e4e1d90",
+  "IOTAUSDT": "82fe9736ca9a2f1477ee0a9b100b236a2f00e5e03309fd0b80415c333e12a391",
+  "IOSTUSDT": "996a57e0c14fe9ce67cbe67ca94b7bd781079f01363e9011ef6ad11132372db8",
+  "GRTUSDT": "95dc2f2a86335c5a39016735c97f0790657b9b9c2c60c914b1834caf74115a7f",
+  "CELRUSDT": "e6aa7a1b5fea2a10e20106fedeabf932531d2632e7eacd4e0319d68098815be4"
+ }
+}

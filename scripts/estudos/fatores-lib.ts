@@ -10,7 +10,9 @@ const HOUR=3600000;
 export type Attractiveness=(datasets:Record<string,PerpetualDataset>,symbols:string[],i:number)=>Map<string,number>;
 
 /** Um livro: um sinal que ordena as moedas, quantas comprar e vender e o tamanho de cada posição. */
-export interface Book {signal:Attractiveness;legFraction:number;longCount:number;shortCount:number}
+export interface Book {signal:Attractiveness;legFraction:number;longCount:number;shortCount:number;
+ /** Se presente, restringe a cada decisão as moedas que o livro pode comprar ou vender (universo ponto no tempo). */
+ eligible?:(datasets:Record<string,PerpetualDataset>,symbols:string[],i:number)=>ReadonlySet<string>}
 export type BlendConfig=Omit<CrossSectionalConfig,'longCount'|'shortCount'|'legFraction'>;
 
 /**
@@ -54,7 +56,9 @@ export function simulateBlend(datasets:Record<string,PerpetualDataset>,cfg:Blend
   if(i>=cfg.startBar&&(i-cfg.startBar)%cfg.rebalanceHours===0&&i+1<bars){
    pending=new Map(symbols.map(s=>[s,0]));let record:{long:string[];short:string[]}|null=null;
    for(const book of books){
-    const score=book.signal(datasets,symbols,i),ranked=symbols.map(s=>({s,r:score.get(s)!})).sort((a,b)=>b.r-a.r||a.s.localeCompare(b.s));
+    const allowed=book.eligible?.(datasets,symbols,i),pool=allowed?symbols.filter(s=>allowed.has(s)):symbols;
+    if(pool.length<book.longCount+book.shortCount)throw new Error('eligible universe smaller than the portfolio');
+    const score=book.signal(datasets,symbols,i),ranked=pool.map(s=>({s,r:score.get(s)!})).sort((a,b)=>b.r-a.r||a.s.localeCompare(b.s));
     const long=ranked.slice(0,book.longCount).map(x=>x.s),short=ranked.slice(-book.shortCount).map(x=>x.s),notional=book.legFraction*equity;
     for(const s of long)pending.set(s,pending.get(s)!+notional/datasets[s].trade[i].close);
     for(const s of short)pending.set(s,pending.get(s)!-notional/datasets[s].trade[i].close);

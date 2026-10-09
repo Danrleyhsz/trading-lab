@@ -21,7 +21,7 @@ const P=MOM_METADE,SQRT_YEAR=Math.sqrt(24*365);
 const book=(frac:number):Book[]=>[{signal:momentum(672),legFraction:frac,longCount:5,shortCount:5}];
 
 /** Último fechamento das 15 moedas originais: todos os grupos terminam no mesmo instante. */
-const lastBarOf=()=>JSON.parse(readFileSync(`${dir}/BTCUSDT-1791241200000.json`,'utf8')).trade.at(-1).timestamp as number;
+export const lastBarOf=()=>JSON.parse(readFileSync(`${dir}/BTCUSDT-1791241200000.json`,'utf8')).trade.at(-1).timestamp as number;
 export function downloadRange(symbol:string,lastBar:number){
  const file=`${dir}/outras-${symbol}.json`;if(existsSync(file))return JSON.parse(readFileSync(file,'utf8'));
  const raw:Candle[]=[];let cursor=P.firstBar;
@@ -38,7 +38,7 @@ export function gridRange(raw:Candle[],first:number,last:number){
  return {candles:out,filled};
 }
 /** Carrega um grupo; moedas com dados ruins saem antes de qualquer retorno ser calculado (regra do protocolo). */
-function loadGroup(symbols:string[],lastBar:number){
+export function loadGroup(symbols:string[],lastBar:number){
  const datasets:Record<string,PerpetualDataset>={},dropped:{symbol:string;reason:string}[]=[],quality:Record<string,{filled:number;share:number;fundingMarkFilled:number}>={};
  for(const s of symbols){
   try{
