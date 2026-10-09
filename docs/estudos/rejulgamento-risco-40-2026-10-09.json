@@ -1,0 +1,218 @@
+{
+ "rule": {
+  "from": 0.15,
+  "to": 0.4,
+  "decidedBy": "owner",
+  "decidedAt": "2026-10-09",
+  "postHoc": true
+ },
+ "runAt": "2026-10-09T20:10:44.235Z",
+ "rows": [
+  {
+   "study": "XSMOM_V1 (2 períodos de 6 meses, 10% por posição)",
+   "candidate": "XSMOM_L7",
+   "maxDrawdown": 0.171529065693242,
+   "periodDrawdowns": {
+    "A": 0.1594274289233779,
+    "B": 0.171529065693242
+   },
+   "failedOld": [
+    "BOUNDED_DRAWDOWN_A",
+    "POSITIVE_PNL_B",
+    "BOUNDED_DRAWDOWN_B"
+   ],
+   "failedNew": [
+    "POSITIVE_PNL_B"
+   ]
+  },
+  {
+   "study": "XSMOM_V1 (2 períodos de 6 meses, 10% por posição)",
+   "candidate": "XSMOM_L28",
+   "maxDrawdown": 0.22858603749531003,
+   "periodDrawdowns": {
+    "A": 0.22858603749531003,
+    "B": 0.15845492321944932
+   },
+   "failedOld": [
+    "BOUNDED_DRAWDOWN_A",
+    "BOUNDED_DRAWDOWN_B"
+   ],
+   "failedNew": []
+  },
+  {
+   "study": "XSMOM_LONG_HISTORY_V1 (2022 a ago/2025)",
+   "candidate": "XSMOM_L28",
+   "maxDrawdown": 0.08773707325626035,
+   "failedOld": [
+    "DEFLATED_SHARPE"
+   ],
+   "failedNew": [
+    "DEFLATED_SHARPE"
+   ]
+  },
+  {
+   "study": "FATORES_V1 (2022 a out/2026)",
+   "candidate": "XSMOM_L28",
+   "maxDrawdown": 0.20531314295906256,
+   "failedOld": [
+    "BOUNDED_DRAWDOWN",
+    "DEFLATED_SHARPE"
+   ],
+   "failedNew": [
+    "DEFLATED_SHARPE"
+   ]
+  },
+  {
+   "study": "FATORES_V1 (2022 a out/2026)",
+   "candidate": "XS_CARRY_V1",
+   "maxDrawdown": 0.14909077630682033,
+   "failedOld": [
+    "DEFLATED_SHARPE"
+   ],
+   "failedNew": [
+    "DEFLATED_SHARPE"
+   ]
+  },
+  {
+   "study": "FATORES_V1 (2022 a out/2026)",
+   "candidate": "XS_LOWVOL_V1",
+   "maxDrawdown": 0.4484770497937679,
+   "failedOld": [
+    "POSITIVE_PNL",
+    "BOUNDED_DRAWDOWN",
+    "POSITIVE_YEARS",
+    "DOUBLED_COSTS_POSITIVE",
+    "MARKET_NEUTRAL",
+    "DEFLATED_SHARPE"
+   ],
+   "failedNew": [
+    "POSITIVE_PNL",
+    "BOUNDED_DRAWDOWN",
+    "POSITIVE_YEARS",
+    "DOUBLED_COSTS_POSITIVE",
+    "MARKET_NEUTRAL",
+    "DEFLATED_SHARPE"
+   ]
+  },
+  {
+   "study": "FATORES_V1 (2022 a out/2026)",
+   "candidate": "XS_COMPOSITE_V1",
+   "maxDrawdown": 0.20389956068436477,
+   "failedOld": [
+    "BOUNDED_DRAWDOWN",
+    "MARKET_NEUTRAL",
+    "DEFLATED_SHARPE"
+   ],
+   "failedNew": [
+    "MARKET_NEUTRAL",
+    "DEFLATED_SHARPE"
+   ]
+  },
+  {
+   "study": "COMBO_CARRY_MOM_V1 replay (2022 a out/2026)",
+   "candidate": "COMBO_CARRY_MOM_V1",
+   "maxDrawdown": 0.10444693504065161,
+   "failedOld": [],
+   "failedNew": []
+  },
+  {
+   "study": "RAPIDO_V1 (2022 a out/2026)",
+   "candidate": "XS_REV24_V1",
+   "maxDrawdown": 0.6689720100484082,
+   "failedOld": [
+    "POSITIVE_PNL",
+    "BOUNDED_DRAWDOWN",
+    "POSITIVE_YEARS",
+    "DOUBLED_COSTS_POSITIVE",
+    "BOTH_HALVES_POSITIVE"
+   ],
+   "failedNew": [
+    "POSITIVE_PNL",
+    "BOUNDED_DRAWDOWN",
+    "POSITIVE_YEARS",
+    "DOUBLED_COSTS_POSITIVE",
+    "BOTH_HALVES_POSITIVE"
+   ]
+  },
+  {
+   "study": "RAPIDO_V1 (2022 a out/2026)",
+   "candidate": "XS_REV8_V1",
+   "maxDrawdown": 0.9201934368134883,
+   "failedOld": [
+    "POSITIVE_PNL",
+    "BOUNDED_DRAWDOWN",
+    "POSITIVE_YEARS",
+    "DOUBLED_COSTS_POSITIVE",
+    "BOTH_HALVES_POSITIVE"
+   ],
+   "failedNew": [
+    "POSITIVE_PNL",
+    "BOUNDED_DRAWDOWN",
+    "POSITIVE_YEARS",
+    "DOUBLED_COSTS_POSITIVE",
+    "BOTH_HALVES_POSITIVE"
+   ]
+  },
+  {
+   "study": "RAPIDO_V1 (2022 a out/2026)",
+   "candidate": "XS_MOM72_V1",
+   "maxDrawdown": 0.16360896298061167,
+   "failedOld": [
+    "BOUNDED_DRAWDOWN",
+    "POSITIVE_YEARS",
+    "DOUBLED_COSTS_POSITIVE",
+    "BOTH_HALVES_POSITIVE"
+   ],
+   "failedNew": [
+    "POSITIVE_YEARS",
+    "DOUBLED_COSTS_POSITIVE",
+    "BOTH_HALVES_POSITIVE"
+   ]
+  },
+  {
+   "study": "RAPIDO_V1 (2022 a out/2026)",
+   "candidate": "XS_CARRY72_V1",
+   "maxDrawdown": 0.2686431973927781,
+   "failedOld": [
+    "POSITIVE_PNL",
+    "BOUNDED_DRAWDOWN",
+    "POSITIVE_YEARS",
+    "DOUBLED_COSTS_POSITIVE",
+    "BOTH_HALVES_POSITIVE"
+   ],
+   "failedNew": [
+    "POSITIVE_PNL",
+    "POSITIVE_YEARS",
+    "DOUBLED_COSTS_POSITIVE",
+    "BOTH_HALVES_POSITIVE"
+   ]
+  },
+  {
+   "study": "HOLDOUT_2021_V1 (12/2020 a 12/2021, não visto)",
+   "candidate": "XSMOM_L28",
+   "maxDrawdown": 0.15988905816462562,
+   "failedOld": [
+    "BOUNDED_DRAWDOWN"
+   ],
+   "failedNew": []
+  },
+  {
+   "study": "HOLDOUT_2021_V1 (12/2020 a 12/2021, não visto)",
+   "candidate": "XS_CARRY_V1",
+   "maxDrawdown": 0.3250273227996002,
+   "failedOld": [
+    "BOUNDED_DRAWDOWN"
+   ],
+   "failedNew": []
+  },
+  {
+   "study": "HOLDOUT_2021_V1 (12/2020 a 12/2021, não visto)",
+   "candidate": "COMBO_CARRY_MOM_V1",
+   "maxDrawdown": 0.17377780143998844,
+   "failedOld": [
+    "BOUNDED_DRAWDOWN"
+   ],
+   "failedNew": []
+  }
+ ]
+}
