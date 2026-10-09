@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {pilotReport,PILOT_EVALUATION_PROTOCOL} from '../src/application/pilot-report.js';
+import {pilotReport,equityBeforeStart,PILOT_EVALUATION_PROTOCOL} from '../src/application/pilot-report.js';
 import type {DomainEvent} from '../src/domain/events.js';
 
 const H=3600000,t0=Date.UTC(2026,9,4,23);
@@ -25,4 +25,19 @@ test('verdicts follow the pre-declared protocol',()=>{
  assert.equal(run({autonomous:{enabled:false,eligible:false,stopReason:'PILOT_LOSS_LIMIT',studyId:'s'}}).verdict,'STOPPED_BY_LOSS_LIMIT');
  const live=run({autonomous:{enabled:true,eligible:true,stopReason:null,studyId:'s'}});assert.equal(live.verdict,'IN_PROGRESS');assert.equal(live.provisionalVerdict,'OUTPERFORMED');
  assert.equal((pilotReport({...base,events:[],autonomous:{enabled:true,eligible:true,stopReason:null,studyId:'s'}}) as any).status,'NO_DECISIONS');
+});
+
+test('without an equity point before the start, a flat book keeps the earlier acceptance round trip out of the pilot result',()=>{
+ const fill=(at:number,side:string,price:number,fee:number)=>ev('PAPER_FILL',at,{fill:{side,quantity:0.001,fillPrice:price,fee}});
+ const acceptance=[fill(t0-13*H,'BUY',85299.13,0.0469),fill(t0-13*H+137,'SELL',85281.97,0.0469)];
+ const cost=0.001*(85299.13-85281.97)+0.0469*2,start=1000-cost;
+ assert.equal(equityBeforeStart(acceptance,t0,1000)!.toFixed(4),start.toFixed(4));
+ const r:any=pilotReport({...base,equityPoints:[],ledger:acceptance,equity:start,events:[decision(t0,0)],autonomous:{enabled:true,eligible:true,stopReason:null,studyId:'s'}});
+ assert.equal(r.startEquity.toFixed(4),start.toFixed(4));assert.equal(r.pnl.toFixed(6),'0.000000','no pilot trade, no pilot result');assert.equal(r.fills,0);assert.equal(r.fees,0);
+ // fills after the start are still the pilot's own
+ const own=pilotReport({...base,equityPoints:[],ledger:[...acceptance,fill(t0+H,'BUY',100000,0.05)],equity:start-0.05,events:[decision(t0,1)],autonomous:{enabled:true,eligible:true,stopReason:null,studyId:'s'}}) as any;
+ assert.equal(own.fills,1);assert.equal(own.fees.toFixed(2),'0.05');
+ // an open position at the start cannot be valued from the ledger: the endowment stays
+ assert.equal(equityBeforeStart([fill(t0-H,'BUY',100000,0.05)],t0,1000),1000);
+ assert.equal(equityBeforeStart([],t0,null),null);assert.equal(equityBeforeStart([],t0,1000),1000);
 });
