@@ -558,7 +558,7 @@
    "room": "ring",
    "tile": {
     "i": 3,
-    "j": 24
+    "j": 25
    },
    "kind": "WORK",
    "agent": "nova",
@@ -569,7 +569,7 @@
    "room": "ring",
    "tile": {
     "i": 3,
-    "j": 30
+    "j": 31
    },
    "kind": "WORK",
    "agent": "flux",
@@ -580,7 +580,7 @@
    "room": "ring",
    "tile": {
     "i": 3,
-    "j": 26
+    "j": 27
    },
    "kind": "WORK",
    "agent": "atlas",
@@ -1371,7 +1371,7 @@
    "room": "ring",
    "tile": {
     "i": 0,
-    "j": 23
+    "j": 24
    },
    "footprint": {
     "a": 3,
@@ -1386,7 +1386,7 @@
    "room": "ring",
    "tile": {
     "i": 0,
-    "j": 28
+    "j": 29
    },
    "footprint": {
     "a": 3,
@@ -1454,7 +1454,7 @@
    "asset": "ficus",
    "room": "ring",
    "tile": {
-    "i": 0,
+    "i": 11,
     "j": 32
    },
    "footprint": {
