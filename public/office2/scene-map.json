@@ -557,23 +557,23 @@
    "id": "nova",
    "room": "ring",
    "tile": {
-    "i": 1,
-    "j": 26
+    "i": 3,
+    "j": 24
    },
    "kind": "WORK",
    "agent": "nova",
-   "facing": "NE"
+   "facing": "NW"
   },
   {
    "id": "flux",
    "room": "ring",
    "tile": {
-    "i": 9,
-    "j": 26
+    "i": 3,
+    "j": 30
    },
    "kind": "WORK",
    "agent": "flux",
-   "facing": "NE"
+   "facing": "NW"
   },
   {
    "id": "atlas",
@@ -584,7 +584,7 @@
    },
    "kind": "WORK",
    "agent": "atlas",
-   "facing": "NE"
+   "facing": "NW"
   },
   {
    "id": "euler",
@@ -1374,42 +1374,42 @@
     "j": 23
    },
    "footprint": {
-    "a": 5,
-    "b": 3
+    "a": 3,
+    "b": 5
    },
    "h": 40,
-   "wall": "j0",
-   "flip": true
+   "wall": "i0",
+   "flip": false
   },
   {
    "asset": "mesa-curva-media",
-   "room": "ring",
-   "tile": {
-    "i": 7,
-    "j": 23
-   },
-   "footprint": {
-    "a": 4,
-    "b": 3
-   },
-   "h": 40,
-   "wall": "j0",
-   "flip": true
-  },
-  {
-   "asset": "poltrona",
    "room": "ring",
    "tile": {
     "i": 0,
     "j": 28
    },
    "footprint": {
+    "a": 3,
+    "b": 4
+   },
+   "h": 40,
+   "wall": "i0",
+   "flip": false
+  },
+  {
+   "asset": "poltrona",
+   "room": "ring",
+   "tile": {
+    "i": 8,
+    "j": 23
+   },
+   "footprint": {
     "a": 2,
     "b": 2
    },
    "h": 28,
-   "wall": "i0",
-   "flip": false
+   "wall": "j0",
+   "flip": true
   },
   {
    "asset": "totem-logo",
