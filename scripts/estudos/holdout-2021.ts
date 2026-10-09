@@ -15,7 +15,7 @@ export const HOLDOUT=Object.freeze({version:'HOLDOUT_2021_V1',declaredAt:'2026-1
  measured:{feeRate:0.0005,slippageBps:1},bootstrap:{draws:10000,blockWeeks:4,seed:20201201}});
 const P=HOLDOUT;
 const sleep=(ms:number)=>Atomics.wait(new Int32Array(new SharedArrayBuffer(4)),0,0,ms);
-function get(path:string,params:Record<string,string|number>){
+export function get(path:string,params:Record<string,string|number>){
  const url='https://fapi.binance.com'+path+'?'+new URLSearchParams(Object.entries(params).map(([k,v])=>[k,String(v)]));
  for(let attempt=0;attempt<4;attempt++){
   const out=execFileSync('curl',['-sS','-m','30','-w','\n%{http_code}',url],{encoding:'utf8',maxBuffer:64*1024*1024}),i=out.lastIndexOf('\n'),status=Number(out.slice(i+1));
