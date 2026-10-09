@@ -9,11 +9,20 @@ const HOUR=3600000;
 /** Atratividade de cada moeda na vela de decisão `i`, só com informação até o fechamento de `i`. Maior é melhor. */
 export type Attractiveness=(datasets:Record<string,PerpetualDataset>,symbols:string[],i:number)=>Map<string,number>;
 
-export function simulateFactor(datasets:Record<string,PerpetualDataset>,cfg:CrossSectionalConfig,attractiveness:Attractiveness):CrossSectionalResult{
+/** Um livro: um sinal que ordena as moedas, quantas comprar e vender e o tamanho de cada posição. */
+export interface Book {signal:Attractiveness;legFraction:number;longCount:number;shortCount:number}
+export type BlendConfig=Omit<CrossSectionalConfig,'longCount'|'shortCount'|'legFraction'>;
+
+/**
+ * Simulador de um ou mais livros somados: a posição final de cada moeda é a soma das posições dos livros (compras e vendas de livros
+ * diferentes na mesma moeda se compensam), e a taxa e o slippage incidem só sobre a quantidade líquida negociada. Com um único livro
+ * é exatamente o simulador de momentum original (conferido em test/fatores.test.ts).
+ */
+export function simulateBlend(datasets:Record<string,PerpetualDataset>,cfg:BlendConfig,books:Book[]):CrossSectionalResult{
  const symbols=Object.keys(datasets).sort();
- if(symbols.length<cfg.longCount+cfg.shortCount||cfg.longCount<1||cfg.shortCount<1)throw new Error('universe smaller than the portfolio');
+ if(!books.length||books.some(b=>b.longCount<1||b.shortCount<1)||symbols.length<Math.max(...books.map(b=>b.longCount+b.shortCount)))throw new Error('universe smaller than the portfolio');
  if(![cfg.lookbackHours,cfg.rebalanceHours,cfg.startBar].every(v=>Number.isSafeInteger(v)&&v>0)||cfg.startBar<cfg.lookbackHours)throw new Error('invalid schedule');
- if(!(cfg.legFraction>0&&cfg.legFraction*(cfg.longCount+cfg.shortCount)<=1))throw new Error('gross exposure above 1x');
+ if(!(books.every(b=>b.legFraction>0)&&books.reduce((sum,b)=>sum+b.legFraction*(b.longCount+b.shortCount),0)<=1))throw new Error('gross exposure above 1x');
  if(!(cfg.feeRate>=0&&cfg.slippageBps>=0&&cfg.initialCapital>0))throw new Error('invalid costs');
  const datasetHashes:Record<string,string>={};for(const s of symbols)datasetHashes[s]=validatePerpetualDataset(datasets[s],cfg.maxBars);
  const bars=datasets[symbols[0]].trade.length;
@@ -43,17 +52,24 @@ export function simulateFactor(datasets:Record<string,PerpetualDataset>,cfg:Cros
   const equity=mark(i);
   if(i>=cfg.startBar){equitySeries.push({timestamp:t,equity});peak=Math.max(peak,equity);maxDrawdown=Math.max(maxDrawdown,peak>0?1-equity/peak:0);}
   if(i>=cfg.startBar&&(i-cfg.startBar)%cfg.rebalanceHours===0&&i+1<bars){
-   const score=attractiveness(datasets,symbols,i);
-   const ranked=symbols.map(s=>({s,r:score.get(s)!})).sort((a,b)=>b.r-a.r||a.s.localeCompare(b.s));
-   const long=ranked.slice(0,cfg.longCount).map(x=>x.s),short=ranked.slice(-cfg.shortCount).map(x=>x.s),notional=cfg.legFraction*equity;
-   pending=new Map(symbols.map(s=>[s,0]));
-   for(const s of long)pending.set(s,notional/datasets[s].trade[i].close);
-   for(const s of short)pending.set(s,-notional/datasets[s].trade[i].close);
-   rebalances.push({timestamp:t,long,short});
+   pending=new Map(symbols.map(s=>[s,0]));let record:{long:string[];short:string[]}|null=null;
+   for(const book of books){
+    const score=book.signal(datasets,symbols,i),ranked=symbols.map(s=>({s,r:score.get(s)!})).sort((a,b)=>b.r-a.r||a.s.localeCompare(b.s));
+    const long=ranked.slice(0,book.longCount).map(x=>x.s),short=ranked.slice(-book.shortCount).map(x=>x.s),notional=book.legFraction*equity;
+    for(const s of long)pending.set(s,pending.get(s)!+notional/datasets[s].trade[i].close);
+    for(const s of short)pending.set(s,pending.get(s)!-notional/datasets[s].trade[i].close);
+    if(books.length===1)record={long,short};
+   }
+   rebalances.push({timestamp:t,long:record?.long??symbols.filter(s=>pending!.get(s)!>0),short:record?.short??symbols.filter(s=>pending!.get(s)!<0)});
   }
  }
  const finalEquity=equitySeries.at(-1)?.equity??cfg.initialCapital;
  return {model:'CROSS_SECTIONAL_MOMENTUM_V1',execution:'HISTORICAL_SIMULATION',datasetHashes,equitySeries,finalEquity,netPnl:finalEquity-cfg.initialCapital,maxDrawdown,feesPaid:fees,fundingCashDelta:funding,tradedNotional:traded,closedLegs,rebalances};
+}
+/** Um livro só (o molde do momentum e das candidatas de FATORES_V1). */
+export function simulateFactor(datasets:Record<string,PerpetualDataset>,cfg:CrossSectionalConfig,attractiveness:Attractiveness):CrossSectionalResult{
+ const {longCount,shortCount,legFraction,...rest}=cfg;
+ return simulateBlend(datasets,rest,[{signal:attractiveness,legFraction,longCount,shortCount}]);
 }
 
 /** Retorno de 672 h (o sinal do XSMOM_L28; o controle do estudo). */

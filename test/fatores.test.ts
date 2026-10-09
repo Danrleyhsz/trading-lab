@@ -2,7 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {simulateCrossSectional} from '../src/domain/cross-sectional-momentum.js';
 import type {PerpetualDataset} from '../src/domain/perpetual-backtest.js';
-import {simulateFactor,momentum,lowVolatility,carry,composite,positions,joinBlocks} from '../scripts/estudos/fatores-lib.js';
+import {simulateFactor,simulateBlend,momentum,lowVolatility,carry,composite,positions,joinBlocks} from '../scripts/estudos/fatores-lib.js';
+import {comboForwardFromDatasets,COMBO} from '../scripts/estudos/combo.js';
 
 const H=3600000,T0=Date.UTC(2024,0,1);
 function prng(seed:number){let a=seed>>>0;return ()=>{a=(a+0x6D2B79F5)>>>0;let t=a;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return ((t^(t>>>14))>>>0)/4294967296;};}
@@ -66,4 +67,39 @@ test('junção de blocos recusa lacuna, repetição e funding fora de ordem',()=
  assert.throws(()=>joinBlocks('AAAUSDT',[a,{trade:d.trade.slice(9,20),funding:[]}]),/lacuna ou repetição/);
  const f=[{timestamp:5,rate:0.1,markPrice:1},{timestamp:9,rate:0.1,markPrice:1}];
  assert.throws(()=>joinBlocks('AAAUSDT',[{trade:a.trade,funding:f},{trade:b.trade,funding:[f[1]]}]),/funding repetido/);
+});
+
+test('simulateBlend com um único livro é idêntico ao simulador de um livro',()=>{
+ const d=universe(symbols,1500),{longCount,shortCount,legFraction,...rest}=cfg,a=simulateFactor(d,cfg,momentum(240)),b=simulateBlend(d,rest,[{signal:momentum(240),legFraction,longCount,shortCount}]);
+ assert.deepEqual(b,a);
+});
+
+test('dois livros com sinais opostos se compensam moeda a moeda e o custo incide só sobre a quantidade líquida',()=>{
+ const d=universe(symbols,900),{longCount,shortCount,legFraction,...rest}=cfg,m=momentum(240),inverse=(x:typeof m)=>(dd:any,ss:string[],i:number)=>new Map([...x(dd,ss,i)].map(([s,v])=>[s,-v]));
+ const book=(signal:typeof m)=>({signal,legFraction,longCount,shortCount});
+ // Mesmo livro e o seu inverso: posições finais zero, nada é negociado, o patrimônio fica no capital inicial.
+ const flat=simulateBlend(d,rest,[book(m),book(inverse(m))]);
+ assert.equal(flat.tradedNotional,0);assert.equal(flat.feesPaid,0);assert.equal(flat.fundingCashDelta,0);assert.equal(flat.finalEquity,cfg.initialCapital);
+ // Dois livros iguais com metade do tamanho = um livro inteiro (quantidades somam), com as mesmas taxas.
+ const half=simulateBlend(d,rest,[book(m),book(m)].map(b=>({...b,legFraction:legFraction/2}))),whole=simulateFactor(d,cfg,m);
+ assert.ok(Math.abs(half.finalEquity-whole.finalEquity)<1e-6);assert.ok(Math.abs(half.feesPaid-whole.feesPaid)<1e-6);
+});
+
+test('a soma dos livros não pode ultrapassar 1x de exposição bruta',()=>{
+ const d=universe(symbols,900),{longCount,shortCount,...rest}=cfg;
+ assert.throws(()=>simulateBlend(d,{...rest,startBar:240},[{signal:momentum(240),legFraction:0.1,longCount:3,shortCount:3},{signal:carry(168),legFraction:0.1,longCount:3,shortCount:3}]),/gross exposure/);
+});
+
+test('acompanhamento ao vivo da combinação: espera o início, usa só velas até o fim declarado e é determinístico',()=>{
+ const bars=1700,d=universe(symbols,bars),startBar=1000,proto={...COMBO.forward,firstDecisionBar:T0+startBar*H,weeks:3,symbols:symbols as any};
+ // Antes da primeira execução: aguardando.
+ assert.equal(comboForwardFromDatasets(d,T0+startBar*H,proto).status,'WAITING_START');
+ // Com algumas horas de dados: rodando.
+ const cut=Object.fromEntries(Object.entries(d).map(([s,x])=>[s,{...x,trade:x.trade.slice(0,startBar+100),mark:x.mark.slice(0,startBar+100)}]));
+ const run=comboForwardFromDatasets(cut,T0+(startBar+100)*H,proto);
+ assert.equal(run.status,'RUNNING');assert.equal(run.rebalances,1);assert.ok(run.portfolio&&run.portfolio.long.length>0&&run.portfolio.short.length>0);assert.deepEqual(comboForwardFromDatasets(cut,T0+(startBar+100)*H,proto),run);
+ // Passou do fim (3 semanas = 504 h): concluído, e velas além do fim não mudam nada.
+ const done=comboForwardFromDatasets(d,T0+bars*H,proto),end=startBar+3*168+1;
+ assert.equal(done.status,'COMPLETED');assert.ok(['APPROVED','REJECTED'].includes(done.verdict));assert.equal(done.lastCandle,new Date(T0+(end-1)*H).toISOString());
+ assert.equal(done.rebalances,3);
 });
