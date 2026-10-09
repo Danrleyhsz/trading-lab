@@ -1,10 +1,11 @@
-// Escritório 2.0 (F1): câmera, foco por zona, barra de cima, agentes e painel. Dados só de rotas GET autenticadas;
+// Escritório 2.0: câmera, foco por zona, iluminação, agentes e painel. Dados só de rotas GET autenticadas;
 // sem dado, o elemento diz "sem dado" (UNKNOWN). Passeios de agentes em pausa são cosméticos e rotulados (STATIC).
 (() => {
  const D=globalThis.document;if(!D)return;
  const $=s=>D.querySelector(s),el=(tag,cls,text)=>{const n=D.createElement(tag);if(cls)n.className=cls;if(text!==undefined)n.textContent=text;return n;};
+ const A=globalThis.Office2Ambience;
  const reduced=globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches??false;
- // Fonte prevista e fase de cada módulo (OFFICE_BACKEND_VISUAL_MAP.md). Na F1 os painéis ainda não leem esses dados.
+ // Fontes e fases dos módulos (OFFICE_BACKEND_VISUAL_MAP.md); disponibilidade depende das respostas reais.
  const MODULES={
   MAIN_FLOOR:{name:'Entrada e visão geral',phase:'F1',truth:'REAL',sources:['/finance (equity, P&L do dia, posições)']},
   MARKET_HORIZON:{name:'Horizon · inteligência de mercado',phase:'F5',truth:'REAL',sources:['/market/v3','/market/panorama','/market/venues (referência)']},
@@ -21,11 +22,19 @@
  };
  const STATUS={IDLE:'parado',RESEARCHING:'pesquisando',BACKTESTING:'testando',TRADING:'operando (paper)',REVIEWING_RISK:'revisando risco',MEETING:'em reunião'};
  const state={map:null,iso:null,scene:null,cache:null,agents:new Map(),session:null,market:null,focus:null,camera:{x:0,y:0,s:1},target:null,anim:null,hidden:false};
+ let preferences=null;try{preferences=globalThis.localStorage;}catch{}
+ let lightingMode=A?.read(preferences)??'auto',lightingPhase=A?.phase(lightingMode)??'night';
+ state.lighting={mode:lightingMode,phase:lightingPhase};
  const viewport=$('#viewport'),canvas=$('#scene'),ctx=canvas.getContext('2d'),labels=$('#labels'),panel=$('#panel');
- const loadImage=src=>{const img=new Image();img.decoding='async';img.src=src;return img;};
- const charImages={},images={props:{}};
+ const loadImage=(src,settled)=>{const img=new Image();img.decoding='async';if(settled){img.onload=settled;img.onerror=settled;}img.src=src;return img;};
+ const charImages={},images={props:{},textures:{},characters:{}};
+ /** Ícone da arte (art/icones) ou nada, se o manifesto não carregou: o texto ao lado continua dizendo tudo. */
+ const icon=(name,cls='ico')=>{const info=images.icons?.[name];if(!info)return null;const i=el('img',cls);i.src='/office2/art/'+info.file;i.alt='';i.decoding='async';return i;};
+ const ZONE_EMBLEM={horizon:'zona-horizon',nexus:'zona-nexus',ring:'zona-ring','stress-lab':'zona-lab',risk:'zona-risk',auditoria:'zona-auditoria',diagnostico:'zona-diagnostico',backtest:'zona-backtest','hall-marca':'zona-marca'};
+ // F7: cidade gerada, desenhada como fundo em tela cheia a cada quadro (antes de carregar vale um degradê).
+ images.skylines=Object.fromEntries([['day','dia'],['dusk','entardecer'],['night','noite']].map(([phase,name])=>[phase,loadImage('/office2/art/cidade-'+name+'.png')]));images.skyline=images.skylines.night;
  async function get(path){try{const r=await fetch(path,{credentials:'same-origin',headers:{accept:'application/json'}});if(!r.ok)return {ok:false,status:r.status};return {ok:true,body:await r.json()};}catch{return {ok:false,status:0};}}
- const why=res=>res.status===401||res.status===403?'sem acesso (entre pelo escritório atual)':res.status===404?'rota ainda não publicada em produção (deploy pendente)':res.status===0?'sem conexão':'indisponível (HTTP '+res.status+')';
+ const why=res=>res.status===401||res.status===403?'sem acesso (entre pelo escritório atual)':res.status===404?'fonte não disponível':res.status===0?'sem conexão':'indisponível (HTTP '+res.status+')';
 
  // ---------- F2: Anel de decisão e Execução paper ----------
  const R=globalThis.Office2Ring;
@@ -92,6 +101,8 @@
  const simSeal=text=>{const n=el('span','sim-seal',text);n.dataset.truth='SIMULATION';return n;};
  const truthChip=t=>{const c=el('span','truth',t);c.dataset.truth=t;return c;};
  const PANELS={
+  IDLE_LOUNGE(box){box.append(truthChip('STATIC'),el('p','muted','Área de descanso e convivência. Passeios e pausas dos personagens são decorativos.'));},
+  PANORAMIC_EDGE(box){box.append(truthChip('STATIC'),el('p','muted','Ambiente panorâmico. A cidade e a iluminação acompanham o horário ou o modo de luz escolhido.'));},
   DECISION_RING(box){
    const res=state.ring.receipts;
    if(!res){box.append(el('p','muted','Carregando fichas…'));return;}
@@ -106,7 +117,7 @@
    const newer=Object.assign(el('button','ghost','mais recente →'),{type:'button',disabled:state.ring.index===0,onclick:()=>{state.ring.index--;renderPanel();}});
    nav.append(older,el('span','',(state.ring.index+1)+' de '+list.length+' mais recentes'),newer);box.append(nav);
    const ol=el('ol','stages');
-   for(const s of R.stages(r)){const li=el('li','stage');li.dataset.state=s.state;li.dataset.truth=s.truth;const head=el('div','stage-head');head.append(el('b','',s.label),truthChip(s.truth));li.append(head,el('span','',s.text));if(s.detail)li.append(el('small','',s.detail));ol.append(li);}
+   for(const s of R.stages(r)){const li=el('li','stage');li.dataset.state=s.state;li.dataset.truth=s.truth;const head=el('div','stage-head'),b=el('b','',s.label),ic=icon('estagio-'+s.id);if(ic)b.prepend(ic);head.append(b,truthChip(s.truth));li.append(head,el('span','',s.text));if(s.detail)li.append(el('small','',s.detail));ol.append(li);}
    box.append(ol);
    if(r.team?.length)box.append(el('p','muted','Equipe ('+r.team.length+' mensagens, consultivas): '+r.team.filter(m=>m.kind==='DEBATE').map(m=>m.summary).join(' ').slice(0,220)));
    box.append(el('p','muted','Ligação decisão → ordem por janela de tempo (lacuna L1); sem impressão digital do backend por decisão (L5).'));
@@ -117,7 +128,7 @@
    const vm=stressView();if(!vm){box.append(truthChip('UNKNOWN'),el('p','muted','Relatório do laboratório: '+(res.ok?'formato inesperado':why(res))+'.'));return;}
    box.append(simSeal('SIMULAÇÃO · mercado sintético · semente '+vm.seed),el('p','',vm.headline));
    const dl=el('dl','facts');for(const [k,v] of vm.facts)dl.append(el('dt','',k),el('dd','',v));box.append(dl);
-   const ol=el('ol','scenarios');for(const c of vm.scenarios){const li=el('li','stage');li.dataset.state=c.survived?'ok':'rejected';li.dataset.truth='SIMULATION';const head=el('div','stage-head');head.append(el('b','',c.title),el('span','muted',c.survived?'sobreviveu':'falhou'));li.append(head,el('small','',c.id+' · '+c.line));
+   const ol=el('ol','scenarios');for(const c of vm.scenarios){const li=el('li','stage');li.dataset.state=c.survived?'ok':'rejected';li.dataset.truth='SIMULATION';const head=el('div','stage-head'),t=el('b','',c.title),ic=icon('cenario-'+String(c.id).toLowerCase().replace(/_/g,'-'));if(ic)t.prepend(ic);head.append(t,el('span','muted',c.survived?'sobreviveu':'falhou'));li.append(head,el('small','',c.id+' · '+c.line));
     for(const v of c.violations)li.append(el('small','bad','invariante: '+v));for(const x of c.failed)li.append(el('small','bad','esperado: '+x));ol.append(li);}box.append(ol);
    box.append(el('p','muted','Sobreviver = manter os invariantes e os controles de risco, não ter lucro. Os preços são sintéticos: nada aqui é resultado do piloto ou do mercado. '+vm.version+' · sha256 '+vm.sha.slice(0,12)+'…'));
    const ul=el('ul');for(const t of ['O risco não tem limite de spread (entradas com spread de 2% pagam ~101 bps).','O limite de perda do piloto é checado de hora em hora: num salto de uma hora a perda passa do limite (4,35% contra 3%).','A divergência entre corretoras não é detectada (lacuna L7); só vale “dado de reserva nunca abre posição”.','Kill switch com posição aberta mantém a posição; ele só impede abrir ou aumentar.'])ul.append(el('li','',t));box.append(el('p','muted','Achados documentados (docs/STRESS_LAB.md):'),ul);
@@ -209,22 +220,30 @@
  };
 
  // ---------- câmera ----------
- function overview(){const {w,h}=state.map.projection.scene,vw=viewport.clientWidth,vh=viewport.clientHeight,s=Math.min(vw/w,vh/h);return {s,x:(vw-w*s)/2,y:(vh-h*s)/2};}
- function roomCamera(room){
-  const t=room.tiles,pts=[[t.i0,t.j0],[t.i1,t.j0],[t.i1,t.j1],[t.i0,t.j1]].map(([i,j])=>state.iso.project(i,j));
-  const cx=(Math.min(...pts.map(p=>p.x))+Math.max(...pts.map(p=>p.x)))/2,cy=(Math.min(...pts.map(p=>p.y))+Math.max(...pts.map(p=>p.y)))/2-24;
-  const vw=viewport.clientWidth,vh=viewport.clientHeight,s=vw<900?Math.max(1,Math.floor(overview().s*2)):2;return {s,x:vw/2-cx*s,y:vh/2-cy*s};
- }
+ /** Visão geral: enquadra a planta do andar (com as paredes altas e a borda da laje), não o retângulo inteiro da cena; o fundo cobre o resto. */
+ function overview(){const iso=state.iso,top=iso.project(0,0,102),left=iso.project(0,iso.H),right=iso.project(iso.W,0),bottom=iso.project(iso.W,iso.H);
+  const bounds={x0:left.x-12,x1:right.x+12,y0:(state.scene?.topY??top.y)-14,y1:bottom.y+24},c=Office2Iso.fit(bounds,viewport.clientWidth,viewport.clientHeight,2,16);
+  if(viewport.clientWidth<600)c.y=Math.min(c.y,88-bounds.y0*c.s);return c;}
+ function roomCamera(room){const t=room.tiles,pts=[[t.i0,t.j0],[t.i1,t.j0],[t.i1,t.j1],[t.i0,t.j1]].map(([i,j])=>state.iso.project(i,j));
+  return Office2Iso.fit({x0:Math.min(...pts.map(p=>p.x))-32,x1:Math.max(...pts.map(p=>p.x))+32,y0:Math.min(...pts.map(p=>p.y))-112,y1:Math.max(...pts.map(p=>p.y))+30},viewport.clientWidth,viewport.clientHeight,2.6,32);}
  function moveCamera(to){if(reduced){state.camera=to;return;}const from={...state.camera},start=performance.now();state.anim={from,to,start};}
  function stepCamera(now){const a=state.anim;if(!a)return;const t=Math.min(1,(now-a.start)/320),e=1-Math.pow(1-t,3);
   state.camera={s:a.from.s+(a.to.s-a.from.s)*e,x:a.from.x+(a.to.x-a.from.x)*e,y:a.from.y+(a.to.y-a.from.y)*e};if(t>=1)state.anim=null;}
+ function renderCache(phase=lightingPhase,force=true){
+  const scale=viewport.clientWidth<900?1:2,min=overview().s*.75;
+  const height=Math.ceil(Math.max(state.map.projection.scene.h+720,viewport.clientHeight/(min*2)+state.iso.project(state.iso.W,state.iso.H).y+180)),key=scale+':'+height+':'+phase;
+  if(!force&&state.cacheSpec===key)return state.cache;
+  state.cacheSpec=key;return state.scene.renderStatic(scale,phase,height);
+ }
  function resize(){const dpr=globalThis.devicePixelRatio||1;canvas.width=Math.round(viewport.clientWidth*dpr);canvas.height=Math.round(viewport.clientHeight*dpr);canvas.style.width=viewport.clientWidth+'px';canvas.style.height=viewport.clientHeight+'px';
-  state.camera=state.focus?roomCamera(state.focus):overview();state.anim=null;}
+  state.camera=state.focus?roomCamera(state.focus):overview();state.anim=null;
+  if(state.scene)state.cache=renderCache(lightingPhase,false);}
 
  // ---------- zonas ----------
  function focusRoom(room){
-  state.focus=room;moveCamera(room?roomCamera(room):overview());
-  for(const b of D.querySelectorAll('[data-room]'))b.setAttribute('aria-current',String(!!room&&b.dataset.room===room.id));
+  state.focus=room;viewport.classList.toggle('focused',!!room);moveCamera(room?roomCamera(room):overview());
+  $('#otherRooms').value=room&&['hall-marca','elevadores','cozinha','cafe','varanda','terraco-norte'].includes(room.id)?room.id:'';
+  for(const b of D.querySelectorAll('[data-room]'))b.setAttribute('aria-current',String(room?b.dataset.room===room.id:b.dataset.room===''));
   renderPanel();
   if(room?.module==='DIAGNOSTICS'&&Date.now()-state.ops.parityAt>120000)fetchOps().then(renderPanel);
  }
@@ -238,7 +257,7 @@
    const list=el('ul');for(const s of info.sources)list.append(el('li','',s));box.append(el('p','muted','Fonte prevista:'),list);
    box.append(el('p','muted',info.phase==='F1'?'Sem painel de dados: área de ambiente.':'Painel com dados entra na fase '+info.phase+'. Até lá, as telas desta zona ficam apagadas (sem dado).'));panel.append(box);}
   const screens=state.map.screens.filter(s=>s.room===room.id);
-  if(screens.length){const box=el('section','module');box.append(el('h3','','Telas'));const ul=el('ul');for(const s of screens){const live=!!screenContent()[s.id];const li=el('li','',s.id+' · ');const t=live?s.truth:'UNKNOWN',chip=el('span','truth',t);chip.dataset.truth=t;li.append(chip,D.createTextNode(live?' com dado':' sem dado (fase '+MODULES[s.module].phase+')'));ul.append(li);}box.append(ul);panel.append(box);}
+  if(screens.length){const box=el('section','module');box.append(el('h3','','Telas'));const ul=el('ul');for(const s of screens){const live=!!screenContent()[s.id];const li=el('li','',(screens.length>1?'Tela '+(screens.indexOf(s)+1):'Tela da sala')+' · ');const t=live?s.truth:'UNKNOWN',chip=el('span','truth',t);chip.dataset.truth=t;li.append(chip,D.createTextNode(live?' com dado':' sem dado disponível'));ul.append(li);}box.append(ul);panel.append(box);}
   const here=[...state.agents.values()].filter(a=>state.iso.roomAt(Math.round(a.pos.i),Math.round(a.pos.j))?.id===room.id);
   const box=el('section','module');box.append(el('h3','','Agentes aqui'));
   if(!state.agentsReal)box.append(el('p','muted','Sem dado de agentes (sem acesso ou rota indisponível).'));
@@ -258,7 +277,7 @@
   }
   for(const [id,ag] of state.agents)if(!seen.has(id)){ag.plate.remove();state.agents.delete(id);}
  }
- function occupied(except){return [...state.agents.values()].filter(a=>a!==except).map(a=>({i:Math.round(a.pos.i),j:Math.round(a.pos.j)}));}
+ function occupied(except){return [...state.agents.values()].filter(a=>a!==except).flatMap(a=>[{i:Math.round(a.pos.i),j:Math.round(a.pos.j)},...(a.path.length?[a.path.at(-1)]:[])]);}
  function walkTo(ag,goal){const from={i:Math.round(ag.pos.i),j:Math.round(ag.pos.j)};const path=state.iso.plan(from,goal,occupied(ag));if(path.length>1){ag.path=path.slice(1);ag.mode='walk';ag.legStart=performance.now();ag.legFrom={...from};return true;}return false;}
  const idlePoints=()=>state.map.points.filter(p=>p.kind==='IDLE');
  function tickAgent(ag,now){
@@ -276,20 +295,27 @@
    if(t>=1){ag.path.shift();ag.legFrom={...next};ag.legStart=now;if(!ag.path.length){ag.mode='idle';if(ag.pause&&ag.pause.until===Infinity)ag.pause.until=now+20000+ag.rnd()*20000;}}}
  }
  function placePlate(ag){ag.plate.hidden=tiny();const c=state.camera,p=state.iso.project(ag.pos.i+0.5,ag.pos.j+0.5,state.map.projection.personHeightPx+10);
+  ag.plate.dataset.focused=String(state.iso.roomAt(Math.round(ag.pos.i),Math.round(ag.pos.j))?.id===state.focus?.id);
   ag.plate.style.transform=`translate(${Math.round(p.x*c.s+c.x)}px,${Math.round(p.y*c.s+c.y)}px) translate(-50%,-100%)`;
   const label=ag.name+(ag.pause?' · pausa':'');if(ag.plate.textContent!==label)ag.plate.textContent=label;ag.plate.dataset.truth=ag.pause?'STATIC':'REAL';}
 
  // ---------- rótulos das zonas (L7) ----------
  const zoneLabels=[];
- function buildZoneLabels(){for(const r of state.map.rooms){if(r.module==='PANORAMIC_EDGE'&&r.outdoor&&r.id==='terraco-norte')continue;const n=el('button','zone-label',r.label);n.type='button';n.dataset.truth='STATIC';n.onclick=()=>focusRoom(r);labels.append(n);
-   const brand=r.edges?.j0==='parede-marca';if(brand){const b=el('div','brand','TRADINGLAB');b.dataset.truth='STATIC';labels.append(b);zoneLabels.push({node:b,room:r,brand:true});}
+ function buildZoneLabels(){for(const r of state.map.rooms){if(r.module==='PANORAMIC_EDGE'&&r.outdoor&&r.id==='terraco-norte')continue;const n=el('button','zone-label',r.label);n.type='button';const em=ZONE_EMBLEM[r.id]&&icon(ZONE_EMBLEM[r.id],'ico emblem');if(em)n.prepend(em);n.dataset.truth='STATIC';n.onclick=()=>focusRoom(r);labels.append(n);
+   // Placas são pintadas na parede; a navegação equivalente fica na barra e no seletor de ambientes.
+   if(state.scene.signs.includes(r.id)){n.classList.add('on-wall');n.tabIndex=-1;n.setAttribute('aria-hidden','true');}
    zoneLabels.push({node:n,room:r});}}
  // Abaixo de 0,45 (celular na visão geral) os rótulos se sobrepõem: some o texto e a navegação fica na barra.
 const tiny=()=>state.camera.s<0.45;
-function placeZoneLabels(){const c=state.camera;for(const z of zoneLabels){z.node.hidden=tiny();const t=z.room.tiles,mid=state.iso.project((t.i0+t.i1)/2,t.j0,z.brand?56:80);z.node.style.transform=`translate(${Math.round(mid.x*c.s+c.x)}px,${Math.round(mid.y*c.s+c.y)}px) translate(-50%,-100%)`;z.node.style.fontSize=Math.max(10,Math.min(16,11*c.s))+'px';}}
+function placeZoneLabels(){const c=state.camera;for(const z of zoneLabels){z.node.hidden=tiny();z.node.dataset.focused=String(z.room.id===state.focus?.id);const t=z.room.tiles,mid=state.iso.project((t.i0+t.i1)/2,t.j0,z.brand?56:80);z.node.style.transform=`translate(${Math.round(mid.x*c.s+c.x)}px,${Math.round(mid.y*c.s+c.y)}px) translate(-50%,-100%)`;z.node.style.fontSize=Math.max(10,Math.min(16,11*c.s))+'px';}}
 
  // ---------- barra de cima ----------
- function clock(){const now=new Date();$('#clockDate').textContent=now.toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'short'});$('#clockTime').textContent=now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});}
+ function updateLighting(){
+  const next=A?.phase(lightingMode)??'night';$('#lightingMode').value=lightingMode;
+  viewport.dataset.lighting=next;state.lighting={mode:lightingMode,phase:next};
+  if(state.scene&&next!==lightingPhase){state.transition=reduced?null:{from:lightingPhase,start:performance.now(),cache:state.cache};lightingPhase=next;state.cache=renderCache(next);}
+ }
+ function clock(){const now=new Date();updateLighting();$('#clockDate').textContent=now.toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'short'});$('#clockTime').textContent=now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});}
  function chip(node,text,truth){node.textContent=text;node.dataset.truth=truth;}
  async function refresh(){
   const auth=await get('/auth/status');
@@ -306,30 +332,61 @@ function placeZoneLabels(){const c=state.camera;for(const z of zoneLabels){z.nod
 
  // ---------- laço ----------
  function frame(now){
-  if(state.hidden)return;stepCamera(now);
+  if(state.hidden)return;
+  if(state.lastFrame&&now-state.lastFrame<32){requestAnimationFrame(frame);return;}state.lastFrame=now;stepCamera(now);
   for(const ag of state.agents.values())tickAgent(ag,now);
-  const dpr=globalThis.devicePixelRatio||1,c=state.camera;ctx.setTransform(1,0,0,1,0,0);ctx.fillStyle='#0b1426';ctx.fillRect(0,0,canvas.width,canvas.height);
+  const dpr=globalThis.devicePixelRatio||1,c=state.camera;const transition=state.transition?{from:state.transition.from,progress:Math.min(1,(now-state.transition.start)/850)}:null;
+  state.scene.backdrop.draw(ctx,canvas.width,canvas.height,c,reduced?0:now,dpr,lightingPhase,transition);
   ctx.imageSmoothingEnabled=false;ctx.setTransform(c.s*dpr,0,0,c.s*dpr,c.x*dpr,c.y*dpr);
-  state.scene.draw(ctx,state.cache,[...state.agents.values()],globalThis.OfficeSpriteSheets,charImages,screenContent());
+  state.scene.draw(ctx,state.cache,[...state.agents.values()],globalThis.OfficeSpriteSheets,charImages,screenContent(),state.focus?.id,state.transition?.cache,transition?.progress);
+  if(transition?.progress===1)state.transition=null;
   for(const ag of state.agents.values())placePlate(ag);placeZoneLabels();
   requestAnimationFrame(frame);
  }
- function onClick(ev){const r=canvas.getBoundingClientRect(),c=state.camera,x=(ev.clientX-r.left-c.x)/c.s,y=(ev.clientY-r.top-c.y)/c.s;const t=state.iso.tileAt(x,y);const room=t&&state.iso.roomAt(t.i,t.j);if(room)focusRoom(room);else if(state.focus)focusRoom(null);}
+ /** Arrastar move a visão; a roda aproxima no ponto do mouse. Um arrasto não conta como clique numa sala. */
+ const drag={on:false,moved:false,x:0,y:0};
+ function clampCamera(c){const iso=state.iso,vw=viewport.clientWidth,vh=viewport.clientHeight,l=iso.project(0,iso.H).x,r=iso.project(iso.W,0).x,t=state.scene?.topY??iso.project(0,0,84).y,b=iso.project(iso.W,iso.H).y+60;
+  c.x=Math.min(vw*0.5-l*c.s,Math.max(vw*0.5-r*c.s,c.x));c.y=Math.min(vh*0.5-t*c.s,Math.max(vh*0.5-b*c.s,c.y));return c;}
+ function onPointer(ev){if(ev.type==='pointerdown'){drag.on=true;drag.moved=false;drag.x=ev.clientX;drag.y=ev.clientY;return;}
+  if(ev.type==='pointermove'&&drag.on){const dx=ev.clientX-drag.x,dy=ev.clientY-drag.y;if(!drag.moved&&Math.hypot(dx,dy)<5)return;drag.moved=true;drag.x=ev.clientX;drag.y=ev.clientY;state.anim=null;
+   state.camera=clampCamera({...state.camera,x:state.camera.x+dx,y:state.camera.y+dy});canvas.style.cursor='grabbing';return;}
+  if(ev.type==='pointerup'||ev.type==='pointercancel'){drag.on=false;canvas.style.cursor='';}}
+ function onWheel(ev){ev.preventDefault();const r=canvas.getBoundingClientRect(),c=state.camera,mx=ev.clientX-r.left,my=ev.clientY-r.top,min=overview().s*0.75,s=Math.min(3,Math.max(min,c.s*Math.exp(-ev.deltaY*0.0015)));
+  state.anim=null;state.camera=clampCamera({s,x:mx-(mx-c.x)*s/c.s,y:my-(my-c.y)*s/c.s});}
+ function onClick(ev){if(drag.moved){drag.moved=false;return;}const r=canvas.getBoundingClientRect(),c=state.camera,x=(ev.clientX-r.left-c.x)/c.s,y=(ev.clientY-r.top-c.y)/c.s;const t=state.iso.tileAt(x,y);const room=t&&state.iso.roomAt(t.i,t.j);if(room)focusRoom(room);else if(state.focus)focusRoom(null);}
 
  async function start(){
   const res=await get('/office2/scene-map.json');if(!res.ok){$('#agentsStatus').hidden=false;$('#agentsStatus').textContent='Mapa da cena indisponível.';return;}
   state.map=res.body;state.iso=Office2Iso.create(state.map);
+  // F7: móveis e ícones recortados das folhas do ChatGPT; sem o manifesto, ficam os blocos.
+  const [art,supports]=await Promise.all([get('/office2/art/manifesto.json'),get('/office2/art/apoios.json')]);if(supports.ok)images.supports=supports.body.supports;
+  if(art.ok){images.propInfo=art.body.props;images.icons=art.body.icons;for(const [name,info] of Object.entries(art.body.props))images.props[name]=loadImage('/office2/art/'+info.file);
+   images.emblems={};for(const [room,name] of Object.entries(ZONE_EMBLEM))if(images.icons[name])images.emblems[room]=loadImage('/office2/art/'+images.icons[name].file);
+   // Ícone em cada aba da barra (Início usa o emblema da marca).
+   for(const b of D.querySelectorAll('nav [data-room]')){const ic=icon(ZONE_EMBLEM[b.dataset.room||'hall-marca']??'','ico tab')??globalThis.Office2NavIcons?.node(b.dataset.room,D);if(ic)b.prepend(ic);}}
   for(const id of Object.keys(globalThis.OfficeSpriteSheets??{}))charImages[id]=loadImage('/office/characters/'+id+'.png');
-  state.scene=Office2Scene.create(state.map,state.iso,images);state.cache=state.scene.renderStatic(2);
+  const frames=await get('/office2/art/personagens/quadros.json');
+  if(frames.ok){images.characterFrames=frames.body;for(const id of frames.body.ids)images.characters[id]=loadImage('/office2/art/personagens/'+id+'.png');}
+  const textureLoads=['piso-marmore','piso-madeira','carpete','deck','parede-ripada','parede-escura'].map(name=>new Promise(resolve=>{
+   images.textures[name]=loadImage('/office2/art/texturas/'+name+'.png',resolve);
+  }));
+  state.scene=Office2Scene.create(state.map,state.iso,images);state.cache=renderCache();
+  Promise.all(textureLoads).then(()=>{state.cache=renderCache();});
   buildZoneLabels();resize();
+  $('#otherRooms').addEventListener('change',e=>{const room=state.map.rooms.find(r=>r.id===e.target.value);if(room)focusRoom(room);});
+  $('#lightingMode').addEventListener('change',e=>{lightingMode=A?.save(preferences,e.target.value)??e.target.value;updateLighting();});
+  for(const b of D.querySelectorAll('[data-zoom]'))b.addEventListener('click',()=>{const c=state.camera,x=viewport.clientWidth/2,y=viewport.clientHeight/2,s=Math.max(overview().s*.75,Math.min(3,c.s*Number(b.dataset.zoom)));moveCamera(clampCamera({s,x:x-(x-c.x)*s/c.s,y:y-(y-c.y)*s/c.s}));});
+  $('#fitView').addEventListener('click',()=>moveCamera(state.focus?roomCamera(state.focus):overview()));
   for(const b of D.querySelectorAll('[data-room]'))b.addEventListener('click',()=>{const id=b.dataset.room;focusRoom(id?state.map.rooms.find(r=>r.id===id):null);});
-  $('#moreZones').addEventListener('change',e=>{const r=state.map.rooms.find(x=>x.id===e.target.value);if(r)focusRoom(r);e.target.value='';});
   canvas.addEventListener('click',onClick);
+  for(const t of ['pointerdown','pointermove','pointerup','pointercancel'])canvas.addEventListener(t,onPointer);canvas.addEventListener('wheel',onWheel,{passive:false});
   D.addEventListener('keydown',e=>{if(e.key==='Escape'&&state.focus)focusRoom(null);});
   // O painel abre e fecha ao lado da cena: o tamanho da área da cena é observado, não só o da janela.
   if(globalThis.ResizeObserver)new ResizeObserver(()=>resize()).observe(viewport);else globalThis.addEventListener('resize',resize);
   D.addEventListener('visibilitychange',()=>{state.hidden=D.hidden;if(!D.hidden)requestAnimationFrame(frame);});
   clock();setInterval(clock,15000);await refresh();setInterval(refresh,15000);
+  // Endereço #sala (ex.: /office2/#ring) abre direto na sala.
+  const wanted=state.map.rooms.find(r=>r.id===decodeURIComponent((globalThis.location?.hash??'').slice(1)));if(wanted)focusRoom(wanted);
   requestAnimationFrame(frame);
  }
  globalThis.Office2={state,focusRoom,MODULES};

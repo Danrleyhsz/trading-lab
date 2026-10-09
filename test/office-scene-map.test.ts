@@ -39,10 +39,10 @@ test('os 8 agentes têm posto de trabalho, os pontos ficam dentro das salas e as
  const room=(id:string)=>map.rooms.find(r=>r.id===id)!;
  assert.deepEqual(map.points.filter(p=>p.agent).map(p=>p.agent).sort(),['atlas','euler','flux','nova','oracle','satoshi','sentinel','vega']);
  for(const p of map.points)assert.ok(inside(room(p.room).tiles,p.tile.i,p.tile.j),p.id);
- for(const s of map.screens){const t=room(s.room).tiles;assert.equal(s.wall,'j0');assert.ok(s.tiles.from>=t.i0&&s.tiles.to<=t.i1&&s.tiles.from<s.tiles.to,s.id);assert.ok(['REAL','SIMULATION'].includes(s.truth),s.id);}
+ for(const s of map.screens){const t=room(s.room).tiles;assert.ok(['j0','i0'].includes(s.wall));const lo=s.wall==='j0'?t.i0:t.j0,hi=s.wall==='j0'?t.i1:t.j1;assert.ok(s.tiles.from>=lo&&s.tiles.to<=hi&&s.tiles.from<s.tiles.to,s.id);assert.ok(['REAL','SIMULATION'].includes(s.truth),s.id);}
 });
 
-test('a projeção 2:1 coloca a planta inteira dentro da cena de 1536 × 864, com espaço para as paredes',()=>{
+test('a projeção 2:1 coloca a planta inteira dentro da cena declarada, com espaço para as paredes',()=>{
  const {tile,origin,scene,wallHeight}=map.projection,at=(i:number,j:number)=>({x:origin.x+(i-j)*tile.w/2,y:origin.y+(i+j)*tile.h/2});
  assert.equal(tile.w,tile.h*2);
  const corners=[at(0,0),at(W,0),at(W,H),at(0,H)];
@@ -50,11 +50,18 @@ test('a projeção 2:1 coloca a planta inteira dentro da cena de 1536 × 864, co
  assert.ok(at(0,0).y-wallHeight>=0,'parede do fundo cabe acima da laje');
 });
 
-test('móveis ficam dentro da sala, sem sobreposição, sem ocupar posto, ponto de lazer ou porta',()=>{
- const props=(map as any).props as {asset:string;room:string;tile:{i:number;j:number};footprint:{a:number;b:number};h:number}[];
+test('móveis sólidos ficam dentro da sala, sem sobreposição, postos ou portas; tapete é camada de piso',()=>{
+ const props=(map as any).props as {asset:string;room?:string;tile:{i:number;j:number};footprint:{a:number;b:number};h:number;blocking?:boolean}[];
  const room=(id:string)=>map.rooms.find(r=>r.id===id)!,taken=new Set<string>();
  for(const p of props){assert.ok(p.h>0&&p.footprint.a>0&&p.footprint.b>0,p.asset);
-  for(let i=p.tile.i;i<p.tile.i+p.footprint.a;i++)for(let j=p.tile.j;j<p.tile.j+p.footprint.b;j++){assert.ok(inside(room(p.room).tiles,i,j),p.asset+' fora de '+p.room);assert.ok(!taken.has(i+','+j),'sobreposição em '+i+','+j);taken.add(i+','+j);}}
+  if(p.blocking===false){assert.equal(p.asset,'tapete');assert.ok(p.h<=2);}
+  for(let i=p.tile.i;i<p.tile.i+p.footprint.a;i++)for(let j=p.tile.j;j<p.tile.j+p.footprint.b;j++){
+   assert.ok(i>=0&&j>=0&&i<W&&j<H,p.asset+' fora da planta');
+   if(p.room)assert.ok(inside(room(p.room).tiles,i,j),p.asset+' fora de '+p.room);
+   else assert.ok(!map.rooms.some(r=>inside(r.tiles,i,j)),p.asset+' de corredor dentro de sala');
+   if(p.blocking===false)continue;
+   assert.ok(!taken.has(i+','+j),'sobreposição em '+i+','+j);taken.add(i+','+j);
+  }}
  for(const pt of map.points)assert.ok(!taken.has(pt.tile.i+','+pt.tile.j),pt.id);
  for(const r of map.rooms)for(const d of r.doors??[]){const t=r.tiles,a=d.side==='i0'?[t.i0,d.at]:d.side==='i1'?[t.i1-1,d.at]:d.side==='j0'?[d.at,t.j0]:[d.at,t.j1-1];assert.ok(!taken.has(a.join(',')),'porta de '+r.id);}
 });
