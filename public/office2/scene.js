@@ -73,7 +73,8 @@
    const run=(side,lo,hi,blocked)=>{let best=null,start=null;for(let k=lo;k<=hi;k++){const ok=k<hi&&!blocked(k);if(ok&&start===null)start=k;if(!ok&&start!==null){if(!best||k-start>best.to-best.from)best={side,from:start,to:k};start=null;}}return best;};
    const seg=(side,k)=>side==='j0'?[k,t.j0,k+1,t.j0]:[t.i0,k,t.i0,k+1];
    const has=(side,k)=>{const w=uniq.get(seg(side,k).join(','));return !!w&&!w.glass&&w.h>=TALL;};
-   let pick=run('j0',t.i0,t.i1,k=>busy.has(k)||!has('j0',k));
+   // Sala com telas na parede j0: a placa vira faixa em cima delas (nunca uma placa curta espremida atrás de um móvel).
+   let pick=busy.size?null:run('j0',t.i0,t.i1,k=>busy.has(k)||!has('j0',k));
    if(!pick||pick.to-pick.from<3){const alt=run('i0',t.j0,t.j1,k=>busyI.has(k)||!has('i0',k));if(alt&&alt.to-alt.from>=3&&(!pick||alt.to-alt.from>pick.to-pick.from))pick=alt;}
    if(!pick||pick.to-pick.from<3){
     // Parede de fundo tomada por telas: a placa vira uma faixa iluminada em cima delas (maior trecho sólido da parede j0).
@@ -227,7 +228,7 @@
   }
   /** Tela de parede: apagada e listrada quando não há dado (UNKNOWN); o conteúdo real entra nas fases F2–F5. */
   function drawScreen(ctx,s,content){
-   const r=roomById.get(s.room),J=r.tiles.j0,I=r.tiles.i0,bottom=12;
+   const r=roomById.get(s.room),J=r.tiles.j0,I=r.tiles.i0,bottom=22;
    const pts=s.wall==='i0'?[P(I,s.tiles.to-.15,bottom+s.heightPx),P(I,s.tiles.from+.15,bottom+s.heightPx),P(I,s.tiles.from+.15,bottom),P(I,s.tiles.to-.15,bottom)]:[P(s.tiles.from+0.15,J,bottom+s.heightPx),P(s.tiles.to-0.15,J,bottom+s.heightPx),P(s.tiles.to-0.15,J,bottom),P(s.tiles.from+0.15,J,bottom)];
    poly(ctx,pts,C.screenFrame);const inner=pts.map((p,k)=>({x:p.x+(k===0||k===3?2:-2),y:p.y+(k<2?2:-2)}));poly(ctx,inner,C.screenOff);
    // Conteúdo real desenhado por cima; se a função disser que não há dado (false), a tela volta a ficar apagada.
@@ -294,11 +295,11 @@
    for(const pt of postList)items.push({key:pt.i+pt.j-.4,room:pt.room,wall:true,draw:()=>drawPost(ctx,pt)});
    for(const s of map.screens){const r=roomById.get(s.room);items.push({key:(s.tiles.to-1)+(s.wall==='i0'?r.tiles.i0:r.tiles.j0)-0.4,room:s.room,wall:true,draw:()=>drawScreen(ctx,s,screenContent?.[s.id])});}
    // Tapetes ficam no chão, antes de toda a mobília, e não bloqueiam a circulação.
-   for(const p of map.props??[])if(p.blocking===false)drawProp(ctx,p);else items.push({key:iso.propDepth(p)+0.1,room:p.room,draw:()=>drawProp(ctx,p)});
+   for(const p of map.props??[])if(p.blocking===false)drawProp(ctx,p);else items.push({key:iso.propDepth(p)+0.1,room:p.room,prop:true,draw:()=>drawProp(ctx,p)});
    // Cadeiras dos postos são decoração sobre tiles andáveis, com os mesmos apoios das peças normais.
-   for(const p of map.points.filter(p=>p.kind==='WORK'))items.push({key:iso.depth(p.tile.i,p.tile.j)+.2,room:p.room,draw:()=>drawProp(ctx,{asset:'cadeira-costas',tile:p.tile,footprint:{a:1,b:1},h:26})});
+   for(const p of map.points.filter(p=>p.kind==='WORK'))items.push({key:iso.depth(p.tile.i,p.tile.j)+.2,room:p.room,prop:true,draw:()=>drawProp(ctx,{asset:'cadeira-costas',tile:p.tile,footprint:{a:1,b:1},h:26})});
    for(const ag of agents)items.push({key:iso.depth(ag.pos.i,ag.pos.j)+0.3,room:iso.roomAt(Math.round(ag.pos.i),Math.round(ag.pos.j))?.id,draw:()=>drawAgent(ctx,ag,sheets,charImages)});
-   items.sort((x,y)=>x.key-y.key);for(const it of items){if(focus&&it.wall&&it.room!==focus)continue;ctx.save();if(focus&&it.room!==focus)ctx.globalAlpha=.22;if(it.fade)ctx.globalAlpha*=.3;it.draw();ctx.restore();}
+   items.sort((x,y)=>x.key-y.key);for(const it of items){if(focus&&(it.wall||it.prop)&&it.room!==focus)continue;ctx.save();if(focus&&it.room!==focus)ctx.globalAlpha=.22;if(it.fade)ctx.globalAlpha*=.3;it.draw();ctx.restore();}
   }
   const topY=Math.min(...wallList.map(w=>P(w.a.i,w.a.j,w.h+HEAD).y));
   return {renderStatic,draw,topY,walls:wallList,posts:postList.map(p=>({i:p.i,j:p.j,h:p.h,door:p.door})),signs:signs.map(s=>s.room),backdrop:createBackdrop(images)};

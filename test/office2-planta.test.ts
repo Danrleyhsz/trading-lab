@@ -81,3 +81,18 @@ test('F8: o endereço #sala abre a sala direto, e um endereço desconhecido é i
   assert.equal(context.Office2.state.focus?.id,expected,hash);
  }
 });
+
+test('F8: móveis com frente ficam de costas para uma parede de trás, com a orientação certa, e nada grande fica solto no meio da sala',()=>{
+ // arte: frente para +i, costas para −i; espelhada, frente para +j. Logo: parede j0 → espelhado; parede i0 → sem espelho.
+ const direcionais=new Set(['sofa','sofa-cinza','sofa-externo','poltrona','poltrona-externa','estacao-2-monitores','estacao-madeira','mesa-curva-operacoes','mesa-curva-media','armarios-arquivo','lockers','estante-arquivo','armario-baixo','bancada-cozinha','geladeira','parede-elevadores','rack-servidor','esteira']);
+ const soltos=new Set(['tapete','mesa-centro','mesa-reuniao','mesa-reuniao-6','mesa-cafe-4','balcao-recepcao','catraca','banqueta','mesa-externa','bancada-teste']);
+ for(const p of map.props.filter((p:any)=>p.room&&p.blocking!==false)){
+  const t=map.rooms.find((r:any)=>r.id===p.room).tiles,{i,j}=p.tile,{a,b}=p.footprint;
+  if(direcionais.has(p.asset)){assert.ok(p.wall==='j0'||p.wall==='i0',`${p.asset} (${i},${j}) sem parede declarada`);
+   assert.ok((p.wall==='j0'?j-t.j0:i-t.i0)<=1,`${p.asset} (${i},${j}) longe da parede ${p.wall}`);
+   if(!p.faceWall)assert.equal(Boolean(p.flip),p.wall==='j0',`${p.asset} (${i},${j}) com orientação errada para ${p.wall}`);}
+  if(!soltos.has(p.asset))assert.ok(Math.min(i-t.i0,j-t.j0,t.i1-(i+a),t.j1-(j+b))<=1,`${p.asset} (${i},${j}) solto no meio de ${p.room}`);
+ }
+ // as telas de dados ficam acima dos móveis baixos: faixa de 22 a 70 px
+ assert.match(readFileSync('public/office2/scene.js','utf8'),/bottom=22;/);
+});

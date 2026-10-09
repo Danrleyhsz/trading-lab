@@ -30,8 +30,8 @@ Todas são conferidas por `scripts/assets/office2-layout.mjs` (que recusa gravar
 3. **Duas fileiras atrás de parede alta ficam livres.** Uma parede de 72 px esconde 24 px de altura por tile de distância; objeto a menos de 3 tiles atrás dela fica quase todo escondido. O autor da planta mede, móvel por móvel, quanto sobraria à vista e recusa o que ficaria quase todo atrás da parede. Por isso o fundo de cada linha de salas tem faixa de piso livre e os corredores têm 3 a 4 tiles.
 4. **Cada sala declara as bordas.** `edges` diz o tipo de cada lado; sem tipo, não há parede. Tipos: `parede-painel`, `parede-marca`, `fachada-vidro`, `divisoria-vidro`, `divisoria-vidro-baixa`, `guarda-corpo-vidro`, `divisoria-baixa`, `aberta`.
 5. **Portas e circulação.** Cada porta tem um tile livre dentro e outro fora. Todos os postos e pontos de lazer têm rota a partir da chegada, e nenhuma sala fica com menos de 35% do piso livre.
-6. **Móveis na grade.** Cada móvel tem posição e ocupação em tiles; não há sobreposição, nem sobre porta ou posto. Um posto de trabalho fica de frente para a mesa.
-7. **Telas só com dado real.** As dez telas ficam na parede `j0`; sem dado, apagadas.
+6. **Móveis encostados nas paredes, com a frente para a sala.** Cada peça com frente (sofá, poltrona, mesa de trabalho, arquivo, armário, bancada, geladeira, esteira) declara a parede em que apoia as costas. A arte de todas vem desenhada com a frente para +i e as costas para −i; espelhada, a frente olha para +j. Logo, **parede de fundo direita (`j0`): espelhada, de frente para o sudoeste; parede de fundo esquerda (`i0`): sem espelho, de frente para o sudeste.** A orientação sai da parede, e não do formato do retângulo. Como só existem frentes voltadas para a câmera, peça com frente não vai nas bordas da frente. A folga até a parede é de no máximo 1 tile, e o centro da sala fica livre. Exceções por natureza: tapete, mesa de centro, mesas de reunião e de café, balcão da recepção, catracas, banquetas e a bancada de testes. Cada móvel tem posição e ocupação em tiles, sem sobreposição, sem tapar porta ou posto, e um posto de trabalho fica de frente para a mesa.
+7. **Telas só com dado real, e visíveis.** As dez telas ficam na parede `j0`, na faixa de 22 a 70 px de altura, acima dos móveis baixos; nada alto fica na frente de uma tela. Sem dado, ficam apagadas. Sala com tela leva a placa em faixa por cima dela.
 
 ## Desenho
 
@@ -39,6 +39,7 @@ Todas são conferidas por `scripts/assets/office2-layout.mjs` (que recusa gravar
 - **Vidro:** película azulada, brilho diagonal, montantes pretos, travessa grossa e rodapé; os guarda-corpos têm fio âmbar.
 - **Chão:** corredores com tom quente por cima do mármore, sombra suave junto de cada parede alta e luminárias de teto em retículo; poças de luz por sala.
 - **Paredes que escondem agentes** ficam translúcidas enquanto escondem (só para agentes; nenhum dado muda).
+- **Sala em foco:** os móveis das outras salas não são desenhados (sem "fantasmas" translúcidos); as paredes delas também somem.
 - **Fachada:** andares com luz quente de escritório, luz de teto nas vidraças, lajes iluminadas por baixo e vidraças frias; sem silhuetas de gente.
 - **Câmera:** a visão geral enquadra a planta (inclusive o alto das placas), o que aumenta o desenho em cerca de 12%. `/office2/#ring` (qualquer id de sala) abre direto na sala.
 
@@ -59,5 +60,5 @@ node scripts/assets/office2-layout.mjs          # valida e grava public/office2/
 
 ![As 16 salas](previews/office2-f8-salas.jpg)
 
-- `test/office2-planta.test.ts`: corredores retos e salas alinhadas, tipos de parede, regra das duas fileiras (pelo autor da planta), alturas, montantes e batentes, parede translúcida diante de agente, enquadramento da visão geral e endereço `#sala`.
+- `test/office2-planta.test.ts`: corredores retos e salas alinhadas, tipos de parede, móveis na parede com a orientação certa, regra das duas fileiras (pelo autor da planta), alturas, montantes e batentes, parede translúcida diante de agente, enquadramento da visão geral e endereço `#sala`.
 - As 16 salas foram abertas uma a uma (foco, painel e retorno) em 1920×1080.
