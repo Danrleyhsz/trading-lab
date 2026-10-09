@@ -29,3 +29,4 @@ experiments/kronos/vendor/
 experiments/kronos/.cache/
 experiments/kronos/data/
 __pycache__/
+scripts/estudos/out/long-*.json

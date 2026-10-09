@@ -26,7 +26,7 @@ function get(path:string,params:Record<string,string|number>){
  }
  throw Error('Binance indisponível para '+path);
 }
-function download(symbol:string){
+export function download(symbol:string){
  const file=`${dir}/long-${symbol}.json`;if(existsSync(file))return JSON.parse(readFileSync(file,'utf8'));
  const raw:Candle[]=[];let cursor=P.firstBar;
  while(cursor<=P.lastBar){const page=get('/fapi/v1/klines',{symbol,interval:'1h',startTime:cursor,endTime:P.lastBar+H-1,limit:1500}) as unknown[][];if(!page.length)break;
@@ -37,7 +37,7 @@ function download(symbol:string){
  const data={symbol,raw,funding};writeFileSync(file,JSON.stringify(data));return data;
 }
 /** Grade horária completa: horas faltando viram vela parada no último fechamento, com volume zero (contadas). */
-function grid(raw:Candle[]){
+export function grid(raw:Candle[]){
  const byHour=new Map(raw.map(c=>[c.timestamp,c])),out:Candle[]=[];let filled=0,last:Candle|undefined;
  for(let t=P.firstBar;t<=P.lastBar;t+=H){const c=byHour.get(t);if(c){out.push(c);last=c;}else{if(!last)throw Error('sem vela inicial');filled++;out.push({timestamp:t,open:last.close,high:last.close,low:last.close,close:last.close,volume:0});}}
  return {candles:out,filled};
