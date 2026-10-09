@@ -72,3 +72,13 @@ Só depois da aprovação do dono, em uma única mudança de release:
 - **Estudo:** novo `AUTONOMOUS_STUDY_ID`, no mesmo formato de configuração do piloto 1.
 - **Avaliação:** o mesmo `PILOT_EVALUATION_V1` (3 operações fechadas no mínimo, limite de perda de 3%), com o ponto de partida já corrigido (#103).
 - **Deploy:** muda o backend, então `CONTINUOUS_RELEASE_COMMIT` primeiro (Save, rebuild e deploy) e `CONTINUOUS_RELEASE_BACKEND` depois (Save apenas).
+
+## Emenda 1 (09/10/2026, antes de qualquer estudo rodar): ferramenta de avaliação e duas regras operacionais
+
+`scripts/estudos/triagem-piloto-2.ts` aplica os critérios acima aos dois estudos e escreve o resultado; a regra de decisão está em `src/application/triagem-piloto-2.ts`, com testes. Nenhum critério ou limiar mudou. Duas lacunas operacionais, que o texto original não cobria, ficam fechadas aqui, antes de existir qualquer resultado:
+
+- **Estudo ou robustez faltando:** o veredito é `INCOMPLETA` e nada é escolhido, mesmo que o outro estudo passe. A decisão só sai com os dois estudos e as duas robustezes calculadas.
+- **Empate no Sharpe deflacionado entre elegíveis:** fica o controle (a opção mais simples).
+- **Dados diferentes entre os dois estudos** (uma hora virou entre os pedidos): o critério 3 compara o Vega com o controle **refeito sobre os dados do Vega** (replay offline, o mesmo cálculo do estudo), nunca com o controle de outro conjunto de dados.
+
+O encanamento foi ensaiado com os dados do estudo antigo `d674cb32`, só para conferir a leitura dos arquivos, a decisão e o relatório. Esse ensaio **não é resultado da triagem** e não foi gravado em `docs/estudos/`.
