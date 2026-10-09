@@ -4,140 +4,278 @@
   "mesa-curva-operacoes": {
    "file": "props/mesa-curva-operacoes.png",
    "width": 384,
-   "height": 204,
+   "height": 221,
+   "axis": "none"
+  },
+  "mesa-curva-media": {
+   "file": "props/mesa-curva-media.png",
+   "width": 288,
+   "height": 202,
+   "axis": "none"
+  },
+  "totem-logo": {
+   "file": "props/totem-logo.png",
+   "width": 72,
+   "height": 150,
+   "axis": "none"
+  },
+  "cadeira-costas": {
+   "file": "props/cadeira-costas.png",
+   "width": 56,
+   "height": 78,
+   "axis": "none"
+  },
+  "cadeira-frente": {
+   "file": "props/cadeira-frente.png",
+   "width": 56,
+   "height": 84,
    "axis": "none"
   },
   "mesa-monitores": {
    "file": "props/mesa-monitores.png",
    "width": 240,
-   "height": 124,
-   "axis": "none"
+   "height": 190,
+   "axis": "j"
   },
-  "cadeira-frente": {
-   "file": "props/cadeira-frente.png",
-   "width": 44,
-   "height": 78,
-   "axis": "none"
+  "estacao-2-monitores": {
+   "file": "props/estacao-2-monitores.png",
+   "width": 192,
+   "height": 183,
+   "axis": "j"
   },
-  "cadeira-costas": {
-   "file": "props/cadeira-costas.png",
-   "width": 44,
-   "height": 75,
-   "axis": "none"
+  "armario-baixo": {
+   "file": "props/armario-baixo.png",
+   "width": 144,
+   "height": 151,
+   "axis": "j"
   },
   "mesa-reuniao": {
    "file": "props/mesa-reuniao.png",
+   "width": 384,
+   "height": 263,
+   "axis": "j"
+  },
+  "mesa-reuniao-6": {
+   "file": "props/mesa-reuniao-6.png",
    "width": 336,
-   "height": 254,
+   "height": 280,
+   "axis": "j"
+  },
+  "mesa-cafe-4": {
+   "file": "props/mesa-cafe-4.png",
+   "width": 192,
+   "height": 154,
+   "axis": "none"
+  },
+  "aparador": {
+   "file": "props/aparador.png",
+   "width": 192,
+   "height": 144,
    "axis": "j"
   },
   "balcao-recepcao": {
    "file": "props/balcao-recepcao.png",
    "width": 288,
-   "height": 232,
+   "height": 212,
+   "axis": "none"
+  },
+  "banco-espera": {
+   "file": "props/banco-espera.png",
+   "width": 144,
+   "height": 108,
+   "axis": "j"
+  },
+  "parede-elevadores": {
+   "file": "props/parede-elevadores.png",
+   "width": 192,
+   "height": 225,
+   "axis": "j"
+  },
+  "catraca": {
+   "file": "props/catraca.png",
+   "width": 96,
+   "height": 100,
    "axis": "none"
   },
   "sofa": {
    "file": "props/sofa.png",
    "width": 192,
-   "height": 157,
+   "height": 133,
    "axis": "j"
   },
   "poltrona": {
    "file": "props/poltrona.png",
-   "width": 80,
-   "height": 82,
-   "axis": "none"
-  },
-  "jardineira": {
-   "file": "props/jardineira.png",
-   "width": 192,
-   "height": 219,
-   "axis": "i"
-  },
-  "planta-alta": {
-   "file": "props/planta-alta.png",
-   "width": 60,
-   "height": 142,
+   "width": 96,
+   "height": 91,
    "axis": "none"
   },
   "mesa-centro": {
    "file": "props/mesa-centro.png",
    "width": 144,
-   "height": 117,
+   "height": 103,
    "axis": "j"
   },
-  "planta-baixa": {
-   "file": "props/planta-baixa.png",
-   "width": 56,
-   "height": 73,
+  "tapete": {
+   "file": "props/tapete.png",
+   "width": 336,
+   "height": 162,
+   "axis": "j"
+  },
+  "luminaria-chao": {
+   "file": "props/luminaria-chao.png",
+   "width": 48,
+   "height": 147,
    "axis": "none"
   },
   "esteira": {
    "file": "props/esteira.png",
    "width": 144,
-   "height": 165,
-   "axis": "i"
+   "height": 160,
+   "axis": "j"
   },
   "saco-pancada": {
    "file": "props/saco-pancada.png",
-   "width": 64,
-   "height": 124,
+   "width": 72,
+   "height": 133,
    "axis": "none"
   },
   "rack-halteres": {
    "file": "props/rack-halteres.png",
    "width": 144,
-   "height": 140,
-   "axis": "i"
+   "height": 135,
+   "axis": "j"
   },
   "bancada-teste": {
    "file": "props/bancada-teste.png",
-   "width": 150,
-   "height": 160,
+   "width": 192,
+   "height": 244,
    "axis": "none"
+  },
+  "estacao-madeira": {
+   "file": "props/estacao-madeira.png",
+   "width": 240,
+   "height": 208,
+   "axis": "j"
   },
   "estante-arquivo": {
    "file": "props/estante-arquivo.png",
    "width": 144,
-   "height": 272,
+   "height": 208,
+   "axis": "j"
+  },
+  "lockers": {
+   "file": "props/lockers.png",
+   "width": 192,
+   "height": 190,
    "axis": "j"
   },
   "armarios-arquivo": {
    "file": "props/armarios-arquivo.png",
    "width": 240,
-   "height": 324,
+   "height": 219,
    "axis": "j"
   },
   "rack-servidor": {
    "file": "props/rack-servidor.png",
-   "width": 84,
-   "height": 184,
+   "width": 96,
+   "height": 214,
    "axis": "none"
+  },
+  "sofa-cinza": {
+   "file": "props/sofa-cinza.png",
+   "width": 144,
+   "height": 115,
+   "axis": "j"
   },
   "bancada-cozinha": {
    "file": "props/bancada-cozinha.png",
    "width": 240,
-   "height": 314,
+   "height": 212,
+   "axis": "j"
+  },
+  "banqueta": {
+   "file": "props/banqueta.png",
+   "width": 48,
+   "height": 81,
    "axis": "none"
   },
   "geladeira": {
    "file": "props/geladeira.png",
-   "width": 84,
-   "height": 189,
+   "width": 96,
+   "height": 203,
    "axis": "none"
   },
   "mesa-redonda": {
    "file": "props/mesa-redonda.png",
-   "width": 150,
-   "height": 183,
+   "width": 192,
+   "height": 231,
    "axis": "none"
   },
-  "catraca": {
-   "file": "props/catraca.png",
-   "width": 96,
-   "height": 93,
+  "cadeira-cafe": {
+   "file": "props/cadeira-cafe.png",
+   "width": 56,
+   "height": 82,
    "axis": "none"
+  },
+  "sofa-externo": {
+   "file": "props/sofa-externo.png",
+   "width": 192,
+   "height": 123,
+   "axis": "j"
+  },
+  "mesa-externa": {
+   "file": "props/mesa-externa.png",
+   "width": 144,
+   "height": 91,
+   "axis": "j"
+  },
+  "poltrona-externa": {
+   "file": "props/poltrona-externa.png",
+   "width": 96,
+   "height": 82,
+   "axis": "none"
+  },
+  "jardineira-capim": {
+   "file": "props/jardineira-capim.png",
+   "width": 192,
+   "height": 137,
+   "axis": "j"
+  },
+  "planta-alta": {
+   "file": "props/planta-alta.png",
+   "width": 72,
+   "height": 98,
+   "axis": "none"
+  },
+  "samambaia": {
+   "file": "props/samambaia.png",
+   "width": 72,
+   "height": 67,
+   "axis": "none"
+  },
+  "planta-baixa": {
+   "file": "props/planta-baixa.png",
+   "width": 56,
+   "height": 67,
+   "axis": "none"
+  },
+  "espada": {
+   "file": "props/espada.png",
+   "width": 56,
+   "height": 124,
+   "axis": "none"
+  },
+  "ficus": {
+   "file": "props/ficus.png",
+   "width": 80,
+   "height": 133,
+   "axis": "none"
+  },
+  "jardineira": {
+   "file": "props/jardineira.png",
+   "width": 192,
+   "height": 149,
+   "axis": "j"
   }
  },
  "icons": {
