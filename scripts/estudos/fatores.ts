@@ -20,7 +20,7 @@ const strategies:{id:string;label:string;trial:boolean;signal:Attractiveness}[]=
  {id:'XS_LOWVOL_V1',label:'C2 · baixa volatilidade',trial:true,signal:lowVolatility(672)},
  {id:'XS_COMPOSITE_V1',label:'C3 · composto',trial:true,signal:composite([momentum(672),lowVolatility(672),carry(168)])}];
 
-function load(){
+export function load(){
  const quality:Record<string,{filledLong:number;share:number}>={},datasets:Record<string,PerpetualDataset>={},longOnly:Record<string,PerpetualDataset>={};
  for(const s of P.symbols){
   const d=download(s),{candles,filled}=grid(d.raw),share=filled/candles.length;quality[s]={filledLong:filled,share};
@@ -34,9 +34,9 @@ function load(){
  }
  return {datasets,longOnly,quality};
 }
-const startOf=(d:Record<string,PerpetualDataset>)=>d[P.symbols[0]].trade.findIndex(c=>c.timestamp===P.firstDecisionBar);
+export const startOf=(d:Record<string,PerpetualDataset>)=>d[P.symbols[0]].trade.findIndex(c=>c.timestamp===P.firstDecisionBar);
 
-function metrics(datasets:Record<string,PerpetualDataset>,r:ReturnType<typeof simulateFactor>,startBar:number){
+export function metrics(datasets:Record<string,PerpetualDataset>,r:ReturnType<typeof simulateFactor>,startBar:number){
  const symbols=Object.keys(datasets),trade=datasets[symbols[0]].trade,returns=hourlyReturns(r.equitySeries),m=moments(returns);
  const years:Record<string,{returnPct:number;maxDrawdown:number;partial:boolean}>={};
  for(const y of [2022,2023,2024,2025,2026]){
@@ -52,8 +52,8 @@ function metrics(datasets:Record<string,PerpetualDataset>,r:ReturnType<typeof si
   marketCorrelation:va>0&&vb>0?cov/Math.sqrt(va*vb):NaN,feesPaid:r.feesPaid,fundingCashDelta:r.fundingCashDelta,turnover:r.tradedNotional/P.rule.initialCapital,rebalances:r.rebalances.length,closedLegs:r.closedLegs,weeklyReturns,
   buyHold:symbols.reduce((s,sym)=>s+(trade.at(-1)!.close/trade[startBar].close-1)/symbols.length,0)};
 }
-const corr=(a:number[],b:number[])=>{const n=Math.min(a.length,b.length),x=a.slice(0,n),y=b.slice(0,n),mx=x.reduce((s,v)=>s+v,0)/n,my=y.reduce((s,v)=>s+v,0)/n;let c=0,vx=0,vy=0;for(let i=0;i<n;i++){c+=(x[i]-mx)*(y[i]-my);vx+=(x[i]-mx)**2;vy+=(y[i]-my)**2;}return c/Math.sqrt(vx*vy);};
-const pct=(v:number)=>(v>=0?'+':'')+(v*100).toFixed(2)+'%';
+export const corr=(a:number[],b:number[])=>{const n=Math.min(a.length,b.length),x=a.slice(0,n),y=b.slice(0,n),mx=x.reduce((s,v)=>s+v,0)/n,my=y.reduce((s,v)=>s+v,0)/n;let c=0,vx=0,vy=0;for(let i=0;i<n;i++){c+=(x[i]-mx)*(y[i]-my);vx+=(x[i]-mx)**2;vy+=(y[i]-my)**2;}return c/Math.sqrt(vx*vy);};
+export const pct=(v:number)=>(v>=0?'+':'')+(v*100).toFixed(2)+'%';
 
 function main(){
  const {datasets,longOnly,quality}=load(),start=startOf(datasets),startLong=startOf(longOnly);

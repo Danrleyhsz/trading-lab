@@ -1,0 +1,329 @@
+{
+ "protocol": {
+  "version": "COMBO_CARRY_MOM_V1",
+  "declaredAt": "2026-10-09",
+  "legFraction": 0.025,
+  "longCount": 5,
+  "shortCount": 5,
+  "lookbackHours": 672,
+  "carryWindowHours": 168,
+  "rule": {
+   "lookbackHours": 672,
+   "rebalanceHours": 168,
+   "longCount": 5,
+   "shortCount": 5,
+   "legFraction": 0.05,
+   "feeRate": 0.00055,
+   "slippageBps": 2,
+   "initialCapital": 10000,
+   "maxBars": 60000
+  },
+  "gate": {
+   "maximumDrawdown": 0.15,
+   "minimumPositiveYears": 3,
+   "maximumMarketCorrelation": 0.3,
+   "maximumFilledShare": 0.01,
+   "trials": 9
+  },
+  "forward": {
+   "symbols": [
+    "ENAUSDT",
+    "ZECUSDT",
+    "WLDUSDT",
+    "NEARUSDT",
+    "UNIUSDT",
+    "ONDOUSDT",
+    "1000PEPEUSDT",
+    "BCHUSDT",
+    "FILUSDT",
+    "AAVEUSDT",
+    "SUIUSDT",
+    "TAOUSDT",
+    "AVAXUSDT",
+    "LINKUSDT",
+    "XRPUSDT",
+    "XLMUSDT",
+    "DOGEUSDT",
+    "SOLUSDT",
+    "LTCUSDT",
+    "ETHUSDT",
+    "BTCUSDT"
+   ],
+   "firstDecisionBar": 1791856800000,
+   "weeks": 11,
+   "rebalanceHours": 168,
+   "stopDrawdown": 0.15,
+   "initialCapital": 10000
+  }
+ },
+ "protocolCommit": "6a98ad3c55c95f137ef5989c4d34b39bdfb60808",
+ "execution": "HISTORICAL_SIMULATION_OFFLINE",
+ "automaticPaperApproval": false,
+ "runAt": "2026-10-09T15:39:42.068Z",
+ "symbols": [
+  "ZECUSDT",
+  "NEARUSDT",
+  "UNIUSDT",
+  "BCHUSDT",
+  "FILUSDT",
+  "AAVEUSDT",
+  "AVAXUSDT",
+  "LINKUSDT",
+  "XRPUSDT",
+  "XLMUSDT",
+  "DOGEUSDT",
+  "SOLUSDT",
+  "LTCUSDT",
+  "ETHUSDT",
+  "BTCUSDT"
+ ],
+ "regression": {
+  "returnPct": 0.5505731816765305,
+  "expectedReturnPct": 0.5505731816765305,
+  "maxDrawdown": 0.08773707325626035,
+  "expectedMaxDrawdown": 0.08773707325626035,
+  "ok": true
+ },
+ "quality": {
+  "ZECUSDT": {
+   "filledLong": 0,
+   "share": 0
+  },
+  "NEARUSDT": {
+   "filledLong": 0,
+   "share": 0
+  },
+  "UNIUSDT": {
+   "filledLong": 0,
+   "share": 0
+  },
+  "BCHUSDT": {
+   "filledLong": 0,
+   "share": 0
+  },
+  "FILUSDT": {
+   "filledLong": 0,
+   "share": 0
+  },
+  "AAVEUSDT": {
+   "filledLong": 0,
+   "share": 0
+  },
+  "AVAXUSDT": {
+   "filledLong": 0,
+   "share": 0
+  },
+  "LINKUSDT": {
+   "filledLong": 0,
+   "share": 0
+  },
+  "XRPUSDT": {
+   "filledLong": 0,
+   "share": 0
+  },
+  "XLMUSDT": {
+   "filledLong": 0,
+   "share": 0
+  },
+  "DOGEUSDT": {
+   "filledLong": 0,
+   "share": 0
+  },
+  "SOLUSDT": {
+   "filledLong": 0,
+   "share": 0
+  },
+  "LTCUSDT": {
+   "filledLong": 0,
+   "share": 0
+  },
+  "ETHUSDT": {
+   "filledLong": 0,
+   "share": 0
+  },
+  "BTCUSDT": {
+   "filledLong": 0,
+   "share": 0
+  }
+ },
+ "verdict": "PROPOR_ACOMPANHAMENTO",
+ "checks": {
+  "DATA_QUALITY": true,
+  "POSITIVE_PNL": true,
+  "BOUNDED_DRAWDOWN": true,
+  "POSITIVE_YEARS": true,
+  "DOUBLED_COSTS_POSITIVE": true,
+  "MARKET_NEUTRAL": true
+ },
+ "failed": [],
+ "positiveYears": 4,
+ "deflatedSharpe": 0.11169987613218557,
+ "trialSharpes": [
+  0.03381044178512447,
+  -0.00040964276532527374,
+  0.015872736254956877,
+  0.014140303685360614,
+  0.012091978496275437,
+  0.007793134092438584,
+  -0.007711116311637309,
+  0.004376887819536141,
+  0.012985579481637085
+ ],
+ "trialSharpeVariance": 0.00015449692191931528,
+ "blend": {
+  "netPnl": 5243.279793227137,
+  "returnPct": 0.5243279793227137,
+  "maxDrawdown": 0.10444693504065161,
+  "years": {
+   "2022": {
+    "returnPct": 0.047954387904466156,
+    "maxDrawdown": 0.05426498596297946,
+    "partial": false
+   },
+   "2023": {
+    "returnPct": 0.17843147759669176,
+    "maxDrawdown": 0.038175027306195486,
+    "partial": false
+   },
+   "2024": {
+    "returnPct": 0.10654913744065309,
+    "maxDrawdown": 0.059631962022910434,
+    "partial": false
+   },
+   "2025": {
+    "returnPct": 0.0978686002161524,
+    "maxDrawdown": 0.06920618363437658,
+    "partial": false
+   },
+   "2026": {
+    "returnPct": 0.016039607561164626,
+    "maxDrawdown": 0.046313225846918216,
+    "partial": true
+   }
+  },
+  "sharpeAnnualized": 1.2153836449415827,
+  "marketCorrelation": -0.017423287087716666,
+  "doubledPnl": 4427.928542366968,
+  "feesPaid": 514.5880503928477,
+  "fundingCashDelta": 648.5039217480232,
+  "turnover": 93.56146370779034,
+  "rebalances": 249,
+  "closedLegs": 945,
+  "buyHold": 8.02176696542894
+ },
+ "comparison": {
+  "momentumAlone": {
+   "returnPct": 0.5704345947460518,
+   "maxDrawdown": 0.20531314295906256,
+   "sharpeAnnualized": 0.8826540862307398,
+   "years": {
+    "2022": {
+     "returnPct": 0.08332109783144159,
+     "maxDrawdown": 0.07573228964651557,
+     "partial": false
+    },
+    "2023": {
+     "returnPct": 0.29217744404332757,
+     "maxDrawdown": 0.0757886763516129,
+     "partial": false
+    },
+    "2024": {
+     "returnPct": 0.01691105552569505,
+     "maxDrawdown": 0.08773707325626035,
+     "partial": false
+    },
+    "2025": {
+     "returnPct": 0.15106220297072825,
+     "maxDrawdown": 0.1286238476387036,
+     "partial": false
+    },
+    "2026": {
+     "returnPct": -0.04157367390395306,
+     "maxDrawdown": 0.09959599304503308,
+     "partial": true
+    }
+   }
+  },
+  "carryAlone": {
+   "returnPct": 0.3876519524260217,
+   "maxDrawdown": 0.14909077630682033,
+   "sharpeAnnualized": 0.7293973851671681,
+   "years": {
+    "2022": {
+     "returnPct": 0.001294014030931212,
+     "maxDrawdown": 0.1023351740910845,
+     "partial": false
+    },
+    "2023": {
+     "returnPct": 0.06235961143068103,
+     "maxDrawdown": 0.104058198364395,
+     "partial": false
+    },
+    "2024": {
+     "returnPct": 0.18820311001116474,
+     "maxDrawdown": 0.07739828091485723,
+     "partial": false
+    },
+    "2025": {
+     "returnPct": 0.030984381843230713,
+     "maxDrawdown": 0.131154072078296,
+     "partial": false
+    },
+    "2026": {
+     "returnPct": 0.06488965663598734,
+     "maxDrawdown": 0.08246224264231194,
+     "partial": true
+    }
+   }
+  },
+  "weeklyCorrelation": {
+   "blendVsMomentum": 0.7765748934787048,
+   "blendVsCarry": 0.6484326828228225,
+   "momentumVsCarry": 0.023956030295057308
+  },
+  "legsAlone25": {
+   "momentumLegReturnPct": 0.2640656445364957,
+   "carryLegReturnPct": 0.18513487007750629
+  }
+ },
+ "otherUniverse": {
+  "symbols": 21,
+  "period": {
+   "from": "2025-09-12T07:00:00.000Z",
+   "to": "2026-10-05T22:00:00.000Z"
+  },
+  "blend": {
+   "returnPct": 0.165210843622241,
+   "maxDrawdown": 0.0863265407759699,
+   "sharpeAnnualized": 1.7081441710483125,
+   "marketCorrelation": 0.08348365026844604
+  },
+  "momentumAlone": {
+   "returnPct": 0.1831783200008167,
+   "maxDrawdown": 0.12720728404350057,
+   "sharpeAnnualized": 1.2717986816291411
+  },
+  "carryAlone": {
+   "returnPct": 0.12939396332022135,
+   "maxDrawdown": 0.0719266127240995,
+   "sharpeAnnualized": 1.1104438208978995
+  }
+ },
+ "datasetHashes": {
+  "AAVEUSDT": "5c75caf4d74efe6153c47c9e5b188cc35f34acfcf2a7e60c1f0513360e792ef9",
+  "AVAXUSDT": "f76076da2b7e6dffd1d7dbcbb4755a6f33891b604c09f435cda5b1e9220ee78a",
+  "BCHUSDT": "1ac8e19392409f0bd4869d60ed847f2710969db5085ee8ef54b2a11b0fa10309",
+  "BTCUSDT": "a6756b85f3d38f119f54d5463fae2e211b3b4dad70b2fe49298a767e9e51cb3f",
+  "DOGEUSDT": "1f6b9e3c6f93fda50693dac022547b5701f4c826746c4ea4339ba4403b82431f",
+  "ETHUSDT": "f6678a6d21be22ee7909269c2998aacc9557ee82d06bb4d0983fcdc0bb56a9d5",
+  "FILUSDT": "d6859e338f81578af9086664342fa3718e7db1053449cc9803174f96cf57602c",
+  "LINKUSDT": "20c32307840788975be244299dd494898d306e6d1fc7afce282354542cd9e5e6",
+  "LTCUSDT": "21a62f5c1ce3fbfa16ee086fff727d956e8576ff7f270bc6690fd4d9cefeed8e",
+  "NEARUSDT": "c4418d34590e1766b4aa28a7a874b1d2a9a5083a3eb9457e77cbf9f0692ab0c0",
+  "SOLUSDT": "3c74a9c67af35b5efde186d51f78f24bb4794d4ba65d23f7bde7472bb99a8c2e",
+  "UNIUSDT": "8ab5a79322a81874b5b65d2c80b34b9ae099b88fa8654a82c5845a2bc7cb2f3e",
+  "XLMUSDT": "325dec8c4f2a539e910422168d2ab9eeb8942e83f34005de1cae1032b33e1b9c",
+  "XRPUSDT": "e630685f5e889cb5e6b781b9e26dca8ba9dbee1028cdc752c1e8df8e5fe189f4",
+  "ZECUSDT": "379584390df97a543757720dab716d7809d8732f1dccabee23097f8c2a86acc8"
+ }
+}
