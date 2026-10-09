@@ -65,7 +65,7 @@ room('horizon',[
 room('nexus',[
  ['mesa-reuniao',3,15,7,4,30,{flip:true}],PAREDE('armario-baixo','j0',1,14,2,1,22),PAREDE('armario-baixo','j0',9,14,2,1,22),['planta-alta',0,14,1,1,50],['ficus',11,14,1,1,54],['planta-baixa',1,18,1,1,24],['samambaia',10,18,1,1,32]]);
 room('ring',[
- PAREDE('mesa-curva-operacoes','j0',1,23,5,3,40),PAREDE('mesa-curva-media','j0',7,23,4,3,40),
+ PAREDE('mesa-curva-operacoes','j0',0,23,5,3,40),PAREDE('mesa-curva-media','j0',7,23,4,3,40),
  PAREDE('poltrona','i0',0,28,2,2,28),['totem-logo',11,23,1,1,56],['jardineira',6,32,4,1,30],['planta-alta',11,29,1,1,50],['ficus',0,32,1,1,54],['espada',6,22,1,1,38],['samambaia',11,31,1,1,32]]);
 room('convivencia',[
  ['tapete',15,11,8,5,2,NB],['jardineira',17,10,4,1,30],PAREDE('sofa','j0',17,11,4,2,28),PAREDE('poltrona','i0',15,12,2,2,28),PAREDE('poltrona','j0',21,11,2,2,28),['mesa-centro',18,13,3,2,12],
@@ -91,7 +91,7 @@ for(const [i,j,a] of [[13,6,'planta-alta'],[19,6,'planta-baixa'],[22,6,'planta-a
  props.push({asset:a,tile:{i,j},footprint:{a:1,b:1},h:a==='planta-alta'?50:24});
 
 // ---------- pontos: postos de trabalho, lazer e chegada ----------
-const homes={satoshi:['horizon',2,9],oracle:['horizon',6,9],vega:['horizon',10,9],nova:['ring',2,26],flux:['ring',9,26],atlas:['ring',4,26],euler:['backtest',18,24],sentinel:['risk',28,24]};
+const homes={satoshi:['horizon',2,9],oracle:['horizon',6,9],vega:['horizon',10,9],nova:['ring',1,26],flux:['ring',9,26],atlas:['ring',3,26],euler:['backtest',18,24],sentinel:['risk',28,24]};
 const leisure=[['sofa-1','convivencia',17,13],['sofa-2','convivencia',21,13],['cafe-1','cafe',17,30],['cafe-2','cafe',19,30],['copa-1','cozinha',28,31],['copa-2','cozinha',30,31],['varanda-1','varanda',37,31],['varanda-2','varanda',42,31]];
 const points=[
  ...Object.entries(homes).map(([agent,[r,i,j]])=>({id:agent,room:r,tile:{i,j},kind:'WORK',agent,facing:'NE'})),

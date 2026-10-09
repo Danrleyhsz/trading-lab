@@ -39,7 +39,7 @@ Todas são conferidas por `scripts/assets/office2-layout.mjs` (que recusa gravar
 - **Vidro:** película azulada, brilho diagonal, montantes pretos, travessa grossa e rodapé; os guarda-corpos têm fio âmbar.
 - **Chão:** corredores com tom quente por cima do mármore, sombra suave junto de cada parede alta e luminárias de teto em retículo; poças de luz por sala.
 - **Paredes que escondem agentes** ficam translúcidas enquanto escondem (só para agentes; nenhum dado muda).
-- **Sala em foco:** os móveis das outras salas não são desenhados (sem "fantasmas" translúcidos); as paredes delas também somem.
+- **Sala em foco:** as paredes das outras salas somem e os móveis delas ficam como "fantasmas" translúcidos (22%), que dão contexto sem competir com a sala.
 - **Fachada:** andares com luz quente de escritório, luz de teto nas vidraças, lajes iluminadas por baixo e vidraças frias; sem silhuetas de gente.
 - **Câmera:** a visão geral enquadra a planta (inclusive o alto das placas), o que aumenta o desenho em cerca de 12%. `/office2/#ring` (qualquer id de sala) abre direto na sala.
 
