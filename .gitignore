@@ -30,3 +30,4 @@ experiments/kronos/.cache/
 experiments/kronos/data/
 __pycache__/
 scripts/estudos/out/long-*.json
+scripts/estudos/out/holdout21-*.json
