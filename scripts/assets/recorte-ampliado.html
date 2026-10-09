@@ -1,0 +1,12 @@
+<!doctype html><meta charset="utf-8"><title>Recorte</title><body style="margin:0;background:#111">
+<script>
+// Recortes ampliados da arte para medir telas e janelas (?img=&x=&y=&w=&h=&z=&name=).
+const q=new URLSearchParams(location.search),load=src=>new Promise((ok,err)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=()=>err(src);i.src=src;});
+(async()=>{const img=await load('/office/'+q.get('img')),x=+q.get('x'),y=+q.get('y'),w=+q.get('w'),h=+q.get('h'),z=+(q.get('z')||3);
+ const c=document.createElement('canvas');c.width=w*z;c.height=h*z;const k=c.getContext('2d');k.imageSmoothingEnabled=false;k.drawImage(img,x,y,w,h,0,0,w*z,h*z);
+ // grade a cada 10 px da cena, para ler coordenadas
+ k.strokeStyle='rgba(255,0,255,.35)';k.lineWidth=1;const G=+(q.get("g")||10);for(let gx=Math.ceil(x/G)*G;gx<x+w;gx+=G){k.beginPath();k.moveTo((gx-x)*z+.5,0);k.lineTo((gx-x)*z+.5,h*z);k.stroke();}
+ for(let gy=Math.ceil(y/G)*G;gy<y+h;gy+=G){k.beginPath();k.moveTo(0,(gy-y)*z+.5);k.lineTo(w*z,(gy-y)*z+.5);k.stroke();}
+ k.fillStyle='#ff0';k.font='10px monospace';for(let gx=Math.ceil(x/50)*50;gx<x+w;gx+=50)k.fillText(gx,(gx-x)*z+2,10);for(let gy=Math.ceil(y/50)*50;gy<y+h;gy+=50)k.fillText(gy,2,(gy-y)*z+10);
+ await fetch('/save?name='+q.get('name'),{method:'POST',body:c.toDataURL('image/png')});document.title='pronto';})().catch(e=>document.title='erro '+e);
+</script>

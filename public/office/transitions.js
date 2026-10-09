@@ -1,7 +1,7 @@
 // Original browser presentation. A received state is authoritative before any journey starts.
 (() => {
   const layout = OfficeNavigation.layout;
-  // Foot-center passages inspected against office-reference-v2.png; other doors fail closed.
+  // Foot-center passages inspected against the original art (same lanes in cenario-modular.png); other doors fail closed.
   const doors = [
     {rooms:['Research Lab','Quant Lab'], approaches:{'Research Lab':{x:94,y:94},'Quant Lab':{x:94,y:98}}, via:[{x:33.4,y:36.32},{x:33.4,y:66.42}]},
     {rooms:['Trading Floor','Lounge'], approaches:{'Trading Floor':{x:94,y:94},Lounge:{x:94,y:98}}, via:[{x:66.9,y:36.32},{x:66.9,y:66.42}]}

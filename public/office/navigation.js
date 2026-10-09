@@ -1,13 +1,13 @@
 // Original Trading Lab browser geometry. No market, agent-work or persistence capability.
 (() => {
- const scene=Object.freeze({width:1852,height:849,asset:'/office/office-reference-v2.png'});
+ const scene=Object.freeze({width:1852,height:849,asset:'/office/cenario-modular.png'});
  const layout=Object.freeze({
   'Research Lab':{x:2,y:10,w:30,h:28,floorY:94},'Trading Floor':{x:34,y:10,w:33,h:28,floorY:94},'Risk Desk':{x:69,y:10,w:29,h:28,floorY:94},
   'Quant Lab':{x:2,y:38,w:30,h:29,floorY:98},Lounge:{x:34,y:38,w:33,h:29,floorY:98},'Meeting Room':{x:69,y:38,w:29,h:29,floorY:98}
  });
  const features=[
   {id:'library',room:'Research Lab',label:'Biblioteca de pesquisas',icon:'▤',x:14,y:20,approach:{x:22,y:94}},
-  {id:'terminal',room:'Trading Floor',label:'Terminal de mercado',icon:'↗',x:50,y:35,approach:{x:52,y:94}},
+  {id:'terminal',room:'Trading Floor',label:'Relógio do mercado',icon:'◷',x:50,y:35,approach:{x:52,y:94}},
   {id:'risk-board',room:'Risk Desk',label:'Quadro de risco',icon:'✓',x:67,y:26,approach:{x:70,y:94}},
   {id:'quant-servers',room:'Quant Lab',label:'Bancada de estudos históricos',icon:'⚗',x:64,y:23,approach:{x:70,y:98}},
   {id:'coffee',room:'Lounge',label:'Café e convivência',icon:'☕',x:86,y:28,approach:{x:90,y:98}},

@@ -46,4 +46,4 @@ jobs:
             exit 1
           fi
           printf '%s' "$report" | node -e "let text='';process.stdin.on('data',c=>text+=c);process.stdin.on('end',()=>{const r=JSON.parse(text);if(r.ready!==false||r.scope!=='FIRST_PUBLICATION_CONFIG_ONLY')process.exit(1)})"
-          docker run --rm --entrypoint node trading-lab:ci -e "for (const path of ['./dist/src/launch-cloud.js','./dist/src/check-cloud-config.js','./dist/src/check-cloud-service.js','./dist/src/import-state.js','./public/office/office-reference-v2.png']) require('fs').accessSync(path)"
+          docker run --rm --entrypoint node trading-lab:ci -e "for (const path of ['./dist/src/launch-cloud.js','./dist/src/check-cloud-config.js','./dist/src/check-cloud-service.js','./dist/src/import-state.js','./public/office/cenario-modular.png']) require('fs').accessSync(path)"

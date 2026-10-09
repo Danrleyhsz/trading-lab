@@ -20,6 +20,20 @@ export interface PilotReportInput {
  equityPoints:{timestamp:number;equity:number}[];closedTrades:{openedAt:string;closedAt:string;netPnl:number}[];
  autonomous:{enabled:boolean;eligible:boolean;stopReason:string|null;studyId:string|null};mark:number|null;now:number;
 }
+/**
+ * Equity of a book that was flat when the pilot began, from the ledger alone: endowment plus the cash of every earlier fill
+ * (sells in, buys out, fees out) and funding settlement. If a position was still open at the start there is no mark to value it
+ * from the ledger, so the endowment is kept (the previous behaviour).
+ */
+export function equityBeforeStart(ledger:DomainEvent[],startedAt:number,initialCash:number|null):number|null{
+ if(initialCash===null)return null;
+ let cash=initialCash,position=0;
+ for(const e of ledger){if(Date.parse(e.occurredAt)>=startedAt)continue;
+  if(e.type==='PAPER_FILL'){const f=(e.payload as {fill?:{side:string;quantity:number;fillPrice:number;fee?:number}}).fill;if(!f)continue;
+   const sign=f.side==='BUY'?1:-1;cash-=sign*f.quantity*f.fillPrice+(f.fee??0);position+=sign*f.quantity;}
+  else if(e.type==='FUNDING_SETTLED')cash+=(e.payload as {cashDelta?:number}).cashDelta??0;}
+ return Math.abs(position)<1e-9?cash:initialCash;
+}
 export function pilotReport(input:PilotReportInput){
  const decisions=input.events.filter(e=>e.type==='AUTONOMOUS_DECISION'&&(e.payload as {accountId?:string})?.accountId===input.accountId)
   .sort((a,b)=>Date.parse(a.occurredAt)-Date.parse(b.occurredAt));
@@ -27,8 +41,9 @@ export function pilotReport(input:PilotReportInput){
  if(!first)return {scope:'PILOT_EVALUATION' as const,protocol:PILOT_EVALUATION_PROTOCOL,status:'NO_DECISIONS' as const,accountId:input.accountId};
  const startedAt=Date.parse(first.occurredAt);
  const startPrice=(first.payload as {signalDataset?:{trade?:{close:number}[]}}).signalDataset?.trade?.at(-1)?.close??null;
- // Equity when the pilot started: the last recorded point before the first decision, otherwise the endowment.
- const before=input.equityPoints.filter(p=>p.timestamp<=startedAt).at(-1);const startEquity=before?.equity??input.initialCash;
+ // Equity when the pilot started: the last recorded point before the first decision. Without one, rebuild it from the ledger
+ // (endowment plus cash flows of fills and funding before the start) when the book was flat then; otherwise the endowment.
+ const before=input.equityPoints.filter(p=>p.timestamp<=startedAt).at(-1);const startEquity=before?.equity??equityBeforeStart(input.ledger,startedAt,input.initialCash);
  const fills=input.ledger.filter(e=>e.type==='PAPER_FILL'&&Date.parse(e.occurredAt)>=startedAt);
  const funding=input.ledger.filter(e=>e.type==='FUNDING_SETTLED'&&Date.parse(e.occurredAt)>=startedAt).reduce((s,e)=>s+((e.payload as {cashDelta?:number}).cashDelta??0),0);
  const fees=fills.reduce((s,e)=>s+((e.payload as {fill?:{fee?:number}}).fill?.fee??0),0);
@@ -52,7 +67,7 @@ export function pilotReport(input:PilotReportInput){
   pnl,startEquity,equity:input.equity,fees,funding,maxDrawdownObserved:input.maxDrawdown,
   benchmarks:{flat:0,btcReturn,buyAndHoldSameExposure:sameExposure,buyAndHoldFullEquity:btcReturn!==null&&startEquity!==null?startEquity*btcReturn:null,startPrice,mark:input.mark},
   // Métricas no estilo quantstats só com a equity e as operações do período do piloto.
-  metrics:performanceMetrics(input.equityPoints.filter(p=>p.timestamp>=(before?.timestamp??startedAt)),closed.map(t=>({netPnl:t.netPnl})),{inMarketHours:closed.reduce((s,t)=>s+Math.max(0,Date.parse(t.closedAt)-Date.parse(t.openedAt))/3600000,0)}),
+  metrics:performanceMetrics(input.equityPoints.filter(p=>p.timestamp>=(before?.timestamp??startedAt)),closed.map(t=>({netPnl:t.netPnl})),{inMarketHours:closed.reduce((s,t)=>s+Math.max(0,Date.parse(t.closedAt)-Date.parse(t.openedAt))/3600000,0)},startPrice&&input.mark?{startPrice,endPrice:input.mark}:undefined),
   verdict,provisionalVerdict:verdict==='IN_PROGRESS'?provisional:verdict,nextStep:PILOT_NEXT_STEP[verdict==='IN_PROGRESS'?provisional:verdict]};
 }
 export function registerPilotReport(app:FastifyInstance,input:()=>PilotReportInput){app.get('/paper/perpetual/pilot/report',async()=>pilotReport(input()));}

@@ -38,7 +38,7 @@ test('reserva só entra quando ligada e quando a Binance falha; o status registr
  await assert.rejects(new ResilientPerpetualHistory(binance,bybit,false).load(100),/418/,'desligada: o erro original continua');
  const on=new ResilientPerpetualHistory(binance,bybit,true,()=>now),data=await on.load(100);
  assert.equal(data.instrument,'BYBIT_LINEAR:BTCUSDT');assert.equal(on.status().fallbacks,1);assert.match(on.status().lastFallback!.reason,/418/);
- const ok=new ResilientPerpetualHistory({load:async()=>({instrument:'BINANCE_USDM:BTCUSDT'} as PerpetualDataset)},bybit,true);assert.equal((await ok.load(100)).instrument,'BINANCE_USDM:BTCUSDT');assert.equal(ok.status().fallbacks,0);
+ const ok=new ResilientPerpetualHistory({load:async()=>({instrument:'BINANCE_USDM:BTCUSDT'} as unknown as PerpetualDataset)},bybit,true);assert.equal((await ok.load(100)).instrument,'BINANCE_USDM:BTCUSDT');assert.equal(ok.status().fallbacks,0);
 });
 
 test('com dados de reserva o piloto fecha posição, mas nunca abre',async()=>{

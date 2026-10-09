@@ -1,0 +1,304 @@
+{
+ "protocol": {
+  "version": "VOL_TARGET_V1",
+  "data": {
+   "source": "BINANCE_USDM BTCUSDT 1h + funding (cache FUNDING_CARRY_V1)",
+   "firstBar": 1640995200000,
+   "lastBar": 1791241200000
+  },
+  "calibration": {
+   "from": 1640995200000,
+   "to": 1672531200000
+  },
+  "evaluation": {
+   "from": 1672531200000,
+   "years": [
+    2023,
+    2024,
+    2025,
+    2026
+   ]
+  },
+  "base": {
+   "strategy": "BREAKOUT",
+   "fastPeriod": 10,
+   "slowPeriod": 480,
+   "feeRate": 0.00055,
+   "slippageBps": 1,
+   "initialCapital": 10000,
+   "maintenanceRate": 0.01,
+   "liquidationFeeRate": 0.005,
+   "positionFraction": 0.1
+  },
+  "sizing": {
+   "base": 0.1,
+   "min": 0.02,
+   "max": 0.199
+  },
+  "primary": {
+   "lookback": 720
+  },
+  "sensitivity": [
+   {
+    "lookback": 168
+   },
+   {
+    "lookback": 2160
+   }
+  ],
+  "stressedCosts": {
+   "feeRate": 0.0011,
+   "slippageBps": 5
+  },
+  "bootstrap": {
+   "blockDays": 30,
+   "resamples": 2000,
+   "seed": 20261006,
+   "threshold": 0.9
+  }
+ },
+ "provenance": {
+  "version": "SCRIPT_PROVENANCE_V1",
+  "script": "scripts/estudos/vol-target.ts",
+  "codeCommit": "c9131e0389af1411cbc313b24c86cdf5f7970867",
+  "workingTreeClean": true,
+  "uncommittedFiles": [],
+  "node": "v24.18.0"
+ },
+ "execution": "HISTORICAL_SIMULATION_OFFLINE",
+ "automaticPaperApproval": false,
+ "runAt": "2026-10-06T23:41:48.524Z",
+ "data": {
+  "cacheSha256": "3af7d2fc5c7798a1f8175a9c32d0d2aa4fa3c8036d0b6e69065abc2e6f259cce",
+  "bars": 41736,
+  "filledHours": 0,
+  "fundingMarkFilled": 2005,
+  "evaluationDays": 1373
+ },
+ "trials": 3,
+ "arms": {
+  "A": {
+   "lookback": null,
+   "target": null,
+   "netPnl": 319.31707447689405,
+   "feesPaid": 45.03090891233078,
+   "fundingCashDelta": -196.3252704502923,
+   "liquidations": 0,
+   "trades": 39,
+   "sharpe": 0.19212934123313183,
+   "maxDrawdown": 0.11857646925466703,
+   "calmar": 0.07071540970887122,
+   "annualizedReturn": 0.00838518360517515,
+   "annualizedVolatility": 0.049956911724758093,
+   "yearSharpe": {
+    "2023": 1.2208972631944748,
+    "2024": -0.3278636321254782,
+    "2025": -1.0053278216767543,
+    "2026": 1.3429303139858098
+   },
+   "yearReturn": {
+    "2023": 0.06006232591725169,
+    "2024": -0.022402085300198382,
+    "2025": -0.04305444040568418,
+    "2026": 0.04102674996825417
+   },
+   "fractions": null
+  },
+  "B": {
+   "lookback": 720,
+   "target": 0.006962245267716922,
+   "netPnl": 828.0069451150757,
+   "feesPaid": 72.91785766579787,
+   "fundingCashDelta": -333.37761406428586,
+   "liquidations": 0,
+   "trades": 39,
+   "sharpe": 0.313612946608639,
+   "maxDrawdown": 0.17445903328672963,
+   "calmar": 0.12242444322294295,
+   "annualizedReturn": 0.021358050015340746,
+   "annualizedVolatility": 0.0767874203558961,
+   "yearSharpe": {
+    "2023": 1.5370346152595147,
+    "2024": -0.19324948033794467,
+    "2025": -1.4570914354058317,
+    "2026": 1.4919689046478628
+   },
+   "yearReturn": {
+    "2023": 0.13320790784990022,
+    "2024": -0.021402067353501808,
+    "2025": -0.08949562648147713,
+    "2026": 0.07254635655069364
+   },
+   "fractions": {
+    "entries": 39,
+    "mean": 0.15535399668854347,
+    "min": 0.09529625464848689,
+    "max": 0.199,
+    "atCap": 9,
+    "atFloor": 0
+   }
+  },
+  "A_stressed": {
+   "lookback": null,
+   "target": null,
+   "netPnl": 241.27211131717377,
+   "feesPaid": 89.73081845117099,
+   "fundingCashDelta": -195.95969951337457,
+   "liquidations": 0,
+   "trades": 39,
+   "sharpe": 0.15173390659504388,
+   "maxDrawdown": 0.12252077365882819,
+   "calmar": 0.05185677109355057,
+   "annualizedReturn": 0.006353531713830574,
+   "annualizedVolatility": 0.04996910353588414,
+   "yearSharpe": {
+    "2023": 1.1944865709987504,
+    "2024": -0.36894528980599145,
+    "2025": -1.059087815761229,
+    "2026": 1.296276549759533
+   },
+   "yearReturn": {
+    "2023": 0.05870652246604302,
+    "2024": -0.024941436158971597,
+    "2025": -0.045257970996761765,
+    "2026": 0.039564461300036324
+   },
+   "fractions": null
+  },
+  "B_stressed": {
+   "lookback": 720,
+   "target": 0.006962245267716922,
+   "netPnl": 701.4214384442039,
+   "feesPaid": 145.008106838686,
+   "fundingCashDelta": -332.4604938554706,
+   "liquidations": 0,
+   "trades": 39,
+   "sharpe": 0.27286178332130423,
+   "maxDrawdown": 0.18009809638954744,
+   "calmar": 0.10090247990794074,
+   "annualizedReturn": 0.018172344552404684,
+   "annualizedVolatility": 0.07681400627222593,
+   "yearSharpe": {
+    "2023": 1.5121984864355333,
+    "2024": -0.23164652273948907,
+    "2025": -1.519771373737718,
+    "2026": 1.4447859581414515
+   },
+   "yearReturn": {
+    "2023": 0.1308857040630218,
+    "2024": -0.0248175938684726,
+    "2025": -0.0931092720201181,
+    "2026": 0.070151804235975
+   },
+   "fractions": {
+    "entries": 39,
+    "mean": 0.15535399668854347,
+    "min": 0.09529625464848689,
+    "max": 0.199,
+    "atCap": 9,
+    "atFloor": 0
+   }
+  },
+  "sensitivity": [
+   {
+    "lookback": 168,
+    "target": 0.005890699558948095,
+    "netPnl": 729.3686114689899,
+    "feesPaid": 68.18615859066836,
+    "fundingCashDelta": -331.4764079741292,
+    "liquidations": 0,
+    "trades": 39,
+    "sharpe": 0.29698223996578943,
+    "maxDrawdown": 0.17557906159460224,
+    "calmar": 0.10751877714413373,
+    "annualizedReturn": 0.01887804599476617,
+    "annualizedVolatility": 0.07160760700059808,
+    "yearSharpe": {
+     "2023": 1.5368502500875079,
+     "2024": -0.11111760800637331,
+     "2025": -1.4602554474802831,
+     "2026": 1.362459133610124
+    },
+    "yearReturn": {
+     "2023": 0.11789201902619473,
+     "2024": -0.013466751962521561,
+     "2025": -0.08368631374359059,
+     "2026": 0.06207648907418628
+    },
+    "fractions": {
+     "entries": 39,
+     "mean": 0.14511687494148978,
+     "min": 0.0672297956749323,
+     "max": 0.199,
+     "atCap": 7,
+     "atFloor": 0
+    }
+   },
+   {
+    "lookback": 2160,
+    "target": 0.006943641997402486,
+    "netPnl": 419.2505459253716,
+    "feesPaid": 68.30818488474843,
+    "fundingCashDelta": -313.01833920206064,
+    "liquidations": 0,
+    "trades": 39,
+    "sharpe": 0.18521892125034717,
+    "maxDrawdown": 0.18855628577296346,
+    "calmar": 0.05818010456616,
+    "annualizedReturn": 0.010970224422877761,
+    "annualizedVolatility": 0.0734850703762608,
+    "yearSharpe": {
+     "2023": 1.4127183249538864,
+     "2024": -0.321955485419666,
+     "2025": -1.3698451668944276,
+     "2026": 1.3190814415596257
+    },
+    "yearReturn": {
+     "2023": 0.11138866064673114,
+     "2024": -0.0317739703790243,
+     "2025": -0.08542670776509409,
+     "2026": 0.05898929458280078
+    },
+    "fractions": {
+     "entries": 39,
+     "mean": 0.1491186161761673,
+     "min": 0.10973718918575755,
+     "max": 0.199,
+     "atCap": 5,
+     "atFloor": 0
+    }
+   }
+  ]
+ },
+ "bootstrap": {
+  "probability": 0.7975,
+  "p05": -0.09641196579927044,
+  "p50": 0.09279428355840225,
+  "p95": 0.27891695016713364
+ },
+ "criteria": [
+  {
+   "id": "HIGHER_SHARPE",
+   "passed": true
+  },
+  {
+   "id": "DRAWDOWN_NOT_WORSE",
+   "passed": false
+  },
+  {
+   "id": "HIGHER_SHARPE_3_OF_4_YEARS",
+   "passed": true,
+   "detail": "3 de 4"
+  },
+  {
+   "id": "HIGHER_SHARPE_DOUBLED_COSTS",
+   "passed": true
+  },
+  {
+   "id": "BOOTSTRAP_P_GE_0_90",
+   "passed": false,
+   "detail": "0.797"
+  }
+ ],
+ "decision": "REPROVADO"
+}

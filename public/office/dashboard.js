@@ -57,11 +57,6 @@
   data.forEach((c,i)=>{const up=c.c>=c.o,x=i*w+w/2,color=up?'#22e39f':'#ff5577';s.append(shape('line',{x1:x,x2:x,y1:y(c.h),y2:y(c.l),stroke:color,'stroke-width':1.2}));s.append(shape('rect',{x:x-w*0.32,y:Math.min(y(c.o),y(c.c)),width:w*0.64,height:Math.max(1.5,Math.abs(y(c.o)-y(c.c))),fill:color}));});
   host.append(s);
  }
- function spark(host,values,color='#35c9ff'){
-  host.replaceChildren();const s=svg(200,60);if(!s||values.length<2)return;
-  const low=Math.min(...values),high=Math.max(...values),pts=values.map((v,i)=>(i/(values.length-1)*200).toFixed(1)+','+(56-(v-low)/(high-low||1)*52).toFixed(1)).join(' ');
-  s.append(shape('polyline',{points:pts,fill:'none',stroke:color,'stroke-width':2,'vector-effect':'non-scaling-stroke'}));host.append(s);
- }
  const coinIcons={BNBUSDT:['B','bnb'],SOLUSDT:['S','sol'],XRPUSDT:['✕','xrp'],DOGEUSDT:['Ð','doge'],ADAUSDT:['₳','ada'],AVAXUSDT:['▲','avax']};
  function wall(){
   const p=state.panorama,field=(scope,f)=>$('[data-wall="'+scope+'"] [data-field="'+f+'"]');
@@ -73,13 +68,16 @@
   const qt=quote();field('funding','value').textContent=qt?fmt(qt.fundingRate*100,4)+'%':'—';
   // Diferença de funding entre corretoras (Binance, Bybit, OKX, Hyperliquid), quando disponível.
   field('funding','sub').textContent=state.venues?.fundingSpread8h!=null?'entre corretoras: '+fmt(state.venues.fundingSpread8h*100,4)+'%':qt?'próx. liquidação em '+span(qt.nextFundingTime-Date.now()):'sem cotação';
-  // Telão do perpétuo USD-M: mark price e o traçado recebido nesta sessão (o mesmo que a Nova usa).
+  // Telão do perpétuo USD-M: mark price (o mesmo que a Nova usa) e candles de 1 hora do perpétuo; a variação de 24 h
+  // só aparece quando as 24 velas existem.
   field('BTCPERP','price').textContent=qt?fmt(qt.markPrice,2):'—';
-  const perpSub=field('BTCPERP','sub');perpSub.textContent=qt?'mark price · sessão':'sem cotação';perpSub.className='delta';
-  spark(field('BTCPERP','chart'),traces.mark.map(x=>x.price).slice(-90),'#35c9ff');
+  const perp=p?.candles?.BTCPERP??[],day=perp.slice(-24),perpChange=day.length===24?day.at(-1).c/day[0].o-1:NaN;
+  const perpSub=field('BTCPERP','sub');perpSub.textContent=Number.isFinite(perpChange)?pct(perpChange):qt?'mark price':'sem cotação';perpSub.className='delta '+tone(perpChange);
+  if(p)candles(field('BTCPERP','chart'),perp);
   field('funding','chart').replaceChildren();
   const oi=p?.openInterest;field('oi','value').textContent=oi?big(oi.usd):'—';const sub=field('oi','sub');sub.textContent=oi&&Number.isFinite(oi.change24h)?pct(oi.change24h)+' 24h':'';sub.className='delta '+tone(oi?.change24h);
-  spark(field('oi','chart'),(oi?.history||[]).map(h=>h.usd),'#7ad7ff');
+  // Um candle por hora, montado com os pontos de 5 minutos do open interest (US$).
+  if(p)candles(field('oi','chart'),oi?.candles);
   const l=p?.liquidations;field('liquidations','value').textContent=l?big(l.longs+l.shorts):'—';
   field('liquidations','longs').textContent=l?'Longs: '+big(l.longs):'';field('liquidations','shorts').textContent=l?'Shorts: '+big(l.shorts)+(l.coverageHours<23.9?' · desde '+hhmm(Date.parse(l.since)):''):'';
   const map=field('sessions','map');worldMap(map);const open=paintSessions(map);field('sessions','label').textContent=open.length?'Abertas: '+open.join(' · '):'Sessões fechadas';
@@ -218,7 +216,7 @@
  async function loadOperations(){
   const host=$('#operationsList');$('#operationsStatus').textContent='Consultando registros…';
   try{const [fills,funding]=await Promise.all([get('/audit/events?type=PAPER_FILL&limit=50&compact=1'),get('/audit/events?type=FUNDING_SETTLED&limit=25&compact=1')]);
-   const rows=[...fills.events,...funding.events].sort((a,b)=>Date.parse(b.occurredAt)-Date.parse(a.occurredAt));
+   const rows=[...fills.events,...funding.events].sort((a,b)=>Date.parse(b.occurredAt)-Date.parse(a.occurredAt));OfficePanelData.operations=rows;globalThis.OfficePanels?.render();
    $('#operationsStatus').textContent=rows.length?rows.length+' registros mais recentes · clique para abrir o original.':'Nenhuma operação registrada.';
    host.replaceChildren(table(['Quando','Conta','Evento','Detalhe'],rows.map(e=>{const l=eventLine(e)||{who:'',text:e.type};return {cells:[new Date(e.occurredAt).toLocaleString('pt-BR'),name(l.who)||'—',e.type==='PAPER_FILL'?'Fill':'Funding',l.text],open:()=>showEvent(e.id)};})));}
   catch{$('#operationsStatus').textContent='Registros indisponíveis. Confira o acesso.';}
@@ -226,7 +224,7 @@
  async function loadMemory(){
   const select=$('#memoryAgent');if(select.options.length<=1)for(const a of agents.values())select.append(Object.assign(el('option',a.name),{value:a.id}));
   $('#memoryStatus').textContent='Consultando memórias…';
-  try{const rows=await get('/memories'+(select.value?'?agentId='+encodeURIComponent(select.value):''));if(!Array.isArray(rows))throw Error('invalid');const recent=rows.slice(-60).reverse();
+  try{const rows=await get('/memories'+(select.value?'?agentId='+encodeURIComponent(select.value):''));if(!Array.isArray(rows))throw Error('invalid');const recent=rows.slice(-60).reverse();OfficePanelData.memories={agent:select.value,rows};if(!select.value)OfficePanelData.memoriesAll=rows;globalThis.OfficePanels?.render();
    $('#memoryStatus').textContent=rows.length+' memórias registradas'+(rows.length>60?' · mostrando as 60 mais recentes':'');
    $('#memoryList').replaceChildren(...recent.map(m=>{const li=el('li');const who=el('b',name(m.agentId));who.style.color=agentColors[m.agentId]||'';li.append(who,el('span',' · '+OfficeI18n.kind(m.kind)),el('p',OfficeI18n.text(m.summary)),el('small',new Date(m.createdAt).toLocaleString('pt-BR')));if(m.sourceEventId)li.append(sourceButton(m.sourceEventId));return li;}));}
   catch{$('#memoryStatus').textContent='Memórias indisponíveis. Confira o acesso.';}
@@ -238,6 +236,7 @@
  async function loadReport(){
   const host=$('#pilotReport');$('#reportStatus').textContent='Consultando avaliação…';
   try{const r=await get('/paper/perpetual/pilot/report');if(r?.scope!=='PILOT_EVALUATION')throw Error('invalid');
+   OfficePanelData.report=r;globalThis.OfficePanels?.render();
    if(r.status==='NO_DECISIONS'){$('#reportStatus').textContent='Nenhuma decisão do piloto registrada ainda.';host.replaceChildren();return;}
    $('#reportStatus').textContent=r.protocol.version+' · declarado em '+r.protocol.declaredAt+' · '+r.hours+' h desde '+new Date(r.startedAt).toLocaleString('pt-BR');
    const head=el('div','','report-verdict');head.dataset.verdict=r.verdict;head.append(el('small',r.verdict==='IN_PROGRESS'?'Veredito (em andamento)':'Veredito final'),el('b',verdictLabels[r.verdict]||r.verdict));
@@ -317,7 +316,9 @@
    let badge=view.button.querySelector?.('.state-badge');if(badges[id]){if(!badge){badge=el('span','','state-badge');badge.setAttribute('aria-hidden','true');view.button.append(badge);}badge.textContent=badges[id];}else badge?.remove();
   }
  }
- function paint(){activity();header();wall();if(!state.cardReady&&agents.has(state.selected)){state.cardReady=true;$('#agentCard').hidden=false;selectAgent(state.selected);}card();renderActivity();lighting();watchPositions();if(openGroup)fillLarge();}
+ function paint(){activity();header();wall();
+  // Monitores das mesas: só dados recebidos (panorama público, cotação da sessão, conta do piloto, mensagens registradas).
+  globalThis.OfficeDeskScreens?.paint({panorama:state.panorama,finance:finance(),messages:communicationReady?communications:[]});if(!state.cardReady&&agents.has(state.selected)){state.cardReady=true;$('#agentCard').hidden=false;selectAgent(state.selected);}card();renderActivity();lighting();watchPositions();if(openGroup)fillLarge();}
  for(const b of D.querySelectorAll('.dock-tabs button'))b.onclick=()=>{state.tab=b.dataset.tab;card();};
  $('#closeCard').onclick=()=>{$('#agentCard').hidden=true;};
  $('#cardProfile').onclick=()=>profile(state.selected);

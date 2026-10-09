@@ -159,3 +159,65 @@ test('cadeiras e destinos movidos no editor: cadeira, monitor e recorte andam ju
  // O piso padrão é refeito com as posições novas: a cadeira movida continua alcançando todo destino.
  const grid=OfficeMap.defaultGrid();for(const place of OfficeLife.places){const target=place.to??{x:place.x,y:OfficeLife.lanes[place.lane].y};assert.ok(OfficeMap.route({x:nova.x,y:nova.y},target,grid).length>=2,'nova → '+place.id);}
 });
+
+test('monitores das mesas: sem dado fresco ficam apagados; com candles reais desenham gráfico; 3 telas por mesa',()=>{
+ const used:string[]=[];
+ const ctx:any=new Proxy({},{get:(t:any,k)=>k in t?t[k]:(()=>{}),set:(t:any,k,v)=>{if((k==='fillStyle'||k==='strokeStyle')&&typeof v==='string')used.push(v);t[k]=v;return true;}});
+ const canvas={getContext:()=>ctx,setAttribute(){},id:'',width:0,height:0};
+ const office={prepend(){}};
+ const context=vm.createContext({document:{querySelector:(s:string)=>s==='#office'?office:null,createElement:()=>canvas},Date,Math,Object,Array,console});
+ for(const name of ['scene-quads','desk-screens'])vm.runInContext(readFileSync('public/office/'+name+'.js','utf8'),context);
+ const {OfficeDeskScreens}=context as any;
+ assert.deepEqual(Object.keys(OfficeDeskScreens.stations()).sort(),['atlas','euler','flux','nova','oracle','satoshi','sentinel','vega'],'a mesa vazia não recebe conteúdo');
+ for(const q of Object.values(OfficeDeskScreens.stations()) as any[])assert.deepEqual(Object.keys(q),['left','center','right']);
+ OfficeDeskScreens.paint({panorama:null,finance:null,marks:[],messages:[]});
+ assert.ok(!used.some(c=>['#22e39f','#ff6b6b','#5fb6ff','#ffd166'].includes(c)),'sem dados: nenhuma cor de gráfico, só telas apagadas');
+ used.length=0;const t0=Date.UTC(2026,9,5);
+ OfficeDeskScreens.paint({panorama:{candles:{BTCUSDT:Array.from({length:30},(_,i)=>({t:t0+i*3600000,o:100+i,h:102+i,l:99+i,c:i%2?101+i:99+i}))}},finance:null,marks:[],messages:[]});
+ assert.ok(used.includes('#22e39f')&&used.includes('#ff6b6b'),'candles reais aparecem em verde e vermelho');
+});
+
+test('cenário oficial: cadeira apoiada no agente, áreas clicáveis no formato das telas, peças existentes e nenhum móvel nas rotas',()=>{
+ const qctx=vm.createContext({});vm.runInContext(readFileSync('public/office/scene-quads.js','utf8'),qctx);const Q=(qctx as any).OfficeSceneQuads;
+ assert.deepEqual({...Q.chairRect({x:174,y:299})},{x:150,y:243,w:48,h:64},'cadeira apoiada no ponto do agente');
+ // A área clicável envolve a tela e o polígono segue os 4 cantos (tela inclinada da esquerda da mesa da Nova).
+ const attrs:Record<string,string>={},classes:string[]=[];const button:any={setAttribute:(k:string,v:string)=>{attrs[k]=v;},classList:{add:(c:string)=>classes.push(c)}};
+ const left=Q.desk().nova.left;assert.equal(Q.place(button,left),true);assert.ok(classes.includes('quad-hit'));
+ const xs=left.map((p:number[])=>p[0]),ys=left.map((p:number[])=>p[1]);
+ assert.match(attrs.style,new RegExp('^left:'+(Math.min(...xs)/1852*100).toString().slice(0,6)));
+ assert.equal(Object.keys(Q.desk()).sort().join(),['atlas','euler','flux','nova','oracle','satoshi','sentinel','trading-empty','vega'].join(),'8 mesas + a mesa vazia do Trading Floor');
+ assert.equal(JSON.stringify(Q.rect([705,595,124,68])),'[[705,595],[829,595],[829,663],[705,663]]','telões usam o retângulo exato de screens.js');
+ // Layout: toda peça existe no catálogo e tem escala.
+ const L=JSON.parse(readFileSync('public/office/assets/cenario-modular.json','utf8')),cat=JSON.parse(readFileSync('public/office/assets/catalog.json','utf8')),esc=JSON.parse(readFileSync('public/office/assets/escala.json','utf8'));
+ for(const o of L.objetos)assert.ok(cat[o.id]&&esc[o.id],'peça sem catálogo ou escala: '+o.id);
+ // Nenhum móvel no chão cruza as rotas dos personagens (corredores horizontais e passagens verticais).
+ const ctx=vm.createContext({document:{createElement:()=>new Element(),activeElement:null},setTimeout,clearTimeout,console});
+ for(const name of ['navigation','workstations','life'])vm.runInContext(readFileSync('public/office/'+name+'.js','utf8'),ctx);
+ const {OfficeLife}=ctx as any;
+ const size=(id:string)=>{const e=esc[id],p=cat[id];const s=e.w?e.w/p.width:e.h/p.height;return {w:p.width*s,h:p.height*s};};
+ for(const o of L.objetos){if(o.chao||o.parede||o.fit||o.z!==undefined)continue;const s=size(o.id),x0=o.x-s.w/2,x1=o.x+s.w/2,foot0=o.base-10;
+  for(const [id,lane] of Object.entries(OfficeLife.lanes) as [string,any][])if(lane.y>foot0&&lane.y<o.base+2&&x1>lane.from&&x0<lane.to)assert.fail(o.id+' em x '+o.x+' cruza a rota '+id);
+  for(const p of OfficeLife.passages){const ya=OfficeLife.lanes[p.a].y,yb=OfficeLife.lanes[p.b].y;if(p.x>x0&&p.x<x1&&o.base>Math.min(ya,yb)&&foot0<Math.max(ya,yb))assert.fail(o.id+' bloqueia a passagem x '+p.x);}
+ }
+ const css=readFileSync('public/office/v3.css','utf8');assert.match(css,/#office\{background-image:url\('\/office\/cenario-modular\.png'\)/);assert.doesNotMatch(css+readFileSync('public/office/style.css','utf8'),/office-reference-v2|office-day\.png|data-cenario/,'arte antiga removida');
+ const assets=readFileSync('src/application/office-assets.ts','utf8');for(const f of ['scene-quads.js','cenario-modular.png','cidade-faixa-dia.png','cidade-faixa-entardecer.png','cidade-faixa-noite.png','assets/cadeira-costas.png'])assert.ok(assets.includes("'"+f+"'"),'arquivo liberado: '+f);
+});
+
+test('objetos clicáveis no cenário oficial ficam sobre a própria peça (estante, relógio, rack, cafeteira e mesa)',()=>{
+ const qctx=vm.createContext({});vm.runInContext(readFileSync('public/office/scene-quads.js','utf8'),qctx);const Q=(qctx as any).OfficeSceneQuads;
+ const layout=JSON.parse(readFileSync('public/office/assets/cenario-modular.json','utf8')),scale=JSON.parse(readFileSync('public/office/assets/escala.json','utf8')),catalog=JSON.parse(readFileSync('public/office/assets/catalog.json','utf8'));
+ const pieces=catalog.pecas??catalog.pieces??catalog,piece=(id:string)=>Array.isArray(pieces)?pieces.find((p:any)=>p.id===id):pieces[id];
+ // Caixa da peça no cenário: x no centro, base embaixo, tamanho de escala.json mantendo a proporção do recorte.
+ const box=(o:any)=>{const p=piece(o.id),s=scale[o.id],w=s.w??s.h*p.width/p.height,h=s.h??s.w*p.height/p.width;return [o.x-w/2,o.base-h,w,h];};
+ const expected:Record<string,[string,number]>={library:['decoracao-estante-livros',58],terminal:['decoracao-relogio',947],'quant-servers':['eletronico-rack-servidor',560],coffee:['copa-cafeteira',1030],'meeting-table':['estar-mesa-reuniao',1565]};
+ const nav=vm.createContext({});vm.runInContext(readFileSync('public/office/navigation.js','utf8'),nav);const features=(nav as any).OfficeNavigation.features.map((f:any)=>f.id);
+ assert.equal([...Object.keys(Q.FEATURE),...Q.SCREEN_FEATURES].sort().join(),[...features].sort().join(),'todo objeto da navegação tem área no cenário (ou já é um telão)');
+ for(const [id,[pieceId,x]] of Object.entries(expected)){
+  const o=layout.objetos.find((item:any)=>item.id===pieceId&&item.x===x);assert.ok(o,pieceId+' x'+x+' existe no cenário');
+  const [bx,by,bw,bh]=box(o),points=Q.feature(id),xs=points.map((p:number[])=>p[0]),ys=points.map((p:number[])=>p[1]);
+  assert.ok(Math.min(...xs)>=bx-1.5&&Math.max(...xs)<=bx+bw+1.5&&Math.min(...ys)>=by-1.5&&Math.max(...ys)<=by+bh+1.5,id+' fica dentro da peça');
+  assert.ok((Math.max(...xs)-Math.min(...xs))*(Math.max(...ys)-Math.min(...ys))>=bw*bh*0.6,id+' cobre a peça, não só um ponto');
+ }
+ assert.equal(Q.feature('risk-board'),null,'o quadro de risco já é o telão risk-wall');
+ assert.match(readFileSync('public/office/navigation.js','utf8'),/id:'terminal',room:'Trading Floor',label:'Relógio do mercado'/);
+});

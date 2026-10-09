@@ -13,7 +13,7 @@
  let canvas=null,ctx=null,frame=0,lastDraw=0,stats=null;
  const preferred=()=>{try{return globalThis.localStorage?.getItem(KEY)==='canvas'?'canvas':'dom';}catch{return 'dom';}};
  const reduced=()=>D.body?.dataset?.motion!=='on'&&globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
- function sceneImage(){return image($('#office')?.dataset.lighting==='day'?'/office/office-day.png':'/office/office-reference-v2.png');}
+ const chairImage=()=>image(globalThis.OfficeSceneQuads?.CHAIR.src??'/office/assets/cadeira-costas.png');
  /** Coluna da folha de sprites para a pose atual (mesma regra do CSS: 0 parado, 1-4 andando, 5 sentado). */
  function column(agent,now){
   if(agent.dataset.pose==='seated')return 5;
@@ -35,15 +35,10 @@
   ctx.drawImage(img,b.x,b.y,b.w,b.h,(r.left-origin.left)*ratio,(r.top-origin.top)*ratio,r.width*ratio,r.height*ratio);
   ctx.shadowColor='transparent';ctx.globalAlpha=1;
  }
- function drawChair(chair,origin,scene){
-  const r=chair.getBoundingClientRect();if(r.width<1)return;
-  const ratio=canvas.width/origin.width,scale=scene.naturalWidth/origin.width;
-  const x=(r.left-origin.left)*ratio,y=(r.top-origin.top)*ratio,w=r.width*ratio,h=r.height*ratio;
-  ctx.save();ctx.beginPath();
-  // Mesmo recorte do clip-path do CSS (encosto da cadeira).
-  for(const [i,[px,py]] of [[.07,0],[.93,0],[1,.9],[.84,1],[.16,1],[0,.9]].entries())i?ctx.lineTo(x+px*w,y+py*h):ctx.moveTo(x+px*w,y+py*h);
-  ctx.closePath();ctx.clip();
-  ctx.drawImage(scene,(r.left-origin.left)*scale,(r.top-origin.top)*scale,r.width*scale,r.height*scale,x,y,w,h);ctx.restore();
+ /** Cadeira das estações: a peça cadeira-costas desenhada inteira no retângulo do elemento (mesma do DOM). */
+ function drawChair(chair,origin,piece){
+  const r=chair.getBoundingClientRect();if(r.width<1)return;const ratio=canvas.width/origin.width;
+  ctx.drawImage(piece,(r.left-origin.left)*ratio,(r.top-origin.top)*ratio,r.width*ratio,r.height*ratio);
  }
  function draw(now){
   // Enquanto as imagens não carregam, o DOM continua pintando e o canvas fica vazio (nada aparece duplicado).
@@ -55,7 +50,7 @@
   const agents=[...office.querySelectorAll('.agent')],away=a=>a.dataset.life==='away';
   // Ordem igual à do DOM: agentes no lugar (camada 3), cadeiras (4), agentes andando pelo escritório (7).
   for(const a of agents)if(!away(a))drawAgent(a,origin,now);
-  const scene=sceneImage();if(ready(scene))for(const chair of office.querySelectorAll('.station-chair'))drawChair(chair,origin,scene);
+  const piece=chairImage();if(ready(piece))for(const chair of office.querySelectorAll('.station-chair'))drawChair(chair,origin,piece);
   for(const a of agents)if(away(a))drawAgent(a,origin,now);
  }
  function loop(now){
@@ -70,7 +65,7 @@
   canvas=D.createElement('canvas');canvas.id='sceneCanvas';canvas.setAttribute('aria-hidden','true');ctx=canvas.getContext('2d');
   office.append(canvas);
   // Só esconde a pintura do DOM depois que as imagens carregarem, para nunca deixar a cena vazia.
-  const needed=[sceneImage(),...Object.keys(globalThis.OfficeSpriteSheets??{}).map(id=>image('/office/characters/'+id+'.png'))];
+  const needed=[chairImage(),...Object.keys(globalThis.OfficeSpriteSheets??{}).map(id=>image('/office/characters/'+id+'.png'))];
   const loaded=i=>new Promise(res=>{if(i.complete)res();else{i.addEventListener('load',res,{once:true});i.addEventListener('error',res,{once:true});}});
   Promise.all(needed.map(loaded)).then(()=>{if(canvas&&needed.every(ready))D.body.dataset.renderer='canvas';});
   frame=requestAnimationFrame(loop);

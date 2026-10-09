@@ -26,6 +26,13 @@ const annualize=(sharpe:number)=>Number.isFinite(sharpe)?sharpe*Math.sqrt(24*365
 function fullReturns(dataset:PerpetualDataset,config:PerpetualConfig,skipHours:number){
  const series=backtestPerpetual(dataset,config).equitySeries;return hourlyReturns(series).slice(skipHours);
 }
+/** Mercado nas janelas de teste (contíguas): do fechamento anterior à primeira janela ao fechamento da última vela de teste. */
+function outOfSampleMarket(input:RobustnessInput){
+ if(!input.folds.length)return undefined;
+ const first=Math.min(...input.folds.map(f=>f.testStart)),last=Math.max(...input.folds.map(f=>f.testEnd)),trade=input.dataset.trade;
+ const start=trade.filter(c=>c.timestamp<first).at(-1)??trade.find(c=>c.timestamp>=first),end=trade.filter(c=>c.timestamp<=last).at(-1);
+ return start&&end?{startPrice:start.close,endPrice:end.close}:undefined;
+}
 export function computeStudyRobustness(input:RobustnessInput){
  // 1) Retornos fora da amostra do estudo: só as horas de teste de cada janela (o aquecimento fica de fora).
  const oos=input.folds.flatMap(f=>hourlyReturns((f.result.equitySeries??[]).filter(p=>p.timestamp>=f.testStart&&p.timestamp<f.testEnd+HOUR)));
@@ -60,6 +67,6 @@ export function computeStudyRobustness(input:RobustnessInput){
    medianSharpeAnnualized:cpcvSharpes.length?annualize(cpcvSharpes[Math.floor(cpcvSharpes.length/2)]):null,worstSharpeAnnualized:cpcvSharpes.length?annualize(cpcvSharpes[0]):null,
    pathReturns:cpcv.paths.map(p=>p.totalReturn),selections:Object.fromEntries(Object.entries(cpcv.selections).map(([i,n])=>[String(input.candidates[Number(i)]?.strategy??'SMA')+' '+input.candidates[Number(i)]?.fastPeriod+'/'+input.candidates[Number(i)]?.slowPeriod+'#'+i,n])),note:cpcv.reason},
   // Métricas fora da amostra (equity das janelas de teste e operações de cada janela).
-  metrics:performanceMetrics(input.folds.flatMap(f=>(f.result.equitySeries??[]).filter(p=>p.timestamp>=f.testStart&&p.timestamp<f.testEnd+HOUR)),input.folds.flatMap(f=>(f.result.tradeOutcomes??[]).map(netPnl=>({netPnl})))),
+  metrics:performanceMetrics(input.folds.flatMap(f=>(f.result.equitySeries??[]).filter(p=>p.timestamp>=f.testStart&&p.timestamp<f.testEnd+HOUR)),input.folds.flatMap(f=>(f.result.tradeOutcomes??[]).map(netPnl=>({netPnl}))),undefined,outOfSampleMarket(input)),
   eligible:checks.every(c=>c.ok),checks};
 }

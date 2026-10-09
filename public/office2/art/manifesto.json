@@ -1,0 +1,423 @@
+{
+ "version": 1,
+ "props": {
+  "mesa-curva-operacoes": {
+   "file": "props/mesa-curva-operacoes.png",
+   "width": 384,
+   "height": 221,
+   "axis": "none"
+  },
+  "mesa-curva-media": {
+   "file": "props/mesa-curva-media.png",
+   "width": 288,
+   "height": 202,
+   "axis": "none"
+  },
+  "totem-logo": {
+   "file": "props/totem-logo.png",
+   "width": 72,
+   "height": 150,
+   "axis": "none"
+  },
+  "cadeira-costas": {
+   "file": "props/cadeira-costas.png",
+   "width": 56,
+   "height": 78,
+   "axis": "none"
+  },
+  "cadeira-frente": {
+   "file": "props/cadeira-frente.png",
+   "width": 56,
+   "height": 84,
+   "axis": "none"
+  },
+  "mesa-monitores": {
+   "file": "props/mesa-monitores.png",
+   "width": 240,
+   "height": 190,
+   "axis": "j"
+  },
+  "estacao-2-monitores": {
+   "file": "props/estacao-2-monitores.png",
+   "width": 192,
+   "height": 183,
+   "axis": "j"
+  },
+  "armario-baixo": {
+   "file": "props/armario-baixo.png",
+   "width": 144,
+   "height": 151,
+   "axis": "j"
+  },
+  "mesa-reuniao": {
+   "file": "props/mesa-reuniao.png",
+   "width": 384,
+   "height": 263,
+   "axis": "j"
+  },
+  "mesa-reuniao-6": {
+   "file": "props/mesa-reuniao-6.png",
+   "width": 336,
+   "height": 280,
+   "axis": "j"
+  },
+  "mesa-cafe-4": {
+   "file": "props/mesa-cafe-4.png",
+   "width": 192,
+   "height": 154,
+   "axis": "none"
+  },
+  "aparador": {
+   "file": "props/aparador.png",
+   "width": 192,
+   "height": 144,
+   "axis": "j"
+  },
+  "balcao-recepcao": {
+   "file": "props/balcao-recepcao.png",
+   "width": 288,
+   "height": 212,
+   "axis": "none"
+  },
+  "banco-espera": {
+   "file": "props/banco-espera.png",
+   "width": 144,
+   "height": 108,
+   "axis": "j"
+  },
+  "parede-elevadores": {
+   "file": "props/parede-elevadores.png",
+   "width": 192,
+   "height": 225,
+   "axis": "j"
+  },
+  "catraca": {
+   "file": "props/catraca.png",
+   "width": 96,
+   "height": 100,
+   "axis": "none"
+  },
+  "sofa": {
+   "file": "props/sofa.png",
+   "width": 192,
+   "height": 133,
+   "axis": "j"
+  },
+  "poltrona": {
+   "file": "props/poltrona.png",
+   "width": 96,
+   "height": 91,
+   "axis": "none"
+  },
+  "mesa-centro": {
+   "file": "props/mesa-centro.png",
+   "width": 144,
+   "height": 103,
+   "axis": "j"
+  },
+  "tapete": {
+   "file": "props/tapete.png",
+   "width": 336,
+   "height": 162,
+   "axis": "j"
+  },
+  "luminaria-chao": {
+   "file": "props/luminaria-chao.png",
+   "width": 48,
+   "height": 147,
+   "axis": "none"
+  },
+  "esteira": {
+   "file": "props/esteira.png",
+   "width": 144,
+   "height": 160,
+   "axis": "j"
+  },
+  "saco-pancada": {
+   "file": "props/saco-pancada.png",
+   "width": 72,
+   "height": 133,
+   "axis": "none"
+  },
+  "rack-halteres": {
+   "file": "props/rack-halteres.png",
+   "width": 144,
+   "height": 135,
+   "axis": "j"
+  },
+  "bancada-teste": {
+   "file": "props/bancada-teste.png",
+   "width": 192,
+   "height": 244,
+   "axis": "none"
+  },
+  "estacao-madeira": {
+   "file": "props/estacao-madeira.png",
+   "width": 240,
+   "height": 208,
+   "axis": "j"
+  },
+  "estante-arquivo": {
+   "file": "props/estante-arquivo.png",
+   "width": 144,
+   "height": 208,
+   "axis": "j"
+  },
+  "lockers": {
+   "file": "props/lockers.png",
+   "width": 192,
+   "height": 190,
+   "axis": "j"
+  },
+  "armarios-arquivo": {
+   "file": "props/armarios-arquivo.png",
+   "width": 240,
+   "height": 219,
+   "axis": "j"
+  },
+  "rack-servidor": {
+   "file": "props/rack-servidor.png",
+   "width": 96,
+   "height": 214,
+   "axis": "none"
+  },
+  "sofa-cinza": {
+   "file": "props/sofa-cinza.png",
+   "width": 144,
+   "height": 115,
+   "axis": "j"
+  },
+  "bancada-cozinha": {
+   "file": "props/bancada-cozinha.png",
+   "width": 240,
+   "height": 212,
+   "axis": "j"
+  },
+  "banqueta": {
+   "file": "props/banqueta.png",
+   "width": 48,
+   "height": 81,
+   "axis": "none"
+  },
+  "geladeira": {
+   "file": "props/geladeira.png",
+   "width": 96,
+   "height": 203,
+   "axis": "none"
+  },
+  "mesa-redonda": {
+   "file": "props/mesa-redonda.png",
+   "width": 192,
+   "height": 231,
+   "axis": "none"
+  },
+  "cadeira-cafe": {
+   "file": "props/cadeira-cafe.png",
+   "width": 56,
+   "height": 82,
+   "axis": "none"
+  },
+  "sofa-externo": {
+   "file": "props/sofa-externo.png",
+   "width": 192,
+   "height": 123,
+   "axis": "j"
+  },
+  "mesa-externa": {
+   "file": "props/mesa-externa.png",
+   "width": 144,
+   "height": 91,
+   "axis": "j"
+  },
+  "poltrona-externa": {
+   "file": "props/poltrona-externa.png",
+   "width": 96,
+   "height": 82,
+   "axis": "none"
+  },
+  "jardineira-capim": {
+   "file": "props/jardineira-capim.png",
+   "width": 192,
+   "height": 137,
+   "axis": "j"
+  },
+  "planta-alta": {
+   "file": "props/planta-alta.png",
+   "width": 72,
+   "height": 98,
+   "axis": "none"
+  },
+  "samambaia": {
+   "file": "props/samambaia.png",
+   "width": 72,
+   "height": 67,
+   "axis": "none"
+  },
+  "planta-baixa": {
+   "file": "props/planta-baixa.png",
+   "width": 56,
+   "height": 67,
+   "axis": "none"
+  },
+  "espada": {
+   "file": "props/espada.png",
+   "width": 56,
+   "height": 124,
+   "axis": "none"
+  },
+  "ficus": {
+   "file": "props/ficus.png",
+   "width": 80,
+   "height": 133,
+   "axis": "none"
+  },
+  "jardineira": {
+   "file": "props/jardineira.png",
+   "width": 192,
+   "height": 149,
+   "axis": "j"
+  }
+ },
+ "icons": {
+  "estagio-trader": {
+   "file": "icones/estagio-trader.png",
+   "size": 64
+  },
+  "estagio-risk": {
+   "file": "icones/estagio-risk.png",
+   "size": 64
+  },
+  "estagio-validator": {
+   "file": "icones/estagio-validator.png",
+   "size": 64
+  },
+  "estagio-execution": {
+   "file": "icones/estagio-execution.png",
+   "size": 64
+  },
+  "estagio-audit": {
+   "file": "icones/estagio-audit.png",
+   "size": 64
+  },
+  "zona-horizon": {
+   "file": "icones/zona-horizon.png",
+   "size": 64
+  },
+  "zona-nexus": {
+   "file": "icones/zona-nexus.png",
+   "size": 64
+  },
+  "zona-ring": {
+   "file": "icones/zona-ring.png",
+   "size": 64
+  },
+  "zona-lab": {
+   "file": "icones/zona-lab.png",
+   "size": 64
+  },
+  "zona-risk": {
+   "file": "icones/zona-risk.png",
+   "size": 64
+  },
+  "zona-auditoria": {
+   "file": "icones/zona-auditoria.png",
+   "size": 64
+  },
+  "zona-diagnostico": {
+   "file": "icones/zona-diagnostico.png",
+   "size": 64
+  },
+  "zona-backtest": {
+   "file": "icones/zona-backtest.png",
+   "size": 64
+  },
+  "zona-ordens": {
+   "file": "icones/zona-ordens.png",
+   "size": 64
+  },
+  "zona-marca": {
+   "file": "icones/zona-marca.png",
+   "size": 64
+  },
+  "estado-trabalhando": {
+   "file": "icones/estado-trabalhando.png",
+   "size": 32
+  },
+  "estado-aguardando": {
+   "file": "icones/estado-aguardando.png",
+   "size": 32
+  },
+  "estado-bloqueado": {
+   "file": "icones/estado-bloqueado.png",
+   "size": 32
+  },
+  "estado-desconectado": {
+   "file": "icones/estado-desconectado.png",
+   "size": 32
+  },
+  "estado-mensagem": {
+   "file": "icones/estado-mensagem.png",
+   "size": 32
+  },
+  "estado-pausa": {
+   "file": "icones/estado-pausa.png",
+   "size": 32
+  },
+  "cenario-baseline": {
+   "file": "icones/cenario-baseline.png",
+   "size": 64
+  },
+  "cenario-abrupt-move": {
+   "file": "icones/cenario-abrupt-move.png",
+   "size": 64
+  },
+  "cenario-volatility-spike": {
+   "file": "icones/cenario-volatility-spike.png",
+   "size": 64
+  },
+  "cenario-spread-widening": {
+   "file": "icones/cenario-spread-widening.png",
+   "size": 64
+  },
+  "cenario-stale-quote": {
+   "file": "icones/cenario-stale-quote.png",
+   "size": 64
+  },
+  "cenario-stale-candles": {
+   "file": "icones/cenario-stale-candles.png",
+   "size": 64
+  },
+  "cenario-missing-candle": {
+   "file": "icones/cenario-missing-candle.png",
+   "size": 64
+  },
+  "cenario-provider-outage": {
+   "file": "icones/cenario-provider-outage.png",
+   "size": 64
+  },
+  "cenario-backup-venue-divergence": {
+   "file": "icones/cenario-backup-venue-divergence.png",
+   "size": 64
+  },
+  "cenario-loss-limit": {
+   "file": "icones/cenario-loss-limit.png",
+   "size": 64
+  },
+  "cenario-kill-switch": {
+   "file": "icones/cenario-kill-switch.png",
+   "size": 64
+  },
+  "cenario-malformed-snapshot": {
+   "file": "icones/cenario-malformed-snapshot.png",
+   "size": 64
+  },
+  "cenario-duplicate-out-of-order": {
+   "file": "icones/cenario-duplicate-out-of-order.png",
+   "size": 64
+  },
+  "cenario-restart": {
+   "file": "icones/cenario-restart.png",
+   "size": 64
+  }
+ }
+}

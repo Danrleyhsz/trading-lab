@@ -1,0 +1,667 @@
+{
+  "scope": "SIMULATION",
+  "policy": {
+    "version": "STRESS_LAB_V1",
+    "warmupBars": 120,
+    "runHours": 240,
+    "startPrice": 60000,
+    "hourlyVolatility": 0.004,
+    "trendDrift": 0.0015,
+    "trendBlockHours": 36,
+    "fundingRate": 0.0001,
+    "halfSpread": 0.5,
+    "initialCash": 1000,
+    "maxLossFraction": 0.03,
+    "recoveryLimitHours": 1,
+    "configuration": {
+      "strategy": "SMA",
+      "initialCapital": 10000,
+      "feeRate": 0.00055,
+      "slippageBps": 1,
+      "maintenanceRate": 0.01,
+      "liquidationFeeRate": 0.005,
+      "positionFraction": 0.1,
+      "fastPeriod": 5,
+      "slowPeriod": 20
+    }
+  },
+  "seed": 20261006,
+  "note": "Mercado sintético gerado pela semente; mede invariantes e controles do código de produção, não o mercado real.",
+  "summary": {
+    "scenarios": 14,
+    "survived": 14,
+    "invariantViolations": 0,
+    "killSwitchActivations": 2,
+    "worstSlippageBps": 101.01,
+    "maxDrawdown": 0.05577521
+  },
+  "scenarios": [
+    {
+      "id": "BASELINE",
+      "title": "Sem falhas",
+      "covers": [
+        "baseline"
+      ],
+      "window": null,
+      "survived": true,
+      "invariantViolations": [],
+      "expectations": [
+        {
+          "id": "decides_every_hour",
+          "description": "uma decisão por hora fechada",
+          "passed": true
+        },
+        {
+          "id": "trades",
+          "description": "o ciclo abre posições",
+          "passed": true
+        },
+        {
+          "id": "no_errors",
+          "description": "nenhum erro de ciclo ou sincronização",
+          "passed": true
+        }
+      ],
+      "metrics": {
+        "decisions": 240,
+        "fills": 19,
+        "openingFills": 10,
+        "riskRejected": {},
+        "cycleErrors": {},
+        "syncRejected": {},
+        "entryBlocked": 0,
+        "killSwitchActivations": 0,
+        "pilotStops": [],
+        "worstSlippageBps": 1.0931,
+        "maxDrawdown": 0.00518734,
+        "finalEquity": 1014.996175,
+        "finalPosition": 0.001806823505,
+        "recoveryHours": null,
+        "rejectedCorrectly": []
+      }
+    },
+    {
+      "id": "ABRUPT_MOVE",
+      "title": "Queda de 12% numa hora e alta de 10% doze horas depois",
+      "covers": [
+        "abrupt BTC move"
+      ],
+      "window": null,
+      "survived": true,
+      "invariantViolations": [],
+      "expectations": [
+        {
+          "id": "keeps_deciding",
+          "description": "continua decidindo todas as horas",
+          "passed": true
+        }
+      ],
+      "metrics": {
+        "decisions": 240,
+        "fills": 17,
+        "openingFills": 9,
+        "riskRejected": {},
+        "cycleErrors": {},
+        "syncRejected": {},
+        "entryBlocked": 0,
+        "killSwitchActivations": 0,
+        "pilotStops": [],
+        "worstSlippageBps": 1.0942,
+        "maxDrawdown": 0.0095612,
+        "finalEquity": 1018.807924,
+        "finalPosition": -0.001856947684,
+        "recoveryHours": null,
+        "rejectedCorrectly": []
+      }
+    },
+    {
+      "id": "VOLATILITY_SPIKE",
+      "title": "Volatilidade 6x por 24 h",
+      "covers": [
+        "volatility spike"
+      ],
+      "window": null,
+      "survived": true,
+      "invariantViolations": [],
+      "expectations": [
+        {
+          "id": "keeps_deciding",
+          "description": "continua decidindo todas as horas",
+          "passed": true
+        }
+      ],
+      "metrics": {
+        "decisions": 240,
+        "fills": 19,
+        "openingFills": 10,
+        "riskRejected": {},
+        "cycleErrors": {},
+        "syncRejected": {},
+        "entryBlocked": 0,
+        "killSwitchActivations": 0,
+        "pilotStops": [],
+        "worstSlippageBps": 1.0969,
+        "maxDrawdown": 0.00671979,
+        "finalEquity": 1017.585284,
+        "finalPosition": 0.001885628451,
+        "recoveryHours": null,
+        "rejectedCorrectly": []
+      }
+    },
+    {
+      "id": "SPREAD_WIDENING",
+      "title": "Spread de 2% (1% para cada lado) por 24 h",
+      "covers": [
+        "spread widening",
+        "abnormal slippage"
+      ],
+      "window": [
+        100,
+        124
+      ],
+      "survived": true,
+      "invariantViolations": [],
+      "expectations": [
+        {
+          "id": "cost_visible",
+          "description": "o pior slippage reflete o spread (>= 100 bps)",
+          "passed": true
+        }
+      ],
+      "metrics": {
+        "decisions": 240,
+        "fills": 19,
+        "openingFills": 10,
+        "riskRejected": {},
+        "cycleErrors": {},
+        "syncRejected": {},
+        "entryBlocked": 0,
+        "killSwitchActivations": 0,
+        "pilotStops": [],
+        "worstSlippageBps": 101.01,
+        "maxDrawdown": 0.00518734,
+        "finalEquity": 1013.010543,
+        "finalPosition": 0.001803288826,
+        "recoveryHours": 0,
+        "rejectedCorrectly": []
+      }
+    },
+    {
+      "id": "STALE_QUOTE",
+      "title": "Cotação atrasada 60 s por 24 h",
+      "covers": [
+        "stale/delayed market data"
+      ],
+      "window": [
+        100,
+        124
+      ],
+      "survived": true,
+      "invariantViolations": [],
+      "expectations": [
+        {
+          "id": "sync_rejected",
+          "description": "a sincronização recusa cada cotação velha",
+          "passed": true
+        },
+        {
+          "id": "recovers",
+          "description": "volta a decidir na primeira hora boa",
+          "passed": true
+        }
+      ],
+      "metrics": {
+        "decisions": 216,
+        "fills": 19,
+        "openingFills": 10,
+        "riskRejected": {},
+        "cycleErrors": {},
+        "syncRejected": {
+          "stale market": 24
+        },
+        "entryBlocked": 0,
+        "killSwitchActivations": 0,
+        "pilotStops": [],
+        "worstSlippageBps": 1.0931,
+        "maxDrawdown": 0.00542087,
+        "finalEquity": 1009.64334,
+        "finalPosition": 0.001797294771,
+        "recoveryHours": 0,
+        "rejectedCorrectly": []
+      }
+    },
+    {
+      "id": "STALE_CANDLES",
+      "title": "Fonte de candles atrasada 3 h por 24 h",
+      "covers": [
+        "stale/delayed market data"
+      ],
+      "window": [
+        100,
+        124
+      ],
+      "survived": true,
+      "invariantViolations": [],
+      "expectations": [
+        {
+          "id": "stale_blocked",
+          "description": "\"signal history stale\" em cada hora da janela",
+          "passed": true
+        },
+        {
+          "id": "recovers",
+          "description": "volta a decidir na primeira hora boa",
+          "passed": true
+        }
+      ],
+      "metrics": {
+        "decisions": 216,
+        "fills": 19,
+        "openingFills": 10,
+        "riskRejected": {},
+        "cycleErrors": {
+          "signal history stale": 24
+        },
+        "syncRejected": {},
+        "entryBlocked": 0,
+        "killSwitchActivations": 0,
+        "pilotStops": [],
+        "worstSlippageBps": 1.0931,
+        "maxDrawdown": 0.00542087,
+        "finalEquity": 1009.64334,
+        "finalPosition": 0.001797294771,
+        "recoveryHours": 0,
+        "rejectedCorrectly": []
+      }
+    },
+    {
+      "id": "MISSING_CANDLE",
+      "title": "Fonte devolve histórico com um candle faltando por 24 h",
+      "covers": [
+        "missing candle"
+      ],
+      "window": [
+        100,
+        124
+      ],
+      "survived": true,
+      "invariantViolations": [],
+      "expectations": [
+        {
+          "id": "rejected",
+          "description": "conjunto descontínuo recusado em cada hora",
+          "passed": true
+        },
+        {
+          "id": "recovers",
+          "description": "volta a decidir na primeira hora boa",
+          "passed": true
+        }
+      ],
+      "metrics": {
+        "decisions": 216,
+        "fills": 19,
+        "openingFills": 10,
+        "riskRejected": {},
+        "cycleErrors": {
+          "invalid or discontinuous candles": 24
+        },
+        "syncRejected": {},
+        "entryBlocked": 0,
+        "killSwitchActivations": 0,
+        "pilotStops": [],
+        "worstSlippageBps": 1.0931,
+        "maxDrawdown": 0.00542087,
+        "finalEquity": 1009.64334,
+        "finalPosition": 0.001797294771,
+        "recoveryHours": 0,
+        "rejectedCorrectly": []
+      }
+    },
+    {
+      "id": "PROVIDER_OUTAGE",
+      "title": "Fonte de candles fora do ar por 24 h",
+      "covers": [
+        "market-data provider outage"
+      ],
+      "window": [
+        100,
+        124
+      ],
+      "survived": true,
+      "invariantViolations": [],
+      "expectations": [
+        {
+          "id": "errors",
+          "description": "erro em cada hora da janela, sem decisão inventada",
+          "passed": true
+        },
+        {
+          "id": "recovers",
+          "description": "volta a decidir na primeira hora boa",
+          "passed": true
+        }
+      ],
+      "metrics": {
+        "decisions": 216,
+        "fills": 19,
+        "openingFills": 10,
+        "riskRejected": {},
+        "cycleErrors": {
+          "provider unavailable (simulated)": 24
+        },
+        "syncRejected": {},
+        "entryBlocked": 0,
+        "killSwitchActivations": 0,
+        "pilotStops": [],
+        "worstSlippageBps": 1.0931,
+        "maxDrawdown": 0.00542087,
+        "finalEquity": 1009.64334,
+        "finalPosition": 0.001797294771,
+        "recoveryHours": 0,
+        "rejectedCorrectly": []
+      }
+    },
+    {
+      "id": "BACKUP_VENUE_DIVERGENCE",
+      "title": "Só dados de reserva (Bybit), 3% acima da Binance, por 24 h",
+      "covers": [
+        "Binance/Bybit disagreement"
+      ],
+      "window": [
+        100,
+        124
+      ],
+      "survived": true,
+      "invariantViolations": [],
+      "expectations": [
+        {
+          "id": "decides",
+          "description": "continua decidindo (pode fechar)",
+          "passed": true
+        }
+      ],
+      "metrics": {
+        "decisions": 240,
+        "fills": 19,
+        "openingFills": 10,
+        "riskRejected": {},
+        "cycleErrors": {},
+        "syncRejected": {},
+        "entryBlocked": 23,
+        "killSwitchActivations": 0,
+        "pilotStops": [],
+        "worstSlippageBps": 1.0931,
+        "maxDrawdown": 0.00518734,
+        "finalEquity": 1012.26976,
+        "finalPosition": 0.001801970136,
+        "recoveryHours": 0,
+        "rejectedCorrectly": []
+      }
+    },
+    {
+      "id": "LOSS_LIMIT",
+      "title": "Alta de 48 h e queda de 50% numa hora com posição comprada",
+      "covers": [
+        "maximum-loss boundary",
+        "repeated stop sequence"
+      ],
+      "window": null,
+      "survived": true,
+      "invariantViolations": [],
+      "expectations": [
+        {
+          "id": "stopped",
+          "description": "o piloto para por PILOT_LOSS_LIMIT",
+          "passed": true
+        },
+        {
+          "id": "flat",
+          "description": "termina sem posição",
+          "passed": true
+        },
+        {
+          "id": "halted",
+          "description": "o kill switch fica ligado",
+          "passed": true
+        }
+      ],
+      "metrics": {
+        "decisions": 100,
+        "fills": 8,
+        "openingFills": 4,
+        "riskRejected": {},
+        "cycleErrors": {},
+        "syncRejected": {},
+        "entryBlocked": 0,
+        "killSwitchActivations": 1,
+        "pilotStops": [
+          "PILOT_LOSS_LIMIT"
+        ],
+        "worstSlippageBps": 1.151,
+        "maxDrawdown": 0.05577521,
+        "finalEquity": 956.469532,
+        "finalPosition": 0,
+        "recoveryHours": null,
+        "rejectedCorrectly": []
+      }
+    },
+    {
+      "id": "KILL_SWITCH",
+      "title": "Kill switch ligado por 24 h",
+      "covers": [
+        "kill-switch"
+      ],
+      "window": [
+        100,
+        124
+      ],
+      "survived": true,
+      "invariantViolations": [],
+      "expectations": [
+        {
+          "id": "no_decisions",
+          "description": "nenhuma decisão com o kill switch ligado",
+          "passed": true
+        },
+        {
+          "id": "recovers",
+          "description": "volta a decidir ao desligar",
+          "passed": true
+        }
+      ],
+      "metrics": {
+        "decisions": 216,
+        "fills": 19,
+        "openingFills": 10,
+        "riskRejected": {},
+        "cycleErrors": {},
+        "syncRejected": {},
+        "entryBlocked": 0,
+        "killSwitchActivations": 1,
+        "pilotStops": [],
+        "worstSlippageBps": 1.0931,
+        "maxDrawdown": 0.00542087,
+        "finalEquity": 1009.64334,
+        "finalPosition": 0.001797294771,
+        "recoveryHours": 0,
+        "rejectedCorrectly": []
+      }
+    },
+    {
+      "id": "MALFORMED_SNAPSHOT",
+      "title": "Candle incoerente (máxima abaixo da mínima) e cotação NaN por 24 h",
+      "covers": [
+        "malformed/partial market snapshot"
+      ],
+      "window": [
+        100,
+        124
+      ],
+      "survived": true,
+      "invariantViolations": [],
+      "expectations": [
+        {
+          "id": "rejected",
+          "description": "nas 12 horas pares a cotação NaN é recusada (sem cotação, o ciclo não roda); nas 12 ímpares o candle incoerente é recusado",
+          "passed": true
+        },
+        {
+          "id": "recovers",
+          "description": "volta a decidir na primeira hora boa",
+          "passed": true
+        }
+      ],
+      "metrics": {
+        "decisions": 216,
+        "fills": 19,
+        "openingFills": 10,
+        "riskRejected": {},
+        "cycleErrors": {
+          "invalid or discontinuous candles": 12
+        },
+        "syncRejected": {
+          "stale market": 12
+        },
+        "entryBlocked": 0,
+        "killSwitchActivations": 0,
+        "pilotStops": [],
+        "worstSlippageBps": 1.0931,
+        "maxDrawdown": 0.00542087,
+        "finalEquity": 1009.64334,
+        "finalPosition": 0.001797294771,
+        "recoveryHours": 0,
+        "rejectedCorrectly": []
+      }
+    },
+    {
+      "id": "DUPLICATE_OUT_OF_ORDER",
+      "title": "Ciclo chamado 3x por hora, marca fora de ordem e cursor repetido",
+      "covers": [
+        "duplicate/out-of-order events"
+      ],
+      "window": [
+        100,
+        124
+      ],
+      "survived": true,
+      "invariantViolations": [],
+      "expectations": [
+        {
+          "id": "one_per_candle",
+          "description": "uma decisão por candle",
+          "passed": true
+        },
+        {
+          "id": "rejections",
+          "description": "marca fora de ordem e cursor repetido recusados em cada hora",
+          "passed": true
+        }
+      ],
+      "metrics": {
+        "decisions": 240,
+        "fills": 19,
+        "openingFills": 10,
+        "riskRejected": {},
+        "cycleErrors": {},
+        "syncRejected": {},
+        "entryBlocked": 0,
+        "killSwitchActivations": 0,
+        "pilotStops": [],
+        "worstSlippageBps": 1.0931,
+        "maxDrawdown": 0.00518734,
+        "finalEquity": 1014.996175,
+        "finalPosition": 0.001806823505,
+        "recoveryHours": 0,
+        "rejectedCorrectly": [
+          "OUT_OF_ORDER_MARK",
+          "REPEATED_CURSOR",
+          "OUT_OF_ORDER_MARK",
+          "REPEATED_CURSOR",
+          "OUT_OF_ORDER_MARK",
+          "REPEATED_CURSOR",
+          "OUT_OF_ORDER_MARK",
+          "REPEATED_CURSOR",
+          "OUT_OF_ORDER_MARK",
+          "REPEATED_CURSOR",
+          "OUT_OF_ORDER_MARK",
+          "REPEATED_CURSOR",
+          "OUT_OF_ORDER_MARK",
+          "REPEATED_CURSOR",
+          "OUT_OF_ORDER_MARK",
+          "REPEATED_CURSOR",
+          "OUT_OF_ORDER_MARK",
+          "REPEATED_CURSOR",
+          "OUT_OF_ORDER_MARK",
+          "REPEATED_CURSOR",
+          "OUT_OF_ORDER_MARK",
+          "REPEATED_CURSOR",
+          "OUT_OF_ORDER_MARK",
+          "REPEATED_CURSOR",
+          "OUT_OF_ORDER_MARK",
+          "REPEATED_CURSOR",
+          "OUT_OF_ORDER_MARK",
+          "REPEATED_CURSOR",
+          "OUT_OF_ORDER_MARK",
+          "REPEATED_CURSOR",
+          "OUT_OF_ORDER_MARK",
+          "REPEATED_CURSOR",
+          "OUT_OF_ORDER_MARK",
+          "REPEATED_CURSOR",
+          "OUT_OF_ORDER_MARK",
+          "REPEATED_CURSOR",
+          "OUT_OF_ORDER_MARK",
+          "REPEATED_CURSOR",
+          "OUT_OF_ORDER_MARK",
+          "REPEATED_CURSOR",
+          "OUT_OF_ORDER_MARK",
+          "REPEATED_CURSOR",
+          "OUT_OF_ORDER_MARK",
+          "REPEATED_CURSOR",
+          "OUT_OF_ORDER_MARK",
+          "REPEATED_CURSOR",
+          "OUT_OF_ORDER_MARK",
+          "REPEATED_CURSOR"
+        ]
+      }
+    },
+    {
+      "id": "RESTART",
+      "title": "Reinício do serviço a cada hora por 24 h",
+      "covers": [
+        "restart/recovery"
+      ],
+      "window": [
+        100,
+        124
+      ],
+      "survived": true,
+      "invariantViolations": [],
+      "expectations": [
+        {
+          "id": "one_per_candle",
+          "description": "uma decisão por candle, sem fill repetido",
+          "passed": true
+        }
+      ],
+      "metrics": {
+        "decisions": 240,
+        "fills": 19,
+        "openingFills": 10,
+        "riskRejected": {},
+        "cycleErrors": {},
+        "syncRejected": {},
+        "entryBlocked": 0,
+        "killSwitchActivations": 0,
+        "pilotStops": [],
+        "worstSlippageBps": 1.0931,
+        "maxDrawdown": 0.00518734,
+        "finalEquity": 1014.996175,
+        "finalPosition": 0.001806823505,
+        "recoveryHours": 0,
+        "rejectedCorrectly": []
+      }
+    }
+  ],
+  "reportSha256": "d99ec87b49d967703c8d9aa2993b5ca0fb4b8a9fb757497ae5520ad9d2f91630"
+}

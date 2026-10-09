@@ -1,3 +1,4 @@
+import {createHash} from 'node:crypto';
 import type {FastifyInstance} from 'fastify';
 import {z} from 'zod';
 import type {walkForwardPerpetual} from '../domain/perpetual-walk-forward.js';
@@ -28,11 +29,36 @@ export const STUDY_CANDIDATE_SETS={
 export type StudyCandidateSet=keyof typeof STUDY_CANDIDATE_SETS;
 export const studyCandidates=(set:StudyCandidateSet='SHORT_HORIZON_V1')=>structuredClone(STUDY_CANDIDATE_SETS[set]);
 const schema=z.object({bars:z.number().int().min(300).max(5000).default(1000),trainBars:z.number().int().min(100).max(3000).default(400),testBars:z.number().int().min(50).max(1000).default(100),candidateSet:z.enum(Object.keys(STUDY_CANDIDATE_SETS) as [StudyCandidateSet,...StudyCandidateSet[]]).optional()}).strict().refine(v=>v.bars>=v.trainBars+v.testBars,'insufficient study windows').refine(v=>studyCandidates(v.candidateSet).every(c=>c.slowPeriod<v.trainBars),'training window shorter than candidate warmup');
-export interface PerpetualStudy {id:string;status:'QUEUED'|'RUNNING'|'COMPLETED'|'FAILED'|'INTERRUPTED';createdAt:string;request:z.infer<typeof schema>;dataset?:PerpetualDataset;datasetHash?:string;result?:ReturnType<typeof walkForwardPerpetual>;error?:string;completedAt?:string}
+/**
+ * Proveniência do estudo (docs/FREQTRADE_FREQAI_AUDIT.md, item 3): liga cada resultado ao código e à configuração exatos
+ * que o geraram. Gravada na criação, antes de baixar dados, então até estudos que falham a têm. Estudos antigos não têm
+ * este campo e não são reescritos.
+ */
+export const STUDY_SIMULATOR_MODEL='LINEAR_PERPETUAL_WALK_FORWARD_V2' as const;
+export interface ReleaseIdentity {codeCommit:string|null;backendFingerprint:string|null}
+export interface StudyProvenance extends ReleaseIdentity {version:'STUDY_PROVENANCE_V1';candidateSet:StudyCandidateSet;configSha256:string;simulatorModel:typeof STUDY_SIMULATOR_MODEL}
+/** JSON com chaves ordenadas: o mesmo conteúdo dá o mesmo hash, mesmo que o armazenamento reordene as chaves. */
+function canonical(value:unknown):string{
+ if(Array.isArray(value))return '['+value.map(canonical).join(',')+']';
+ if(value&&typeof value==='object')return '{'+Object.keys(value).sort().filter(k=>(value as Record<string,unknown>)[k]!==undefined).map(k=>JSON.stringify(k)+':'+canonical((value as Record<string,unknown>)[k])).join(',')+'}';
+ return JSON.stringify(value);
+}
+/** Hash do que define o estudo: janelas pedidas, nome do conjunto e cada candidato com todos os parâmetros, pelo código atual. */
+export function studyConfigHash(request:z.infer<typeof schema>){
+ const candidateSet=request.candidateSet??'SHORT_HORIZON_V1';
+ return {candidateSet,configSha256:createHash('sha256').update(canonical({request:{bars:request.bars,trainBars:request.trainBars,testBars:request.testBars,candidateSet},candidates:studyCandidates(candidateSet),simulatorModel:STUDY_SIMULATOR_MODEL})).digest('hex')};
+}
+/** Confere se a configuração gravada ainda é a que o código atual produziria (os conjuntos nunca são editados no lugar). */
+export function studyProvenanceCheck(study:PerpetualStudy){
+ if(!study.provenance)return {recorded:false as const};
+ const current=studyConfigHash(study.request).configSha256;
+ return {recorded:true as const,configMatchesCurrentCode:current===study.provenance.configSha256,currentConfigSha256:current};
+}
+export interface PerpetualStudy {id:string;status:'QUEUED'|'RUNNING'|'COMPLETED'|'FAILED'|'INTERRUPTED';createdAt:string;request:z.infer<typeof schema>;provenance?:StudyProvenance;dataset?:PerpetualDataset;datasetHash?:string;result?:ReturnType<typeof walkForwardPerpetual>;error?:string;completedAt?:string}
 export class PerpetualStudies {
  private screens=new WeakMap<PerpetualStudy,ReturnType<typeof screenPerpetualStudy>>();
  private records:PerpetualStudy[];private busy=false;private accepting=true;private activeTasks=new Set<Promise<void>>();private persistenceError:string|null=null;
- constructor(private source:{load(count:number):Promise<PerpetualDataset>},restored:PerpetualStudy[]=[],private simulator:HistoricalStudySimulator=new HistoricalStudyRunner()){this.records=structuredClone(restored).map(s=>s.status==='RUNNING'||s.status==='QUEUED'?{...s,status:'INTERRUPTED',error:'server restarted before completion'}:s);}
+ constructor(private source:{load(count:number):Promise<PerpetualDataset>},restored:PerpetualStudy[]=[],private simulator:HistoricalStudySimulator=new HistoricalStudyRunner(),private release:ReleaseIdentity={codeCommit:null,backendFingerprint:null}){this.records=structuredClone(restored).map(s=>s.status==='RUNNING'||s.status==='QUEUED'?{...s,status:'INTERRUPTED',error:'server restarted before completion'}:s);}
  list(){return structuredClone(this.records);}
  status(){return {busy:this.busy,accepting:this.accepting,persistenceFailed:!!this.persistenceError,activeTasks:this.activeTasks.size,interruptedStudies:this.records.filter(s=>s.status==='INTERRUPTED').length};}
  stopAccepting(){this.accepting=false;}
@@ -47,7 +73,7 @@ export class PerpetualStudies {
  async start(request:z.infer<typeof schema>,persist:()=>Promise<void>,coordinator:AgentCoordinator,bus:EventBus){
   if(!this.accepting)throw new Error('historical runtime draining');
   if(this.busy||coordinator.registry.get('euler')?.status==='BACKTESTING'||coordinator.registry.get('atlas')?.status==='RESEARCHING')throw new Error('quant job already running');
-  request=structuredClone(request);this.busy=true;let finish!:()=>void;const completion=new Promise<void>(resolve=>{finish=resolve;});this.activeTasks.add(completion);const finished=()=>{this.activeTasks.delete(completion);finish();};const study:PerpetualStudy={id:crypto.randomUUID(),status:'QUEUED',createdAt:new Date().toISOString(),request};this.records.push(study);
+  request=structuredClone(request);this.busy=true;let finish!:()=>void;const completion=new Promise<void>(resolve=>{finish=resolve;});this.activeTasks.add(completion);const finished=()=>{this.activeTasks.delete(completion);finish();};const study:PerpetualStudy={id:crypto.randomUUID(),status:'QUEUED',createdAt:new Date().toISOString(),request,provenance:{version:'STUDY_PROVENANCE_V1',codeCommit:this.release.codeCommit,backendFingerprint:this.release.backendFingerprint,...studyConfigHash(request),simulatorModel:STUDY_SIMULATOR_MODEL}};this.records.push(study);
   try{await persist();}catch(error){this.records.pop();this.busy=false;finished();throw error;}
   const task=async()=>{study.status='RUNNING';coordinator.backtest(`USD-M historical study ${study.id}`);bus.publish(event('BACKTEST_STARTED',{studyId:study.id,model:'LINEAR_PERPETUAL_V2'}));
    try{await persist();study.dataset=structuredClone(await this.source.load(request.bars));if(study.dataset.trade.length!==request.bars)throw Error('incomplete study dataset');study.datasetHash=validatePerpetualDataset(study.dataset);try{await persist();}catch{throw Error('historical evidence persistence failed');}

@@ -15,7 +15,8 @@
     "check:cloud-service": "node dist/src/check-cloud-service.js",
     "decrypt-backup": "tsx src/decrypt-backup.ts",
     "team-drill": "tsx src/team-drill.ts",
-    "restore-drill": "tsx src/restore-drill.ts"
+    "restore-drill": "tsx src/restore-drill.ts",
+    "stress-lab": "tsx src/stress-lab.ts"
   },
   "dependencies": {
     "@fastify/websocket": "^11.2.0",
