@@ -10,7 +10,8 @@ import {DAY,type SpotSeriesLike} from './busca-diaria-lib.js';
 import {ACCOUNTS,GENESIS,TREND_LIVE,decide,initialState,mark,rebalance,recordHash,verifyLedger,
  type AccountId,type AccountRun,type Ledger,type Level,type Quote,type RunRecord} from './tendencia-ao-vivo-lib.js';
 
-const ORIGIN_API='https://api.binance.com',DIR='docs/estudos',LEDGER=`${DIR}/tendencia-ao-vivo-registro.json`,REPORT=`${DIR}/tendencia-ao-vivo.md`;
+// Os dois hosts servem os mesmos dados públicos de mercado; o segundo não é bloqueado nos servidores do GitHub Actions.
+const ORIGINS=['https://api.binance.com','https://data-api.binance.vision'],ORIGIN_API=process.env.BINANCE_SPOT_ORIGIN??ORIGINS[0],DIR='docs/estudos',LEDGER=`${DIR}/tendencia-ao-vivo-registro.json`,REPORT=`${DIR}/tendencia-ao-vivo.md`;
 const sleep=(ms:number)=>new Promise(r=>setTimeout(r,ms));
 async function getJson(path:string,params:Record<string,string|number>={}){
  const url=ORIGIN_API+path+'?'+new URLSearchParams(Object.entries(params).map(([k,v])=>[k,String(v)]));
@@ -25,6 +26,7 @@ async function getJson(path:string,params:Record<string,string|number>={}){
 const pct=(v:number,d=2)=>(v>=0?'+':'')+(v*100).toFixed(d)+'%',usd=(v:number)=>v.toFixed(2),bps=(v:number)=>v.toFixed(1);
 
 async function main(){
+ if(!ORIGINS.includes(ORIGIN_API))throw new Error('BINANCE_SPOT_ORIGIN inválido: '+ORIGIN_API);
  const dry=process.argv.includes('--dry'),now=Date.now();
  const info=((await getJson('/api/v3/exchangeInfo')) as {symbols:{symbol:string;baseAsset:string;quoteAsset:string;status:string}[]}).symbols;
  const trading=selectPairs(info).filter(p=>p.status==='TRADING');
