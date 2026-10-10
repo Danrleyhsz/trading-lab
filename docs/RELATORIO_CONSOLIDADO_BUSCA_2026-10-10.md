@@ -179,9 +179,9 @@ Pré-declaração antes de ver o número, uso único da janela de validação, t
 2. **O que fazer com a tendência lenta nas maiores moedas:** arquivar como pesquisa concluída, ou levar a uma execução simulada ao vivo (BTC e ETH, SMA100 ou Donchian, risco alvo, à vista, sem alavancagem) para medir fill, custo e atraso do sinal diário. Exige código no servidor, selo de release e deploy. Com o padrão de 30%, o tamanho precisa ser menor que o testado (alvo de 20%).
 3. **Carry delta-neutro: decidido em 10/10/2026, deixar de lado.** Não será levado a Demo Trading nem a código no servidor.
 4. **Registrador de listagens: decidido em 10/10/2026, encerrado.** Tarefas e script continuam desligados; religar só por pedido novo (ver `docs/ENCERRAMENTO_2026-10-10.md`).
-5. **Foco do laboratório:** com a busca por sinal de preço em dados públicos esgotada nas famílias testadas, o ganho prático do laboratório está em **execução, risco e auditoria** (o que ele faz bem), não em achar alfa em preço. Se for esse o rumo, o próximo esforço vai para a camada de execução e a medição de custos reais, não para novos sinais.
+5. **Foco do laboratório: decidido em 10/10/2026, execução, risco e auditoria, em vez de novos sinais de preço.** O próximo esforço vai para a camada de execução, a medição de custos reais (a execução simulada da tendência nas maiores já mede isso) e a trilha de auditoria; não para novos sinais.
 6. **PR #94 e selos de release:** só se o piloto for retomado; hoje está parado.
-7. **Decisões antigas em aberto:** tornar `/office2` a entrada padrão do escritório; trocar o banco redondo do Stress Lab; polimento de celular (adiado desde 05/10).
+7. **Escritório, decidido em 10/10/2026:** `/office2` é a entrada padrão (PR #156; vale em produção após o deploy manual); falta trocar o banco redondo do Stress Lab (é o prop `bancada-teste`, precisa de arte nova) e o polimento de celular.
 
 ## 9. Recomendação
 

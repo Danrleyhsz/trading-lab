@@ -22,3 +22,5 @@ PR #94 (rascunho) continua sem merge: depende do veredito do piloto e exige os d
 - **Carry delta-neutro:** deixado de lado. Não será levado a Demo Trading nem a código no servidor.
 - **Registrador de listagens:** encerrado. Continua desligado e só volta por pedido novo do dono (rodar `scripts/estudos/listagens-ao-vivo.ts` sob demanda; o protocolo `LISTAGEM_HEDGE_LIVE_V1` continua válido).
 - **Tendência nas maiores:** única execução simulada ao vivo, com rodada diária no GitHub Actions (`docs/PROTOCOLO_TENDENCIA_AO_VIVO.md`, Emenda 1), gravando só na branch `dados/tendencia-ao-vivo`.
+- **Foco do laboratório:** execução, risco e auditoria, em vez de novos sinais de preço. A pesquisa de sinais em dados públicos de preço está concluída para esta rodada.
+- **Escritório:** `/office2` passou a ser a entrada padrão (`/` e `/office` redirecionam para `/office2/`; o 1.0 segue em `/office/index.html`). Em produção só depois do deploy manual.
