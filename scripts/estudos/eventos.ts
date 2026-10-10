@@ -17,49 +17,71 @@ export const BUSCA=Object.freeze({version:'BUSCA_EVENTOS_V1',declaredAt:'2026-10
 const B=BUSCA;
 
 // ---------- motor de eventos ----------
-export interface Ev {k:number;entryBar:number;exitBar:number;side:1|-1;fraction:number;stop:number}
-export interface EvResult {k:number;entryBar:number;exitBar:number;side:1|-1;ret:number;pnl:number;reason:'time'|'stop'|'end';funding:number}
+export interface Ev {k:number;entryBar:number;exitBar:number;side:1|-1;fraction:number;stop:number;
+ /** Perna de hedge: mesma quantia em valor, lado oposto, na moeda `hedgeK`; fecha junto com a perna principal (inclusive no stop). */
+ hedgeK?:number;id?:number}
+export interface EvResult {k:number;entryBar:number;exitBar:number;side:1|-1;ret:number;pnl:number;reason:'time'|'stop'|'end';funding:number;id?:number;notional:number;hedge:boolean}
 export interface EvSim {results:EvResult[];skipped:number;equity:{timestamp:number;equity:number}[];finalEquity:number;maxDrawdown:number;minEquity:number}
-/** Simula eventos de perpétuo (compra ou venda) com tamanho proporcional ao patrimônio, taxas, slippage, funding real e stop por fechamento horário. */
-export function simulateEvents(L:Pick<Loaded,'lean'|'last'>,evs:Ev[],o:{fee:number;slippageBps:number;initial:number;startBar:number;endBar:number;grossCap:number}):EvSim{
- const d=L.lean,slip=o.slippageBps/10000,byBar=new Map<number,Ev[]>();
+export interface EvOptions {fee:number;slippageBps:number;initial:number;startBar:number;endBar:number;grossCap:number;
+ /** Slippage da perna de hedge (padrão: o mesmo da principal). */
+ hedgeSlippageBps?:number;
+ /** Máxima da hora da moeda `k` na vela `i`; se presente, o stop de venda é testado pela máxima (senão, pelo fechamento). */
+ high?:(k:number,i:number)=>number}
+/** Simula eventos de perpétuo (compra ou venda) com tamanho proporcional ao patrimônio, taxas, slippage, funding real, hedge opcional e stop. */
+export function simulateEvents(L:Pick<Loaded,'lean'|'last'>,evs:Ev[],o:EvOptions):EvSim{
+ const d=L.lean,byBar=new Map<number,Ev[]>();
  for(const e of evs){const a=byBar.get(e.entryBar)??[];a.push(e);byBar.set(e.entryBar,a);}
  for(const a of byBar.values())a.sort((x,y)=>x.k-y.k);
- type Pos={e:Ev;qty:number;entry:number;raw:number;j:number;fund:number};
+ type Pos={e:Ev;qty:number;entry:number;raw:number;j:number;fund:number;slip:number;hedge:boolean};
  const open:Pos[]=[],results:EvResult[]=[],equitySeries:{timestamp:number;equity:number}[]=[];
  let cash=o.initial,skipped=0,peak=o.initial,maxDD=0,minEq=o.initial,equity=o.initial;
- const close=(p:Pos,price:number,reason:EvResult['reason'])=>{
-  const exit=price*(1-p.e.side*slip),gross=p.e.side*p.qty*(exit-p.entry),fees=o.fee*p.qty*exit;cash+=gross-fees;
-  const pnl=gross-o.fee*p.qty*p.entry-fees+p.fund;results.push({k:p.e.k,entryBar:p.e.entryBar,exitBar:-1,side:p.e.side,ret:pnl/(p.qty*p.entry),pnl,reason,funding:p.fund});
+ const close=(p:Pos,price:number,reason:EvResult['reason'],bar:number)=>{
+  const exit=price*(1-p.e.side*p.slip),gross=p.e.side*p.qty*(exit-p.entry),fees=o.fee*p.qty*exit;cash+=gross-fees;
+  const pnl=gross-o.fee*p.qty*p.entry-fees+p.fund;results.push({k:p.e.k,entryBar:p.e.entryBar,exitBar:bar,side:p.e.side,ret:pnl/(p.qty*p.entry),pnl,reason,funding:p.fund,id:p.e.id,notional:p.qty*p.entry,hedge:p.hedge});
  };
+ const slipMain=o.slippageBps/10000,slipHedge=(o.hedgeSlippageBps??o.slippageBps)/10000;
+ const px0=(arr:Float64Array[],k:number,i:number)=>px(arr[k],d.first![k],i);
  for(let i=o.startBar;i<=o.endBar;i++){
   const t=d.timestamps[i];
   // saídas no tempo, na abertura
-  for(let n=open.length-1;n>=0;n--){const p=open[n];if(p.e.exitBar===i){const f=d.first![p.e.k];close(p,px(d.open[p.e.k],f,i),'time');results[results.length-1].exitBar=i;open.splice(n,1);}}
-  // entradas, na abertura
+  for(let n=open.length-1;n>=0;n--){const p=open[n];if(p.e.exitBar===i){close(p,px0(d.open,p.e.k,i),'time',i);open.splice(n,1);}}
+  // entradas, na abertura (a perna principal e, se houver, o hedge)
   for(const e of byBar.get(i)??[]){
    const f=d.first![e.k];if(i<f||i>L.last[e.k])continue;
-   const raw=px(d.open[e.k],f,i),entry=raw*(1+e.side*slip);let gross=0;for(const p of open)gross+=p.qty*p.entry;
-   const qty=e.fraction*equity/entry;if(!(qty>0)||(gross+qty*entry)>o.grossCap*equity){skipped++;continue;}
-   cash-=o.fee*qty*entry;
-   let j=0;const list=d.funding[e.k];while(j<list.length&&list[j].timestamp<t)j++;
-   open.push({e,qty,entry,raw,j,fund:0});
+   if(e.hedgeK!==undefined&&(i<d.first![e.hedgeK]||i>L.last[e.hedgeK]))continue;
+   const raw=px0(d.open,e.k,i),entry=raw*(1+e.side*slipMain);let gross=0;for(const p of open)gross+=p.qty*p.entry;
+   const qty=e.fraction*equity/entry,legs=e.hedgeK!==undefined?2:1;if(!(qty>0)||(gross+legs*qty*entry)>o.grossCap*equity){skipped++;continue;}
+   const fund=(k:number)=>{let j=0;const list=d.funding[k];while(j<list.length&&list[j].timestamp<t)j++;return j;};
+   cash-=o.fee*qty*entry;open.push({e,qty,entry,raw,j:fund(e.k),fund:0,slip:slipMain,hedge:false});
+   if(e.hedgeK!==undefined){
+    const rawH=px0(d.open,e.hedgeK,i),side=(-e.side) as 1|-1,entryH=rawH*(1+side*slipHedge),qtyH=qty*entry/entryH;
+    cash-=o.fee*qtyH*entryH;open.push({e:{k:e.hedgeK,entryBar:e.entryBar,exitBar:e.exitBar,side,fraction:e.fraction,stop:Infinity,id:e.id},qty:qtyH,entry:entryH,raw:rawH,j:fund(e.hedgeK),fund:0,slip:slipHedge,hedge:true});
+   }
   }
   // funding, stop e fim da série
-  for(let n=open.length-1;n>=0;n--){
-   const p=open[n],list=d.funding[p.e.k],f=d.first![p.e.k],c=px(d.close[p.e.k],f,i);
+  const stopped=new Set<number>();
+  for(const p of open){
+   const list=d.funding[p.e.k];
    while(p.j<list.length&&list[p.j].timestamp<t+H){const x=list[p.j];if(x.timestamp>=t){const dlt=-p.e.side*p.qty*x.markPrice*x.rate;cash+=dlt;p.fund+=dlt;}p.j++;}
-   const adverse=p.e.side===-1?c/p.raw-1:1-c/p.raw;
-   if(adverse>=p.e.stop){close(p,c,'stop');results[results.length-1].exitBar=i;open.splice(n,1);}
-   else if(i===L.last[p.e.k]){close(p,c,'end');results[results.length-1].exitBar=i;open.splice(n,1);}
   }
-  equity=cash;for(const p of open)equity+=p.e.side*p.qty*(px(d.close[p.e.k],d.first![p.e.k],i)-p.entry);
+  for(let n=open.length-1;n>=0;n--){
+   const p=open[n];if(!Number.isFinite(p.e.stop))continue;
+   const f=d.first![p.e.k],c=px(d.close[p.e.k],f,i);let hit=false,price=c;
+   if(o.high&&p.e.side===-1){const h=o.high(p.e.k,i),trigger=p.raw*(1+p.e.stop);if(h>=trigger){hit=true;price=Math.max(px(d.open[p.e.k],f,i),trigger);}}
+   else{const adverse=p.e.side===-1?c/p.raw-1:1-c/p.raw;if(adverse>=p.e.stop)hit=true;}
+   if(hit){close(p,price,'stop',i);open.splice(n,1);if(p.e.id!==undefined)stopped.add(p.e.id);}
+  }
+  for(let n=open.length-1;n>=0;n--){
+   const p=open[n],c=px0(d.close,p.e.k,i);
+   if(p.e.id!==undefined&&stopped.has(p.e.id)){close(p,c,'stop',i);open.splice(n,1);}
+   else if(i===L.last[p.e.k]){close(p,c,'end',i);open.splice(n,1);}
+  }
+  equity=cash;for(const p of open)equity+=p.e.side*p.qty*(px0(d.close,p.e.k,i)-p.entry);
   equitySeries.push({timestamp:t,equity});peak=Math.max(peak,equity);maxDD=Math.max(maxDD,peak>0?1-equity/peak:1);minEq=Math.min(minEq,equity);
   if(equity<=0)break;
  }
  return {results,skipped,equity:equitySeries,finalEquity:equity,maxDrawdown:maxDD,minEquity:minEq};
-}
-/** Média, erro-padrão agrupado por mês (CR0) e estatística t. */
+}/** Média, erro-padrão agrupado por mês (CR0) e estatística t. */
 export function clusteredT(rets:number[],clusters:string[]){
  const n=rets.length,m=rets.reduce((a,b)=>a+b,0)/n,by=new Map<string,number>();
  rets.forEach((r,i)=>by.set(clusters[i],(by.get(clusters[i])??0)+(r-m)));
