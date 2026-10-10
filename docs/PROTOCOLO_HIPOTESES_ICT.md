@@ -170,3 +170,28 @@ PRs pequenas, nesta ordem:
 ## Combinações
 
 Só quando alguma família ficar **CANDIDATA**, e com protocolo próprio declarado antes. A confluência clássica do ICT (varredura → deslocamento com FVG → retração ao FVG ou OB) só será testada se pelo menos dois dos componentes se sustentarem sozinhos.
+
+## Emenda 1: esclarecimentos de leitura (10/10/2026, antes de qualquer implementação ou execução)
+
+Ao implementar, quatro trechos admitiam duas leituras com efeito sobre os sinais. Foram decididos pelo dono em 10/10/2026, **antes de existir código ou resultado**. Os demais pontos abaixo são a leitura literal do texto e ficam registrados para que não haja ajuste depois. Nenhum número da grade, critério ou contagem muda.
+
+### Decididos pelo dono
+
+1. **H10, `disp = 1`:** a inversão é a **primeira vela que fecha acima de `top` e é de deslocamento altista (P3, k = 1,0)**. Fechamentos comuns acima de `top` antes dela são ignorados e **não matam a zona** dentro das 48 velas. O espelho vale para o FVG altista atravessado para baixo.
+2. **H08, várias varreduras na mesma vela:** todos os níveis acima da mínima da vela são **consumidos**. O sinal só vale para o **nível mais baixo dentro de 1 ATR**; os níveis mais fundos que 1 ATR contam como rompimento, não geram sinal e também são consumidos. Espelho nos topos.
+3. **Toque do CE (H07, H09B, H10):** o **toque** é a vela alcançar o **nível de entrada** (a borda para a entrada EDGE, o CE para a entrada CE). Chegar só à borda sem alcançar o CE não descarta a zona. A zona é descartada no primeiro toque do nível de entrada, operando ou não.
+4. **Placebo (critério 7), sorteio:** para cada moeda e ano de teste com `n` operações reais da configuração escolhida, sorteiam-se `n` velas **distintas** do ano (depois do aquecimento), sem reposição, e ordenam-se no tempo. A k-ésima entrada herda **lado, stop e alvo em múltiplos do ATR da vela de entrada, e limite de tempo** da k-ésima operação real (em ordem cronológica). Uma vela sorteada com posição aberta passa para a **primeira vela livre seguinte**; se passar do fim do ano, a operação é **perdida e contada** no relatório. As sementes são de 1 a 200, e cada semente sorteia todas as moedas e anos na mesma ordem fixa (por símbolo e por ano).
+
+### Leituras literais, registradas
+
+5. **ATR de referência:** `ATR[i]` é o `atr(candles, 24)` de `indicators.ts`, que inclui a própria vela i. Em entradas por toque, o ATR e o fechamento de referência são os da **vela do toque (j)**; no H08 e na retomada, o limite de 1 ATR usa o `ATR[i]` da **vela da varredura**, fixo até a retomada.
+6. **Sanidade de R** vale para **todas** as entradas, inclusive H09A (sem alvo) e H11 (alvo estrutural). Fora de [0,25; 4]·ATR não há sinal, mas a zona ou o nível é consumido do mesmo jeito.
+7. **H07, `bos = 1`:** é a BOS completa do P5 (fecha acima do último topo confirmado e `close[i−1]` ainda abaixo dele), com L = 6.
+8. **Zona criada na vela i:** só pode ser tocada a partir da vela i + 1. Se duas zonas são tocadas na mesma vela, vale a mais antiga e a outra é consumida sem sinal. Sinal com posição aberta é ignorado e a zona é consumida do mesmo jeito.
+9. **Toque e anulação na mesma vela:** se a vela fecha abaixo de `bottom` (zona de compra) a zona é **anulada** mesmo que a mínima tenha alcançado o nível; o espelho vale para as zonas de venda.
+10. **H10, antes da inversão:** fechamentos abaixo de `bottom` **não** anulam o FVG baixista. A anulação por fechamento abaixo de `bottom` só vale depois da inversão, antes do toque.
+11. **H11:** o nível interno é consumido na primeira vela cuja mínima fica abaixo dele (com ou sem retomada, com ou sem sinal). Só entram níveis confirmados até a vela i − 1 e com o pivô dentro de [i − N, i − 1].
+12. **Estatísticas registradas sem ser critério:**
+    - **Taxa de toque** = zonas cujo nível de entrada foi alcançado dentro da validade, dividido pelas zonas criadas (as anuladas antes do toque contam como não tocadas).
+    - **H08 e H11, comparação:** o retorno médio de 12 h e 24 h depois da varredura (fechamento da vela de retomada para o H08, da vela de varredura para o H11) contra o retorno depois de **qualquer** vela cuja mínima é nova mínima de **N** velas, com N = L do H08 e N = N do H11.
+13. **Critério 7, comparação:** o retorno fora da amostra composto da sequência escolhida (a mesma série dos critérios 1 a 6) contra o **percentil 90 por posto** (a 180ª de 200, em ordem crescente) dos retornos fora da amostra compostos dos 200 placebos, calculados com o mesmo simulador, o mesmo funding e os mesmos custos.
