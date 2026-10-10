@@ -16,3 +16,9 @@ Decisão do dono em 10/10/2026: **encerrar todos os acompanhamentos ao vivo e pr
 | Servidor no Render (escritório, feeds públicos de mercado, persistência) | **No ar** | |
 
 PR #94 (rascunho) continua sem merge: depende do veredito do piloto e exige os dois selos.
+
+## Decisões posteriores (10/10/2026)
+
+- **Carry delta-neutro:** deixado de lado. Não será levado a Demo Trading nem a código no servidor.
+- **Registrador de listagens:** encerrado. Continua desligado e só volta por pedido novo do dono (rodar `scripts/estudos/listagens-ao-vivo.ts` sob demanda; o protocolo `LISTAGEM_HEDGE_LIVE_V1` continua válido).
+- **Tendência nas maiores:** única execução simulada ao vivo, com rodada diária no GitHub Actions (`docs/PROTOCOLO_TENDENCIA_AO_VIVO.md`, Emenda 1), gravando só na branch `dados/tendencia-ao-vivo`.

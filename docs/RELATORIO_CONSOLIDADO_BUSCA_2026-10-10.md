@@ -9,7 +9,7 @@ Escrito em 10/10/2026, versão final do dia (substitui a versão da manhã). Re�
 - **A única família com resultado positivo em todas as eras é a tendência lenta nas poucas moedas que dominam o volume** (média de 100 dias ou rompimento de 55 dias, com risco alvo de 20% de volatilidade). Ela passou os 7 critérios em 2013 a 2017 (basicamente BTC), ficou perto de passar em 2017 a 2026 (reprovou em queda máxima e Sharpe) e é **fraca na última era**: Sharpe de cerca de 0,4 em 2022 a 2026, quedas de 32% a 47%.
 - **O melhor resultado antigo do laboratório, o momentum entre moedas, não resistiu à correção do universo.** +57% em 15 moedas escolhidas com critérios de 2026; entre −31% e +3% em 45 outras; +5,7% com universo ponto no tempo; **−46%** no pool completo, com as deslistadas.
 - **As 23 hipóteses ICT dos vídeos (order block, varredura de liquidez, deslocamento, IFVG, liquidez interna) foram rejeitadas**, assim como as 55 de antes (VWAP, Fibonacci, suporte e resistência, bandeira, calendário). Só o IFVG passou o critério do placebo, e com retorno negativo; todas perdem com custos dobrados.
-- **O que sobra de pé, com ressalvas:** carry delta-neutro (2,9% ao ano e caindo, risco baixíssimo), venda de listagens novas com hedge de BTC (evidência moderada, dependente de regime) e a tendência lenta nas maiores (fraca hoje).
+- **O que sobra de pé, com ressalvas:** a tendência lenta nas maiores (fraca hoje). O carry delta-neutro (2,9% ao ano e caindo, risco baixíssimo) e a venda de listagens novas com hedge de BTC (evidência moderada, dependente de regime) foram **deixados de lado por decisão do dono em 10/10/2026**.
 - **Está tudo desligado**, por decisão do dono em 10/10: acompanhamentos ao vivo, registrador de listagens, piloto e vigias. Ficam o escritório, o backup diário e os estudos para rodar sob demanda. O padrão de risco passou a **30% de queda máxima** para tudo.
 
 ## 2. Linha do tempo
@@ -156,8 +156,8 @@ Pré-declaração antes de ver o número, uso único da janela de validação, t
 | Carry direcional entre moedas e combinação carry + momentum | Mesmo viés; −37,8% no universo ponto no tempo | **Encerrados** | |
 | Reversão de curto prazo, momentum 72 h, carry 72 h, baixa volatilidade, composto | Reprovaram por custos, lucro ou neutralidade | **Encerrados** | |
 | Reversão após funding extremo | 13 327 eventos, +0,25%, t = 1,28, negativo com custos x3 | **Encerrada** | |
-| Carry delta-neutro | Risco baixíssimo, retorno 2,9% ao ano e caindo | **Reprovada no retorno**; viável só como "caixa com rendimento extra" | Medir a execução real (Demo Trading) |
-| Venda de listagens novas com hedge de BTC | +6,8% e +6,2% por evento, t = 2,7 (descoberta) e 1,35 (réplica), 2021 ≈ 0 | **Candidata fraca**, dependente de regime; registrador desligado | Eventos ao vivo (cerca de um ano) |
+| Carry delta-neutro | Risco baixíssimo, retorno 2,9% ao ano e caindo | **Reprovada no retorno; deixada de lado por decisão do dono (10/10/2026)** | Nada (encerrada) |
+| Venda de listagens novas com hedge de BTC | +6,8% e +6,2% por evento, t = 2,7 (descoberta) e 1,35 (réplica), 2021 ≈ 0 | **Candidata fraca; registrador encerrado por decisão do dono (10/10/2026)** | Nada (encerrada) |
 | Hipóteses dos vídeos (VWAP, Fibonacci, suporte e resistência, bandeira, calendário) | 55 configurações, nenhuma candidata | **Encerradas** | |
 | Hipóteses ICT (H07 a H11) | 23 configurações, cinco famílias REJEITADA, todas negativas com custos dobrados | **Encerradas**; combinações não executadas | |
 | Tendência de uma moeda no horário, cesta de tendência | Sem vantagem | **Encerradas** | |
@@ -177,8 +177,8 @@ Pré-declaração antes de ver o número, uso único da janela de validação, t
 
 1. **Deploy do PR #137 no Render.** Sem ele o servidor em produção não reflete o padrão de 30% nem o desligamento do acompanhamento e do piloto. É um deploy manual (e atualizar os selos de release, se o piloto for religado).
 2. **O que fazer com a tendência lenta nas maiores moedas:** arquivar como pesquisa concluída, ou levar a uma execução simulada ao vivo (BTC e ETH, SMA100 ou Donchian, risco alvo, à vista, sem alavancagem) para medir fill, custo e atraso do sinal diário. Exige código no servidor, selo de release e deploy. Com o padrão de 30%, o tamanho precisa ser menor que o testado (alvo de 20%).
-3. **Carry delta-neutro:** aceitar 2% a 3% ao ano em troca de risco baixíssimo, ou deixar de lado? Se aceitar, o próximo passo é medir a execução real em Demo Trading da Binance. Também depende de existir rendimento no caixa parado.
-4. **Registrador de listagens:** religar (custo quase nulo, resposta em cerca de um ano) ou deixar encerrado.
+3. **Carry delta-neutro: decidido em 10/10/2026, deixar de lado.** Não será levado a Demo Trading nem a código no servidor.
+4. **Registrador de listagens: decidido em 10/10/2026, encerrado.** Tarefas e script continuam desligados; religar só por pedido novo (ver `docs/ENCERRAMENTO_2026-10-10.md`).
 5. **Foco do laboratório:** com a busca por sinal de preço em dados públicos esgotada nas famílias testadas, o ganho prático do laboratório está em **execução, risco e auditoria** (o que ele faz bem), não em achar alfa em preço. Se for esse o rumo, o próximo esforço vai para a camada de execução e a medição de custos reais, não para novos sinais.
 6. **PR #94 e selos de release:** só se o piloto for retomado; hoje está parado.
 7. **Decisões antigas em aberto:** tornar `/office2` a entrada padrão do escritório; trocar o banco redondo do Stress Lab; polimento de celular (adiado desde 05/10).
@@ -187,7 +187,7 @@ Pré-declaração antes de ver o número, uso único da janela de validação, t
 
 1. **Não colocar dinheiro real em nenhuma das ideias testadas.** Nenhuma tem validação em todas as eras e com o padrão de 30%; a mais forte (tendência nas maiores) é fraca na era atual, e o carry delta-neutro rende menos que um fundo de caixa.
 2. **Considerar a pesquisa de sinais de preço em dados públicos como concluída para esta rodada.** Foram testados, entre 05 e 10/10, tendência, momentum, carry, reversão, eventos, hipóteses de vídeos e ICT, em 1 hora e em velas diárias, de 2011 a 2026. Mais combinações do mesmo material aumentam o risco de falso positivo mais do que a chance de achar algo.
-3. **Se houver apetite por algo operável**, o caminho mais honesto é a tendência lenta em BTC e ETH com risco alvo, ou o carry delta-neutro como camada de rendimento, **medindo primeiro a execução real em Demo Trading** (preenchimento, funding efetivo, custo, atraso do sinal). É medir o que ainda não se sabe, não provar um retorno.
+3. **Se houver apetite por algo operável**, o caminho mais honesto é a tendência lenta em BTC e ETH com risco alvo (o carry delta-neutro foi deixado de lado em 10/10/2026) **medindo primeiro a execução real em Demo Trading** (preenchimento, funding efetivo, custo, atraso do sinal). É medir o que ainda não se sabe, não provar um retorno.
 4. **Se for retomar a pesquisa**, o único material novo possível é dado diferente (livro de ofertas, dados intradiários de custo, dados fora do preço), com protocolo declarado antes. Variações das mesmas regras nos mesmos preços ficam fora.
 
 ## Apêndice: onde está cada coisa
