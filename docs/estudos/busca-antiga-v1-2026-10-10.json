@@ -1,0 +1,460 @@
+{
+ "protocol": {
+  "version": "BUSCA_ANTIGA_V1",
+  "declaredAt": "2026-10-10",
+  "universeSize": 5,
+  "refreshDays": 30,
+  "volumeWindow": 90,
+  "targetVol": 0.2,
+  "volLookback": 60,
+  "minHistory": 30,
+  "earlyScale": 0.5,
+  "costPerSide": 0.0015,
+  "end": "2017-08-16",
+  "rules": [
+   "SMA50",
+   "SMA100",
+   "DONCHIAN_55_20"
+  ],
+  "pairs": [
+   {
+    "symbol": "BTC",
+    "source": "bitstamp",
+    "pair": "btcusd"
+   },
+   {
+    "symbol": "LTC",
+    "source": "bitfinex",
+    "pair": "tLTCUSD"
+   },
+   {
+    "symbol": "ETH",
+    "source": "bitfinex",
+    "pair": "tETHUSD"
+   },
+   {
+    "symbol": "ETC",
+    "source": "bitfinex",
+    "pair": "tETCUSD"
+   },
+   {
+    "symbol": "ZEC",
+    "source": "bitfinex",
+    "pair": "tZECUSD"
+   },
+   {
+    "symbol": "XMR",
+    "source": "bitfinex",
+    "pair": "tXMRUSD"
+   },
+   {
+    "symbol": "DSH",
+    "source": "bitfinex",
+    "pair": "tDSHUSD"
+   },
+   {
+    "symbol": "XRP",
+    "source": "bitfinex",
+    "pair": "tXRPUSD"
+   },
+   {
+    "symbol": "EOS",
+    "source": "bitfinex",
+    "pair": "tEOSUSD"
+   },
+   {
+    "symbol": "IOT",
+    "source": "bitfinex",
+    "pair": "tIOTUSD"
+   },
+   {
+    "symbol": "OMG",
+    "source": "bitfinex",
+    "pair": "tOMGUSD"
+   }
+  ],
+  "maximumDrawdown": 0.3,
+  "minimumSharpe": 0.8,
+  "minimumYearsPositive": 2,
+  "completeYears": [
+   2014,
+   2015,
+   2016
+  ],
+  "minimumBreadth": 0.6,
+  "minimumMemberDays": 365,
+  "trials": 33
+ },
+ "protocolCommit": "f562184a227c2563fb8d842771332174a30e5f96",
+ "execution": "HISTORICAL_SIMULATION_OFFLINE",
+ "automaticPaperApproval": false,
+ "runAt": "2026-10-10T12:44:18.816Z",
+ "data": {
+  "coins": 11,
+  "from": "2011-09-01",
+  "to": "2017-08-16",
+  "days": 2177,
+  "firstDecisionWithMember": "2013-04-23",
+  "pairsDeclared": 11,
+  "pairsUsable": 11,
+  "seriesStart": {
+   "BTC": "2011-09-01",
+   "LTC": "2013-05-19",
+   "ETH": "2016-03-09",
+   "ETC": "2016-07-26",
+   "ZEC": "2016-10-29",
+   "XMR": "2016-11-30",
+   "DSH": "2017-03-03",
+   "XRP": "2017-05-19",
+   "EOS": "2017-07-01",
+   "IOT": "2017-06-12",
+   "OMG": "2017-07-14"
+  }
+ },
+ "benchmark": {
+  "total": 2.797514072972562,
+  "annualized": 0.2509769949870544,
+  "sharpe": 1.1354023303896434,
+  "maxDrawdown": 0.3913774725818244,
+  "days": 2175
+ },
+ "results": [
+  {
+   "rule": "SMA50",
+   "verdict": "NAO_VALIDADA",
+   "failed": [
+    "BOUNDED_DRAWDOWN"
+   ],
+   "checks": {
+    "DATA_QUALITY": true,
+    "POSITIVE_NET": true,
+    "BOUNDED_DRAWDOWN": false,
+    "SHARPE_BAR": true,
+    "POSITIVE_YEARS": true,
+    "COSTS_X2": true,
+    "MEMBER_BREADTH": true
+   },
+   "full": {
+    "total": 4.324100911933586,
+    "annualized": 0.3239628900489804,
+    "sharpe": 1.3684299636460018,
+    "maxDrawdown": 0.33328868647016063,
+    "days": 2175
+   },
+   "costsX2": {
+    "total": 3.96544595383497,
+    "annualized": 0.3085580552119389,
+    "sharpe": 1.3160005199967508,
+    "maxDrawdown": 0.33865765425181016,
+    "days": 2175
+   },
+   "costsX4": {
+    "total": 3.3181939458642207,
+    "annualized": 0.2782444715003063,
+    "sharpe": 1.2104340748145848,
+    "maxDrawdown": 0.34927948413802834,
+    "days": 2175
+   },
+   "byYear": {
+    "2011": {
+     "ret": 0,
+     "dd": 0,
+     "invested": 0
+    },
+    "2012": {
+     "ret": 0,
+     "dd": 0,
+     "invested": 0
+    },
+    "2013": {
+     "ret": 0.16860620214502164,
+     "dd": 0.33328868647016063,
+     "invested": 0.10804286387827483
+    },
+    "2014": {
+     "ret": 0.2532397534652533,
+     "dd": 0.09286849445858159,
+     "invested": 0.12851165370903306
+    },
+    "2015": {
+     "ret": 0.5141559907948787,
+     "dd": 0.1493068613159123,
+     "invested": 0.3340382057583381
+    },
+    "2016": {
+     "ret": 0.652694768358522,
+     "dd": 0.10295355650564664,
+     "invested": 0.506453993675112
+    },
+    "2017": {
+     "ret": 0.42591210186929596,
+     "dd": 0.15003636308649104,
+     "invested": 0.2342769009983047
+    }
+   },
+   "positiveYears": 3,
+   "breadth": 1,
+   "memberCoins": 1,
+   "btcWithVolumeFilter": {
+    "total": 5.951873775292909,
+    "annualized": 0.38458061270662314,
+    "sharpe": 1.5812474897087112,
+    "maxDrawdown": 0.22138590614708875,
+    "days": 2175
+   },
+   "btcNoVolumeFilter": {
+    "total": 37.939199934590135,
+    "annualized": 0.8488110793358763,
+    "sharpe": 2.53195722872253,
+    "maxDrawdown": 0.21262432015350607,
+    "days": 2175
+   },
+   "btcBuyHold": {
+    "total": 24.144561785631332,
+    "annualized": 0.7179758360647424,
+    "sharpe": 2.283507835437397,
+    "maxDrawdown": 0.39137747258182454,
+    "days": 2175
+   },
+   "averageScale": 0.6800215296794514,
+   "investedShare": 0.20509017766636015
+  },
+  {
+   "rule": "SMA100",
+   "verdict": "VALIDADA_ANTIGA",
+   "failed": [],
+   "checks": {
+    "DATA_QUALITY": true,
+    "POSITIVE_NET": true,
+    "BOUNDED_DRAWDOWN": true,
+    "SHARPE_BAR": true,
+    "POSITIVE_YEARS": true,
+    "COSTS_X2": true,
+    "MEMBER_BREADTH": true
+   },
+   "full": {
+    "total": 3.269659485748484,
+    "annualized": 0.2758221270782131,
+    "sharpe": 1.2397911881322017,
+    "maxDrawdown": 0.2940705933540695,
+    "days": 2175
+   },
+   "costsX2": {
+    "total": 3.0712936458974864,
+    "annualized": 0.2656770727759199,
+    "sharpe": 1.2031668916881433,
+    "maxDrawdown": 0.3010099473850124,
+    "days": 2175
+   },
+   "costsX4": {
+    "total": 2.701357015219081,
+    "annualized": 0.24560435502767763,
+    "sharpe": 1.129365088691498,
+    "maxDrawdown": 0.3147084517211425,
+    "days": 2175
+   },
+   "byYear": {
+    "2011": {
+     "ret": 0,
+     "dd": 0,
+     "invested": 0
+    },
+    "2012": {
+     "ret": 0,
+     "dd": 0,
+     "invested": 0
+    },
+    "2013": {
+     "ret": 0.36553191142449926,
+     "dd": 0.2691965919152862,
+     "invested": 0.12229136351493684
+    },
+    "2014": {
+     "ret": 0.11198358133187014,
+     "dd": 0.08891746179946092,
+     "invested": 0.11897634152107356
+    },
+    "2015": {
+     "ret": 0.16159674404517688,
+     "dd": 0.2570169180018449,
+     "invested": 0.2516850155571124
+    },
+    "2016": {
+     "ret": 0.6563931399962151,
+     "dd": 0.10359825636390152,
+     "invested": 0.4366966785999286
+    },
+    "2017": {
+     "ret": 0.4302328917740528,
+     "dd": 0.1431566933893681,
+     "invested": 0.2468196877698238
+    }
+   },
+   "positiveYears": 3,
+   "breadth": 1,
+   "memberCoins": 1,
+   "btcWithVolumeFilter": {
+    "total": 4.075451494608558,
+    "annualized": 0.31337880675324725,
+    "sharpe": 1.3864421589376488,
+    "maxDrawdown": 0.2940705933540696,
+    "days": 2175
+   },
+   "btcNoVolumeFilter": {
+    "total": 27.304043046931884,
+    "annualized": 0.7524415326901168,
+    "sharpe": 2.3431552579875476,
+    "maxDrawdown": 0.2940705933540698,
+    "days": 2175
+   },
+   "btcBuyHold": {
+    "total": 24.144561785631332,
+    "annualized": 0.7179758360647424,
+    "sharpe": 2.283507835437397,
+    "maxDrawdown": 0.39137747258182454,
+    "days": 2175
+   },
+   "averageScale": 0.6820654404924813,
+   "investedShare": 0.1817476247212908
+  },
+  {
+   "rule": "DONCHIAN_55_20",
+   "verdict": "VALIDADA_ANTIGA",
+   "failed": [],
+   "checks": {
+    "DATA_QUALITY": true,
+    "POSITIVE_NET": true,
+    "BOUNDED_DRAWDOWN": true,
+    "SHARPE_BAR": true,
+    "POSITIVE_YEARS": true,
+    "COSTS_X2": true,
+    "MEMBER_BREADTH": true
+   },
+   "full": {
+    "total": 3.0623163007126566,
+    "annualized": 0.2652082908795288,
+    "sharpe": 1.253670245702512,
+    "maxDrawdown": 0.2691965919152862,
+    "days": 2175
+   },
+   "costsX2": {
+    "total": 2.9432150590103094,
+    "annualized": 0.2589059791071895,
+    "sharpe": 1.230459245101397,
+    "maxDrawdown": 0.272488951762224,
+    "days": 2175
+   },
+   "costsX4": {
+    "total": 2.715093245132966,
+    "annualized": 0.24637890718822186,
+    "sharpe": 1.1835003213383741,
+    "maxDrawdown": 0.27903970150033675,
+    "days": 2175
+   },
+   "byYear": {
+    "2011": {
+     "ret": 0,
+     "dd": 0,
+     "invested": 0
+    },
+    "2012": {
+     "ret": 0,
+     "dd": 0,
+     "invested": 0
+    },
+    "2013": {
+     "ret": 0.2421213707455494,
+     "dd": 0.2691965919152862,
+     "invested": 0.10645623745835116
+    },
+    "2014": {
+     "ret": 0.06762236132208388,
+     "dd": 0.10813722186955876,
+     "invested": 0.09021106703990485
+    },
+    "2015": {
+     "ret": 0.6218682811529967,
+     "dd": 0.09651968634757468,
+     "invested": 0.21204787750898427
+    },
+    "2016": {
+     "ret": 0.5357275286133376,
+     "dd": 0.09480383477504217,
+     "invested": 0.30821878913963413
+    },
+    "2017": {
+     "ret": 0.2071865494878431,
+     "dd": 0.25566207583513123,
+     "invested": 0.1644242401628256
+    }
+   },
+   "positiveYears": 3,
+   "breadth": 1,
+   "memberCoins": 1,
+   "btcWithVolumeFilter": {
+    "total": 3.8951858922963716,
+    "annualized": 0.3054323464076687,
+    "sharpe": 1.4236367794448497,
+    "maxDrawdown": 0.23495205103317174,
+    "days": 2175
+   },
+   "btcNoVolumeFilter": {
+    "total": 18.505624568978522,
+    "annualized": 0.6463023035422677,
+    "sharpe": 2.3439755240692377,
+    "maxDrawdown": 0.23495205103317185,
+    "days": 2175
+   },
+   "btcBuyHold": {
+    "total": 24.144561785631332,
+    "annualized": 0.7179758360647424,
+    "sharpe": 2.283507835437397,
+    "maxDrawdown": 0.39137747258182454,
+    "days": 2175
+   },
+   "averageScale": 0.7345313093609732,
+   "investedShare": 0.13750471073095277
+  }
+ ],
+ "deflated": [
+  {
+   "rule": "SMA50",
+   "deflatedSharpe": 0.9978527113611094
+  },
+  {
+   "rule": "SMA100",
+   "deflatedSharpe": 0.9933634070935053
+  },
+  {
+   "rule": "DONCHIAN_55_20",
+   "deflatedSharpe": 0.9938053257456648
+  }
+ ],
+ "sourceCheck": {
+  "BTC": {
+   "days": 501,
+   "returnCorrelation": 0.982427775822575
+  },
+  "ETH": {
+   "days": 501,
+   "returnCorrelation": 0.9929354881967123
+  },
+  "LTC": {
+   "days": 383,
+   "returnCorrelation": 0.9922078380456687
+  }
+ },
+ "datasetHashes": {
+  "BTC": "4f2a403883014e180c9b71ab672f6d85934db044ab1a09320ad9cdd388b752e7",
+  "LTC": "b0c6deb21cf0b4b4a315f150c50da7f6aa4732fd8e33ffac9dfdd42144a689d4",
+  "ETH": "3755d473265e1fb8d5b417a7b839b04cda757105b38cbcea2d3f28d56e4b2ace",
+  "ETC": "4a5de6cf891e95a3995a8d8c2fb7dbb3d82c98837a8e88adc98d2b04113c4485",
+  "ZEC": "8384f90db166f8389558994817895dd1ef51328315daa1aee8f877be53790509",
+  "XMR": "e4a8dbc1f549a3596f80d62ac5a2462f22e0c8644b765ac092403a9ff0bd4d16",
+  "DSH": "24ece94a08875c6a16e338169b1586cb78ffe3d13d10a00112b1b88126e2e96d",
+  "XRP": "438939bddfe3812fa3dae87cdd0009ef23f86a3c6e05d3cb2600f705a4ebecfb",
+  "EOS": "c91f15cb971096d5645981b04f158f868495e34beacdca5b0b7f07b5ad4485ee",
+  "IOT": "fa1d4fde2a9f2d84020aa9d4e9c7fe90acf56da4c7094c71fcf472b24e8946be",
+  "OMG": "c93e3cbf9aacae80d1ac755b39c36ee5f83cf3326d2a260fba063b2aef34079c"
+ }
+}
