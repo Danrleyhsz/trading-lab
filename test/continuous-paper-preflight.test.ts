@@ -13,6 +13,7 @@ import {MemoryStore} from '../src/domain/memory.js';
 import {AiAnalysis} from '../src/application/ai-analysis.js';
 import {eligibleStudyFixture} from './fixtures/perpetual-study.js';
 import {validatePerpetualDataset} from '../src/domain/perpetual-backtest.js';
+import {MAX_DRAWDOWN_FRACTION} from '../src/domain/risk.js';
 const now=Date.parse('2026-10-04T11:00:00Z');
 const source={load:async()=>{throw Error('TEST_ONLY unexpected source retrieval');}};
 
@@ -98,6 +99,7 @@ test('bounded authenticated read includes configured original outside recent win
         assert.equal((await app.inject('/paper/perpetual/preflight')).statusCode,401);
         const response=await app.inject({url:'/paper/perpetual/preflight',headers:{authorization:'Bearer '+token}});
         const body=response.json();assert.equal(response.statusCode,200);assert.equal(body.studies.length,21);assert.equal(body.studies[0].studyId,entries[0].id);assert.equal(body.studies[0].configured,true);
+        assert.equal(body.limits.maxObservedDrawdown,MAX_DRAWDOWN_FRACTION,'o limite exibido é o mesmo do motor de risco');
         assert.doesNotMatch(response.body,/TEST_ONLY_PREFLIGHT_TOKEN|signalDataset|"trade":/);
         assert.equal((await app.inject({method:'POST',url:'/paper/perpetual/preflight',headers:{authorization:'Bearer '+token},payload:{enabled:true}})).statusCode,404);
         assert.deepEqual(studies.list(),original);
