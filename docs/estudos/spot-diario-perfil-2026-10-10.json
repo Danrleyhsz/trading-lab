@@ -1,0 +1,123 @@
+{
+ "pairs": 712,
+ "pegged": [
+  "BFUSDUSDT",
+  "BUSDUSDT",
+  "FDUSDUSDT",
+  "PAXUSDT",
+  "RLUSDUSDT",
+  "SUSDUSDT",
+  "TUSDUSDT",
+  "USD1USDT",
+  "USDCUSDT",
+  "USDEUSDT",
+  "USDPUSDT",
+  "USDSBUSDT",
+  "USDSOLDUSDT",
+  "USDSUSDT",
+  "USTUSDT",
+  "UUSDT",
+  "XUSDUSDT"
+ ],
+ "usable": 695,
+ "trading": 496,
+ "delisted": 199,
+ "first": "2017-08-17",
+ "last": "2026-10-10",
+ "pairsWithGaps": 15,
+ "totalGapDays": 635,
+ "worstGaps": [
+  {
+   "symbol": "FTTUSDT",
+   "gapDays": 310,
+   "days": 2177
+  },
+  {
+   "symbol": "CVCUSDT",
+   "gapDays": 153,
+   "days": 2449
+  },
+  {
+   "symbol": "VENUSDT",
+   "gapDays": 87,
+   "days": 33
+  },
+  {
+   "symbol": "KEYUSDT",
+   "gapDays": 27,
+   "days": 1906
+  },
+  {
+   "symbol": "LUNAUSDT",
+   "gapDays": 17,
+   "days": 2225
+  },
+  {
+   "symbol": "VIDTUSDT",
+   "gapDays": 8,
+   "days": 1308
+  },
+  {
+   "symbol": "STRAXUSDT",
+   "gapDays": 7,
+   "days": 2146
+  },
+  {
+   "symbol": "BNXUSDT",
+   "gapDays": 5,
+   "days": 1226
+  }
+ ],
+ "coverageByYear": {
+  "2017": {
+   "active": 6,
+   "liquid": 2,
+   "dead": 0
+  },
+  "2018": {
+   "active": 21,
+   "liquid": 17,
+   "dead": 2
+  },
+  "2019": {
+   "active": 84,
+   "liquid": 28,
+   "dead": 2
+  },
+  "2020": {
+   "active": 193,
+   "liquid": 90,
+   "dead": 10
+  },
+  "2021": {
+   "active": 306,
+   "liquid": 274,
+   "dead": 3
+  },
+  "2022": {
+   "active": 343,
+   "liquid": 270,
+   "dead": 24
+  },
+  "2023": {
+   "active": 376,
+   "liquid": 237,
+   "dead": 16
+  },
+  "2024": {
+   "active": 423,
+   "liquid": 382,
+   "dead": 40
+  },
+  "2025": {
+   "active": 481,
+   "liquid": 362,
+   "dead": 51
+  },
+  "2026": {
+   "active": 547,
+   "liquid": 157,
+   "dead": 51
+  }
+ }
+}
