@@ -48,3 +48,18 @@ test('estatística t agrupada por mês',()=>{
  const same=clusteredT([0.1,0.1,0.1,0.1],['a','a','b','b']);assert.equal(same.t,0);assert.equal(same.clusters,2);
  const r=clusteredT([0.1,0.12,0.08,0.11,0.09,0.1],['a','a','b','b','c','c']);assert.ok(r.t>5&&Math.abs(r.mean-0.1)<1e-9);
 });
+
+test('hedge: a perna de BTC entra e sai junto, soma ao resultado e fecha também quando a principal leva stop pela máxima',()=>{
+ const w=world();
+ // Moeda 1 (B) dispara 2% ao hora; usa a moeda 0 (A, que cai) como "hedge" comprado só para testar a mecânica de pernas.
+ const high=(k:number,i:number)=>{const f=w.lean.first[k],a=k===0?w.lean.close[0]:w.lean.close[1];const v=a[Math.max(0,i-f)];return v*(k===1?1.05:1);};
+ const ev:Ev[]=[{k:1,entryBar:60,exitBar:300,side:-1,fraction:0.01,stop:0.5,hedgeK:0,id:7}];
+ const r=simulateEvents(w as any,ev,{...base,hedgeSlippageBps:2,high});
+ assert.equal(r.results.length,2);const main=r.results.find(x=>!x.hedge)!,hedge=r.results.find(x=>x.hedge)!;
+ assert.equal(main.id,7);assert.equal(hedge.id,7);assert.equal(main.reason,'stop');assert.equal(hedge.reason,'stop');assert.equal(main.exitBar,hedge.exitBar);
+ assert.equal(hedge.side,1);assert.ok(Math.abs(main.notional-hedge.notional)/main.notional<1e-9,'valores iguais nas duas pernas');
+ // O stop pela máxima sai no nível de 150% da entrada (ou na abertura, se ela já for acima), não no fechamento da hora.
+ assert.ok(main.ret<0&&main.ret>-0.6);
+ // Sem a função de máxima, o stop usa o fechamento e a perda é pelo menos igual.
+ const rc=simulateEvents(w as any,ev,base),mc=rc.results.find(x=>!x.hedge)!;assert.ok(mc.ret<=main.ret+1e-9);
+});
