@@ -1,10 +1,12 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import type {Candle} from '../src/domain/backtest.js';
+import {findDecisionLookahead} from '../src/domain/lookahead-check.js';
 import {atr} from '../src/domain/video-hypotheses/indicators.js';
+import {HYPOTHESIS_GRID,AMENDMENT_1_GRID,buildStrategy} from '../src/domain/video-hypotheses/strategies.js';
 import {
  breakOfStructure,confirmedPivots,displacement,displacementMomentum,fairValueGaps,fvgRetracement,internalRangeLiquidity,
- invertedFvg,liquiditySweeps,orderBlocks,type IctResult
+ ICT_GRID,invertedFvg,liquiditySweeps,orderBlocks,type IctResult
 } from '../src/domain/video-hypotheses/ict.js';
 
 const H=3600000,T0=Date.UTC(2025,0,1);
@@ -177,4 +179,36 @@ test('os detectores estão vivos na série sintética (cada família gera sinais
   assert.ok(n>0,`${name} não gerou nenhum sinal`);
   for(const s of res.signals)if(s){assert.ok(s.stop>0&&Number.isFinite(s.stop));assert.ok(s.maxBars>0);}
  }
+});
+
+test('a grade ICT tem 23 configurações com ids únicos, distribuídas como no protocolo',()=>{
+ assert.equal(ICT_GRID.length,23);
+ assert.equal(new Set(ICT_GRID.map(c=>c.id)).size,23);
+ const count=(family:string)=>ICT_GRID.filter(c=>c.family===family).length;
+ assert.deepEqual(['H07_ORDER_BLOCK','H08_LIQUIDITY_SWEEP','H09_DISPLACEMENT','H10_IFVG','H11_INTERNAL_RANGE_LIQUIDITY'].map(count),[4,4,7,4,4]);
+ const all=[...HYPOTHESIS_GRID,...AMENDMENT_1_GRID,...ICT_GRID];
+ assert.equal(new Set(all.map(c=>c.id)).size,all.length,'nenhum id colide com o V1');
+});
+
+test('as 23 configurações ICT decidem só com o passado (lado e stop), como as 45 do V1',()=>{
+ const data=synthetic(900,9);
+ for(const config of ICT_GRID){
+  const side=(c:readonly Candle[])=>{const s=buildStrategy(c,config);return c.map((_,i)=>{const d=s(i,null);return d&&d!=='EXIT'?d.side:0;});};
+  const stop=(c:readonly Candle[])=>{const s=buildStrategy(c,config);return c.map((_,i)=>{const d=s(i,null);return d&&d!=='EXIT'&&d.stop!==undefined?d.stop:NaN;});};
+  for(const vector of [side,stop]){const r=findDecisionLookahead(data,vector,{from:200,stride:3});assert.deepEqual(r.violations,[],config.id);}
+ }
+});
+
+test('cada família ICT gera sinais na série sintética e ignora sinal com posição aberta',()=>{
+ const data=synthetic(4000,13),families=new Map<string,number>();
+ for(const config of ICT_GRID){
+  const s=buildStrategy(data,config);let n=0;
+  for(let i=0;i<data.length;i++){
+   const d=s(i,null);
+   if(d&&d!=='EXIT'){n++;assert.equal(s(i,{side:1,entryIndex:0,entryPrice:1,quantity:1}),null,`${config.id}: com posição aberta o sinal é ignorado`);}
+  }
+  families.set(config.family,(families.get(config.family)??0)+n);
+ }
+ assert.equal(families.size,5);
+ for(const [family,n] of families)assert.ok(n>0,`${family} não gerou nenhum sinal`);
 });
