@@ -13,8 +13,8 @@ test('read-only monitoring token reads but cannot write, log in, stream or repla
  app.get('/finance',async()=>({ok:true}));app.post('/paper/perpetual/halt',async()=>({halted:true}));app.get('/events',async()=>({stream:true}));
  const bearer={authorization:'Bearer '+reader};
  try{
-  app.get('/',async(_req,reply)=>reply.redirect('/office/index.html'));
-  assert.equal((await app.inject('/')).headers.location,'/office/index.html');
+  app.get('/',async(_req,reply)=>reply.redirect('/office2/'));
+  assert.equal((await app.inject('/')).headers.location,'/office2/');
   assert.equal((await app.inject({url:'/finance',headers:bearer})).statusCode,200);assert.equal((await app.inject({method:'HEAD',url:'/finance',headers:bearer})).statusCode,200);
   assert.equal((await app.inject({method:'POST',url:'/paper/perpetual/halt',headers:bearer,payload:{halted:true}})).statusCode,403);
   assert.equal((await app.inject({url:'/events',headers:bearer})).statusCode,403);

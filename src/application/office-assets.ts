@@ -33,5 +33,6 @@ export function registerOfficeAssets(app:FastifyInstance, directory=join(process
     reply.type(officeFiles[name]).header('X-Content-Type-Options','nosniff').header('Cache-Control','no-cache');
     return readFile(join(directory,name));
   });
-  app.get('/office',async(_req,reply)=>reply.redirect('/office/index.html'));
+  // Entrada padrão do escritório desde 10/10/2026: o 2.0. O 1.0 continua em /office/index.html.
+  app.get('/office',async(_req,reply)=>reply.redirect('/office2/'));
 }

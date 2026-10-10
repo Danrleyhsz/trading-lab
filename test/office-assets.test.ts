@@ -18,6 +18,8 @@ test('office serves binary artwork with correct type and never exposes arbitrary
   for(const name of ['presence.js','navigation.js','collaboration.js','transitions.js','life.js','screens.js','character-frames.js','sprites.js','workstations.js','display.js']){const presentation=await app.inject('/office/'+name);assert.equal(presentation.statusCode,200);assert.match(presentation.headers['content-type']!,/javascript/);}
   const page=await app.inject('/office/index.html');
   assert.match(page.body,/lang="pt-BR"/);
-  assert.equal((await app.inject('/office')).statusCode,302);
+  // O escritório 2.0 é a entrada padrão; o 1.0 segue servido em /office/index.html (checado acima).
+  const entry=await app.inject('/office');assert.equal(entry.statusCode,302);assert.equal(entry.headers.location,'/office2/');
+  assert.equal((await app.inject('/office2')).headers.location,'/office2/');
  } finally {await app.close();}
 });
