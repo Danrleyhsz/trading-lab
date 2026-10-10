@@ -195,3 +195,13 @@ Ao implementar, quatro trechos admitiam duas leituras com efeito sobre os sinais
     - **Taxa de toque** = zonas cujo nível de entrada foi alcançado dentro da validade, dividido pelas zonas criadas (as anuladas antes do toque contam como não tocadas).
     - **H08 e H11, comparação:** o retorno médio de 12 h e 24 h depois da varredura (fechamento da vela de retomada para o H08, da vela de varredura para o H11) contra o retorno depois de **qualquer** vela cuja mínima é nova mínima de **N** velas, com N = L do H08 e N = N do H11.
 13. **Critério 7, comparação:** o retorno fora da amostra composto da sequência escolhida (a mesma série dos critérios 1 a 6) contra o **percentil 90 por posto** (a 180ª de 200, em ordem crescente) dos retornos fora da amostra compostos dos 200 placebos, calculados com o mesmo simulador, o mesmo funding e os mesmos custos.
+
+## Emenda 2: desempates de implementação (10/10/2026, antes de qualquer execução)
+
+Ao escrever os detectores, alguns pontos não tinham resposta literal no texto nem na Emenda 1. Foram fechados pela leitura mais próxima do que está escrito e ficam registrados **antes** de existir qualquer resultado. Nenhum número da grade, critério ou contagem de tentativas muda.
+
+14. **Mesma vela, vários eventos (generaliza o item 8):** zonas (H07, H09B, H10) e retomadas (H08) são resolvidas da **mais antiga para a mais nova**. A mais antiga tocada numa vela fica com ela **mesmo que não gere sinal** (por exemplo, R fora da faixa); as outras são consumidas sem sinal. No H10, a idade da zona conta da **vela de inversão**, que é quando o IFVG passa a existir.
+15. **Fechamento igual à borda:** a leitura é literal em cada hipótese. O H09B aceita `close ≥ bottom` (compra) e `close ≤ top` (venda), como está escrito. O H07 e o H10 exigem `close > bottom` e `close < top`. Fechar exatamente na borda, sem poder entrar, consome a zona se o nível foi tocado.
+16. **H11:** uma vela, um sinal, e a compra é avaliada antes da venda. A varredura é registrada como evento (item 12) quando as condições 1 a 3 valem, antes do filtro de 1,5R e da sanidade de R. Os níveis são consumidos em toda vela, inclusive antes de existirem N velas de história.
+17. **H08:** a retomada é registrada como evento no momento em que ocorre, antes da sanidade de R. Um pivô confirmado na vela i só pode ser varrido a partir da vela i + 1. Nas primeiras 23 velas, com o ATR indefinido, não há varreduras.
+18. **Taxa de toque no H10:** as zonas são os IFVG (existem a partir da inversão), e os FVG que nunca invertem não entram no denominador. A **taxa de inversão** (fração dos FVG base que invertem em até 48 velas) é registrada à parte.
