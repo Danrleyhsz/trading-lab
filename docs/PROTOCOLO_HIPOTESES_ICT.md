@@ -1,6 +1,6 @@
 # Protocolo pré-declarado: VIDEO_HYPOTHESES_V2_ICT
 
-> **Status:** especificação, nada implementado ainda. Só passa a valer como **declarado** quando este arquivo, o código, a grade e os testes estiverem na main **antes** da execução, como no V1.
+> **Status:** declarado e executado em 10/10/2026. Protocolo, código, grade e testes entraram na main (PRs #144 a #148) **antes** da execução; o resultado está em `docs/estudos/hipoteses-ict-2026-10-10.md` (cinco famílias REJEITADA).
 > **Origem:** Reels "Entenda esses 5 conceitos de ICT" (@trading.de.livro, 09/10/2026), que é anúncio do livro *A Mente Institucional*. O vídeo é só fonte de ideias, e **nada aqui é estratégia validada**. O melhor veredito possível é **"candidata a validação adicional"**.
 > **Continua:** `docs/research/video-strategy-hypotheses.md` (H01 a H06) e `docs/PROTOCOLO_HIPOTESES_VIDEO.md` (VIDEO_HYPOTHESES_V1 e emenda 1). Lá, nenhuma família ficou CANDIDATA.
 

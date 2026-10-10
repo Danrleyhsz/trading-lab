@@ -1,0 +1,1148 @@
+{
+ "protocol": {
+  "version": "VIDEO_HYPOTHESES_V2_ICT",
+  "declaredAt": "2026-10-10",
+  "symbols": [
+   "ZECUSDT",
+   "NEARUSDT",
+   "UNIUSDT",
+   "BCHUSDT",
+   "FILUSDT",
+   "AAVEUSDT",
+   "AVAXUSDT",
+   "LINKUSDT",
+   "XRPUSDT",
+   "XLMUSDT",
+   "DOGEUSDT",
+   "SOLUSDT",
+   "LTCUSDT",
+   "ETHUSDT",
+   "BTCUSDT"
+  ],
+  "firstBar": 1640995200000,
+  "lastBar": 1791241200000,
+  "testYears": [
+   2024,
+   2025,
+   2026
+  ],
+  "warmup": 200,
+  "costs": {
+   "initialCapital": 10000,
+   "positionFraction": 0.1,
+   "feeRate": 0.00055,
+   "slippageBps": 2
+  },
+  "stressedCosts": {
+   "feeRate": 0.0011,
+   "slippageBps": 5
+  },
+  "calendarKinds": [
+   "HOUR_OF_DAY",
+   "DAY_OF_WEEK"
+  ],
+  "screen": {
+   "version": "VIDEO_SCREEN_V2",
+   "minimumDeflatedSharpe": 0.9,
+   "minimumPositiveYears": 2,
+   "minimumCoinBreadth": 0.6,
+   "minimumStableShare": 0.5,
+   "maximumFilledShare": 0.01,
+   "placebo": {
+    "seeds": 200,
+    "percentile": 0.9
+   }
+  }
+ },
+ "smoke": false,
+ "trials": 78,
+ "trialSharpeCount": 78,
+ "trialSharpeVariance": 0.0002406347021933486,
+ "provenance": {
+  "version": "SCRIPT_PROVENANCE_V1",
+  "script": "scripts/estudos/hipoteses-video.ts",
+  "codeCommit": "7df3aaf671e5fc18d4ed6bd8b47fdfd56d67f3f8",
+  "workingTreeClean": true,
+  "uncommittedFiles": [],
+  "node": "v24.18.0"
+ },
+ "execution": "HISTORICAL_SIMULATION_OFFLINE",
+ "automaticPaperApproval": false,
+ "runAt": "2026-10-10T15:21:58.845Z",
+ "data": [
+  {
+   "symbol": "ZECUSDT",
+   "candles": 41736,
+   "filled": 0,
+   "fundings": 5217,
+   "fundingMarkFilled": 2005
+  },
+  {
+   "symbol": "NEARUSDT",
+   "candles": 41736,
+   "filled": 0,
+   "fundings": 5217,
+   "fundingMarkFilled": 2005
+  },
+  {
+   "symbol": "UNIUSDT",
+   "candles": 41736,
+   "filled": 0,
+   "fundings": 5217,
+   "fundingMarkFilled": 2005
+  },
+  {
+   "symbol": "BCHUSDT",
+   "candles": 41736,
+   "filled": 0,
+   "fundings": 5217,
+   "fundingMarkFilled": 2005
+  },
+  {
+   "symbol": "FILUSDT",
+   "candles": 41736,
+   "filled": 0,
+   "fundings": 5217,
+   "fundingMarkFilled": 2005
+  },
+  {
+   "symbol": "AAVEUSDT",
+   "candles": 41736,
+   "filled": 0,
+   "fundings": 5217,
+   "fundingMarkFilled": 2005
+  },
+  {
+   "symbol": "AVAXUSDT",
+   "candles": 41736,
+   "filled": 0,
+   "fundings": 5217,
+   "fundingMarkFilled": 2005
+  },
+  {
+   "symbol": "LINKUSDT",
+   "candles": 41736,
+   "filled": 0,
+   "fundings": 5217,
+   "fundingMarkFilled": 2005
+  },
+  {
+   "symbol": "XRPUSDT",
+   "candles": 41736,
+   "filled": 0,
+   "fundings": 5217,
+   "fundingMarkFilled": 2005
+  },
+  {
+   "symbol": "XLMUSDT",
+   "candles": 41736,
+   "filled": 0,
+   "fundings": 5217,
+   "fundingMarkFilled": 2005
+  },
+  {
+   "symbol": "DOGEUSDT",
+   "candles": 41736,
+   "filled": 0,
+   "fundings": 5217,
+   "fundingMarkFilled": 2005
+  },
+  {
+   "symbol": "SOLUSDT",
+   "candles": 41736,
+   "filled": 0,
+   "fundings": 5292,
+   "fundingMarkFilled": 2080
+  },
+  {
+   "symbol": "LTCUSDT",
+   "candles": 41736,
+   "filled": 0,
+   "fundings": 5217,
+   "fundingMarkFilled": 2005
+  },
+  {
+   "symbol": "ETHUSDT",
+   "candles": 41736,
+   "filled": 0,
+   "fundings": 5217,
+   "fundingMarkFilled": 2005
+  },
+  {
+   "symbol": "BTCUSDT",
+   "candles": 41736,
+   "filled": 0,
+   "fundings": 5217,
+   "fundingMarkFilled": 2005
+  }
+ ],
+ "families": [
+  {
+   "family": "H07_ORDER_BLOCK",
+   "configs": 4,
+   "selected": {
+    "2024": "H07_K2_BOS0",
+    "2025": "H07_K2_BOS1",
+    "2026": "H07_K2_BOS1"
+   },
+   "oosReturn": -0.008188402359802671,
+   "oosReturnStressed": -0.02267724806879501,
+   "years": {
+    "2024": -0.0017225800493853027,
+    "2025": 0.0006847202906410388,
+    "2026": -0.007156799310889861
+   },
+   "maxDrawdown": 0.0108590121103731,
+   "sharpeAnnualized": -0.5438222599519181,
+   "deflatedSharpe": 5.536293645747037e-12,
+   "positiveYears": 1,
+   "coinBreadth": 0.3333333333333333,
+   "stableShare": 0,
+   "stableByConfig": {
+    "H07_K1.5_BOS0": -0.05411810430285702,
+    "H07_K1.5_BOS1": -0.0300769126160646,
+    "H07_K2_BOS0": -0.025093358559798662,
+    "H07_K2_BOS1": -0.004496062154278224
+   },
+   "trades": 1298,
+   "winRate": 0.3443759630200308,
+   "expectancy": -0.9260719374181017,
+   "profitFactor": 0.919219218345167,
+   "averageHoldingHours": 11.63328199152543,
+   "bySide": {
+    "LONG": {
+     "trades": 749,
+     "netPnl": 322.50332879671436,
+     "winRate": 0.3604806408544726
+    },
+    "SHORT": {
+     "trades": 549,
+     "netPnl": -1524.5447035654104,
+     "winRate": 0.3224043715846995
+    }
+   },
+   "placebo": {
+    "seeds": 200,
+    "p90": -0.004623334182410899,
+    "median": -0.013444125587943945,
+    "mean": -0.013412904566383983,
+    "p10": -0.02163894281446055,
+    "max": 0.006850137279245105,
+    "realBeatsShare": 0.78,
+    "realEntries": 1297,
+    "lostEntriesMean": 0.055,
+    "lostEntriesMax": 1
+   },
+   "checks": {
+    "OOS_POSITIVE": false,
+    "COSTS_DOUBLED_POSITIVE": false,
+    "DEFLATED_SHARPE": false,
+    "POSITIVE_YEARS": false,
+    "COIN_BREADTH": false,
+    "PARAMETER_STABILITY": false,
+    "PLACEBO_P90": false
+   },
+   "verdict": "REJEITADA"
+  },
+  {
+   "family": "H08_LIQUIDITY_SWEEP",
+   "configs": 4,
+   "selected": {
+    "2024": "H08_L24_R1",
+    "2025": "H08_L24_R1",
+    "2026": "H08_L24_R1"
+   },
+   "oosReturn": -0.0410275230520164,
+   "oosReturnStressed": -0.06990833351989545,
+   "years": {
+    "2024": -0.017039215023026855,
+    "2025": -0.012787400460564813,
+    "2026": -0.011767206864390256
+   },
+   "maxDrawdown": 0.04296044464658588,
+   "sharpeAnnualized": -2.8781367117322367,
+   "deflatedSharpe": 0,
+   "positiveYears": 0,
+   "coinBreadth": 0.13333333333333333,
+   "stableShare": 0,
+   "stableByConfig": {
+    "H08_L6_R1": -0.16573647775023725,
+    "H08_L6_R3": -0.17079340489004913,
+    "H08_L24_R1": -0.0410275230520164,
+    "H08_L24_R3": -0.05789665034124458
+   },
+   "trades": 2702,
+   "winRate": 0.3060695780903035,
+   "expectancy": -2.235877459782977,
+   "profitFactor": 0.744548021077914,
+   "averageHoldingHours": 6.301998525474959,
+   "bySide": {
+    "LONG": {
+     "trades": 1363,
+     "netPnl": -3822.930326731264,
+     "winRate": 0.28980190755685986
+    },
+    "SHORT": {
+     "trades": 1339,
+     "netPnl": -2218.4105696023353,
+     "winRate": 0.32262882748319643
+    }
+   },
+   "placebo": {
+    "seeds": 200,
+    "p90": -0.02244559343987962,
+    "median": -0.0323997148181262,
+    "mean": -0.03219909521198724,
+    "p10": -0.041234061038254,
+    "max": -0.015355032941154922,
+    "realBeatsShare": 0.1,
+    "realEntries": 2701,
+    "lostEntriesMean": 0.17,
+    "lostEntriesMax": 3
+   },
+   "checks": {
+    "OOS_POSITIVE": false,
+    "COSTS_DOUBLED_POSITIVE": false,
+    "DEFLATED_SHARPE": false,
+    "POSITIVE_YEARS": false,
+    "COIN_BREADTH": false,
+    "PARAMETER_STABILITY": false,
+    "PLACEBO_P90": false
+   },
+   "verdict": "REJEITADA"
+  },
+  {
+   "family": "H09_DISPLACEMENT",
+   "configs": 7,
+   "selected": {
+    "2024": "H09A_K2",
+    "2025": "H09A_K2",
+    "2026": "H09A_K2"
+   },
+   "oosReturn": 0.0035537199155180055,
+   "oosReturnStressed": -0.030612354712928447,
+   "years": {
+    "2024": 0.010161067081022601,
+    "2025": 0.008983666734364348,
+    "2026": -0.015386325906469156
+   },
+   "maxDrawdown": 0.030610380711352914,
+   "sharpeAnnualized": 0.07273113207104337,
+   "deflatedSharpe": 3.810364579415193e-9,
+   "positiveYears": 2,
+   "coinBreadth": 0.5333333333333333,
+   "stableShare": 0.2857142857142857,
+   "stableByConfig": {
+    "H09A_K1.5": -0.013439826690693546,
+    "H09A_K2": 0.0035537199155180055,
+    "H09A_K3": 0.0028931838831993684,
+    "H09B_K1.5_EDGE": -0.028731950759257385,
+    "H09B_K1.5_CE": -0.041214142516090124,
+    "H09B_K2_EDGE": -0.01886285180103675,
+    "H09B_K2_CE": -0.02313287511167683
+   },
+   "trades": 3047,
+   "winRate": 0.4171316048572366,
+   "expectancy": 0.17453651180362928,
+   "profitFactor": 1.0103480379415142,
+   "averageHoldingHours": 18.166065143491885,
+   "bySide": {
+    "LONG": {
+     "trades": 1627,
+     "netPnl": 3566.6537096972975,
+     "winRate": 0.4265519360786724
+    },
+    "SHORT": {
+     "trades": 1420,
+     "netPnl": -3034.8409582316453,
+     "winRate": 0.4063380281690141
+    }
+   },
+   "placebo": {
+    "seeds": 200,
+    "p90": 0.012831937962585194,
+    "median": -0.007940625051862438,
+    "mean": -0.0069933205319761904,
+    "p10": -0.024122054341633725,
+    "max": 0.0265717372833445,
+    "realBeatsShare": 0.8,
+    "realEntries": 3046,
+    "lostEntriesMean": 0.815,
+    "lostEntriesMax": 4
+   },
+   "checks": {
+    "OOS_POSITIVE": true,
+    "COSTS_DOUBLED_POSITIVE": false,
+    "DEFLATED_SHARPE": false,
+    "POSITIVE_YEARS": true,
+    "COIN_BREADTH": false,
+    "PARAMETER_STABILITY": false,
+    "PLACEBO_P90": false
+   },
+   "verdict": "REJEITADA"
+  },
+  {
+   "family": "H10_IFVG",
+   "configs": 4,
+   "selected": {
+    "2024": "H10_G0.5_D0",
+    "2025": "H10_G0.5_D0",
+    "2026": "H10_G0.5_D0"
+   },
+   "oosReturn": -0.02692941621043099,
+   "oosReturnStressed": -0.07838000950106716,
+   "years": {
+    "2024": 0.010883543412243624,
+    "2025": -0.018768940359381148,
+    "2026": -0.018993396990884537
+   },
+   "maxDrawdown": 0.04311489244750866,
+   "sharpeAnnualized": -0.9015186624536821,
+   "deflatedSharpe": 8.509859483751825e-14,
+   "positiveYears": 1,
+   "coinBreadth": 0.2,
+   "stableShare": 0,
+   "stableByConfig": {
+    "H10_G0.25_D0": -0.04569176536161923,
+    "H10_G0.25_D1": -0.03162795883510938,
+    "H10_G0.5_D0": -0.02692941621043099,
+    "H10_G0.5_D1": -0.02215150614311756
+   },
+   "trades": 4806,
+   "winRate": 0.35476487723678735,
+   "expectancy": -0.8242278298965525,
+   "profitFactor": 0.9210797013684082,
+   "averageHoldingHours": 9.651061183705515,
+   "bySide": {
+    "LONG": {
+     "trades": 2181,
+     "netPnl": -3200.7920424388267,
+     "winRate": 0.33700137551581844
+    },
+    "SHORT": {
+     "trades": 2625,
+     "netPnl": -760.4469080440044,
+     "winRate": 0.36952380952380953
+    }
+   },
+   "placebo": {
+    "seeds": 200,
+    "p90": -0.03559361531299188,
+    "median": -0.04898444623405629,
+    "mean": -0.04901195783932412,
+    "p10": -0.06405538155695811,
+    "max": -0.022345989779881226,
+    "realBeatsShare": 0.985,
+    "realEntries": 4806,
+    "lostEntriesMean": 0.96,
+    "lostEntriesMax": 4
+   },
+   "checks": {
+    "OOS_POSITIVE": false,
+    "COSTS_DOUBLED_POSITIVE": false,
+    "DEFLATED_SHARPE": false,
+    "POSITIVE_YEARS": false,
+    "COIN_BREADTH": false,
+    "PARAMETER_STABILITY": false,
+    "PLACEBO_P90": true
+   },
+   "verdict": "REJEITADA"
+  },
+  {
+   "family": "H11_INTERNAL_RANGE_LIQUIDITY",
+   "configs": 4,
+   "selected": {
+    "2024": "H11_N168_L6",
+    "2025": "H11_N168_L6",
+    "2026": "H11_N168_L6"
+   },
+   "oosReturn": -0.04821162538535506,
+   "oosReturnStressed": -0.09632552915172754,
+   "years": {
+    "2024": -0.015269556457059519,
+    "2025": -0.019922688508360986,
+    "2026": -0.013805228316583484
+   },
+   "maxDrawdown": 0.05493567704055158,
+   "sharpeAnnualized": -1.637416398600248,
+   "deflatedSharpe": 0,
+   "positiveYears": 0,
+   "coinBreadth": 0.2,
+   "stableShare": 0,
+   "stableByConfig": {
+    "H11_N48_L3": -0.05781880444089771,
+    "H11_N48_L6": -0.03187679762763618,
+    "H11_N168_L3": -0.07042420823689244,
+    "H11_N168_L6": -0.04821162538535506
+   },
+   "trades": 4586,
+   "winRate": 0.12668992586131705,
+   "expectancy": -1.4937943054581841,
+   "profitFactor": 0.8368842608915584,
+   "averageHoldingHours": 14.232446598282069,
+   "bySide": {
+    "LONG": {
+     "trades": 2523,
+     "netPnl": -3247.088048682132,
+     "winRate": 0.12643678160919541
+    },
+    "SHORT": {
+     "trades": 2063,
+     "netPnl": -3603.452636149109,
+     "winRate": 0.1269995152690257
+    }
+   },
+   "placebo": {
+    "seeds": 200,
+    "p90": -0.034925672774086314,
+    "median": -0.055229918183255844,
+    "mean": -0.05425388054540856,
+    "p10": -0.07306358117845468,
+    "max": -0.013282344111674949,
+    "realBeatsShare": 0.655,
+    "realEntries": 4583,
+    "lostEntriesMean": 3.11,
+    "lostEntriesMax": 13
+   },
+   "checks": {
+    "OOS_POSITIVE": false,
+    "COSTS_DOUBLED_POSITIVE": false,
+    "DEFLATED_SHARPE": false,
+    "POSITIVE_YEARS": false,
+    "COIN_BREADTH": false,
+    "PARAMETER_STABILITY": false,
+    "PLACEBO_P90": false
+   },
+   "verdict": "REJEITADA"
+  }
+ ],
+ "touchRates": [
+  {
+   "id": "H07_K1.5_BOS0",
+   "allPeriod": {
+    "created": 15618,
+    "touched": 10742,
+    "entered": 9884,
+    "touchRate": 0.687796132667435,
+    "entryRate": 0.6328595210654373
+   },
+   "testYears": {
+    "created": 9695,
+    "touched": 6688,
+    "entered": 6142,
+    "touchRate": 0.6898401237751418,
+    "entryRate": 0.6335224342444559
+   },
+   "baseFvgs": null,
+   "inversionRate": null
+  },
+  {
+   "id": "H07_K1.5_BOS1",
+   "allPeriod": {
+    "created": 5796,
+    "touched": 3709,
+    "entered": 3576,
+    "touchRate": 0.6399240855762595,
+    "entryRate": 0.6169772256728778
+   },
+   "testYears": {
+    "created": 3439,
+    "touched": 2233,
+    "entered": 2156,
+    "touchRate": 0.6493166618202966,
+    "entryRate": 0.6269264321023553
+   },
+   "baseFvgs": null,
+   "inversionRate": null
+  },
+  {
+   "id": "H07_K2_BOS0",
+   "allPeriod": {
+    "created": 6209,
+    "touched": 3768,
+    "entered": 3504,
+    "touchRate": 0.6068610082138831,
+    "entryRate": 0.5643420840715091
+   },
+   "testYears": {
+    "created": 3735,
+    "touched": 2265,
+    "entered": 2099,
+    "touchRate": 0.606425702811245,
+    "entryRate": 0.5619812583668006
+   },
+   "baseFvgs": null,
+   "inversionRate": null
+  },
+  {
+   "id": "H07_K2_BOS1",
+   "allPeriod": {
+    "created": 2910,
+    "touched": 1664,
+    "entered": 1593,
+    "touchRate": 0.5718213058419244,
+    "entryRate": 0.5474226804123712
+   },
+   "testYears": {
+    "created": 1655,
+    "touched": 953,
+    "entered": 916,
+    "touchRate": 0.5758308157099697,
+    "entryRate": 0.5534743202416919
+   },
+   "baseFvgs": null,
+   "inversionRate": null
+  },
+  {
+   "id": "H09B_K1.5_EDGE",
+   "allPeriod": {
+    "created": 12306,
+    "touched": 9398,
+    "entered": 9208,
+    "touchRate": 0.7636925077198115,
+    "entryRate": 0.7482528847716561
+   },
+   "testYears": {
+    "created": 7448,
+    "touched": 5637,
+    "entered": 5539,
+    "touchRate": 0.7568474758324383,
+    "entryRate": 0.7436895810955961
+   },
+   "baseFvgs": null,
+   "inversionRate": null
+  },
+  {
+   "id": "H09B_K1.5_CE",
+   "allPeriod": {
+    "created": 12306,
+    "touched": 7116,
+    "entered": 7090,
+    "touchRate": 0.5782545099951243,
+    "entryRate": 0.5761417194864293
+   },
+   "testYears": {
+    "created": 7448,
+    "touched": 4226,
+    "entered": 4210,
+    "touchRate": 0.5674006444683136,
+    "entryRate": 0.5652524167561761
+   },
+   "baseFvgs": null,
+   "inversionRate": null
+  },
+  {
+   "id": "H09B_K2_EDGE",
+   "allPeriod": {
+    "created": 5663,
+    "touched": 4325,
+    "entered": 4160,
+    "touchRate": 0.7637294720113015,
+    "entryRate": 0.734592971923009
+   },
+   "testYears": {
+    "created": 3356,
+    "touched": 2558,
+    "entered": 2477,
+    "touchRate": 0.7622169249106079,
+    "entryRate": 0.7380810488676997
+   },
+   "baseFvgs": null,
+   "inversionRate": null
+  },
+  {
+   "id": "H09B_K2_CE",
+   "allPeriod": {
+    "created": 5663,
+    "touched": 3118,
+    "entered": 3110,
+    "touchRate": 0.5505915592442169,
+    "entryRate": 0.5491788804520572
+   },
+   "testYears": {
+    "created": 3356,
+    "touched": 1809,
+    "entered": 1805,
+    "touchRate": 0.5390345649582837,
+    "entryRate": 0.5378426698450537
+   },
+   "baseFvgs": null,
+   "inversionRate": null
+  },
+  {
+   "id": "H10_G0.25_D0",
+   "allPeriod": {
+    "created": 16488,
+    "touched": 12848,
+    "entered": 11961,
+    "touchRate": 0.7792333818534692,
+    "entryRate": 0.7254366812227074
+   },
+   "testYears": {
+    "created": 9998,
+    "touched": 7800,
+    "entered": 7266,
+    "touchRate": 0.7801560312062412,
+    "entryRate": 0.7267453490698139
+   },
+   "baseFvgs": 25443,
+   "inversionRate": 0.6480367881146091
+  },
+  {
+   "id": "H10_G0.25_D1",
+   "allPeriod": {
+    "created": 11578,
+    "touched": 6848,
+    "entered": 6287,
+    "touchRate": 0.5914665745379167,
+    "entryRate": 0.5430126101226463
+   },
+   "testYears": {
+    "created": 7116,
+    "touched": 4281,
+    "entered": 3916,
+    "touchRate": 0.601602023608769,
+    "entryRate": 0.5503091624508151
+   },
+   "baseFvgs": 25443,
+   "inversionRate": 0.4550564005816924
+  },
+  {
+   "id": "H10_G0.5_D0",
+   "allPeriod": {
+    "created": 11114,
+    "touched": 9013,
+    "entered": 8604,
+    "touchRate": 0.8109591506208386,
+    "entryRate": 0.7741587187331294
+   },
+   "testYears": {
+    "created": 6703,
+    "touched": 5471,
+    "entered": 5222,
+    "touchRate": 0.8162017007310159,
+    "entryRate": 0.7790541548560346
+   },
+   "baseFvgs": 18320,
+   "inversionRate": 0.6066593886462882
+  },
+  {
+   "id": "H10_G0.5_D1",
+   "allPeriod": {
+    "created": 7801,
+    "touched": 4863,
+    "entered": 4584,
+    "touchRate": 0.6233816177413152,
+    "entryRate": 0.5876169721830534
+   },
+   "testYears": {
+    "created": 4759,
+    "touched": 3029,
+    "entered": 2845,
+    "touchRate": 0.6364782517335574,
+    "entryRate": 0.5978146669468376
+   },
+   "baseFvgs": 18320,
+   "inversionRate": 0.42581877729257644
+  }
+ ],
+ "eventStudy": [
+  {
+   "id": "H08_L6_R1",
+   "n": 6,
+   "allPeriod": {
+    "sweep": {
+     "h12": {
+      "n": 23969,
+      "mean": -0.0007323073616618017
+     },
+     "h24": {
+      "n": 23959,
+      "mean": -0.0006193664905700646
+     }
+    },
+    "anyNewExtreme": {
+     "h12": {
+      "n": 242792,
+      "mean": -0.0000042674294217610836
+     },
+     "h24": {
+      "n": 242731,
+      "mean": 0.0002164452964505348
+     }
+    }
+   },
+   "testYears": {
+    "sweep": {
+     "h12": {
+      "n": 13893,
+      "mean": -0.000978516251505552
+     },
+     "h24": {
+      "n": 13883,
+      "mean": -0.0011887259068773192
+     }
+    },
+    "anyNewExtreme": {
+     "h12": {
+      "n": 144375,
+      "mean": -0.00031364564628529984
+     },
+     "h24": {
+      "n": 144314,
+      "mean": -0.00011230156196416062
+     }
+    }
+   }
+  },
+  {
+   "id": "H08_L6_R3",
+   "n": 6,
+   "allPeriod": {
+    "sweep": {
+     "h12": {
+      "n": 30490,
+      "mean": -0.000625730517213264
+     },
+     "h24": {
+      "n": 30478,
+      "mean": -0.0001883885134961351
+     }
+    },
+    "anyNewExtreme": {
+     "h12": {
+      "n": 242792,
+      "mean": -0.0000042674294217610836
+     },
+     "h24": {
+      "n": 242731,
+      "mean": 0.0002164452964505348
+     }
+    }
+   },
+   "testYears": {
+    "sweep": {
+     "h12": {
+      "n": 17909,
+      "mean": -0.000964341930661415
+     },
+     "h24": {
+      "n": 17897,
+      "mean": -0.0007472365620620326
+     }
+    },
+    "anyNewExtreme": {
+     "h12": {
+      "n": 144375,
+      "mean": -0.00031364564628529984
+     },
+     "h24": {
+      "n": 144314,
+      "mean": -0.00011230156196416062
+     }
+    }
+   }
+  },
+  {
+   "id": "H08_L24_R1",
+   "n": 24,
+   "allPeriod": {
+    "sweep": {
+     "h12": {
+      "n": 4855,
+      "mean": -0.0014459806611695164
+     },
+     "h24": {
+      "n": 4854,
+      "mean": -0.0017860994434652352
+     }
+    },
+    "anyNewExtreme": {
+     "h12": {
+      "n": 105271,
+      "mean": -0.00005922008926819156
+     },
+     "h24": {
+      "n": 105246,
+      "mean": 0.00040369879571585136
+     }
+    }
+   },
+   "testYears": {
+    "sweep": {
+     "h12": {
+      "n": 2782,
+      "mean": -0.0020903845681126032
+     },
+     "h24": {
+      "n": 2781,
+      "mean": -0.0024891028607328613
+     }
+    },
+    "anyNewExtreme": {
+     "h12": {
+      "n": 64757,
+      "mean": -0.0006136515762788564
+     },
+     "h24": {
+      "n": 64732,
+      "mean": -0.0004880197317790454
+     }
+    }
+   }
+  },
+  {
+   "id": "H08_L24_R3",
+   "n": 24,
+   "allPeriod": {
+    "sweep": {
+     "h12": {
+      "n": 6038,
+      "mean": -0.0016811857965637609
+     },
+     "h24": {
+      "n": 6037,
+      "mean": -0.0015748576937768463
+     }
+    },
+    "anyNewExtreme": {
+     "h12": {
+      "n": 105271,
+      "mean": -0.00005922008926819156
+     },
+     "h24": {
+      "n": 105246,
+      "mean": 0.00040369879571585136
+     }
+    }
+   },
+   "testYears": {
+    "sweep": {
+     "h12": {
+      "n": 3542,
+      "mean": -0.0024405931326000416
+     },
+     "h24": {
+      "n": 3541,
+      "mean": -0.002121337610687837
+     }
+    },
+    "anyNewExtreme": {
+     "h12": {
+      "n": 64757,
+      "mean": -0.0006136515762788564
+     },
+     "h24": {
+      "n": 64732,
+      "mean": -0.0004880197317790454
+     }
+    }
+   }
+  },
+  {
+   "id": "H11_N48_L3",
+   "n": 48,
+   "allPeriod": {
+    "sweep": {
+     "h12": {
+      "n": 10482,
+      "mean": -0.0008969257259735252
+     },
+     "h24": {
+      "n": 10479,
+      "mean": -0.0010496452322299099
+     }
+    },
+    "anyNewExtreme": {
+     "h12": {
+      "n": 68456,
+      "mean": -0.0004678116911966759
+     },
+     "h24": {
+      "n": 68445,
+      "mean": -0.000057728472811895674
+     }
+    }
+   },
+   "testYears": {
+    "sweep": {
+     "h12": {
+      "n": 5707,
+      "mean": -0.0013732552253924717
+     },
+     "h24": {
+      "n": 5704,
+      "mean": -0.0018698330202058329
+     }
+    },
+    "anyNewExtreme": {
+     "h12": {
+      "n": 42687,
+      "mean": -0.0011641674664865259
+     },
+     "h24": {
+      "n": 42676,
+      "mean": -0.0011490027410829883
+     }
+    }
+   }
+  },
+  {
+   "id": "H11_N48_L6",
+   "n": 48,
+   "allPeriod": {
+    "sweep": {
+     "h12": {
+      "n": 4062,
+      "mean": -0.0007293934257814977
+     },
+     "h24": {
+      "n": 4062,
+      "mean": -0.0008246086774663465
+     }
+    },
+    "anyNewExtreme": {
+     "h12": {
+      "n": 68456,
+      "mean": -0.0004678116911966759
+     },
+     "h24": {
+      "n": 68445,
+      "mean": -0.000057728472811895674
+     }
+    }
+   },
+   "testYears": {
+    "sweep": {
+     "h12": {
+      "n": 2221,
+      "mean": -0.0009764909165101642
+     },
+     "h24": {
+      "n": 2221,
+      "mean": -0.0019743560509368945
+     }
+    },
+    "anyNewExtreme": {
+     "h12": {
+      "n": 42687,
+      "mean": -0.0011641674664865259
+     },
+     "h24": {
+      "n": 42676,
+      "mean": -0.0011490027410829883
+     }
+    }
+   }
+  },
+  {
+   "id": "H11_N168_L3",
+   "n": 168,
+   "allPeriod": {
+    "sweep": {
+     "h12": {
+      "n": 20448,
+      "mean": -0.00010013239327312264
+     },
+     "h24": {
+      "n": 20438,
+      "mean": -0.00022758027105294085
+     }
+    },
+    "anyNewExtreme": {
+     "h12": {
+      "n": 30129,
+      "mean": -0.001262219779080094
+     },
+     "h24": {
+      "n": 30129,
+      "mean": -0.0008955307841805996
+     }
+    }
+   },
+   "testYears": {
+    "sweep": {
+     "h12": {
+      "n": 11752,
+      "mean": -0.00025673652930667984
+     },
+     "h24": {
+      "n": 11742,
+      "mean": -0.0005986598507076577
+     }
+    },
+    "anyNewExtreme": {
+     "h12": {
+      "n": 18986,
+      "mean": -0.0016511493604264998
+     },
+     "h24": {
+      "n": 18986,
+      "mean": -0.0012819051818790837
+     }
+    }
+   }
+  },
+  {
+   "id": "H11_N168_L6",
+   "n": 168,
+   "allPeriod": {
+    "sweep": {
+     "h12": {
+      "n": 10305,
+      "mean": 0.00006525192636900997
+     },
+     "h24": {
+      "n": 10298,
+      "mean": 0.00014611439224812618
+     }
+    },
+    "anyNewExtreme": {
+     "h12": {
+      "n": 30129,
+      "mean": -0.001262219779080094
+     },
+     "h24": {
+      "n": 30129,
+      "mean": -0.0008955307841805996
+     }
+    }
+   },
+   "testYears": {
+    "sweep": {
+     "h12": {
+      "n": 5941,
+      "mean": -0.00022560512074272293
+     },
+     "h24": {
+      "n": 5934,
+      "mean": -0.0005855213762550906
+     }
+    },
+    "anyNewExtreme": {
+     "h12": {
+      "n": 18986,
+      "mean": -0.0016511493604264998
+     },
+     "h24": {
+      "n": 18986,
+      "mean": -0.0012819051818790837
+     }
+    }
+   }
+  }
+ ],
+ "baselines": {
+  "flat": 0,
+  "basketSameExposure": 0.1456776840138445,
+  "basketByYear": {
+   "2024": 0.9455905045114462,
+   "2025": 0.19931463764095536,
+   "2026": 0.2624786821697618
+  }
+ },
+ "combinations": {
+  "status": "NAO_EXECUTADAS",
+  "reason": "nenhuma família foi classificada como CANDIDATA (regra do protocolo: combinar só o que se sustenta sozinho)"
+ }
+}
