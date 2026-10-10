@@ -18,13 +18,13 @@ const P=LISTAGEM;
 
 // ---------- dados ----------
 interface Series {symbol:string;first:number;count:number;o:number[];h:number[];c:number[];filled:number;funding:[number,number,number][];sha256:string}
-function pages(path:string,symbol:string,start:number,end:number,limit:number){
+export function pages(path:string,symbol:string,start:number,end:number,limit:number){
  const raw:{t:number;o:number;h:number;c:number}[]=[];let cursor=start;
  while(cursor<=end){const page=get(path,{symbol,interval:'1h',startTime:cursor,endTime:end,limit}) as unknown[][];if(!page.length)break;
   for(const r of page)raw.push({t:Number(r[0]),o:Number(r[1]),h:Number(r[2]),c:Number(r[4])});cursor=raw.at(-1)!.t+H;if(page.length<limit)break;}
  return raw;
 }
-function fundingPages(symbol:string,start:number,end:number){
+export function fundingPages(symbol:string,start:number,end:number){
  const out:[number,number,number][]=[];let cursor=start;
  while(cursor<=end){const page=get('/fapi/v1/fundingRate',{symbol,startTime:cursor,endTime:end,limit:1000}) as Record<string,string>[];if(!page.length)break;
   for(const f of page)out.push([Number(f.fundingTime),Number(f.fundingRate),Number(f.markPrice)]);cursor=out.at(-1)![0]+1;if(page.length<1000)break;}
