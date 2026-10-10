@@ -1,13 +1,14 @@
 import type {Candle} from '../backtest.js';
 import type {Decision,SignalStrategy} from '../signal-backtest.js';
 import {atr,returnStd,rollingExtremes,rollingVwap,sessionVwap,sma} from './indicators.js';
+import {buildIctStrategy,type IctFamily} from './ict.js';
 
 /**
  * Hipóteses H01 a H05 de docs/research/video-strategy-hypotheses.md em regras determinísticas (protocolo
  * VIDEO_HYPOTHESES_V1, docs/PROTOCOLO_HIPOTESES_VIDEO.md). Cada estratégia pré-calcula indicadores causais e decide no
  * fechamento da vela i usando só as velas 0..i. A H06 (calendário) depende da janela de treino e fica em calendar.ts.
  */
-export type Family='H01_FIBONACCI'|'H02_MA_DEVIATION'|'H03_VWAP'|'H04_SUPPORT_RESISTANCE'|'H04_V2_SUPPORT_RESISTANCE'|'H05_FLAG';
+export type Family='H01_FIBONACCI'|'H02_MA_DEVIATION'|'H03_VWAP'|'H04_SUPPORT_RESISTANCE'|'H04_V2_SUPPORT_RESISTANCE'|'H05_FLAG'|IctFamily;
 export interface HypothesisConfig {id:string;family:Family;params:Record<string,number|string>}
 const ATR_BARS=24;
 
@@ -148,5 +149,7 @@ export function buildStrategy(candles:readonly Candle[],config:HypothesisConfig)
   case 'H01_FIBONACCI':return fibonacci(candles,p);
   case 'H05_FLAG':return flag(candles,p);
   case 'H04_SUPPORT_RESISTANCE':case 'H04_V2_SUPPORT_RESISTANCE':return supportResistance(candles,p).strategy;
+  // H07 a H11 (VIDEO_HYPOTHESES_V2_ICT): primitivas e detectores em ict.ts, para que as cinco usem a mesma definição.
+  case 'H07_ORDER_BLOCK':case 'H08_LIQUIDITY_SWEEP':case 'H09_DISPLACEMENT':case 'H10_IFVG':case 'H11_INTERNAL_RANGE_LIQUIDITY':return buildIctStrategy(candles,config);
  }
 }

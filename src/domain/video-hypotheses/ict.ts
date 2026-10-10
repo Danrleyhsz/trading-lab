@@ -1,5 +1,7 @@
 import type {Candle} from '../backtest.js';
+import type {SignalStrategy} from '../signal-backtest.js';
 import {atr} from './indicators.js';
+import type {HypothesisConfig} from './strategies.js';
 
 /**
  * Primitivas e detectores do VIDEO_HYPOTHESES_V2_ICT (docs/PROTOCOLO_HIPOTESES_ICT.md, com as Emendas 1 e 2).
@@ -258,4 +260,35 @@ export function internalRangeLiquidity(candles:readonly Candle[],opts:{N:number;
   while(next<pivots.length&&pivots[next].confirmedAt<=i){const pv=pivots[next++];(pv.kind==='LOW'?lows:highs).push({index:pv.index,price:pv.price});}
  }
  return result;
+}
+
+// ---------- grade e integração com buildStrategy ----------
+export type IctFamily='H07_ORDER_BLOCK'|'H08_LIQUIDITY_SWEEP'|'H09_DISPLACEMENT'|'H10_IFVG'|'H11_INTERNAL_RANGE_LIQUIDITY';
+
+/** Grade pré-declarada do VIDEO_HYPOTHESES_V2_ICT (docs/PROTOCOLO_HIPOTESES_ICT.md): 4 + 4 + 7 + 4 + 4 = 23 configurações. */
+export const ICT_GRID:HypothesisConfig[]=[
+ ...[1.5,2.0].flatMap(k=>[0,1].map(bos=>({id:`H07_K${k}_BOS${bos}`,family:'H07_ORDER_BLOCK' as const,params:{k,bos}}))),
+ ...[6,24].flatMap(L=>[1,3].map(r=>({id:`H08_L${L}_R${r}`,family:'H08_LIQUIDITY_SWEEP' as const,params:{L,r}}))),
+ ...[1.5,2.0,3.0].map(k=>({id:`H09A_K${k}`,family:'H09_DISPLACEMENT' as const,params:{role:'MOMENTUM',k}})),
+ ...[1.5,2.0].flatMap(k=>(['EDGE','CE'] as const).map(entry=>({id:`H09B_K${k}_${entry}`,family:'H09_DISPLACEMENT' as const,params:{role:'RETRACEMENT',k,entry}}))),
+ ...[0.25,0.5].flatMap(g=>[0,1].map(disp=>({id:`H10_G${g}_D${disp}`,family:'H10_IFVG' as const,params:{g,disp}}))),
+ ...[48,168].flatMap(N=>[3,6].map(L=>({id:`H11_N${N}_L${L}`,family:'H11_INTERNAL_RANGE_LIQUIDITY' as const,params:{N,L}}))),
+];
+
+/** Detector da configuração: sinais por vela, zonas (taxa de toque) e eventos de varredura. */
+export function runIct(candles:readonly Candle[],config:HypothesisConfig):IctResult{
+ const p=config.params;
+ switch(config.family){
+  case 'H07_ORDER_BLOCK':return orderBlocks(candles,{k:Number(p.k),bos:Number(p.bos)===1?1:0});
+  case 'H08_LIQUIDITY_SWEEP':return liquiditySweeps(candles,{L:Number(p.L),r:Number(p.r)});
+  case 'H09_DISPLACEMENT':return p.role==='MOMENTUM'?displacementMomentum(candles,{k:Number(p.k)}):fvgRetracement(candles,{k:Number(p.k),entry:p.entry==='CE'?'CE':'EDGE'});
+  case 'H10_IFVG':return invertedFvg(candles,{g:Number(p.g),disp:Number(p.disp)===1?1:0});
+  case 'H11_INTERNAL_RANGE_LIQUIDITY':return internalRangeLiquidity(candles,{N:Number(p.N),L:Number(p.L)});
+  default:throw new Error(`família ICT desconhecida: ${config.family}`);
+ }
+}
+/** Sinais pré-calculados em vetor, no mesmo formato das famílias do V1: com posição aberta o sinal é ignorado. */
+export function buildIctStrategy(candles:readonly Candle[],config:HypothesisConfig):SignalStrategy{
+ const {signals}=runIct(candles,config);
+ return (i,pos)=>pos?null:signals[i];
 }
