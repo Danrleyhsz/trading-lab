@@ -50,3 +50,10 @@ test('serviço: espera o início sem buscar nada, nunca calcula com a cesta inco
  now+=H;fail='';assert.equal((await t.refresh()).status,'RUNNING');
  assert.equal(t.snapshot().scope,'FORWARD_PAPER_TRACKING_ONLY');
 });
+
+test('acompanhamento desligado pelo dono: não busca dados, não agenda e diz isso no instantâneo',async()=>{
+ let calls=0;const history={load:async()=>{calls++;throw new Error('não deveria buscar');}};
+ const t=new ForwardMomentumTracker(history as never,()=>Date.UTC(2026,9,10,12),false);t.start();
+ const s=t.snapshot();assert.equal(s.status,'DISABLED');assert.equal(s.verdict,'CLOSED_BY_OWNER');assert.equal(s.nextDecisionAt,null);assert.equal(s.equity,null);assert.equal(s.error,null);
+ assert.equal((await t.refresh()).status,'DISABLED');assert.equal(calls,0);t.stop();
+});

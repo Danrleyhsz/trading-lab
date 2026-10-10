@@ -5,6 +5,7 @@ import type {PerpetualPaperBook,PerpetualBookState} from './perpetual-paper-book
 import type {MemoryStore} from '../domain/memory.js';
 import type {EventBus} from './event-bus.js';
 import {event} from '../domain/events.js';
+import {MAX_DRAWDOWN_FRACTION} from '../domain/risk.js';
 import {screenPerpetualStudy} from './perpetual-study-screen.js';
 import type {PilotDecisionContext} from './pilot-team-briefing.js';
 export function studyEligibility(study:PerpetualStudy|undefined,now=Date.now()){
@@ -28,7 +29,7 @@ export class AutonomousPerpetualCycle {
  constructor(private enabled:boolean,private studyId:string,private studies:PerpetualStudies,private book:PerpetualPaperBook,private source:{load(count:number):Promise<PerpetualDataset>},private save:(state:PerpetualBookState)=>Promise<void>,private memories:MemoryStore,private bus:EventBus,private persist:()=>Promise<void>,private now:()=>number=Date.now,private canContinue:()=>boolean=()=>true,options:PilotOptions={}){
   this.blockedReason=options.blockedReason??null;this.maxLossFraction=options.maxLossFraction??0.03;this.retryDelayMs=options.retryDelayMs??300000;this.settleMs=options.settleMs??0;
   if(!(Number.isInteger(this.settleMs)&&this.settleMs>=0&&this.settleMs<=300000))throw Error('settle delay must be an integer from 0 to 300 seconds');this.onDecision=options.onDecision;
-  if(!(this.maxLossFraction>0&&this.maxLossFraction<0.1))throw Error('pilot loss limit must be between 0 and the 10% risk drawdown limit');
+  if(!(this.maxLossFraction>0&&this.maxLossFraction<MAX_DRAWDOWN_FRACTION))throw Error('pilot loss limit must be between 0 and the risk drawdown limit ('+MAX_DRAWDOWN_FRACTION*100+'%)');
  }
  private active(){return this.enabled&&!this.blockedReason;}
  status(){const {eligible,reason}=this.studies.screen(this.studyId,this.now());return {enabled:this.active(),studyId:this.studyId||null,busy:this.busy,error:this.error,eligible,reason,accountId:'evaluation:nova:usdm',lastProcessedCandle:this.book.status().autonomousCursor,blockedReason:this.blockedReason,stopReason:this.stopReason,maxLossFraction:this.maxLossFraction,settleSeconds:this.settleMs/1000,lastAttemptFailed:this.lastAttemptFailed,nextAttemptAt:this.nextAttemptAt>this.now()?this.nextAttemptAt:null};}

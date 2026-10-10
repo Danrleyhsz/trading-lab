@@ -38,12 +38,12 @@ test('Auditoria e Risk: frações e distâncias calculadas dos dados; sem dado f
  const r=O.risk(accounts,{halted:false,autonomous:{maxLossFraction:0.03}},{summary:{reasons:{'RISK:DRAWDOWN_LIMIT':2}}});
  assert.equal(r.killSwitch,false);
  const by=Object.fromEntries(r.limits.map((l:any)=>[l.id,l]));
- assert.equal(by['pilot-loss'].use.toFixed(3),'0.500');assert.equal(by['daily-loss'].use.toFixed(3),'0.300');assert.equal(by.drawdown.use.toFixed(3),'0.200');
+ assert.equal(by['pilot-loss'].use.toFixed(3),'0.500');assert.equal(by['daily-loss'].use.toFixed(3),'0.300');assert.equal(by.drawdown.use.toFixed(3),'0.067');
  assert.deepEqual(JSON.parse(JSON.stringify(r.rejections)),[{reason:'RISK:DRAWDOWN_LIMIT',n:2}]);
  const none=O.risk(null,null,null);assert.equal(none.killSwitch,null);assert.ok(none.limits.every((l:any)=>l.use===null));
- // Os limites batem com o motor de risco (perpetual-risk.ts: 10% de drawdown, 5% de perda diária).
- const engine=readFileSync('src/domain/perpetual-risk.ts','utf8');assert.match(engine,/peakEquity\*0\.9/);assert.match(engine,/dailyStartEquity\*0\.95/);
- assert.equal(O.RISK_LIMITS.drawdown,0.1);assert.equal(O.RISK_LIMITS.dailyLoss,0.05);
+ // Os limites batem com o motor de risco (perpetual-risk.ts: 30% de drawdown desde 10/10/2026, 5% de perda diária).
+ const engine=readFileSync('src/domain/perpetual-risk.ts','utf8');assert.match(engine,/peakEquity\*\(1-MAX_DRAWDOWN_FRACTION\)/);assert.match(readFileSync('src/domain/risk.ts','utf8'),/MAX_DRAWDOWN_FRACTION=0\.30/);assert.match(engine,/dailyStartEquity\*0\.95/);
+ assert.equal(O.RISK_LIMITS.drawdown,0.3);assert.equal(O.RISK_LIMITS.dailyLoss,0.05);
 });
 
 test('telas do F4 só desenham com dado',()=>{

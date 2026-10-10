@@ -54,7 +54,7 @@ test('a failed attempt backs off instead of retrying on every quote',async()=>{
  await assert.rejects(cycle.onMarket(),/418/);assert.equal(cycle.status().lastAttemptFailed,true);
  clock+=60000;await book.synchronize(quote(199),[],async()=>{});await cycle.onMarket();assert.equal(loads,1,'no retry inside the back-off window');
  clock+=241000;await book.synchronize(quote(199),[],async()=>{});await assert.rejects(cycle.onMarket(),/418/);assert.equal(loads,2);
- assert.throws(()=>new AutonomousPerpetualCycle(true,'x',new PerpetualStudies(source,[]),book,source,async()=>{},new MemoryStore(),bus,async()=>{},now,()=>true,{maxLossFraction:0.1}),/loss limit/);
+ assert.throws(()=>new AutonomousPerpetualCycle(true,'x',new PerpetualStudies(source,[]),book,source,async()=>{},new MemoryStore(),bus,async()=>{},now,()=>true,{maxLossFraction:0.3}),/loss limit/);
 });
 
 test('only the explicit pilot phase may enable autonomy, with an explicit study and a pinned release',()=>{
@@ -67,7 +67,7 @@ test('only the explicit pilot phase may enable autonomy, with an explicit study 
  assert.ok(failed({...pilot,CONTINUOUS_RELEASE_COMMIT:undefined}).includes('PINNED_RELEASE_COMMIT'));
  assert.ok(failed({...pilot,AUTONOMOUS_STUDY_ID:'latest'}).includes('EXPLICIT_PILOT_STUDY'));
  assert.ok(failed({...pilot,AUTONOMOUS_PERPETUAL_ENABLED:'false'}).includes('AUTONOMOUS_PERPETUAL_ENABLED_MUST_BE_TRUE'));
- assert.ok(failed({...pilot,PILOT_MAX_LOSS:'0.2'}).includes('VALID_PILOT_LOSS_LIMIT'));
+ assert.ok(failed({...pilot,PILOT_MAX_LOSS:'0.3'}).includes('VALID_PILOT_LOSS_LIMIT'));assert.ok(!failed({...pilot,PILOT_MAX_LOSS:'0.2'}).includes('VALID_PILOT_LOSS_LIMIT'),'20% passa a ser válido com o limite de 30%');
  assert.ok(failed({...pilot,LEGACY_PAPER_EXECUTION_ENABLED:'true'}).includes('LEGACY_PAPER_EXECUTION_ENABLED_MUST_BE_FALSE'));
 });
 

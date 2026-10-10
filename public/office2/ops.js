@@ -2,7 +2,7 @@
 // UNKNOWN (ex.: histórico de falhas do ciclo, lacuna L2). Limites de risco vêm do código de risco (perpetual-risk.ts).
 (() => {
  const AGENTS=['atlas','satoshi','oracle','nova','flux','sentinel','euler','vega'];
- const RISK_LIMITS=Object.freeze({drawdown:0.10,dailyLoss:0.05});
+ const RISK_LIMITS=Object.freeze({drawdown:0.30,dailyLoss:0.05});
  const t=iso=>{const d=new Date(iso);return Number.isFinite(d.getTime())?d.toISOString().slice(11,19)+' UTC':'n/d';};
  const day=iso=>{const d=new Date(iso);return Number.isFinite(d.getTime())?d.toISOString().slice(0,16).replace('T',' ')+' UTC':'n/d';};
  /** Nexus: arestas agente → agente das últimas `limit` mensagens gravadas (opcional: só as de uma decisão). */
@@ -53,7 +53,7 @@
    limits:[
     {id:'pilot-loss',label:'Limite de perda do piloto',limit:maxLoss??null,value:pilotLoss,use:maxLoss?use(pilotLoss,maxLoss):null,note:'fecha a posição e liga o kill switch; checado de hora em hora'},
     {id:'daily-loss',label:'Perda do dia (risco)',limit:RISK_LIMITS.dailyLoss,value:dailyLoss,use:use(dailyLoss,RISK_LIMITS.dailyLoss),note:'bloqueia nova exposição'},
-    {id:'drawdown',label:'Maior drawdown observado',limit:RISK_LIMITS.drawdown,value:dd,use:use(dd,RISK_LIMITS.drawdown),note:'o risco bloqueia nova exposição no drawdown atual ≥ 10%; aqui é o máximo histórico da conta'}],
+    {id:'drawdown',label:'Maior drawdown observado',limit:RISK_LIMITS.drawdown,value:dd,use:use(dd,RISK_LIMITS.drawdown),note:'o risco bloqueia nova exposição no drawdown atual ≥ 30% (padrão desde 10/10/2026); aqui é o máximo histórico da conta'}],
    rejections:Object.entries(receiptsBody?.summary?.reasons??{}).map(([k,n])=>({reason:k,n}))};
  }
  function onScreen(ctx,inner,draw){const [p0,p1,,p3]=inner;ctx.save();ctx.beginPath();inner.forEach((p,k)=>k?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));ctx.closePath();ctx.clip();

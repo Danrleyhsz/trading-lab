@@ -1,0 +1,498 @@
+{
+ "scope": "FORWARD_PAPER_TRACKING_ONLY",
+ "protocol": {
+  "version": "XSMOM_FORWARD_V1",
+  "declaredAt": "2026-10-06T00:55:00Z",
+  "symbols": [
+   "ENAUSDT",
+   "ZECUSDT",
+   "WLDUSDT",
+   "NEARUSDT",
+   "UNIUSDT",
+   "ONDOUSDT",
+   "1000PEPEUSDT",
+   "BCHUSDT",
+   "FILUSDT",
+   "AAVEUSDT",
+   "SUIUSDT",
+   "TAOUSDT",
+   "AVAXUSDT",
+   "LINKUSDT",
+   "XRPUSDT",
+   "XLMUSDT",
+   "DOGEUSDT",
+   "SOLUSDT",
+   "LTCUSDT",
+   "ETHUSDT",
+   "BTCUSDT"
+  ],
+  "firstDecisionBar": 1791252000000,
+  "lookbackHours": 672,
+  "rebalanceHours": 168,
+  "longCount": 5,
+  "shortCount": 5,
+  "legFraction": 0.05,
+  "feeRate": 0.00055,
+  "slippageBps": 2,
+  "initialCapital": 10000,
+  "weeks": 12,
+  "stopDrawdown": 0.15
+ },
+ "observedAt": "2026-10-10T11:26:34.328Z",
+ "status": "RUNNING",
+ "verdict": "IN_PROGRESS",
+ "startedAt": "2026-10-06T03:00:00.000Z",
+ "endsAt": "2026-12-29T03:00:00.000Z",
+ "nextDecisionAt": "2026-10-13T03:00:00.000Z",
+ "weeksElapsed": 0,
+ "lastCandle": "2026-10-10T10:00:00.000Z",
+ "equity": 10014.175269849984,
+ "netPnl": 14.175269849984033,
+ "returnPct": 0.0014175269849984033,
+ "maxDrawdown": 0.015383982502202187,
+ "feesPaid": 2.750080727812134,
+ "fundingCashDelta": -0.9164995205469905,
+ "portfolio": {
+  "decidedAt": "2026-10-06T03:00:00.000Z",
+  "long": [
+   "NEARUSDT",
+   "ENAUSDT",
+   "SUIUSDT",
+   "AAVEUSDT",
+   "AVAXUSDT"
+  ],
+  "short": [
+   "LINKUSDT",
+   "ETHUSDT",
+   "BTCUSDT",
+   "XRPUSDT",
+   "DOGEUSDT"
+  ]
+ },
+ "rebalances": 1,
+ "curve": [
+  {
+   "timestamp": 1791252000000,
+   "equity": 10000
+  },
+  {
+   "timestamp": 1791255600000,
+   "equity": 9987.716059949133
+  },
+  {
+   "timestamp": 1791259200000,
+   "equity": 9986.65059274699
+  },
+  {
+   "timestamp": 1791262800000,
+   "equity": 9981.212849719856
+  },
+  {
+   "timestamp": 1791266400000,
+   "equity": 9978.094693209843
+  },
+  {
+   "timestamp": 1791270000000,
+   "equity": 9988.984363762636
+  },
+  {
+   "timestamp": 1791273600000,
+   "equity": 9976.755327876122
+  },
+  {
+   "timestamp": 1791277200000,
+   "equity": 9963.916937511183
+  },
+  {
+   "timestamp": 1791280800000,
+   "equity": 9959.825124772584
+  },
+  {
+   "timestamp": 1791284400000,
+   "equity": 9969.062159379644
+  },
+  {
+   "timestamp": 1791288000000,
+   "equity": 9968.401792717423
+  },
+  {
+   "timestamp": 1791291600000,
+   "equity": 9947.911734929117
+  },
+  {
+   "timestamp": 1791295200000,
+   "equity": 9952.948287093215
+  },
+  {
+   "timestamp": 1791298800000,
+   "equity": 9954.264369150878
+  },
+  {
+   "timestamp": 1791302400000,
+   "equity": 9944.642348708281
+  },
+  {
+   "timestamp": 1791306000000,
+   "equity": 9951.861165044338
+  },
+  {
+   "timestamp": 1791309600000,
+   "equity": 9964.485455124837
+  },
+  {
+   "timestamp": 1791313200000,
+   "equity": 9966.65160845216
+  },
+  {
+   "timestamp": 1791316800000,
+   "equity": 9965.970156004365
+  },
+  {
+   "timestamp": 1791320400000,
+   "equity": 9970.331182441972
+  },
+  {
+   "timestamp": 1791324000000,
+   "equity": 9969.216305708063
+  },
+  {
+   "timestamp": 1791327600000,
+   "equity": 9965.765960796196
+  },
+  {
+   "timestamp": 1791331200000,
+   "equity": 9965.26592400816
+  },
+  {
+   "timestamp": 1791334800000,
+   "equity": 9951.632568511573
+  },
+  {
+   "timestamp": 1791338400000,
+   "equity": 9937.793248420878
+  },
+  {
+   "timestamp": 1791342000000,
+   "equity": 9934.212212917842
+  },
+  {
+   "timestamp": 1791345600000,
+   "equity": 9937.988264926727
+  },
+  {
+   "timestamp": 1791349200000,
+   "equity": 9969.755325381415
+  },
+  {
+   "timestamp": 1791352800000,
+   "equity": 9983.618506423014
+  },
+  {
+   "timestamp": 1791356400000,
+   "equity": 9988.455851330764
+  },
+  {
+   "timestamp": 1791360000000,
+   "equity": 9980.288092934607
+  },
+  {
+   "timestamp": 1791363600000,
+   "equity": 9961.914825608836
+  },
+  {
+   "timestamp": 1791367200000,
+   "equity": 9972.593551504817
+  },
+  {
+   "timestamp": 1791370800000,
+   "equity": 9960.282040426708
+  },
+  {
+   "timestamp": 1791374400000,
+   "equity": 9979.957585605616
+  },
+  {
+   "timestamp": 1791378000000,
+   "equity": 9994.873840948449
+  },
+  {
+   "timestamp": 1791381600000,
+   "equity": 9981.159055694898
+  },
+  {
+   "timestamp": 1791385200000,
+   "equity": 9979.322942804718
+  },
+  {
+   "timestamp": 1791388800000,
+   "equity": 9991.890098784925
+  },
+  {
+   "timestamp": 1791392400000,
+   "equity": 9994.682515521663
+  },
+  {
+   "timestamp": 1791396000000,
+   "equity": 10002.391385528816
+  },
+  {
+   "timestamp": 1791399600000,
+   "equity": 10010.298369804967
+  },
+  {
+   "timestamp": 1791403200000,
+   "equity": 10024.516051718012
+  },
+  {
+   "timestamp": 1791406800000,
+   "equity": 9998.972041738396
+  },
+  {
+   "timestamp": 1791410400000,
+   "equity": 10013.308012290057
+  },
+  {
+   "timestamp": 1791414000000,
+   "equity": 10013.676714935913
+  },
+  {
+   "timestamp": 1791417600000,
+   "equity": 10009.283097441907
+  },
+  {
+   "timestamp": 1791421200000,
+   "equity": 10005.887512641159
+  },
+  {
+   "timestamp": 1791424800000,
+   "equity": 10026.967169458096
+  },
+  {
+   "timestamp": 1791428400000,
+   "equity": 10012.900286741984
+  },
+  {
+   "timestamp": 1791432000000,
+   "equity": 10005.579546322188
+  },
+  {
+   "timestamp": 1791435600000,
+   "equity": 10012.574358381627
+  },
+  {
+   "timestamp": 1791439200000,
+   "equity": 10029.611209327564
+  },
+  {
+   "timestamp": 1791442800000,
+   "equity": 10010.743984065059
+  },
+  {
+   "timestamp": 1791446400000,
+   "equity": 9988.050683863636
+  },
+  {
+   "timestamp": 1791450000000,
+   "equity": 9999.879522954014
+  },
+  {
+   "timestamp": 1791453600000,
+   "equity": 9988.370352625532
+  },
+  {
+   "timestamp": 1791457200000,
+   "equity": 9980.090032147413
+  },
+  {
+   "timestamp": 1791460800000,
+   "equity": 9965.031563006132
+  },
+  {
+   "timestamp": 1791464400000,
+   "equity": 9961.15613377559
+  },
+  {
+   "timestamp": 1791468000000,
+   "equity": 9962.309065181897
+  },
+  {
+   "timestamp": 1791471600000,
+   "equity": 9916.702438853086
+  },
+  {
+   "timestamp": 1791475200000,
+   "equity": 9916.569919743933
+  },
+  {
+   "timestamp": 1791478800000,
+   "equity": 9880.943009414821
+  },
+  {
+   "timestamp": 1791482400000,
+   "equity": 9888.204349685097
+  },
+  {
+   "timestamp": 1791486000000,
+   "equity": 9894.696687016632
+  },
+  {
+   "timestamp": 1791489600000,
+   "equity": 9900.390000162846
+  },
+  {
+   "timestamp": 1791493200000,
+   "equity": 9888.300165675566
+  },
+  {
+   "timestamp": 1791496800000,
+   "equity": 9886.847692474656
+  },
+  {
+   "timestamp": 1791500400000,
+   "equity": 9875.315845979378
+  },
+  {
+   "timestamp": 1791504000000,
+   "equity": 9879.986984733838
+  },
+  {
+   "timestamp": 1791507600000,
+   "equity": 9907.389962887753
+  },
+  {
+   "timestamp": 1791511200000,
+   "equity": 9902.358909048067
+  },
+  {
+   "timestamp": 1791514800000,
+   "equity": 9910.11765128541
+  },
+  {
+   "timestamp": 1791518400000,
+   "equity": 9899.063654487327
+  },
+  {
+   "timestamp": 1791522000000,
+   "equity": 9931.5013124197
+  },
+  {
+   "timestamp": 1791525600000,
+   "equity": 9930.764730917977
+  },
+  {
+   "timestamp": 1791529200000,
+   "equity": 9933.32093645508
+  },
+  {
+   "timestamp": 1791532800000,
+   "equity": 9930.524328457519
+  },
+  {
+   "timestamp": 1791536400000,
+   "equity": 9931.056727475869
+  },
+  {
+   "timestamp": 1791540000000,
+   "equity": 9923.998652831642
+  },
+  {
+   "timestamp": 1791543600000,
+   "equity": 9941.606369435149
+  },
+  {
+   "timestamp": 1791547200000,
+   "equity": 9928.005047278675
+  },
+  {
+   "timestamp": 1791550800000,
+   "equity": 9924.887435774106
+  },
+  {
+   "timestamp": 1791554400000,
+   "equity": 9931.496298194126
+  },
+  {
+   "timestamp": 1791558000000,
+   "equity": 9926.643217451712
+  },
+  {
+   "timestamp": 1791561600000,
+   "equity": 9927.780254273297
+  },
+  {
+   "timestamp": 1791565200000,
+   "equity": 9919.523459093087
+  },
+  {
+   "timestamp": 1791568800000,
+   "equity": 9910.899986551181
+  },
+  {
+   "timestamp": 1791572400000,
+   "equity": 9904.929576879045
+  },
+  {
+   "timestamp": 1791576000000,
+   "equity": 9920.55323585666
+  },
+  {
+   "timestamp": 1791579600000,
+   "equity": 9932.724335332585
+  },
+  {
+   "timestamp": 1791583200000,
+   "equity": 9939.209955747245
+  },
+  {
+   "timestamp": 1791586800000,
+   "equity": 9936.017437252749
+  },
+  {
+   "timestamp": 1791590400000,
+   "equity": 9941.769507443787
+  },
+  {
+   "timestamp": 1791594000000,
+   "equity": 9967.164952743136
+  },
+  {
+   "timestamp": 1791597600000,
+   "equity": 9961.94546553205
+  },
+  {
+   "timestamp": 1791601200000,
+   "equity": 9959.432891455941
+  },
+  {
+   "timestamp": 1791604800000,
+   "equity": 9992.668403558064
+  },
+  {
+   "timestamp": 1791608400000,
+   "equity": 10004.192081173851
+  },
+  {
+   "timestamp": 1791612000000,
+   "equity": 10000.00190026281
+  },
+  {
+   "timestamp": 1791615600000,
+   "equity": 10005.618492962627
+  },
+  {
+   "timestamp": 1791619200000,
+   "equity": 10020.985175536807
+  },
+  {
+   "timestamp": 1791622800000,
+   "equity": 10014.852432191745
+  },
+  {
+   "timestamp": 1791626400000,
+   "equity": 10014.175269849984
+  }
+ ],
+ "error": null,
+ "archivedAt": "2026-10-10T11:26:34.399Z",
+ "archivedBecause": "Acompanhamento encerrado a pedido do dono em 10/10/2026; último estado lido em produção antes do desligamento. Não é veredito: o acompanhamento ia até 29/12/2026 (3,4 dias de 84)."
+}

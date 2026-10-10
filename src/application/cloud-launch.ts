@@ -1,6 +1,7 @@
 // Launch configuration checks. They grant no execution, provisioning or risk authority; the runtime still
 // enforces risk, eligibility and the release pin for the continuous pilot.
 import {evaluationWalletCapital} from './evaluation-wallet-bootstrap.js';
+import {MAX_DRAWDOWN_FRACTION} from '../domain/risk.js';
 export type LaunchCheck = { id: string; ok: boolean };
 export function validHttpsOrigin(value: string) {
     try {
@@ -42,7 +43,7 @@ export function checkCloudConfiguration(env: NodeJS.ProcessEnv): LaunchCheck[] {
         // Either an exact commit or an exact backend fingerprint (visual-only releases keep the fingerprint).
         add('PINNED_RELEASE_COMMIT', /^[0-9a-f]{40}$/.test(env.CONTINUOUS_RELEASE_COMMIT ?? '') || /^[0-9a-f]{64}$/.test(env.CONTINUOUS_RELEASE_BACKEND ?? ''));
         const loss = env.PILOT_MAX_LOSS === undefined ? 0.03 : Number(env.PILOT_MAX_LOSS);
-        add('VALID_PILOT_LOSS_LIMIT', Number.isFinite(loss) && loss > 0 && loss < 0.1);
+        add('VALID_PILOT_LOSS_LIMIT', Number.isFinite(loss) && loss > 0 && loss < MAX_DRAWDOWN_FRACTION);
     } else add('NO_AUTONOMOUS_STUDY', !env.AUTONOMOUS_STUDY_ID);
     let walletsValid = true;
     try { evaluationWalletCapital(env); } catch { walletsValid = false; }
