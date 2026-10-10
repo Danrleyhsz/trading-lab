@@ -1,0 +1,2018 @@
+{
+ "protocol": {
+  "version": "BUSCA_DIARIA_V1",
+  "declaredAt": "2026-10-10",
+  "costPerSide": 0.002,
+  "rules": [
+   "SMA20",
+   "SMA50",
+   "SMA100",
+   "DONCHIAN_55_20",
+   "TSMOM90"
+  ],
+  "maximumDrawdown": 0.3,
+  "minimumSharpe": 0.8,
+  "minimumBreadth": 0.6,
+  "minimumCoinDays": 365,
+  "trials": 27,
+  "T0": "2017-08-17T00:00:00.000Z",
+  "era2": "2022-01-01T00:00:00.000Z"
+ },
+ "protocolCommit": "71904acf9c283030ec198e24265e4895e213d645",
+ "execution": "HISTORICAL_SIMULATION_OFFLINE",
+ "automaticPaperApproval": false,
+ "runAt": "2026-10-10T12:03:01.486Z",
+ "data": {
+  "pairs": 712,
+  "nonPegged": 695,
+  "pegged": 17,
+  "delisted": 199,
+  "days": 3342,
+  "firstDay": "2017-08-17",
+  "lastDay": "2026-10-10"
+ },
+ "benchmarkEqualWeight": {
+  "full": {
+   "total": 0.6762509398057894,
+   "annualized": 0.0580741204894506,
+   "sharpe": 0.5068168785435003,
+   "maxDrawdown": 0.9447450569211512,
+   "days": 3340
+  },
+  "era1": {
+   "total": 15.374880962302047,
+   "annualized": 0.8945440703291836,
+   "sharpe": 1.1478668760855575,
+   "maxDrawdown": 0.8986851824026882,
+   "days": 1597
+  },
+  "era2": {
+   "total": -0.9022135962693871,
+   "annualized": -0.38562465494216736,
+   "sharpe": -0.2804706888896627,
+   "maxDrawdown": 0.9327184660805309,
+   "days": 1742
+  }
+ },
+ "benchmarkBtc": {
+  "full": {
+   "total": 11.54533629094635,
+   "annualized": 0.31838946870867013,
+   "sharpe": 0.7544498437679071,
+   "maxDrawdown": 0.8318705353076481,
+   "days": 3340
+  },
+  "era1": {
+   "total": 6.016434563394642,
+   "annualized": 0.5609281571160116,
+   "sharpe": 0.9691261059005287,
+   "maxDrawdown": 0.8318705353076481,
+   "days": 1597
+  },
+  "era2": {
+   "total": 0.7280841148360928,
+   "annualized": 0.12144194807678188,
+   "sharpe": 0.4795290211945346,
+   "maxDrawdown": 0.6699798505531629,
+   "days": 1742
+  }
+ },
+ "results": [
+  {
+   "rule": "SMA20",
+   "verdict": "NAO_VALIDADA",
+   "failed": [
+    "POSITIVE_NET",
+    "BOUNDED_DRAWDOWN",
+    "SHARPE_BAR",
+    "BREADTH",
+    "COSTS_X2",
+    "UNIVERSE_HALVES"
+   ],
+   "checks": {
+    "DATA_QUALITY": true,
+    "POSITIVE_NET": false,
+    "BOUNDED_DRAWDOWN": false,
+    "SHARPE_BAR": false,
+    "BREADTH": false,
+    "COSTS_X2": false,
+    "UNIVERSE_HALVES": false
+   },
+   "per": {
+    "full": {
+     "total": 23.427470929311315,
+     "annualized": 0.4179775585565624,
+     "sharpe": 0.9509058444269662,
+     "maxDrawdown": 0.7141462296590162,
+     "days": 3340
+    },
+    "era1": {
+     "total": 41.56680282706682,
+     "annualized": 1.3568391719466417,
+     "sharpe": 1.7252990043820604,
+     "maxDrawdown": 0.48539729632172013,
+     "days": 1597
+    },
+    "era2": {
+     "total": -0.43658172649914095,
+     "annualized": -0.11326921834786985,
+     "sharpe": -0.15048227036731113,
+     "maxDrawdown": 0.7141462296590161,
+     "days": 1742
+    }
+   },
+   "costsX2": {
+    "full": {
+     "total": 10.3422013640735,
+     "annualized": 0.30394370632126133,
+     "sharpe": 0.7784457462531692,
+     "maxDrawdown": 0.7616530267765308,
+     "days": 3340
+    },
+    "era1": {
+     "total": 29.29159440506875,
+     "annualized": 1.1805267271244424,
+     "sharpe": 1.5939078329569314,
+     "maxDrawdown": 0.5133556510681285,
+     "days": 1597
+    },
+    "era2": {
+     "total": -0.6325236191186869,
+     "annualized": -0.18922035488602218,
+     "sharpe": -0.39836378355950824,
+     "maxDrawdown": 0.7554082521632174,
+     "days": 1742
+    }
+   },
+   "halves": [
+    {
+     "total": 11.856250611609099,
+     "annualized": 0.32192132281963604,
+     "sharpe": 0.8606288869230274,
+     "maxDrawdown": 0.6944709852566462,
+     "days": 3340
+    },
+    {
+     "total": 21.253766465409928,
+     "annualized": 0.40360915985926216,
+     "sharpe": 0.8171062153520474,
+     "maxDrawdown": 0.7359587061559874,
+     "days": 3340
+    }
+   ],
+   "breadth": 0.2383177570093458,
+   "beatsBuyHold": 0.8457943925233645,
+   "coins": 428,
+   "survivorsOnly": {
+    "total": 19.73024759199496,
+    "annualized": 0.3927732939106763,
+    "sharpe": 0.9715700163241753,
+    "maxDrawdown": 0.7125656698935647,
+    "days": 3340
+   },
+   "btcAlone": {
+    "total": 8.931585290197068,
+    "annualized": 0.28515533339705446,
+    "sharpe": 0.7915685702842201,
+    "maxDrawdown": 0.6930485397972732,
+    "days": 3340
+   },
+   "btcByEra": {
+    "full": {
+     "total": 8.931585290197068,
+     "annualized": 0.28515533339705446,
+     "sharpe": 0.7915685702842201,
+     "maxDrawdown": 0.6930485397972732,
+     "days": 3340
+    },
+    "era1": {
+     "total": 7.7729557980466915,
+     "annualized": 0.6427041019303952,
+     "sharpe": 1.2042369285751289,
+     "maxDrawdown": 0.5619353850036024,
+     "days": 1597
+    },
+    "era2": {
+     "total": 0.1320683152659119,
+     "annualized": 0.026332057526664343,
+     "sharpe": 0.24348697241818942,
+     "maxDrawdown": 0.5038094418262027,
+     "days": 1742
+    }
+   },
+   "years": {
+    "2017": {
+     "ret": 0.9085828552494664,
+     "dd": 0.17859300646287846,
+     "active": 0.6911764705882353,
+     "invested": 0.29044117647058826
+    },
+    "2018": {
+     "ret": -0.2895702332519413,
+     "dd": 0.4530518209658374,
+     "active": 9.082417582417582,
+     "invested": 0.3409050084530855
+    },
+    "2019": {
+     "ret": 0.3521624191675725,
+     "dd": 0.26551289444242676,
+     "active": 20.417582417582416,
+     "invested": 0.44431040632532454
+    },
+    "2020": {
+     "ret": 1.445738060383012,
+     "dd": 0.24187702725425175,
+     "active": 47.73150684931507,
+     "invested": 0.5637574644861394
+    },
+    "2021": {
+     "ret": 7.986218301342625,
+     "dd": 0.37378438049476137,
+     "active": 199.6868131868132,
+     "invested": 0.539642429974871
+    },
+    "2022": {
+     "ret": -0.3985155185485876,
+     "dd": 0.4380479008900052,
+     "active": 233.88186813186815,
+     "invested": 0.349690501055196
+    },
+    "2023": {
+     "ret": 0.48757227870494413,
+     "dd": 0.40721222996200823,
+     "active": 201.09065934065933,
+     "invested": 0.5033370306289701
+    },
+    "2024": {
+     "ret": 0.37743739280005606,
+     "dd": 0.3968206012240688,
+     "active": 308.7698630136986,
+     "invested": 0.4488240758723834
+    },
+    "2025": {
+     "ret": -0.5448755599198145,
+     "dd": 0.5567519299138503,
+     "active": 281.4203296703297,
+     "invested": 0.3250561556200032
+    },
+    "2026": {
+     "ret": -0.03031955236018824,
+     "dd": 0.2988260305936231,
+     "active": 153.0711743772242,
+     "invested": 0.43753478793331135
+    }
+   },
+   "turnoverPerDay": 0.11485585511057815,
+   "costBpsPerYear": 838.4477423072206,
+   "worstCoins": [
+    {
+     "symbol": "QUICKUSDT",
+     "status": "TRADING",
+     "total": -0.999568256989457,
+     "buyHold": -0.9999586630221798
+    },
+    {
+     "symbol": "VIDTUSDT",
+     "status": "BREAK",
+     "total": -0.9981333296195487,
+     "buyHold": -0.9995270582388334
+    },
+    {
+     "symbol": "C98USDT",
+     "status": "TRADING",
+     "total": -0.983339753098775,
+     "buyHold": -0.9914586229660631
+    },
+    {
+     "symbol": "IRISUSDT",
+     "status": "BREAK",
+     "total": -0.9767796807776247,
+     "buyHold": -0.9573862034398697
+    },
+    {
+     "symbol": "BNXUSDT",
+     "status": "BREAK",
+     "total": -0.9668668932947745,
+     "buyHold": -0.9446556331999243
+    },
+    {
+     "symbol": "LPTUSDT",
+     "status": "TRADING",
+     "total": -0.962859353647255,
+     "buyHold": -0.9076343756468898
+    },
+    {
+     "symbol": "HOOKUSDT",
+     "status": "BREAK",
+     "total": -0.9610124222368376,
+     "buyHold": -0.9809678344214126
+    },
+    {
+     "symbol": "NMRUSDT",
+     "status": "TRADING",
+     "total": -0.9604106435690242,
+     "buyHold": -0.7488008828044672
+    }
+   ],
+   "deliveredBy": {
+    "delisted": 147
+   }
+  },
+  {
+   "rule": "SMA50",
+   "verdict": "NAO_VALIDADA",
+   "failed": [
+    "POSITIVE_NET",
+    "BOUNDED_DRAWDOWN",
+    "SHARPE_BAR",
+    "BREADTH",
+    "COSTS_X2",
+    "UNIVERSE_HALVES"
+   ],
+   "checks": {
+    "DATA_QUALITY": true,
+    "POSITIVE_NET": false,
+    "BOUNDED_DRAWDOWN": false,
+    "SHARPE_BAR": false,
+    "BREADTH": false,
+    "COSTS_X2": false,
+    "UNIVERSE_HALVES": false
+   },
+   "per": {
+    "full": {
+     "total": 38.03399749232743,
+     "annualized": 0.49250289228095223,
+     "sharpe": 1.0452556642385635,
+     "maxDrawdown": 0.6391795072005025,
+     "days": 3340
+    },
+    "era1": {
+     "total": 49.09961031405533,
+     "annualized": 1.4462630416980042,
+     "sharpe": 1.746313047410508,
+     "maxDrawdown": 0.5429654152561658,
+     "days": 1597
+    },
+    "era2": {
+     "total": -0.22810711678582418,
+     "annualized": -0.052803886831438884,
+     "sharpe": 0.0246473051001517,
+     "maxDrawdown": 0.6391795072005027,
+     "days": 1742
+    }
+   },
+   "costsX2": {
+    "full": {
+     "total": 23.97725389271775,
+     "annualized": 0.4214307030102469,
+     "sharpe": 0.94692699558968,
+     "maxDrawdown": 0.6778288748448219,
+     "days": 3340
+    },
+    "era1": {
+     "total": 40.26785044291114,
+     "annualized": 1.3402044653991583,
+     "sharpe": 1.6741573625749837,
+     "maxDrawdown": 0.5633490005885353,
+     "days": 1597
+    },
+    "era2": {
+     "total": -0.40051067835482823,
+     "annualized": -0.1016641979276054,
+     "sharpe": -0.12546831160482189,
+     "maxDrawdown": 0.6778288748448213,
+     "days": 1742
+    }
+   },
+   "halves": [
+    {
+     "total": 11.017885164005778,
+     "annualized": 0.3122154932301262,
+     "sharpe": 0.846943980980174,
+     "maxDrawdown": 0.6254501409526915,
+     "days": 3340
+    },
+    {
+     "total": 40.06005212646443,
+     "annualized": 0.5007791974581786,
+     "sharpe": 0.9258651701072699,
+     "maxDrawdown": 0.6608060074032633,
+     "days": 3340
+    }
+   ],
+   "breadth": 0.29906542056074764,
+   "beatsBuyHold": 0.8995327102803738,
+   "coins": 428,
+   "survivorsOnly": {
+    "total": 36.75057192283878,
+    "annualized": 0.48705992599863945,
+    "sharpe": 1.1015649939952274,
+    "maxDrawdown": 0.6340940245009853,
+    "days": 3340
+   },
+   "btcAlone": {
+    "total": 43.35975542308442,
+    "annualized": 0.5135101593470908,
+    "sharpe": 1.1471008564413594,
+    "maxDrawdown": 0.6484305782402292,
+    "days": 3340
+   },
+   "btcByEra": {
+    "full": {
+     "total": 43.35975542308442,
+     "annualized": 0.5135101593470908,
+     "sharpe": 1.1471008564413594,
+     "maxDrawdown": 0.6484305782402292,
+     "days": 3340
+    },
+    "era1": {
+     "total": 17.927889602471563,
+     "annualized": 0.9583315680232489,
+     "sharpe": 1.5007748621825316,
+     "maxDrawdown": 0.6484305782402292,
+     "days": 1597
+    },
+    "era2": {
+     "total": 1.3436186682582942,
+     "annualized": 0.19536942917581324,
+     "sharpe": 0.7021420421631952,
+     "maxDrawdown": 0.5169247748323612,
+     "days": 1742
+    }
+   },
+   "years": {
+    "2017": {
+     "ret": 1.2240802476389034,
+     "dd": 0.24110468119016726,
+     "active": 0.6911764705882353,
+     "invested": 0.34558823529411764
+    },
+    "2018": {
+     "ret": -0.27924485651300823,
+     "dd": 0.4743124758918532,
+     "active": 9.082417582417582,
+     "invested": 0.23957243153671737
+    },
+    "2019": {
+     "ret": 0.25305899641045726,
+     "dd": 0.273611069985496,
+     "active": 20.417582417582416,
+     "invested": 0.4723366324138116
+    },
+    "2020": {
+     "ret": 1.1163364029338907,
+     "dd": 0.33560117125024813,
+     "active": 47.73150684931507,
+     "invested": 0.6002621464875136
+    },
+    "2021": {
+     "ret": 10.579700705578142,
+     "dd": 0.33387013059019544,
+     "active": 199.6868131868132,
+     "invested": 0.5608007096171255
+    },
+    "2022": {
+     "ret": -0.3819263074819337,
+     "dd": 0.42649642932258736,
+     "active": 233.88186813186815,
+     "invested": 0.25075496118280344
+    },
+    "2023": {
+     "ret": 0.6955406368272823,
+     "dd": 0.4069604429347904,
+     "active": 201.09065934065933,
+     "invested": 0.49735133864815634
+    },
+    "2024": {
+     "ret": 0.11726661487498857,
+     "dd": 0.4198037427894551,
+     "active": 308.7698630136986,
+     "invested": 0.4507137705952035
+    },
+    "2025": {
+     "ret": -0.33648412854827714,
+     "dd": 0.384228375044977,
+     "active": 281.4203296703297,
+     "invested": 0.27988750967257403
+    },
+    "2026": {
+     "ret": -0.04864069737135468,
+     "dd": 0.28517729517605817,
+     "active": 153.0711743772242,
+     "invested": 0.4265306214430212
+    }
+   },
+   "turnoverPerDay": 0.06689158899971974,
+   "costBpsPerYear": 488.30859969795415,
+   "worstCoins": [
+    {
+     "symbol": "QUICKUSDT",
+     "status": "TRADING",
+     "total": -0.9998713243866161,
+     "buyHold": -0.9999586630221798
+    },
+    {
+     "symbol": "VIDTUSDT",
+     "status": "BREAK",
+     "total": -0.9973234364186913,
+     "buyHold": -0.9995270582388334
+    },
+    {
+     "symbol": "STRAXUSDT",
+     "status": "TRADING",
+     "total": -0.9839917653244866,
+     "buyHold": -0.9937520794990392
+    },
+    {
+     "symbol": "SFPUSDT",
+     "status": "TRADING",
+     "total": -0.973846249252971,
+     "buyHold": -0.8235390280572884
+    },
+    {
+     "symbol": "ONGUSDT",
+     "status": "TRADING",
+     "total": -0.9546110557336057,
+     "buyHold": -0.9039622952683498
+    },
+    {
+     "symbol": "C98USDT",
+     "status": "TRADING",
+     "total": -0.953042597332948,
+     "buyHold": -0.9914586229660631
+    },
+    {
+     "symbol": "ATAUSDT",
+     "status": "BREAK",
+     "total": -0.9507674781553638,
+     "buyHold": -0.9660299775191303
+    },
+    {
+     "symbol": "PUNDIXUSDT",
+     "status": "TRADING",
+     "total": -0.9500403806748555,
+     "buyHold": -0.9736670532780324
+    }
+   ],
+   "deliveredBy": {
+    "delisted": 147
+   }
+  },
+  {
+   "rule": "SMA100",
+   "verdict": "NAO_VALIDADA",
+   "failed": [
+    "POSITIVE_NET",
+    "BOUNDED_DRAWDOWN",
+    "SHARPE_BAR",
+    "BREADTH",
+    "COSTS_X2",
+    "UNIVERSE_HALVES"
+   ],
+   "checks": {
+    "DATA_QUALITY": true,
+    "POSITIVE_NET": false,
+    "BOUNDED_DRAWDOWN": false,
+    "SHARPE_BAR": false,
+    "BREADTH": false,
+    "COSTS_X2": false,
+    "UNIVERSE_HALVES": false
+   },
+   "per": {
+    "full": {
+     "total": 11.770518150183781,
+     "annualized": 0.32095510220724077,
+     "sharpe": 0.7969977726110361,
+     "maxDrawdown": 0.6891494849356841,
+     "days": 3340
+    },
+    "era1": {
+     "total": 20.218429285132704,
+     "annualized": 1.0101339696245906,
+     "sharpe": 1.4044453433660635,
+     "maxDrawdown": 0.4709007881912801,
+     "days": 1597
+    },
+    "era2": {
+     "total": -0.4032545059268956,
+     "annualized": -0.1025272675897142,
+     "sharpe": -0.14797855742642507,
+     "maxDrawdown": 0.6790044400596551,
+     "days": 1742
+    }
+   },
+   "costsX2": {
+    "full": {
+     "total": 8.359045269779644,
+     "annualized": 0.27684323355015605,
+     "sharpe": 0.7293991723812605,
+     "maxDrawdown": 0.7461686428892108,
+     "days": 3340
+    },
+    "era1": {
+     "total": 17.639505406142636,
+     "annualized": 0.9514717701006992,
+     "sharpe": 1.3577786914588672,
+     "maxDrawdown": 0.4815226136408709,
+     "days": 1597
+    },
+    "era2": {
+     "total": -0.5023078970699271,
+     "annualized": -0.13601857595188804,
+     "sharpe": -0.2602479201020922,
+     "maxDrawdown": 0.6994866771987541,
+     "days": 1742
+    }
+   },
+   "halves": [
+    {
+     "total": 4.194662529260441,
+     "annualized": 0.19728387739885922,
+     "sharpe": 0.6365149162976687,
+     "maxDrawdown": 0.6678710892960464,
+     "days": 3340
+    },
+    {
+     "total": 14.25149279417308,
+     "annualized": 0.346834010072985,
+     "sharpe": 0.7451210163677437,
+     "maxDrawdown": 0.746602767016983,
+     "days": 3340
+    }
+   ],
+   "breadth": 0.23598130841121495,
+   "beatsBuyHold": 0.8574766355140186,
+   "coins": 428,
+   "survivorsOnly": {
+    "total": 11.795207592481344,
+    "annualized": 0.32123394766444835,
+    "sharpe": 0.8365663090679963,
+    "maxDrawdown": 0.6719357880324204,
+    "days": 3340
+   },
+   "btcAlone": {
+    "total": 23.783294594146767,
+    "annualized": 0.4202202588772621,
+    "sharpe": 0.996467710068357,
+    "maxDrawdown": 0.6477749154721884,
+    "days": 3340
+   },
+   "btcByEra": {
+    "full": {
+     "total": 23.783294594146767,
+     "annualized": 0.4202202588772621,
+     "sharpe": 0.996467710068357,
+     "maxDrawdown": 0.6477749154721884,
+     "days": 3340
+    },
+    "era1": {
+     "total": 8.622629330360057,
+     "annualized": 0.6777809805770856,
+     "sharpe": 1.196391992226657,
+     "maxDrawdown": 0.6477749154721884,
+     "days": 1597
+    },
+    "era2": {
+     "total": 1.5755221097370753,
+     "annualized": 0.21923748227864026,
+     "sharpe": 0.7737827417673806,
+     "maxDrawdown": 0.3721190221185232,
+     "days": 1742
+    }
+   },
+   "years": {
+    "2017": {
+     "ret": 0.6811168077187402,
+     "dd": 0.24110468119016726,
+     "active": 0.6911764705882353,
+     "invested": 0.27205882352941174
+    },
+    "2018": {
+     "ret": -0.2515234931801329,
+     "dd": 0.47061661950254685,
+     "active": 9.082417582417582,
+     "invested": 0.22694597069597022
+    },
+    "2019": {
+     "ret": 0.41512440305342824,
+     "dd": 0.2745353305036067,
+     "active": 20.417582417582416,
+     "invested": 0.4133241740003757
+    },
+    "2020": {
+     "ret": 0.35333697059762614,
+     "dd": 0.4343135264880379,
+     "active": 47.73150684931507,
+     "invested": 0.5772803569356855
+    },
+    "2021": {
+     "ret": 7.700629608755049,
+     "dd": 0.4126773628173459,
+     "active": 199.6868131868132,
+     "invested": 0.6129576504992378
+    },
+    "2022": {
+     "ret": -0.4166617287563176,
+     "dd": 0.4166617287563176,
+     "active": 233.88186813186815,
+     "invested": 0.16479516690364987
+    },
+    "2023": {
+     "ret": 0.5272770551915409,
+     "dd": 0.37684189673739477,
+     "active": 201.09065934065933,
+     "invested": 0.4915197073586674
+    },
+    "2024": {
+     "ret": 0.1355506250353069,
+     "dd": 0.41382343347045725,
+     "active": 308.7698630136986,
+     "invested": 0.4714224412763775
+    },
+    "2025": {
+     "ret": -0.41446203012336547,
+     "dd": 0.45158504998970495,
+     "active": 281.4203296703297,
+     "invested": 0.2595892639285026
+    },
+    "2026": {
+     "ret": -0.0498319067897085,
+     "dd": 0.2509254194891619,
+     "active": 153.0711743772242,
+     "invested": 0.34843530094165887
+    }
+   },
+   "turnoverPerDay": 0.046567160347693023,
+   "costBpsPerYear": 339.94027053815904,
+   "worstCoins": [
+    {
+     "symbol": "QUICKUSDT",
+     "status": "TRADING",
+     "total": -0.9999047355112165,
+     "buyHold": -0.9999586630221798
+    },
+    {
+     "symbol": "VIDTUSDT",
+     "status": "BREAK",
+     "total": -0.9984207541369423,
+     "buyHold": -0.9995270582388334
+    },
+    {
+     "symbol": "SFPUSDT",
+     "status": "TRADING",
+     "total": -0.9860167991926383,
+     "buyHold": -0.8235390280572884
+    },
+    {
+     "symbol": "UNFIUSDT",
+     "status": "BREAK",
+     "total": -0.9755457020827573,
+     "buyHold": -0.937993887242277
+    },
+    {
+     "symbol": "HARDUSDT",
+     "status": "BREAK",
+     "total": -0.975373345967718,
+     "buyHold": -0.9933022885463038
+    },
+    {
+     "symbol": "STRAXUSDT",
+     "status": "TRADING",
+     "total": -0.9691479207470539,
+     "buyHold": -0.9937520794990392
+    },
+    {
+     "symbol": "MDXUSDT",
+     "status": "BREAK",
+     "total": -0.9573894361524413,
+     "buyHold": -0.9909700529025126
+    },
+    {
+     "symbol": "BELUSDT",
+     "status": "TRADING",
+     "total": -0.9568309830868355,
+     "buyHold": -0.9533443512282893
+    }
+   ],
+   "deliveredBy": {
+    "delisted": 147
+   }
+  },
+  {
+   "rule": "DONCHIAN_55_20",
+   "verdict": "NAO_VALIDADA",
+   "failed": [
+    "POSITIVE_NET",
+    "BOUNDED_DRAWDOWN",
+    "SHARPE_BAR",
+    "BREADTH",
+    "COSTS_X2",
+    "UNIVERSE_HALVES"
+   ],
+   "checks": {
+    "DATA_QUALITY": true,
+    "POSITIVE_NET": false,
+    "BOUNDED_DRAWDOWN": false,
+    "SHARPE_BAR": false,
+    "BREADTH": false,
+    "COSTS_X2": false,
+    "UNIVERSE_HALVES": false
+   },
+   "per": {
+    "full": {
+     "total": 17.91279186852786,
+     "annualized": 0.3788775207986401,
+     "sharpe": 0.9552386216983094,
+     "maxDrawdown": 0.5259687829624977,
+     "days": 3340
+    },
+    "era1": {
+     "total": 18.95875709895251,
+     "annualized": 0.9822120389487847,
+     "sharpe": 1.4935358164614514,
+     "maxDrawdown": 0.5014418273088597,
+     "days": 1597
+    },
+    "era2": {
+     "total": -0.060284539685132144,
+     "annualized": -0.0129436441718499,
+     "sharpe": 0.08043062016222806,
+     "maxDrawdown": 0.5259687829624969,
+     "days": 1742
+    }
+   },
+   "costsX2": {
+    "full": {
+     "total": 16.1242029209681,
+     "annualized": 0.3639885152965576,
+     "sharpe": 0.929783175915962,
+     "maxDrawdown": 0.5333447420482416,
+     "days": 3340
+    },
+    "era1": {
+     "total": 17.986380629560415,
+     "annualized": 0.9597130467391115,
+     "sharpe": 1.472896897440936,
+     "maxDrawdown": 0.5047109978848867,
+     "days": 1597
+    },
+    "era2": {
+     "total": -0.10583887144621629,
+     "annualized": -0.023167310406215225,
+     "sharpe": 0.04010461755285648,
+     "maxDrawdown": 0.5333447420482422,
+     "days": 1742
+    }
+   },
+   "halves": [
+    {
+     "total": 4.089047021495068,
+     "annualized": 0.19459927894937112,
+     "sharpe": 0.6877808433930683,
+     "maxDrawdown": 0.504666513275245,
+     "days": 3340
+    },
+    {
+     "total": 21.50204357992884,
+     "annualized": 0.405312014662899,
+     "sharpe": 0.8440837360266504,
+     "maxDrawdown": 0.5499132344342477,
+     "days": 3340
+    }
+   ],
+   "breadth": 0.32242990654205606,
+   "beatsBuyHold": 0.8925233644859814,
+   "coins": 428,
+   "survivorsOnly": {
+    "total": 15.286177190177188,
+    "annualized": 0.35652980045780747,
+    "sharpe": 0.989795020131761,
+    "maxDrawdown": 0.5208535598220654,
+    "days": 3340
+   },
+   "btcAlone": {
+    "total": 11.19838463410909,
+    "annualized": 0.31435499223601915,
+    "sharpe": 0.8640866429816363,
+    "maxDrawdown": 0.5913856045454278,
+    "days": 3340
+   },
+   "btcByEra": {
+    "full": {
+     "total": 11.19838463410909,
+     "annualized": 0.31435499223601915,
+     "sharpe": 0.8640866429816363,
+     "maxDrawdown": 0.5913856045454278,
+     "days": 3340
+    },
+    "era1": {
+     "total": 9.083513457916293,
+     "annualized": 0.6958172410976233,
+     "sharpe": 1.2607245929600612,
+     "maxDrawdown": 0.5913856045454278,
+     "days": 1597
+    },
+    "era2": {
+     "total": 0.20973554357013113,
+     "annualized": 0.040701231033257956,
+     "sharpe": 0.2818940670289789,
+     "maxDrawdown": 0.32534146577728595,
+     "days": 1742
+    }
+   },
+   "years": {
+    "2017": {
+     "ret": 1.1643035786995997,
+     "dd": 0.24110468119016726,
+     "active": 0.6911764705882353,
+     "invested": 0.3272058823529412
+    },
+    "2018": {
+     "ret": -0.28539036031036313,
+     "dd": 0.4945700187674541,
+     "active": 9.082417582417582,
+     "invested": 0.13384680795395093
+    },
+    "2019": {
+     "ret": 0.1260790659380373,
+     "dd": 0.22949061233685297,
+     "active": 20.417582417582416,
+     "invested": 0.2823503033729987
+    },
+    "2020": {
+     "ret": 0.5786659708692192,
+     "dd": 0.3147388030326249,
+     "active": 47.73150684931507,
+     "invested": 0.403444317962417
+    },
+    "2021": {
+     "ret": 6.187782593783895,
+     "dd": 0.2958110101365,
+     "active": 199.6868131868132,
+     "invested": 0.4486867456463025
+    },
+    "2022": {
+     "ret": -0.26776094515332693,
+     "dd": 0.26776094515332693,
+     "active": 233.88186813186815,
+     "invested": 0.0884197478609822
+    },
+    "2023": {
+     "ret": 0.4633144640519806,
+     "dd": 0.23740544995788182,
+     "active": 201.09065934065933,
+     "invested": 0.3200352009168676
+    },
+    "2024": {
+     "ret": 0.1264162343116444,
+     "dd": 0.2975859207199629,
+     "active": 308.7698630136986,
+     "invested": 0.359806427694574
+    },
+    "2025": {
+     "ret": -0.24231407596289722,
+     "dd": 0.259459104453287,
+     "active": 281.4203296703297,
+     "invested": 0.14159101408194558
+    },
+    "2026": {
+     "ret": -0.019643903274390473,
+     "dd": 0.17094739640556866,
+     "active": 153.0711743772242,
+     "invested": 0.25199805868998515
+    }
+   },
+   "turnoverPerDay": 0.014865412032337086,
+   "costBpsPerYear": 108.51750783606073,
+   "worstCoins": [
+    {
+     "symbol": "STRAXUSDT",
+     "status": "TRADING",
+     "total": -0.9930509624659352,
+     "buyHold": -0.9937520794990392
+    },
+    {
+     "symbol": "VIDTUSDT",
+     "status": "BREAK",
+     "total": -0.9749094432350695,
+     "buyHold": -0.9995270582388334
+    },
+    {
+     "symbol": "DEGOUSDT",
+     "status": "BREAK",
+     "total": -0.963611068547806,
+     "buyHold": -0.9980175082620966
+    },
+    {
+     "symbol": "BAKEUSDT",
+     "status": "BREAK",
+     "total": -0.9571395704899339,
+     "buyHold": -0.9642347384637249
+    },
+    {
+     "symbol": "BELUSDT",
+     "status": "TRADING",
+     "total": -0.9386794752290569,
+     "buyHold": -0.9533443512282893
+    },
+    {
+     "symbol": "TLMUSDT",
+     "status": "TRADING",
+     "total": -0.9321371339910809,
+     "buyHold": -0.9855495041964316
+    },
+    {
+     "symbol": "MDXUSDT",
+     "status": "BREAK",
+     "total": -0.924575960947787,
+     "buyHold": -0.9909700529025126
+    },
+    {
+     "symbol": "BNXUSDT",
+     "status": "BREAK",
+     "total": -0.9218220707692569,
+     "buyHold": -0.9446556331999243
+    }
+   ],
+   "deliveredBy": {
+    "delisted": 147
+   }
+  },
+  {
+   "rule": "TSMOM90",
+   "verdict": "NAO_VALIDADA",
+   "failed": [
+    "POSITIVE_NET",
+    "BOUNDED_DRAWDOWN",
+    "SHARPE_BAR",
+    "BREADTH",
+    "COSTS_X2",
+    "UNIVERSE_HALVES"
+   ],
+   "checks": {
+    "DATA_QUALITY": true,
+    "POSITIVE_NET": false,
+    "BOUNDED_DRAWDOWN": false,
+    "SHARPE_BAR": false,
+    "BREADTH": false,
+    "COSTS_X2": false,
+    "UNIVERSE_HALVES": false
+   },
+   "per": {
+    "full": {
+     "total": 7.412330061192197,
+     "annualized": 0.2620489008624409,
+     "sharpe": 0.6952554197068783,
+     "maxDrawdown": 0.6983487205903047,
+     "days": 3340
+    },
+    "era1": {
+     "total": 12.349927562308839,
+     "annualized": 0.8081405523765401,
+     "sharpe": 1.1899513038622258,
+     "maxDrawdown": 0.6471990359774544,
+     "days": 1597
+    },
+    "era2": {
+     "total": -0.37857940618431374,
+     "annualized": -0.09487566181815865,
+     "sharpe": -0.10474938085285626,
+     "maxDrawdown": 0.6423820609660782,
+     "days": 1742
+    }
+   },
+   "costsX2": {
+    "full": {
+     "total": 5.208384472435771,
+     "annualized": 0.2208374454261406,
+     "sharpe": 0.6345093116842754,
+     "maxDrawdown": 0.7368904469272487,
+     "days": 3340
+    },
+    "era1": {
+     "total": 10.623189277506246,
+     "annualized": 0.7517973644749505,
+     "sharpe": 1.1446062152608187,
+     "maxDrawdown": 0.6703618321392407,
+     "days": 1597
+    },
+    "era2": {
+     "total": -0.4735357334948215,
+     "annualized": -0.12578424918179043,
+     "sharpe": -0.20350437232771257,
+     "maxDrawdown": 0.6622092624710231,
+     "days": 1742
+    }
+   },
+   "halves": [
+    {
+     "total": 1.4519419653831434,
+     "annualized": 0.10297643273050827,
+     "sharpe": 0.4542821431332242,
+     "maxDrawdown": 0.6882295139195311,
+     "days": 3340
+    },
+    {
+     "total": 10.566422141663029,
+     "annualized": 0.3067361896241907,
+     "sharpe": 0.6938523036777031,
+     "maxDrawdown": 0.711400409865985,
+     "days": 3340
+    }
+   ],
+   "breadth": 0.205607476635514,
+   "beatsBuyHold": 0.8387850467289719,
+   "coins": 428,
+   "survivorsOnly": {
+    "total": 6.733081528697036,
+    "annualized": 0.250490646427012,
+    "sharpe": 0.6993231283729777,
+    "maxDrawdown": 0.6639452366034994,
+    "days": 3340
+   },
+   "btcAlone": {
+    "total": 9.36257017499117,
+    "annualized": 0.2911352733964203,
+    "sharpe": 0.7720436681030168,
+    "maxDrawdown": 0.6691185712082668,
+    "days": 3340
+   },
+   "btcByEra": {
+    "full": {
+     "total": 9.36257017499117,
+     "annualized": 0.2911352733964203,
+     "sharpe": 0.7720436681030168,
+     "maxDrawdown": 0.6691185712082668,
+     "days": 3340
+    },
+    "era1": {
+     "total": 4.181503194421989,
+     "annualized": 0.45643596216558446,
+     "sharpe": 0.9265845682888517,
+     "maxDrawdown": 0.6691185712082668,
+     "days": 1597
+    },
+    "era2": {
+     "total": 0.9999158132618133,
+     "annualized": 0.1563006420395021,
+     "sharpe": 0.6048932125213062,
+     "maxDrawdown": 0.3508737721768328,
+     "days": 1742
+    }
+   },
+   "years": {
+    "2017": {
+     "ret": 1.1299352052761993,
+     "dd": 0.24110468119016737,
+     "active": 0.6911764705882353,
+     "invested": 0.3382352941176471
+    },
+    "2018": {
+     "ret": -0.352488245447256,
+     "dd": 0.5481409791770446,
+     "active": 9.082417582417582,
+     "invested": 0.2873490101168674
+    },
+    "2019": {
+     "ret": 0.2006095894242781,
+     "dd": 0.3579056394493537,
+     "active": 20.417582417582416,
+     "invested": 0.43689639590983503
+    },
+    "2020": {
+     "ret": -0.09089808921016085,
+     "dd": 0.5442402871870909,
+     "active": 47.73150684931507,
+     "invested": 0.6001907834718376
+    },
+    "2021": {
+     "ret": 7.686909720995724,
+     "dd": 0.5510217698232869,
+     "active": 199.6868131868132,
+     "invested": 0.6655917580227843
+    },
+    "2022": {
+     "ret": -0.44366922202656534,
+     "dd": 0.4448231976779121,
+     "active": 233.88186813186815,
+     "invested": 0.16905234498624744
+    },
+    "2023": {
+     "ret": 0.39333349526903794,
+     "dd": 0.31089357346547186,
+     "active": 201.09065934065933,
+     "invested": 0.49176858219392855
+    },
+    "2024": {
+     "ret": 0.302572425036719,
+     "dd": 0.3954125114197322,
+     "active": 308.7698630136986,
+     "invested": 0.5325473903390635
+    },
+    "2025": {
+     "ret": -0.3798844082773528,
+     "dd": 0.4320258939917677,
+     "active": 281.4203296703297,
+     "invested": 0.29958603573492293
+    },
+    "2026": {
+     "ret": -0.07320480776605676,
+     "dd": 0.22600762887315273,
+     "active": 153.0711743772242,
+     "invested": 0.32904689967607603
+    }
+   },
+   "turnoverPerDay": 0.04546661486831785,
+   "costBpsPerYear": 331.9062885387203,
+   "worstCoins": [
+    {
+     "symbol": "QUICKUSDT",
+     "status": "TRADING",
+     "total": -1.0001107624765746,
+     "buyHold": -0.9999586630221798
+    },
+    {
+     "symbol": "SUNUSDT",
+     "status": "TRADING",
+     "total": -0.9995614654188032,
+     "buyHold": -0.9995651167233971
+    },
+    {
+     "symbol": "VIDTUSDT",
+     "status": "BREAK",
+     "total": -0.983503047332413,
+     "buyHold": -0.9995270582388334
+    },
+    {
+     "symbol": "STRAXUSDT",
+     "status": "TRADING",
+     "total": -0.9812485374252502,
+     "buyHold": -0.9937520794990392
+    },
+    {
+     "symbol": "KNCUSDT",
+     "status": "TRADING",
+     "total": -0.9652872717211531,
+     "buyHold": -0.7879189058532247
+    },
+    {
+     "symbol": "DEGOUSDT",
+     "status": "BREAK",
+     "total": -0.9593632527776023,
+     "buyHold": -0.9980175082620966
+    },
+    {
+     "symbol": "CVXUSDT",
+     "status": "TRADING",
+     "total": -0.9574326219505254,
+     "buyHold": -0.9583501545814865
+    },
+    {
+     "symbol": "IDEXUSDT",
+     "status": "BREAK",
+     "total": -0.9536606516772285,
+     "buyHold": -0.9743877121237116
+    }
+   ],
+   "deliveredBy": {
+    "delisted": 147
+   }
+  }
+ ],
+ "deflated": [
+  {
+   "rule": "SMA20",
+   "deflatedSharpe": 0.9846126500236377
+  },
+  {
+   "rule": "SMA50",
+   "deflatedSharpe": 0.9930529103182719
+  },
+  {
+   "rule": "SMA100",
+   "deflatedSharpe": 0.9481639337584402
+  },
+  {
+   "rule": "DONCHIAN_55_20",
+   "deflatedSharpe": 0.9867615639135565
+  },
+  {
+   "rule": "TSMOM90",
+   "deflatedSharpe": 0.8983883120299679
+  }
+ ],
+ "datasetHashes": {
+  "0GUSDT": "b8cc7db67c63483b35dab37538c505636865adc509f2e246c81311560e88b4a1",
+  "1000CATUSDT": "1e69864f591d47e69935d027f1739bbfc686af14202e91380b93a738c15a3bea",
+  "1000CHEEMSUSDT": "502d2a8941faf2f2875f57a89fecad0adc0c707de8841c112d84a8509184f414",
+  "1000SATSUSDT": "f11df0b3ec2759bb2588f6b05df3642d73695532e8aca765e981550a62aab57e",
+  "1INCHUSDT": "cad640deb26db7cfe1d0bc3e0389b84c277db2e4eb7add6ab5f6783038bcbcc7",
+  "1MBABYDOGEUSDT": "4ed6cd6465500900f5710d80edf3577b261b7e56c84117ed391672a9c6c11dba",
+  "2ZUSDT": "94f4549f96b9ec6bac798a7a35fbd6344527ad22a30d05e855c9c61a76094407",
+  "A2ZUSDT": "0da2f6f476678e1a93d9883c610333858fc4913c138aff80e840c4751751a7c9",
+  "AAOIBUSDT": "1242879b86dd1e2624919faa3538bb4ab4131475be1d7b72bcf400ee9ce7406c",
+  "AAPLBUSDT": "ff739fed2097e111f1715e14c47098719097dd8e274500668e8d04b232b58f85",
+  "AAVEUSDT": "7523e69d32be5b85e30a12d3cb75265c613a6caca704f056081a07133dc22a84",
+  "ACAUSDT": "4607a1422f61ba4bd841ad218537fa50af8aad57407cb9a0be5bf688c174c9db",
+  "ACEUSDT": "0dc94fc36602faa7590ba1aeaf16297b2072a3d198de77247420dbffb37e22ac",
+  "ACHUSDT": "45fa6c4a832f27c5f34a29b70c6a8946da41984e9d3c5ca50856a24c985a319e",
+  "ACMUSDT": "fd96e69c9d9f06febf9835b728afbe59b1cdeec513da6946ea28f7ca8152ebdf",
+  "ACTUSDT": "dc0f555abe3982956edbd231aa5e1e0ebf95e7f91d144ab9bab31550afbe73bd",
+  "ACXUSDT": "186cbcae69771c216682b0ee8dad5e148e11bb47eadd80a49bbcf41e9c7ec421",
+  "ADAUSDT": "34a3db05655e4d18c4c3815d5be34b6250770eee0a77a035edbd1a6980089f61",
+  "ADBEBUSDT": "7cd3de8ce76d1947c182434af61f03e1942806ee0abcbbbd6b6b215800e2f00b",
+  "ADXUSDT": "d9299b7038fa20f7f6499a534bcbabd4ab796e58c906346d730faef24311a942",
+  "AERGOUSDT": "68a2eb8c83752e281417e9bde1fd0ee1503d9f2ef6889085d96adacddc7f05cb",
+  "AEROUSDT": "7ef9288f0aa184c21e13f96299a4797044ab0183634d404bc21b62f454444f57",
+  "AEURUSDT": "88556b95bb0539b40376aa3338b1fcd8849ed161ad37e6ee98f7f2689f4eb8e4",
+  "AEVOUSDT": "5973d91662c435cdc69f1d31dc9d3b68d6916a1d483145c4daea154847cce153",
+  "AGIXUSDT": "6cc5bbb12000071b4ac3d66c742a99428dad7b434a75abe12337fb612795c919",
+  "AGLDUSDT": "6aac7423849da9d8ec32e463902bb029b2d2c148c6b23d1d2dd12e5b6910560e",
+  "AGPUBUSDT": "a65f81e2e8d6f720953b734de01ec7664bac4afefad5ee9ac3db8c1d94602d1a",
+  "AIGENSYNUSDT": "69151e80c9d0c2ac180bddaa1b15daabd6d97f689218c813644c6aedb06d78a3",
+  "AIONUSDT": "3be7ec0253b9dd23bc3be5a60284240961420e4517936475953f0179f664d557",
+  "AIUSDT": "f57741cfe72547e5812cbb2d57271904ab89d7a0f72bc649d9f58f198f9a7098",
+  "AIXBTUSDT": "745a4a08480e9fe9d471dc6bd3a0ec4177fff048c5d3c365c93ffb1c936d8b81",
+  "AKROUSDT": "7f7cc3abb28b6ed329c40a3c73ecec8ed6d0bfed4e2a21541030b4dd38d92852",
+  "ALABBUSDT": "08104970e8777319bfd7c806e34bfefc15f514e8eb07112d9385fc825699bda3",
+  "ALCXUSDT": "6000ef86ad9ac45f694876f9756cf747d471f580c8b40a6311ad8deb7fb129c4",
+  "ALGOUSDT": "73405381f1b07b81909b316dee5f6ae7bdc969afbb27c1a3f0b66cfb2104c08a",
+  "ALICEUSDT": "3465996715e6e4c6592998e128abe3336e8dccee6f595083618be8783c651ac7",
+  "ALLOUSDT": "7ae2d03efb3c58e1310283341a3b6f739592325e278a2a2f4404b083365f51b5",
+  "ALPACAUSDT": "534d64e964f0d4539fe9d83ffeb9da71aba045b32ef3411104debf317708d308",
+  "ALPHAUSDT": "07d18f0ab2d75dd57c3f04b5dbafef3fcbe007bf7121f78d4bbde7bc3a043e32",
+  "ALPINEUSDT": "6ed8a8db65fadfaa1a4b48a2702c782c45bcd75f677ca726b659f6cfaf71524a",
+  "ALTUSDT": "9b914b83e3e64e819c04a824d09ae0eeca15ffc20effc1f14ccbe368f669ffaf",
+  "AMATBUSDT": "1cee957f45edde64412750237ed9d72be90ecaf0262fe055e1b25daaada7c436",
+  "AMBUSDT": "c7ca838804895239c7afe34cfb5d139ddc43cefb712d3c154e69926b481b77fb",
+  "AMCBUSDT": "f7c2b08d849eb4a388651632235cd87f3ca2a20d9bd5caa66971c6250b512302",
+  "AMDBUSDT": "1f359af30b2e146e3e10a226f332919e64f7826dad4701685e1464649be090ca",
+  "AMPUSDT": "c1433805580d5adec30e97b797418b9fdb934f7a3fa7ebd74827a15decd160e1",
+  "AMZNBUSDT": "d63990ffca65ea55686ab415697454a9dfc948eba1544dca7f3abd73a7cd2fa2",
+  "ANCUSDT": "93126bc2b5dea6edd6e77cbb842c94eacd0c912aaab218c21c3db83a2ba4d3d6",
+  "ANIMEUSDT": "86ee22c8bad8543cda8fc96bc4f813c74758e2286667a17794d47b9a1cf03d27",
+  "ANKRUSDT": "78c415bc0fd3608758a9d60c07a2cb910635687642ee982fbf9319395472b38a",
+  "ANTUSDT": "b181edbae7bcb08b1d90a557bbcabb5e4986b1df09875011c614bc5628fcfe05",
+  "ANYUSDT": "fb0f0024fd62ee82ed174cc29b556359558f7d4e42f5e9e460ba6ee084e94cb1",
+  "APEUSDT": "6a80f3d9730da0ab4cb554705a699cd746e79cd15b746a04ebdfd34bb6f57542",
+  "API3USDT": "c032e608def012de4e67422ae0bc06a137a4e658ba75c0fa16077c18c91af5f9",
+  "APTUSDT": "cfe55440d5c4806c5a3b2ea3b544d57d25f95f9a38953c66a20fa18f5903d09e",
+  "ARBUSDT": "fd84582c7185a645deb107c166611405d3c7763ea9daa4d886c38fae6fd3a084",
+  "ARDRUSDT": "203ea78776c740068d6bab3d42e6f710390c592fb3aa81cd37d134b7fa1a34ed",
+  "ARKMUSDT": "7c9e5821eb44a1589322c57560cf943edb460d06937b69feffc3f9887b9af5c3",
+  "ARKUSDT": "d4d332e1829fe476fe00ded759320cf2623074dcf6a99c70257e28795d482680",
+  "ARMBUSDT": "5a808a70a74262f7207155c9e7d0ea5fd08ca629703b5ede93a80a5d5e475d8f",
+  "ARPAUSDT": "e34cf47550610af3c05eb1b5015f01d3a9a5bab799788fdb8aaedb3935726466",
+  "ARUSDT": "20ce00b6aff072e01918ef0c18572bf0095c93323feb66e15b84fd88f29ae583",
+  "ASMLBUSDT": "6093e6decd85d2ab08e5cf179786efa43479a5a5b8e70a83308699b28887768a",
+  "ASRUSDT": "26f50f099f31145fb5482cbb5a1f1569c59405adbda1eace347efceb6e460ec8",
+  "ASTERUSDT": "d1afb06bff6ff180fa5f35b9ef3fc7041ca2b16ef7423fef24861fcfd76228e3",
+  "ASTRUSDT": "347089ca4a65a77b10655702c53abc4c27f9051b3a470dde08a24254f1d5a307",
+  "ASTSBUSDT": "8bb5374cb931b38b573d3a97ac60b1c4a7a052f365b93f35675f6c829bafd29a",
+  "ASTUSDT": "801ecae2885b6c9ecbd1107ba215d6b3805c3ba2ca5518d921581c14e658c8d9",
+  "ATAUSDT": "1f79f4bfe0a368d103b789e59612180b3a9edc01cede5a17090ef34aa876c9b4",
+  "ATMUSDT": "2efba8911d6457cbcd8f6d56d3391ecd4a4c493cda9c1ee2b2fe1f0b871bb3f8",
+  "ATOMUSDT": "00875b7693ec564ecb8c083f63b673ebbc5c87fcdbac6dfabef3005e9d4da565",
+  "ATUSDT": "84dcabcdcbaf7651da13e07f27d4de43653ab90abac9206c75411910b5e75365",
+  "AUCTIONUSDT": "9ca9b86b4ae76b24af3b43083d40a2a5d97f006b71b7ba825c94c4b810a794b8",
+  "AUDIOUSDT": "32701eef965d77dfe855174ff0aef2a0aed3676f87a0fcd37b53ef211c05f51e",
+  "AUDUSDT": "e0849db176ba0300025ef9ced5b26a87bd34caf66fccaee6a08f72f96994b635",
+  "AUSDT": "721bea9eb5bd8103617bae238fc1a0c03e0b7370bf2cac6fcb5f13fdec2f19d2",
+  "AUTOUSDT": "10913972f94b0d10a51a857fde1d2b38c24c5e75b5a760be250ee455f8fe0d64",
+  "AVAUSDT": "fe5ea33b3f8a3c5732fdd83dac0ec35e140f467dc67e385fe58dd4f884b0d227",
+  "AVAXUSDT": "c04bbf90f5102756cf0d0bc095fe3d99952b60f24313c84a23fef9e20e69821e",
+  "AVGOBUSDT": "a9bcf40358798130ebf0d47fb8142cfb85792ef74913cc616b90db375f848d55",
+  "AVNTUSDT": "4643b9d9e46e0be3e550c0018342f08987f2c3a5f57de85ac3cb175f0b3a0f34",
+  "AWEUSDT": "359958601f501d3a1129b647ceaf0ecf2b5627ab86ed84adad5d8780af6adbf2",
+  "AXLUSDT": "267edaf58ffc90e29e2c767329e3e083c399738ead2ec7be5477e03901d0fbbf",
+  "AXSUSDT": "ab7bf7a21b278ee789c4db3f7491cad04063aacd05e47ec7c5137f01acd93f7d",
+  "AXTIBUSDT": "36a20eedaec24ad7034fe84cedde8775f4593990305423c618c17f915c837629",
+  "BABABUSDT": "049186abffbd4efa1effb2724c970529bd957531adfab43cb41dc01ec8bab783",
+  "BABYUSDT": "b3e152798b50a0a1abb8c44badad8f77a8be5dab2ee2f51bd8a6c2cc9008df09",
+  "BADGERUSDT": "09007ba3d30a9b4d59af167d086c814426286874e5852006378581b84a5ff292",
+  "BAKEUSDT": "2e0b010fbde2c49c09478e086f433da51e3d7feb30dcebff7935aa29d38f511a",
+  "BALUSDT": "041daa4a828e7a3686157198bd2d73ec38ef3ed1720ee8ac59b39b2858f2365b",
+  "BANANAS31USDT": "0383b69999278dc344e143a598a6fc2ec70f40d554e472dfb9d4b2d0d54c1afc",
+  "BANANAUSDT": "0a3026e6b6d02b6d4722d31e422ce7f4c7ad8076bda585fcd9e42af5678fe65c",
+  "BANDUSDT": "d93920f83163c29cc0dd75172f01a607d4c8c95f0e0661c181c6fa7e50e9fd82",
+  "BANKUSDT": "610a2fc7c0615ab453d7ec2cbd82db687a3959f91407eedfb26581094c812009",
+  "BARDUSDT": "48655a0176ce6f64851c8a292044c075f0662600dd27d1065cba1b4a66992e81",
+  "BARUSDT": "9d68b9de3a771eb4ddebc64764e6f953863b505d7fb3c3934f7e2426874379a1",
+  "BATUSDT": "93ad3aae7cfcc10716bc02e08d356266cb30145dd8e0e5a2561b70f18d2b1fc8",
+  "BBUSDT": "e9b12cd250fb19fb4e795051470110759db6d6830d589e863d49948b04831cf2",
+  "BCCUSDT": "a6e67f1205b2abaf4012baf186324287ac3a6a1c1fb184c63d7bb2f8e9d36137",
+  "BCHABCUSDT": "9934ebb674b082ae17a60250114b5f83c3bb3aace6df55a3c2663d7380c7d5cf",
+  "BCHSVUSDT": "799a7efd824f0ddba30664eeb5d77a63d3162503b1538a02973ce0e0ae216dcd",
+  "BCHUSDT": "98d76fdf10698c0c265f46c20927f74d13fece139f0163f3be490dcd57e886be",
+  "BEAMUSDT": "be5958bf5f933923deaff40eaeb2afb57c07826aec24844287a585871941fab4",
+  "BEAMXUSDT": "4e3f273345c0273a1d0f3d6f603eaf0f35f28f2cd381b416f244ae87bfeac445",
+  "BEARUSDT": "0f1dd7a7004eb13dbc1f9034ecb22527f906cc50a015441e3c6d39308c64edb6",
+  "BEBUSDT": "648acc8b621d2726a27ff4ca3dd262c4c2db83e3b7de979d798514e39bc0e316",
+  "BELUSDT": "7a0b9c9a0dc0f45e5465b61e769e9c4edfe8b5c47986710adf3ff0ba9d3145bd",
+  "BERAUSDT": "5cc059955dbbea9685db5758e1b5438330b353501acf48faed2fafcb940cc06b",
+  "BETAUSDT": "b981db522055cb6f43da2f6b290b8599cf7eff87ad0cc89b455d3d1e1350d994",
+  "BETHUSDT": "93ee014894fe99dcec30a00aab0b6dfd3d1d692d189e5fcb3444622f59a13ce8",
+  "BFUSDUSDT": "f39997b4f238c298c973f359a0749f8d35fa72c12ae26f40d4812d43e3a17782",
+  "BICOUSDT": "6c9b12224ea2af31685f4c336750ba2762b91cf01f77990101db65e3e00a3125",
+  "BIFIUSDT": "6dfe751e0be52a1658417d19eb80c8e5911944c820790f0e48562be953e661fb",
+  "BIGTIMEUSDT": "fd21a23b44d31957d7ece5a004641b7362fc64d5b7ede3529f8f811dafc6f3e4",
+  "BIOUSDT": "6d9eb036ef7b8afdab8937daaaa8e94363c6f5a9d00ad3fef1f6104b7329f0e3",
+  "BKRWUSDT": "dee95d546e5537f8734c173dda10e95b66ddaef8af802aa7704421f8b0c971b6",
+  "BLURUSDT": "ec5f1e8e17eb4439cd024752cfd38199c70a6510c7e54db53fed95e69d9e0a25",
+  "BLZUSDT": "7451847a11568afc0d0a84988100056f9d3a3a6c553a60ee7845d338c1b11fc0",
+  "BMNRBUSDT": "7252f27198da73a81b9bb73e096de5bc9207665d64f7d5b8f6c732bd4790485b",
+  "BMTUSDT": "fd0ab9f58b0821e86201ab8731b3f832a0f9e74799e206e7f3986b0916e7d71c",
+  "BNBUSDT": "545473b3784d4ec0e3e10e0ae2d113fb5e1377565ca8aec503f3afebd5ac80d9",
+  "BNCBUSDT": "6de9cf3176becd4c7f409ee18a119e06c03966bb8be09323f8ab6638292568f2",
+  "BNSOLUSDT": "eaa136464bfad12cb1d7b2ea368db74c06a3b43d3109715e66165d6e93c4da33",
+  "BNTUSDT": "6bb4da3fc9ad663ee26d4698c7b97107447b55dff9abacdfa54f87ebfef07b5b",
+  "BNXUSDT": "4d0194423f24f858f31daced5b024e0cb0db9e362781306f737b3127ca40083d",
+  "BOMEUSDT": "e430a8f8a0da30f2be5e2208b5414097c8dbfe24a38af6d0bd2f240cb73866a7",
+  "BONDUSDT": "856135f1939afac3d87886469cf2bec09d7c2a8a400eae172209fa5e3d3e2e56",
+  "BONKUSDT": "5d4d10b9e7cba543118edc5d6012ca1bc74164d2d816d0adaeee1f58265bfe83",
+  "BREVUSDT": "052c014ab29757ba4ba56b4615b8da2ba78629b04b582716487ed0dc40e24693",
+  "BROCCOLI714USDT": "29dc740fac1dcb17fd09aecde0ce552e5e32a6c44c68e2abd68d423f4a4bbee3",
+  "BSWUSDT": "e783fa58686286e66f7ef24d84af366a5195e6a6c4787dd5e16d0fa9d21269e4",
+  "BTCSTUSDT": "3905093a0fa30dbf4d8b234bbd498055bac1bdd21a764782d14d16e9dd4da984",
+  "BTCUSDT": "d869812ede427516b0ee98874ada64810515033fbb274dd98f141c1b735c67a0",
+  "BTGUSDT": "346d485272e78115338df0d83dbe3c609b0f1775c73bad1a0cf9f4215569622e",
+  "BTSUSDT": "4d7b9f939d13ada56a4617a87d7448bf3e4ad0460ac3e856a0d8f864be73c459",
+  "BTTCUSDT": "14220e5eb9b9f319ef927625cbe284e255db36e4c33e299ab5313e2e3b65ff5b",
+  "BTTUSDT": "b78f6e25be10374a32bfa69148ec4eba180e7ae690e14a7411810a9afbe4a6dc",
+  "BULLUSDT": "f0e0540fe38af1bbdbc2942bae0d2c44c4520c92c019acfd1d2ef8b3b97d5aa6",
+  "BURGERUSDT": "62d82067db33c8780a3ccb6a0d6dc629489bb2a9a105d23a0ac96a79e8b6188d",
+  "BUSDUSDT": "d66fef426d52a0a85a9ff5e6eaeb8d67e41fe6a0f5cf730bc0f6c50a25c07316",
+  "BZRXUSDT": "6d393ea33d69debae9b8494f0fe18a887f9343a0f210a73889e525eea40fcb71",
+  "C98USDT": "8cad12b04cf95cbf76225665216d0521f5aaf1f4a837433426f602e79ff21488",
+  "CAKEUSDT": "239b2a9735e2791a47fd5834e4646fa2a9d03d3ef4375d1a64ce33ff70b881ec",
+  "CATIUSDT": "841664f9623e21e5878b10c5f0176eaecc981165c18acff49ab8ad41188cf255",
+  "CBRSBUSDT": "913eb08aedd25c33f7466fed5f24b9c7227283c8fa77302adf9dd2bc33eca519",
+  "CELOUSDT": "8fbc6c70d422881c2ab9fc96b0a5469411d6772fa1ddf77e99f90a9793def7fa",
+  "CELRUSDT": "f325c32b0b363d477d8a01d45c7778c6a8324066f0b02d86f17782efdb4f1f48",
+  "CETUSUSDT": "d80d782e5af20fcbbd9d824dd6c6d235cf6f44cf1b052c4d51b6515533a8175d",
+  "CFGUSDT": "e07c1f8f7cf1afe2663ce917a4fb2cc3f9b5025df9bf4a290c9c8082848cc20e",
+  "CFXUSDT": "f9fe4e4c1f9ed26a6149129fac390af44e1d120873041cc352a8d74de760c7c3",
+  "CGPTUSDT": "dc2cf1381c454b81d6ea0ead3794a1f4b30d3045ec2b5a163c2686c8a7e2c09f",
+  "CHESSUSDT": "cd215279fab0f4063b6544cf04c934186767867a114d37d36ee278ef99aa7cbd",
+  "CHIPUSDT": "63a71b5fb91b066e08445b6409bdf2f9a057dcef1904492a6a75adaa12a91e20",
+  "CHRUSDT": "c769dfc5b1f231f6e9b1fc5d4b3f7b5aff6ccdb99c377e2f5677697d75367a10",
+  "CHZUSDT": "4645e663a97d46ebb27d08df94fb590fd6f26ca17c75d465c35073ef955a1c75",
+  "CITYUSDT": "2dd38a5baaaba1857f4c5740588f70c7e3a052ad5d712499461679ffc0f0ed87",
+  "CKBUSDT": "59e7677501c4aac91239589928bdac9b9f1574db2adf5856fbe3e864b9d6ee1b",
+  "CLVUSDT": "14992473cdcdd27aa919960c84e0547ed6c7a734fd4ee510ca82e973a45f5725",
+  "COCOSUSDT": "4f03acf636daf408b51f3fe0652c86eb5a53a9b700fd31fb72db4d0dca7b1c7e",
+  "COHRBUSDT": "1eaafd153f4f0b5e3aad9285de1bb9be36172a3fb40601631aa5a816f762be8a",
+  "COINBUSDT": "4a6f155e313233aa04d8f345bff71e3388c46ec5aa5de3b14f19006d86a7e591",
+  "COMBOUSDT": "b70f7c1731d8527391482c0bb34f8ce60c1a20cf7b572a2807c956a91b8af736",
+  "COMPUSDT": "7757f225ef6e1c5bbe529cce1a7c241e9f4cb554de3213a30e3d4228cff9a3de",
+  "COOKIEUSDT": "8c21ebf6959dfc4930f99ae0c162ef9a36ddc3f543d564fe388a80ff1b7f6555",
+  "COSUSDT": "5f931261de34b18eba78760df503ada923f2f61dcdd46b6a1fe0c0eaabcbf7d5",
+  "COTIUSDT": "ebc36e2cc2b9416724d2d6e21f0431e1f242b7401e2cb68bb4647cc760e73726",
+  "COWUSDT": "bb1585f8ad835428c6ee656962c4f4d96ce956b125f98d7f32b363f7ef031716",
+  "CRCLBUSDT": "472a83b6517739243a5d4d7c9c93458b313d5d6766e316851d96a5028ecc1527",
+  "CRDOBUSDT": "61ac957dd7e9a3895f643288bc337179f17d64cb9ed525d71f65d57faa5a262c",
+  "CREAMUSDT": "6a4b898893e0adc4ac68ddb7fdab779c6099a39cbe5a8f98d364cac110c63053",
+  "CRMBUSDT": "428db8b3d69b40d43f0722904be9fff80bb2af3dc290f421132d6b3dfe90ba18",
+  "CRVUSDT": "fb9f2421924e7f25ee15abd314a4753aceeace0e6a53b16a67a0b2f7d244b72b",
+  "CRWDBUSDT": "a454d7b9a083d2a1b1602aa43dc97ac2ae7f3d6edacfe3a1c777f33017c075d0",
+  "CRWVBUSDT": "948a854d3df010884ca43e13a7cbcac24cdbf4f8c46cf155e1d02a0a7772449d",
+  "CTKUSDT": "688a669de661e436cdbe012befc59b84382c7d9234742bc6163830ced34adabb",
+  "CTSIUSDT": "13321d9f308728243b635fd73b2c32826df338d881ed300474512a9535b1e399",
+  "CTXCUSDT": "b2365f9cb61460acd106633996048379fda01cfebb0f386d7c3aab645931e37f",
+  "CUSDT": "64c72d399d0bbf36050f3655670a7b76587d32bb8a36358fb28caf03cded56ef",
+  "CVCUSDT": "856a79b9e29868ed904ba939ac723f89e57015d90fa78acef3d5c6f6b5e97fae",
+  "CVPUSDT": "33b064309be2da5a64fc8380d344ab47c5c8df93e5eea4d72c01c20dac81c7bc",
+  "CVXUSDT": "acd917742cc2a986845ab30fc36fe41b8933f70a54a57dcdaf3e1c99e13ea8a9",
+  "CYBERUSDT": "cb8b8d5156ebc3fa945e0a3e5f8bb3079a9fbcd7fb3ed8afc3fea48004ba2e35",
+  "CYPHBUSDT": "332491043e89a8d55079887f10a4e207c8dca8eacb8951afc9cffb28d7de70e1",
+  "DAIUSDT": "63788d9c907545e51c26f338e37870c73fd7c1d62d2373f178e4b840947bf253",
+  "DARUSDT": "2dc96dda2264e36caaa2d40fc98f28bb6f9628fcd7f9648960abbbda7cc292a4",
+  "DASHUSDT": "94bff1da3b3701fab79b5f718f4a3d0dcdb47e22f624d4bc9dac5022af0066ea",
+  "DATAUSDT": "682c6c74e41a990a638a447c73c790f0f2f732f9ada79b5d238b31263b740a6a",
+  "DCRUSDT": "41e833af7aef73a471ce99264f0aeabef5cce2d4795e12f2663fcd31314c59fd",
+  "DEGOUSDT": "11328ec3f2d2b4869d4d7db2610a16059068ec7c5bea8d0bd37f91ba1661351c",
+  "DELLBUSDT": "2affc1fdf16e2bcafe7265167f4b422eb8996cb7b5dce283486025ee6ba254ef",
+  "DENTUSDT": "6300ec7fadc31045c752f3f7855dc5417f2107cbd478e00623df3cf0637e269a",
+  "DEXEUSDT": "74dbfa012b648d04d46667c79019ee77380dd0eddd673249304480e5d756d02e",
+  "DFUSDT": "95ba0d62580ddeda596d93ca50d813986242a59e700ad7257b87346ee156d76a",
+  "DGBUSDT": "ad7f7f81b4f2d3bbb4f12fdab055095e4cf434dc79cce8f9947b3b179e05fd77",
+  "DIAUSDT": "c2215866603d6c6b4d9643e173f08c78b9a1d3b67c9c683b65964968839af27f",
+  "DJTBUSDT": "0c7de447e4caa51d1e8f3a543f5798c0ced3a115e46939d0a7d1bc26dbdfc465",
+  "DNTUSDT": "9dd119335b999cd3d3757261bf064ed39c23144d71ef18464ec2cd23e4288523",
+  "DOCKUSDT": "417de2e165082819926057e592cb71a93fad9578f98f94bcf565a4772ab38bae",
+  "DODOUSDT": "20b94f9fd06667f11b6eb4d04b45c1db67411da6eb7c347a92f0f3e0f1ce21aa",
+  "DOGEUSDT": "3b58690f7f4dc62161fd68d126350656424a0cfbe8acdcb5a8f3d98b554c2a0f",
+  "DOGSUSDT": "97077f962de83730abc47d2683066a1d2b7c2df24272bfc4a7d572c0bb801b6f",
+  "DOLOUSDT": "16d531ab5cea14b0e01be0577f7b2289f6523fa275685b4e0c20bf3fca9246f8",
+  "DOTUSDT": "fe0cdf6b834c393e59e37071ff4e2c4511527601c2ddb96c58fe066462e8d6bd",
+  "DRAMBUSDT": "a12c8a9c155bdc909a087ff4c029c7bcbd5cc597e7823eecb5389772e39e2d4a",
+  "DREPUSDT": "7dac829db9b20b318057a2dff91681217b5e929dce39aecc2a3dd4911c807bf8",
+  "DUSDT": "9f383329410b5accb295de4cbab55e417db9c1c3ee9f0c368e1d75ed99ca3e4a",
+  "DUSKUSDT": "56dbd4453ab0b7f1d27d2acea83904406ed9ab8fc2fcc22782ba87134f41e3ce",
+  "DYDXUSDT": "dd2bc5aada172f6bd3ee7634abf06c593688f6411e04dde3c547d892687ebaab",
+  "DYMUSDT": "35e921bd6617d226a5aef3b00c3eedcd25c2d60f71cf7414bd695aaeceae39fb",
+  "EDENUSDT": "a4c4383053dfb341b24fc897d491e4972044a3c12315585cbc55b0bb7e11a27b",
+  "EDUUSDT": "9ebd515f3b448a9ed93bd62572352b411abc91d7377b1fae41c9a5eb91225f4a",
+  "EGLDUSDT": "35286d57e3d85e99809475735acaeac4f0b1156455a642c78139364dc92af82f",
+  "EIGENUSDT": "95440ef5b7defda57e3c8aadefe469431560b79cc3eedde2a8391bb7b18761bc",
+  "ELFUSDT": "3a45bad3cb5617d87423ff4c23a5ebf06032590fd4e36293b56ee108497943a3",
+  "ENAUSDT": "9adb987853521d558d9267ff0296fbb8e339ad79b5058b0159b8453a721684a7",
+  "ENJUSDT": "41e0698a0994369f16a377887b2c7e32322043f817b4711a80d5d84400b31e52",
+  "ENSOUSDT": "84edd44c48573012118aee07f956d4970bb283c08107c185e56e20e9ac4563c5",
+  "ENSUSDT": "d7c939b47414a9ff09a066990d16ce447d1238054aa077c18c50971bce537dc5",
+  "EOSUSDT": "4c109f31929415e6aae9061a45a9df278a6a5f99e72f9b2530650984b8e06d91",
+  "EPICUSDT": "bdfd8f4f58751e4b5e4046a6b58b2c9502e5c68a62a7760a23bcf0b569f3b3e8",
+  "EPSUSDT": "c66448d67314965f3a49f53f016faa6e160b1260ea3898744fa0ef147873a51b",
+  "EPXUSDT": "211533b1e0e7b2f22d0e9d86fbb6af94e02055af8770d5bfced2e567e5872463",
+  "ERAUSDT": "581840675d112abb319d8176e7b38f0da00f26144a64a401ba4cfcd011733916",
+  "ERDUSDT": "3c3092a76fec680301fdaa696c2857a03a7a50d03a44a4acdf6049c0ada9d89e",
+  "ERNUSDT": "daec24c784dc2ad4b6a31d26fe58335ddb8f33a56087f8ac7ab5d9746aacae76",
+  "ESPUSDT": "bb9329290a76ce23a30ed79e9ecb8a53d0e3f5e9f6bf9c6636d6401505e7f5a0",
+  "ETCUSDT": "8ee3b7efc4b31829e27bf0537737c32035646f066f74b66619f8c9fdcbab97dd",
+  "ETHFIUSDT": "6a6e427799e6505f82c4aa015c229dd03bad9923a739578eea607ffd2ebd2734",
+  "ETHUSDT": "8b8817cd20e9809e4fccb90d7d04fdc00c4996438f9a9bc7c9f8f48d4d085508",
+  "EULUSDT": "2c11c4d36220c372071ee72d18764f304c49cd8c734b766be5a10cd8e8a629f5",
+  "EURIUSDT": "160e35bc9b1318c907970b91d34a75cb94c62bb512d94edbc7b1e99c68525ffb",
+  "EURUSDT": "9d13a2ee864298c89d1656a1dd61bfa92cc0dde50408b6986256adcfd5997975",
+  "EWYBUSDT": "9ec4141c6ef84b0afcf3350c194a2a89c33a2118be058a306081a67204bdf749",
+  "FARMUSDT": "75269c289a37c2b705549bd09780b2fcf239d00deb3e4d9c1809a4a172a581ad",
+  "FDUSDUSDT": "bbb4bc546da52f69d105e42bc5ee035c117c0a905af445af117ce48ef6a7b0c2",
+  "FETUSDT": "3f4ef37ef35c9fe1d75cc9dcca43b3ad5f7e7383beac4f30f0e8b1e70e09bcfd",
+  "FFUSDT": "35f8bf3a3dc61932e4de693c0e6f50c75acbd3cdd8ab2c4ba0660435a612bc2a",
+  "FIDAUSDT": "eeff042407ab041c5d3ce33524e80b871ae2fc4780e81462553c4251888accb5",
+  "FILUSDT": "7fdc3924a8b67e99bab8346b76598c0f64c21ebc655cb043972a32a16e7b280a",
+  "FIOUSDT": "9143818f0e68d09374e6787b449e34233603908d3a5a4059239f675fec2b45af",
+  "FIROUSDT": "c03bcfcd587d1a4ebbb95981c443df1112d7126e6e49da12704bd4bbb4394545",
+  "FISUSDT": "74637991904ac5989ecc52f9fa54d8e72a816382ba81e03cd3c1e3edc42cb15e",
+  "FLMUSDT": "73574627fb27beab033e43fd462fd2fcf808b382388d594d635fbbd01876b9b3",
+  "FLNCBUSDT": "4dbfb7fea33736d02325f2949cc3bd8a52a6ef73495d5ff138e6a1a74c1c31a9",
+  "FLOKIUSDT": "d64f7d11fc8153b7634a300240052e0e2ce0564e9d7daa31328ed3e4d7ca86f5",
+  "FLOWUSDT": "5ef2e2060743a41682ba1987ceeccd1d7a67d93f6be658e42ad18c894909c18a",
+  "FLUXUSDT": "a0642b8e53ef2f8764db6be25bbc6c22a37f01adb73168ec6f9fd76d7a3421dd",
+  "FOGOUSDT": "4be24da5e8c4b277676b8ddb7d4e77b6d10a69a27aadf48edc88cbbfaaa51ef4",
+  "FORMUSDT": "84232129a09be0f0c2a6e557a85304a4602143aa3a7c0bd612910bb750c75c3b",
+  "FORTHUSDT": "ba33366d8f1a0035206d4908f1c0c6e18faa8f2bba9f59e90671c2f42af2551d",
+  "FORUSDT": "de6e029323a43b9140d8d8a739607c8da5d544e0ef409db2f2532b7857707853",
+  "FRAXUSDT": "52043fa75cbcac4917e6960254d4cbba1d5fea5ce1e00d278b9184aff30a2ce4",
+  "FRONTUSDT": "c2a3b56228488a23b633d71affea532f971287f5fc9022120157e35f359c0ae6",
+  "FTMUSDT": "2ad5892518b58a364431af84fd00e1c8a251a550111d0e07982f2aab5d2b9833",
+  "FTTUSDT": "66690b3e8ab7ac1eb516533d744c28043dda8927043455f18b075804948e4cb9",
+  "FUNUSDT": "999564b3ec039a68cd14364ffb89a384f542649bab65fa32e5aa30c211aa79b7",
+  "FUSDT": "dc2ddc882f390a840939783dc429a2831d742d3669c79b6539cecf01227b6e52",
+  "FWDIBUSDT": "4449ec3a6d513affa48c710dc1931610d26977ea30c306134f31b79612355e62",
+  "FXSUSDT": "0c4500869907b8d643f36bc9aa4d1c9e808fa8d3414b61114b623d3fadcb0571",
+  "GALAUSDT": "8c4ae58b0a260c984a85176955ed97f3c9cd2998b6b3149d4b59851655831b6f",
+  "GALUSDT": "24ac16af19c5b56f90f05fb45f16f587c5d0b0bef71acf7682f9f5e606f83ee1",
+  "GASUSDT": "fea1fe207e1831adeac708c167a4928c1480c559335a23c9f9f5802f03312a22",
+  "GBPUSDT": "4c6b464e16f0009e13db95f88a56668104b5ef2b57c1b0db3231b6092fef310a",
+  "GENIUSUSDT": "2ee0f3fe6b42a9d01caa02680d3d0212fd2efba4808603680b6b97cf5f2b0fbc",
+  "GFTUSDT": "17205f2c65e8d05926a36b9b61a1c534b322cfc6720a6fdcb7a41c40c83f4ff4",
+  "GHSTUSDT": "e85a8943ef2924268e252531a3abe33e552672be91248b92c1595e557f64797b",
+  "GIGGLEUSDT": "45e8c18f3289153f8a4973b4c285f9fe2cba32d369a9c37ad49cdf65980f913d",
+  "GLMRUSDT": "ed2cc939a8d924f32e50a26402f300aa9bcb383b3d686fac02e12e2107ab6ac5",
+  "GLMUSDT": "d907c76c0fe2882a245b76454401b02fe2d3ea7802dedb20c521164bec29c493",
+  "GLWBUSDT": "93748e17499a808acec47762edcccf044d9bcb7c7b956e3c7726c2188e4565d0",
+  "GMEBUSDT": "1791689e9851f5a55efacb7c4840d1c11c33cdbba6c618ac4336f4d459ab8306",
+  "GMTUSDT": "a742b787dcf3aa177f0b01cf9e9ff6b2fd6ada36b529730fc58dc8ed97a6dca3",
+  "GMXUSDT": "37b1cead3f62d326868730f0cd8950b00aba14bdd83346e1dcec63b2f4675d1b",
+  "GNOUSDT": "107e46fa61026c8b53de115a5726b76aa490666e36dc1cdc92967dd4c93d35b9",
+  "GNSUSDT": "e88180504e04bf76f4e64e67b92d38b093ecc93296b6b5d114496ef921d073f7",
+  "GOOGLBUSDT": "90ea10f1e45dbbf8f27cb806ca11f02d4e80b0afe35350e765ca05f83e8c5d3a",
+  "GPROBUSDT": "2c70a6c504b9fb2a73e7b49f0a4caed736906da28c0aab40b172fd99720b8122",
+  "GPSUSDT": "7f3d0ddf89797afc208febc45bc491bf662e12305597198a0f0d2a0888beb38b",
+  "GRAMUSDT": "2c87e4d397e1c92408267f4e67d4141ab8f3c92756b7c08ca8ecbe966d0a39ab",
+  "GRTUSDT": "0196e3f5f1321c5348f56c5ab54c113a9a5d2d94613d21be775db56adc99b47b",
+  "GSBUSDT": "62fabf01fb133372d6d265367c534efd67c6024383cee931655f009972e5d873",
+  "GTCUSDT": "bee32701f5fa290caf054e68c75cdabc6b4786541b97eccccff4e81628f6f59f",
+  "GTOUSDT": "c1d06ec6547b7b48f4ba16ed6df120e389114624c0ed961ce9b0aeaf5a05cc7f",
+  "GUNUSDT": "5c8e3fe4a734ead3bc814879ea9cf730330cd9c416cc684116a1f1223339773a",
+  "GUSDT": "bf5cfa63b5e9b8a9e91f700b11d6d1898aa0d9d92751a905cb63c6fb2e4afc39",
+  "GXSUSDT": "4bb3951cfb6eec8405aed28f9137df5745129fce1d06eb17d7b3cf60379cd198",
+  "HAEDALUSDT": "52253d01d13247b91214deff302183112c4c8e8d8f7d99ad5113f298cdabe581",
+  "HARDUSDT": "fc5b489fd05705d261ef1aa90372e6f5b02c39d68426acbba075d110f9e6620d",
+  "HBARUSDT": "e3d5ce32fbe42cc58c23b2881b4b5b02d3226b6fac78f97a8387f66757e1919b",
+  "HCUSDT": "37cc7333eb40e39a58c7f54feb9aad57d634b47dc4321ab5683119d65c231939",
+  "HEIUSDT": "c70a6c3bc0de25a859cbc6787be6abdc8d2a7e16bee52f8704a1afe49c738a62",
+  "HEMIUSDT": "748b71f2331a21d09c1c092955e36cdb69a3c85cf3b8de1e29b2af7af69cc88c",
+  "HFTUSDT": "6e223e8d46c5519a98779a7ea7f4a5a7d3d19b7e7b8b04462e16e7d0c3b23b0b",
+  "HIFIUSDT": "8a00287f8731b9b4e2de0bfa295b3dbff4c5ae9bd0a4b5c5c42aec8c34c7742b",
+  "HIGHUSDT": "2d3d410ca299c37ee852ef78a1c9179094e9e0c461b16017cbcd7ead501212e6",
+  "HIMSBUSDT": "4269bd8a7382f16bf7364d222ea0e7a55e79d05c6d3dfbc49551f4ce936a96b5",
+  "HIVEUSDT": "bb8e46a19109ed8966561a8dd8644d0c1d036fe54c6135931484306e27ec7532",
+  "HMSTRUSDT": "15c165860b1f8ac413697b4aa571912dc1eee97b478dfdb7636696b54740b267",
+  "HNTUSDT": "eadc9987b2384af73b824484e05af85570f0fdbfa32112ce3ce381ec88076820",
+  "HOLOUSDT": "42756552bde7e3ad48eb365a696bc1bcaac1db728199fd525d59c9dd72fd09d8",
+  "HOMEUSDT": "b7e797fa538a684fc370011f18f0eb07598bb78624131c9744c7e375191bc127",
+  "HOODBUSDT": "b85348e29f0465de0d390b56ba5b00ee333d9b0e56bea178958b2cdf4eeb54e1",
+  "HOOKUSDT": "98d1bdf9071c063b973e3a3cb3035e50316b5120fe90af19a99cd3da65559ca8",
+  "HOTUSDT": "2d7599c6833af0c611b6bfcfa87ca3dfeba4497db4b274702108750902ee0013",
+  "HPEBUSDT": "e7f3d266fd7fb4bb4439b9b2bbccfdb62b47024e2badce6c2fd11fc53343180f",
+  "HUMAUSDT": "74991eb4483a9f5c61e4e8aa6436525d1ae1d356ad0ce34b0384d08e9134704b",
+  "HYPERUSDT": "0bdf8f8b7fbcb7cff7217fc286c844ee2e4febd634cfd8d1331029354a7178d4",
+  "HYPEUSDT": "c103a8b471a6f7400776cb529a867b8e34b600e155c75ce2eb826ddeb62c8a22",
+  "IBMBUSDT": "02b45b0198657c37bb3f79ed99a8badfd125d608c5cef14b1f12b8f77921b148",
+  "ICPUSDT": "e0a3433503a38a3301aa9cc979ea32fb24572d6c50ad521c1c938c3f3bcf291c",
+  "ICXUSDT": "f6e5f9c0616dfb43bb3d8e13dbbd54aedaa72d4e6318687dc4635a5e490bf2e5",
+  "IDEXUSDT": "bb4286671566d627aed101c810f8144c4d8475e68f1be321a53444f932efada5",
+  "IDUSDT": "cd17f570622d13f267b3516fd3bbf62d052a692bd77907700f6ea6a92fb200c1",
+  "ILVUSDT": "c7f1cf250fa69a66c319731cf22295f193aec4a883d3e5ebbc6903f134a2b7ec",
+  "IMXUSDT": "539ad98e6de471a86fbe8ac610afba916577f4d8d0779a80cfa53e4125247a39",
+  "INITUSDT": "79028d666076f65bd25642154c3cfab883b56676110eecd37235f8823bd4f6b6",
+  "INJUSDT": "08add65daff6197f53007256d7e161e976603f776ecd3f56c295861708c615de",
+  "INTCBUSDT": "80132569bf926a504a3df6c4939993efe525de2be4dc265aa59f27bb228f596b",
+  "INTWBUSDT": "08351a993aad6bcaf6baa69c11654e9fd2038e0fd46032161c9fe49beb98e7a4",
+  "IOSTUSDT": "5cf28438640f79f5962413c2bc5da4bebb3e5d8edf271514df957f8e9b3d3f90",
+  "IOTAUSDT": "7e811eb7284b36c5fc00feec44975b91a3a6cae7988e8bf35fdbff86e8b410dc",
+  "IOTXUSDT": "3297deff6a0d6880e05b4a3945fd6a941fc633891f3ae32f82f3e9b7468cedfa",
+  "IOUSDT": "adf75248e2b4e00fbe74612aa927ca5d95887ecd37961ad88b5154517c7f71c5",
+  "IQUSDT": "9fa77a4574c994e0800650d2cbff2dcef997aa1d11b1def979f99b50727c3ef8",
+  "IRENBUSDT": "3f721543b0088945cbf2168bf189af20be499f443e0f2db3d356e5c006c44fbb",
+  "IRISUSDT": "4eda17213c537a454e7a8589da1cf96a8dcefff05d49deb8b681ec15cad65671",
+  "JASMYUSDT": "fc383af6f0d1bc21889e99fd654970393c5572bbc50fd92ea37c58e23465c536",
+  "JOEUSDT": "9a210d41756eb8a304b111a5f32bfebd9ddebb389574561a473724a4d116dd0d",
+  "JPMBUSDT": "e8745475356c2edff5b96eba15bbcb326d75a1994bb4a5f3a9e3af71ac9927cf",
+  "JSTUSDT": "9d882f9825fd404657ca2f9df4219298bffa81c87e931d025866524b92a6def8",
+  "JTOUSDT": "5792c0f1b73ae53724593d1932a0e9c22f4b5242231fa215a486ae995afa09c8",
+  "JUPUSDT": "6bbfc4e8d7d1eb16588d76d3a22ed390803ad1eea1a73b46ef10a303f241664e",
+  "JUVUSDT": "62b1238e1cb44d7059e14987d50724945d8a98ff2ad0be6ed6dfac144ab05e32",
+  "KAIAUSDT": "b9d5fc52c864ae32b1ceabe1140663f8d12d0e334117acbb95100b6fa33df961",
+  "KAITOUSDT": "4a34891b7bcd80feceaef45c2fb6812243867e399814696bdbeb3bd4a3177358",
+  "KATUSDT": "1fefc027926c210149cc0091765054e9694d29ebbac96ed68366d7cb9c9b9507",
+  "KAVAUSDT": "f5b55e60daf48ef94eb10def48277469b838e47d6cfa81f15075399c9b18d7b3",
+  "KDAUSDT": "de8ce36290432428491ddddfb50c0700d51cbfbe66c45d422c88385a80935c3c",
+  "KEEPUSDT": "f0b2c79074e5299248d3db9f6c431f355477b6da21d63fa3b8df405010f66355",
+  "KERNELUSDT": "b1636b476124d2a9522c115705feb830eb514dac11194e44f67d969f33f7fb8a",
+  "KEYUSDT": "a09d005374cb9d9b42754a7633c5da1aa361f8d1babe427a3172ffa72c4856fa",
+  "KGSTUSDT": "b1045f1572566385b02dd8b7d27791a707f540ac03a5e668903f59df041c3a5c",
+  "KITEUSDT": "9ed434c50c3c6a4e0c07ed6ab61f87d11c18ae77ddcfd7dafc9551cabf361eb8",
+  "KLAYUSDT": "4526d15f54a3bd6df1ee79c78023505cf01bc829ad048c7bdbe05ff58f1a2d7b",
+  "KMDUSDT": "87e23e93d89f270a99f1aefce7d669da63c9409755a46d5c6d5225735c0dccbf",
+  "KMNOUSDT": "396b79855742735c68a865d4c42c0f7c57d994d9dc404730e0c80dfb4f5465e6",
+  "KNCUSDT": "c7853b554b20df26db2e0f3483486c179b38448fb41bc44ae30c645aec3b0fb0",
+  "KORUBUSDT": "17e5ec3379d940583891ed374262aa7a638807fcc2edd47b89d26e261911ea3f",
+  "KP3RUSDT": "295035006f4cfe19e62c88f3e4818c31f272a1cba07bf50dd18fbb7669788e9b",
+  "KSMUSDT": "be74b6d8175e945465b7b45553c71882eb10fd393c53c39e99695f0eb15336a0",
+  "LAUSDT": "da40971f724c23c41cde568421f0ee1ff158f9d684f38a6d627583e5e7cb9bdb",
+  "LAYERUSDT": "142a52486fb421f76985b078262432ccdbd313956fd7f8f71596c185d3205971",
+  "LAZIOUSDT": "b86c2abaa132a801c59b8697105047b5be21df0f7547d4135cb0deb48c341519",
+  "LDOUSDT": "aa0ab9444855cfcc6cf7304516b4345daa51176af3b7eed475f77a70cbf49c38",
+  "LENDUSDT": "457c5773bf1c19016e71382fa9ec68b49768b55dda252e3a486a87fffe20b52a",
+  "LEVERUSDT": "e1c5d301ac3642d04dbd4dba12223515bec6b61697e6511632e00b71621bfc38",
+  "LINAUSDT": "82954d05e3606f96bcdc1829b2ce241dcc2c7da6303795e92b4a049c770eabc9",
+  "LINEAUSDT": "94d64f454c54dd7a0af3175430638a9f4afc1889d02a3b661c374f41ba3109d9",
+  "LINKUSDT": "c084ba6110552170b714daceb7ef804e5ffafc7be61dbfd011e39a807ca62d22",
+  "LISTAUSDT": "54af5e0b24003e7c32c52e7b8e8a9be23848ad9e1445072606ace7387fa37e85",
+  "LITEBUSDT": "68b26af161b209bb0c9bbc4bba1d821d0fe8a497d6519a0c914d3acfd5084841",
+  "LITUSDT": "9c8a2b138e08a45729c8ffabf871157334ffb606ec26f9ab459922d1211e340c",
+  "LLYBUSDT": "3a25ac88d484a6adc4b055a902994344a5eaabc9aac73e88fb5c5729fdfbfe45",
+  "LOKAUSDT": "67332c5133f39d34314ee472e6b37991cf120ddbb02cf6bca0930283baba126e",
+  "LOOMUSDT": "fc61a4745698bcfed4b9554dfd4afe997625dfeb78111bd606f8bbfea966dcd5",
+  "LPTUSDT": "2edc36b0e62737c3f3fb3b088afeb39257a84d8a678f40d051f840cb32aa37f8",
+  "LQTYUSDT": "c2cd11bde17502fa61c789e6a5dabebdc9aefaf6d2f01958a2351ee8cef84e4c",
+  "LRCUSDT": "9ffb6c7e3cc70a5f4032ce7e8eeee1aab8d0728ef91a81c7ab603fcf68b2c95d",
+  "LSKUSDT": "c413617462601c4f9d1ede2dca52f4c765a392f78bc6ba8c1c22a8a241f1e727",
+  "LTCUSDT": "1d4ccdc74e87ed17e0095f3efff14c32fface702a0f6e81c3274b9a9db31ab87",
+  "LTOUSDT": "81f34f7e973e08ad8fc61a8d1d62e7fcde3874f46eef78cc4f9127ba372d1db5",
+  "LUMIAUSDT": "6db311c12483209f6d1f658ee49b01aa1d5f30222b0595e11f560eaebf608162",
+  "LUNAUSDT": "7ff7bbf5d6c8d3ec6fe44e5913aa3667c88ab35e8c61ebabf4e3bf3eea2b546a",
+  "LUNCUSDT": "68ae406e88a467958c5d530cb8e88ff7de1f60f59f2e39d2ac4841afe22ef2ca",
+  "MAGICUSDT": "d23ed8c34baeaec8f73c52f1dcd4a3399c610054c62bb35de50464195d0c05cb",
+  "MANAUSDT": "9540d48a419c87f7385d735faa5cd89367a04739758543325b0ce2326de370e8",
+  "MANTAUSDT": "ed70b2fd61f59a0c13b12f7ef4febe3364e0516ec46262625cc9332f3e98fe24",
+  "MANTRAUSDT": "ddcafc3bd1363d9d2398eb6b631eb7e60767f21d47250b3dba2918749b5e4f62",
+  "MARSCOINUSDT": "7573d8c68c8ac49df0c3faa041e426a290f306c3654bf54a478c86fbeecfadd1",
+  "MASKUSDT": "40b4d6ec13cd1d193f1820f18626c905e9b26ebc21a3ddd921cc5f532a71025e",
+  "MATICUSDT": "da67af1f249a74a3272a2ae6e2c411ddb1bb56de50910ec4e0bd84722b30fefb",
+  "MAVUSDT": "bb8cfc0997f9c6e9d523eff7fe98c1e13808d1f49e70ecea8acd19de287173bc",
+  "MBLUSDT": "1ce0b26da5caa27a1fbd9cb89038c285309f48d944869eaca233521a44062fc9",
+  "MBOXUSDT": "c71dbd138595fcc0e5def567a6a232fdd762a92bd7eb738db22ff7b09d8a0bc3",
+  "MCOUSDT": "c28c13d95ec82030cf85427b39771326aff4bcb8b6ef482ecbae3b28c34363c8",
+  "MCUSDT": "fb2d5ba5540dd8406da86e15882632f2a27f7eaf2c0fc7562951019791d485b1",
+  "MDTUSDT": "1aab2ee51a4e81c09de8e5be652e785a76339361e32de0b73927301a4d76573f",
+  "MDXUSDT": "4e77ebaac65c394185f709dfc5b1965d18d9ab545f3b9277ed288512ba735978",
+  "MEGAUSDT": "702c005f217d7aacbaeb8c139adc330ca7a58ef172d16924ec44107228a39056",
+  "MEMEUSDT": "b528ba491d926e636599cadc1b829acf9d1f86b1d2d2fec31fec0615473dc4c3",
+  "METABUSDT": "5d398d6b3a68c648e85679ce82e5ea10455b935830d03be63ed84ec258e51afc",
+  "METISUSDT": "a4303f51f66327002a94113c0cee00f721d12d1a81dc29aaf255d9b20a80067c",
+  "METUSDT": "57ac56cb42720baef488fd4c69dc2cf29fbb333d75e41657f97d127f70d88a0f",
+  "MEUSDT": "c4c501e4734f6dcde939be0d905a20f4964cc1264cb9d2402256252fac1315bd",
+  "MFTUSDT": "f1e0fa63b481440e4b8681e0551b43a8704c08045ffe67201482876b39233a44",
+  "MINAUSDT": "e7fce67bc9e30827101eed6997c102679f23f79aa432f8000050f045bd2400ec",
+  "MIRAUSDT": "0a8aac1cf27284a86d33623b4530f7da3f46dbfbf58d7758d5cd000faaec3779",
+  "MIRUSDT": "c5efba0577500d0a59caf889ea0da3e438767de55fa1605705d704aaec1d3c1b",
+  "MITHUSDT": "5ddff620a253d0d48b8dba3a0f84275ffa1511f9e8e3aee55249d8262c551b87",
+  "MITOUSDT": "f2ab04ee9dfd2656615881491de05318c42f68168b69ef4a4d4f36ec910a2ef2",
+  "MKRUSDT": "b97cb09b2d39b8e3960e5b1163be4d9e721d6c42c0febac883a62375fce0160b",
+  "MLNUSDT": "2e44af2fcf8a478d77159ce6b3bca10af53b8110ca2a9db32cc9eea6c4b20e80",
+  "MMTUSDT": "d31a3bb151e8de9c1053db5218ff9a44427859d13057a712125d735e29811eb3",
+  "MOBUSDT": "a2e54b5c5106e5564617e584110fc42cd067f4c7fbc05d4729156c1a140c420d",
+  "MORPHOUSDT": "f7ecb8df1fff99e2868dd35c060c48bc4a85c9b3b12b146e091b03fc66afed5d",
+  "MOVEUSDT": "823b43aa28f898edd358cfd2e23153d354dee96a2638c84f43db1c48d7215b96",
+  "MOVRUSDT": "09c160919be3586bcbed4d20717438a2b0ba906e08e565092c759c71b2ff27b7",
+  "MRNABUSDT": "c6b425a080d593e71a29edd2cbc9c8cd04f417ae89e4dec201524b27f758449b",
+  "MRVLBUSDT": "c15b8fdf9a2c8372935f2d11157bb0534639f4b970347d74f66ed9191db52cc5",
+  "MSFTBUSDT": "6abfe6f6ce64e764f31fa407e050cf9821748e74d3f29642e5ec2f9b38a570d0",
+  "MSTRBUSDT": "954285bc7fd141272dd1d9c783f34bc3cbc5c7e6661f4c75302cb7d637d17640",
+  "MTLUSDT": "5275287bb16f6362d9d4bf3de783384d1852c928a26327c2f2231b4d6096feaf",
+  "MUBARAKUSDT": "4d812a99d9a04afd9f8aaee727f9d874044eab1a8e9155ca1937258a7b5d6c80",
+  "MUBUSDT": "6c73f1a1bbae08387767161bf9f3176c9ff7df941c2a01ef7e2851ce3080f188",
+  "MULTIUSDT": "69d39917f16bb05cf6c4279b72163c0631729b2f633c3b04474de413b729e471",
+  "MUUBUSDT": "00bef3f39eeb8bed418458de3cb33296a4ac31ca244cb6699ec12131be19bd47",
+  "MVLLBUSDT": "97dbf3807e60ae6909d17b6b37bdf64107609ed8c8957c4ad227f7dd820444e5",
+  "NANOUSDT": "9bc7743f26f5193f8f06415f37ee9983cd458d0a0ce58e39bdfd9a6548b7c5de",
+  "NBISBUSDT": "dd9d2ea91053cdfb7da60e16b72597d7a9cad47bcf54912bebc8b74b8811d958",
+  "NBSUSDT": "15ae0a5ed27c3d05adbb548c45bb6f7647ff88e8c7ead8efbffe7a28ca2312ab",
+  "NEARUSDT": "4fe1a07f79e40fd255a58b29092dc8bc1d232e42e963aeac66218103a650ecc8",
+  "NEBLUSDT": "93bc600a08a532facb7c0f349f0db38d0355f286db29c917e4380839a30f4496",
+  "NEIROUSDT": "33ef1a7cb04749bfde93250518567eadcf004ddb41367ae95c22fb4ac9fd634a",
+  "NEOUSDT": "90a4bd47687e9b090aef741d362e8809c5b5e798909e8ef61704c4834dfa2c16",
+  "NEWTUSDT": "317063b745f92258e6888cc16a5dc96c72c446cc4a2842418bb312b5ba9978bd",
+  "NEXOUSDT": "e2d474901a4a0592a17d85f45fab05c11476796fc72dcbf64c3c755f9a3918a0",
+  "NFLXBUSDT": "fdc3a7bc94e674cd4632547b17a47d57aa2e1fdc206e6f8506607dc091e6488c",
+  "NFPUSDT": "3dfcca4e9a3c896127ad594ce1666a6faf7474eeb3c88c4cb60a9030d88546f7",
+  "NIGHTUSDT": "58373f22b4fcbaf1c43d95da5ff5bc075b7485c0500658d3cb4ee2455fb9f1d8",
+  "NILUSDT": "4798d61104832691c1ee01ee38d3a0fd6031087dab328b16789e79a6547fefd6",
+  "NKNUSDT": "4990687b45cd3a5300ecc6acbb3b1c96cbb27aa9341e77f2600e63cf45794aad",
+  "NMRUSDT": "6e03a8938bfa2eb1fb153e8d0b1b4981a329a27c6371a7b9dbd5ec26e477d467",
+  "NOKBUSDT": "8d4cf5c8674ce8ca07b083d127306454d79a1fb1adca3910fad2a0d78f7aa0b9",
+  "NOMUSDT": "6523bef72beafbd1c57b3fb187bb1f7f8f1188beac41b4e3619f6a913256ec13",
+  "NOTUSDT": "b555891fed29b4708c370ec43a2b6e824e9178ae97f63cc0266d8f0928cad156",
+  "NPXSUSDT": "7e99f246554de01d9e7a5e68e9bf25c4e975c9ccf891b5e9bac70c699d2fde35",
+  "NTRNUSDT": "a58d0f6310f2f91bfa4a21bcea5e0c4d3dad863d001502b02377705d7a30942a",
+  "NULSUSDT": "ac44b7ff036726243b7cf4d2eb0db4774f5a6d4cf356ebc216ae9bdc4cb0b4ea",
+  "NUUSDT": "0a7c9e30d8dffde755bfa8ab2bc2beceda48fe417dac53d0dac26ab7fae35e1e",
+  "NVDABUSDT": "eee369778bb7a6e89e15301bdd51abd2fe9c58217e50aa453cba4a3ce32e07c6",
+  "NXPCUSDT": "e66950ec544336607641887498ae997215ba78e1cef0130e0cc1ac8952ae3478",
+  "OAXUSDT": "c9b97371503377c44d87cfb3bdc07c1040611e5c6a4d966ffcb850358925c7fd",
+  "OCEANUSDT": "1758160677e4ea87992179afe92b7490c5cb54ea38c9fd9c010687c17387580b",
+  "OGNUSDT": "74891e3bac5ab6000229731d357bca2e68c5a68e71331f8334bf968c7a127d55",
+  "OGUSDT": "ccab1cb55cdaf7517fb3ce903e709870ae08f50f03163ba2fdb585ba14e5c665",
+  "OMGUSDT": "73e0441b6181ba1eee386afc85434a66fa433623fc07736219599f1103f90402",
+  "OMNIUSDT": "eb68a364c3445d4fa84977a5d9defd747db68959b420a7d03757e4ebfcee8281",
+  "OMUSDT": "ba1533fa5f220a57b6d01aa019c211d4be4cafd7996d5756fd257176dd4e4117",
+  "ONDOUSDT": "5d32f1bf0f9c82367833aab1348bafdf030c68c3deba44dd80766acf3f27623a",
+  "ONEUSDT": "f9831975baeaf478244c0502afbae5d859f2a2ed63c86e9927f6f862015571b7",
+  "ONGUSDT": "e15d701d827dac5e4bbc140365d4f6d30d447edd491f45c99e885d5e19ed23af",
+  "ONTUSDT": "e44dfa99f4eb0ccd04a7a5a4e7ca6a9514c656f0a54f9e09735c3c5c60756b83",
+  "OOKIUSDT": "14acf0d55659daf38f04cf91029cc0ff2edf3000cb3c188169b4b84bcabb42ed",
+  "OPENUSDT": "641795391bc0d0e6a9b2d0e4e0fb21d84f82a3a2ebc0f4e04b8e22614504622b",
+  "OPGUSDT": "a3ed1de65894e14f3b2d962cff2f951e3a28da6a9121d899c98393bc3b72eb6a",
+  "OPNUSDT": "6fe401cc15ae07e820008cdb942f6a245f67f17a311d15627ea5621ca89ba25d",
+  "OPUSDT": "ff272cf6a7007ff23967159b16b7abec103ffa1df7850dde1f4a28acab791429",
+  "ORCAUSDT": "c3c096a4213ee3d4bea196c2ba611a6e867c6c9d940fc4e5ffe70005812b124e",
+  "ORCLBUSDT": "f7c0798c063fa4034e34275ad1b1930c1a588441e482d8d9b3fabaee8fcf3618",
+  "ORDIUSDT": "5afb68359f0458dfcbcabda5eff5e88dc25dcb0371a72d9b11f3cee83eb74119",
+  "ORNUSDT": "26f08630b7054ad1ce67c7cd6fda39eb29b74cf3f90d4be9a7ee149f2644c412",
+  "OSMOUSDT": "76665ff833a6f76db3e113625e0a2d08f7265f4ea4c29b9435c95f553cf146b6",
+  "OXTUSDT": "91853dbda694cc4a29797b73ee6ed1751b73fbe806d1aebbf7b6c05315c9b2c3",
+  "PARTIUSDT": "9545a66eb3bbe43ba4cda5a5ca8901907cf39276e89fef0e60c8d3c77d04062c",
+  "PAXGUSDT": "9077357f0f67725c5a5aa92f806abf9f2d0bc338436e7bd9f8fdf0aee9435507",
+  "PAXUSDT": "4032d9cc7b6bccf7ed6e309b6f4ba810cbd251c454163d57100cd439f8b1c8b3",
+  "PDAUSDT": "403fed9c0ee451dd4ba407096c384dec3d008ca88ae7062795d06af3d3847e58",
+  "PDDBUSDT": "1cd7064201f39f503cbbbe147f4edcd0ec1a71e726ab1b0f14500f86065b784b",
+  "PENDLEUSDT": "8b45295ee70df068baff034aec4d5afda99a00203f6dc4a4d35ceeb0413771ce",
+  "PENGUUSDT": "0f25e93436ad88f014bca1c5d1c29254257fb4f6982fbf8950b13ebe35c25f50",
+  "PEOPLEUSDT": "ff2a424ee969045aa4b01f4d864df99140e376c4fceb8ec25b028c1dc30f4e1c",
+  "PEPEUSDT": "4f10f069cfc713bb3232fb4f42f189c4ad7ffcd0c2805bb90b0777c0123c2fc9",
+  "PERLUSDT": "24a698237d35983554d0ccb3e195288b9b8c53130a17d990924c30c8d93e3d6e",
+  "PERPUSDT": "487ee037408dc277572001a2f55ec84c06d86ec33736501d43e79b1d05ae162e",
+  "PHAUSDT": "4385f4050f175bb89e64e7fcc71c52229dea0fd9d17c69847d1f28f448809846",
+  "PHBUSDT": "e274c977f83e7eec1313b6bf7f228c5df4cb31a125deafba4c8354fbbb38bed2",
+  "PIVXUSDT": "ef27e54681f6b815616366dc9c16012f6ad401a08380b03b8609dbe6113b0555",
+  "PIXELUSDT": "872b0720cc81b27315c38babf7c5a3734c626088279298c287b8e9faac10090c",
+  "PLAUSDT": "2d6c112467b7db0c92643e0e7faf7730fe7665cf772642be9ddf5e5b90ff4cae",
+  "PLTRBUSDT": "fb99624e7efc7f952ac6eea3f1d6c24df93d7f6133e998b21aa9551715520947",
+  "PLUMEUSDT": "82d7e177a5af9db98c27ea8d6029fc8c0bea8bf9d952e00a8b22d2c77efd8de3",
+  "PNTUSDT": "91849625bb21205753774a939f11d08d35e207d71729eca538c3e06318d69bf8",
+  "PNUTUSDT": "6b8cf9b42f7c1344aac213cc34607534ba5444f0ccec272a4914f5bb4077a2f8",
+  "POLSUSDT": "8fa4745532848885e0094807d7f1192ea9ac1591285da65415b599250375c30e",
+  "POLUSDT": "021db5d698daa21440ef7ebeb7b716687d6f5f599f2396303a2cc019169534a4",
+  "POLYUSDT": "57026a236495201479ce7f4a52250ff5eecc873c8bd3a544d6c45b16b8f60ebf",
+  "POLYXUSDT": "88a4a632a59d005ede13124789de076fd341f06d4134691960d9d74e3a647f03",
+  "PONDUSDT": "70595d932efda9e82bf09328df1f841b057474a68052fd40a64d130c679f1c99",
+  "PORTALUSDT": "97670da62ad1727d7808ac749d63878217644c8a9a615207f56dd3547064bde7",
+  "PORTOUSDT": "841348742d15499fc60127df69b185668dc8d70b8b4363c30327862bb4dcff2b",
+  "POWRUSDT": "96a3440a60c08d7643e0b56a8f4aef7729e47e5f13ab2613b2f6210795363d08",
+  "PROMUSDT": "d703788a1f06885bf3a0fe5744f45d4a97c730995a8c672cd07ce631df173635",
+  "PROSUSDT": "fd842edc646bdab5c4d13da96dffff492453188d85ad7c08b3dfd22483437c42",
+  "PROVEUSDT": "5a0f65fa37e7e4059951666cbd4058b58a86d987b19808812093457d2d2cd906",
+  "PSGUSDT": "41efd5ea828b015375e3162788e517177f1907625835a68b9125ea63673813c4",
+  "PUMPUSDT": "591a1fa51ea7fd84d25f9dd5c50e86297fb2914a275aa85a2f0b9d10ecabe50a",
+  "PUNDIXUSDT": "cae73b8e8fe2aa235640438eda0360e056d98953f0991960f423604446cd4228",
+  "PYPLBUSDT": "060ca500050c5ea64e310fb71234234b195d1ea682375184ffd9be6518f23071",
+  "PYRUSDT": "8a26a690e3d6f0e07e87b32821636fc5f9766c52bcb8bf552e059f532881ebfb",
+  "PYTHUSDT": "472900ae6e23289e1089adbb9072f567782c6c4bd32cb093d618f12e69d8f159",
+  "QCOMBUSDT": "4bcc303ff3a0fa5328e013c44bbf7aaf18d352343af9520a0ea26967cfc88156",
+  "QIUSDT": "9389c95c6a33e7e0053260b08729ff6979826a063c8aba55add2b532fa717ed3",
+  "QKCUSDT": "92470180e7499d2801ee5855c04d8c4c1a7291467ff79db0c605f16eb8499ba8",
+  "QNTBUSDT": "7e72230e1c30ed6ae2037ec538d4bd0f976c6d64b11bc5d25557066c00870015",
+  "QNTUSDT": "d1f2b716502bf4bdc0ea46736c5404edffbafc9dc13a658d369a312478333866",
+  "QQQBUSDT": "ca3fbaa4aa68b94643567fa93bd4c1ea09a4cfa0d67bfdf68906e4b2d95b4d2a",
+  "QTUMUSDT": "cd898687ebeff1b3c43ff02355e9e3a1f1287d9d1145f0d5a27a0a8b53121698",
+  "QUICKUSDT": "9c6bc7c77f7c0c8ca91e7aa5ce627a9b195d65aaaebab45340db1566f0d53fa6",
+  "RADUSDT": "5e85f09bac21c60b23bf3b05295dd1c1e781c82c3f519dbbea4a50e095491eda",
+  "RAMPUSDT": "ac1bf70eb0dfeeeb85279ad54d87e70dd22d555c7ed68ff1b71855185215de47",
+  "RAREUSDT": "b6a189b006002bc3a325baa05b067352e35d67b5a342095f97e5846cc996e26d",
+  "RAYUSDT": "5b3a0bc2623a2f97649d936f3a6cdfbe30cce6b118d44e818783fd5a967d3b99",
+  "RDDTBUSDT": "eb3e0c52920040132542ce1e10f04f9a9280511d484bf666996f28ab7e9af835",
+  "RDNTUSDT": "717a58b5a0eb71e30e48c09050699102306f6ae3161238fd1e03390fffd0ec97",
+  "REDUSDT": "df83c40299d40fdab9aa6115d4954bac14532f024bed5a94eae77c82fe29f2fb",
+  "REEFUSDT": "0b9bacbbe04c5443c34117f6d9bd4beaa1dd916262f866cc71f364a1c86712b7",
+  "REIUSDT": "c03c27c8cbe819e860a578824c925f5f2e0ee024b4729089ddf785265286760a",
+  "RENDERUSDT": "48dfadd780735cf9885b76133c2892f89b68854b241b5873c8b2cf8d07e1c879",
+  "RENUSDT": "c0861fa937bb204a9f10292010ad1c0cce3840b3d794c552f0c87103a783898c",
+  "REPUSDT": "f2c8d5b1d26495de9f77485ccc6d4b4fbed5c7ef7c45a383484eec964404d74c",
+  "REQUSDT": "f990c23d722191d931033b51c5f96ba45feecde4eee885daf71e3d0346300242",
+  "RESOLVUSDT": "eb64cf7b6c44f30cff71094575a03414a4f70d533a32f70d9082885de5333bdb",
+  "REUSDT": "5ef48fb33cdb91d75e33c26960d842f028684783225f5d1b2bef0b69915ac939",
+  "REZUSDT": "feff8d842c280c64f81011a5e6ebf75fdcbedb87a13aa6e317b6734eb6b320f9",
+  "RGTUSDT": "9c6015ce483aa6cd8cc1fad8be08c8fc2894f0a5bf3d2a2a57d946173a7614ec",
+  "RIFUSDT": "634d304987d272ad3b23d5db1c1cfbec208a506f2feef9cf7318eee01054e738",
+  "RKLBBUSDT": "2351aa48e93644835323c18ba2669428d9dcecc2e3a5204bb9f607516f9c2725",
+  "RLCUSDT": "fe1ad8ed64185acccf797fbb370ccac36a50472940c196719cd7ac364cfa1ff1",
+  "RLUSDUSDT": "b6b8826977d9f3891c0f38454416223a3d1dc5aba49379ed96964fd7fcefa459",
+  "RNDRUSDT": "1a0fe7e08b36a5a3ab98201a9adcf1c4af8c3b7603f2f0ed84ad4824cc1a0fc2",
+  "ROBOUSDT": "5b9f9dbb9998cdf11d60f86bb257dd47e8eb9749d39827880db1e8bfd18ed02d",
+  "RONINUSDT": "5d8eef15420414466a0f57e8d00f77ad1657cc8316419066b1b488ccb49fe588",
+  "ROSEUSDT": "12f7fa410e41300a9f07105070a2bf680a7b511834a9d0688548a1e5af023473",
+  "RPLUSDT": "45fc554da3069fc9aee8ef21cc87e4f0f540dfe1c7d8ca46c0c984c624eaf759",
+  "RSRUSDT": "452d5553f1ccb31453e22856a6a0ad7db88f289f220fadeb3c5b2042a68e9feb",
+  "RUNEUSDT": "f3db039fc7a95cb375ef6239928c01d5b225c6288f29ea322c578251c3ffa154",
+  "RVNUSDT": "b7fa4431917455ea1433ce61af10ffa427129467c8e574a6f941c4e00a81eaad",
+  "SAGAUSDT": "d0ea17dbef5b5cb260c559078900a9949225b80b4779dbb898a2de369da4ce54",
+  "SAHARAUSDT": "9a4edbff6002de4303e1cd15064d784ac9a3088a7f947e50b3ed42ac7a4a68fd",
+  "SANDUSDT": "c284cf6913d10b0571592ed6a2882f0f6aae8c9d22fd3d9b6d42e6878dd1f405",
+  "SANTOSUSDT": "4b5656985adfaad63780fc4857054dc8894b6b0f6ecd04a162fc60d7c8668556",
+  "SAPIENUSDT": "db6fc934f88032b7148e34893ba674768869d890030a7679750dfa1cbd889717",
+  "SCRTUSDT": "f352ef98ba2b19ae2d5792c3242a6647b726de490371f6e3b57df0d69c8caa6a",
+  "SCRUSDT": "b38d7e1c9d6905b925214104b09a660894d5e91d66c418914808ead2daa184dd",
+  "SCUSDT": "1bf0a9bf1f044c194d8e61133d39bb41415be7d72f6ab93243c77aa2ae74491e",
+  "SECZBUSDT": "a441da89d27f639c11a5293c009285df638bb13558db434ac63c58236d0e0fb1",
+  "SEIUSDT": "9333ccae94adad6967252de8445e35fd33f2fa85728bbc87741860233b848624",
+  "SENTUSDT": "c8b88c2ee28a7b17ebf2e84a2e248b9a9270a6769b5f54f6849d81c903cfed08",
+  "SFPUSDT": "be63e93608347343620b68daa58f2ee6ec446b55ab518141f88bd07fbb680baa",
+  "SHAZBUSDT": "4eba3175bb77f5a1dcfa118e7c02005519afd7ed671e39b2913a147839a6490c",
+  "SHELLUSDT": "eec24855d68e602e3812035de514ccd00cc1a821cd133deb48992a31100c78d0",
+  "SHIBUSDT": "81b27cdf6a44136325f4534cebbfc9a230cbea36fe36d9ec80161cf319281edb",
+  "SIGNUSDT": "b4f6c5ff88e7302910737b04197f95a02a4a34b3738e6176fb9f9edeb525ec98",
+  "SKHYBUSDT": "959774ae2e22fec1fb96c86b5fa89ec5f6a4c83b74432e0250c37936d6d96c83",
+  "SKLUSDT": "c6818eee0f0e5e9f55b680d8a082856190042282c15e351bc5a88edd08d8adb0",
+  "SKYUSDT": "8119d03b096ca3734d867e62f2ed19073e6619c0ff412688091bf92caad92868",
+  "SLFUSDT": "3e0a1f3b966097c97c62c5252065062677c5aa20b76ab17f078c6ad1a9703747",
+  "SLPUSDT": "b884b047d10417fa9dfde7264388f3e8f4fe7261b0fd4ac77ef71aa992918b66",
+  "SMCIBUSDT": "d9d904202f5206155265847bd420211c6d353ec3ae7584c416bf366e9700ce24",
+  "SMHBUSDT": "0a7f2ced9194cc8e3d9b6320cfbf3e5f62b294c2cd06ed140563cd5ef8dd40c9",
+  "SNDKBUSDT": "b2ed38f2e281c1b522fb0379da7d1ec73d852d14a0384646fc12c2d68fc84ec4",
+  "SNTUSDT": "c83f53870eb279af14589726b65f7083108f335d1b36b3bc2e4f033ad0e47ad8",
+  "SNXUSDT": "77e7fb7e77481e4b743ebcf2954a44254547a2d9ad6061fa1a4c6ac0353120ac",
+  "SNXXBUSDT": "5488b46fe5d0eeef8f35ddec760132586a20b24463c0ef1605e061b571c087b4",
+  "SOLUSDT": "7181806e8bb850a10b2ea9ea8707aa031b489dda639045e139449577e189dfbd",
+  "SOLVUSDT": "0c7dbfbaa92844f82a9b64e53f2a306c6fa1009da2ce8e40a885f115fddf0db2",
+  "SOMIUSDT": "b3699990423289f04a27c551810caaa38e037f513b92650655d7aa121fe7351f",
+  "SOPHUSDT": "57120a0ca1e13978d5f28179452f3371be3a57237f6f255bb734a2fc2429c787",
+  "SOXLBUSDT": "89a42a6692f0dd2db39b30ef84f7c91b1051cc9bdd3f1d6332c1f0306eb568f5",
+  "SOXSBUSDT": "1849d1de7216a3255298096a0dae4fa1a20210533cc679ce0d921ffb2ae71fee",
+  "SPCXBUSDT": "af5650bf788851dc74e1236e1b71334a075d122ae20d8a365e6c28c946119113",
+  "SPELLUSDT": "b6dd07294f0b601e2b3022d62d75f0256e2e8d3406737755accfda8623ee8b5a",
+  "SPKUSDT": "506c8fab11053a83a8aaa777c3f8067f7ce0bc0b09e5259d9317c7dac9e5faec",
+  "SPYBUSDT": "c80a8792f7df0b313a467f9d9f848885ccd8ddafa87bf50c438272aec2f44ce4",
+  "SQQQBUSDT": "6d5f5a33ed1c4e4f36ee5c202721fa60fa339462927f7e3bde5c15e5b65284bf",
+  "SRMUSDT": "9f1e2a30044922627a67cee585f644fef09d2c6b95b7f50e8d66d348132526e3",
+  "SSVUSDT": "918f5593e9f6ca0e9331571e7396d1b47498ea8d9424bc388763fa5455495113",
+  "STEEMUSDT": "0ef6802dc8c3828e8e65c71e102c9adedc3f3b52e937d10b517ab0ab768d5d80",
+  "STGUSDT": "4cef8a86b32a6d6ac30f9b368e3edf0f94ad0bd056ca871e252e3e6282e23059",
+  "STMXUSDT": "2a8ac48e6cefa50ef2453e546cd6c8eeb50eea93c808691c475fc0c16814b60d",
+  "STORJUSDT": "742f84f5c0611568752124c66eca5e2c70eb76ee9a99e481874ae083e2aedb9e",
+  "STORMUSDT": "7e2ca2acae1200017f1e79310d663ec040c3e69b53c6350333e11664aba02e93",
+  "STOUSDT": "d62a7a50e62820dbeb5678c5788918bbce474f0597a39cf02a42851e8de53cd8",
+  "STPTUSDT": "c7d7657f693548bdbd24769689d2da9ac87a9aba5ee5fce10405f120a172496b",
+  "STRATUSDT": "2f192efc9ff1b94b9d7d3f04332d658ba8b236bc7be896945602f2fa0883a94d",
+  "STRAXUSDT": "e1aee6996d237d1eca23c0ad8640c683e47c4997b03a7ef9cf775c5589688c21",
+  "STRKUSDT": "9271d427a0f6462797dba7e1ec45af9c74ec797e8ef3d9eceaadd7775cac6c8b",
+  "STXBUSDT": "70d52cfaf133a5338f411b444bc809e5b265fb13deec4ad23a4df9d1ec79c760",
+  "STXUSDT": "5f5e83fd4e0b767af7f33e4e310cb9cf68a4d5b874534c9b4077b2a55c0b1970",
+  "SUIUSDT": "19032b8b748180b818bf73b959dcaa697d77d2ddb204453288ed19191ccb73fc",
+  "SUNUSDT": "d383b4d9bf32c897395e55df4cb7c417b53da30ff288935219d36eb96ec7a7be",
+  "SUPERUSDT": "027d6800e8874765f7eb177484a76f7f99e55803e3bd12529392249f6f1f3182",
+  "SUSDT": "753ad66b2eea4bee500dd64858123dcd08bf4cea39af51309428a4720c57549c",
+  "SUSDUSDT": "8087b72a7d1d637d6c98436fbda610c403984248987ccfd0dcd6fffae5ca6e8e",
+  "SUSHIUSDT": "2e279acd4905d41d4c569344e43ee8fd360ea37c0b7baed3333a1f6ffca86b7b",
+  "SXPUSDT": "f64b4a141947edc01b79545f74f730073256eb127838d1df517ba9eb1eaa3a45",
+  "SXTUSDT": "fb503c31ee5997b0995435f31c6373074390c4376470ec43284261ca8f948cba",
+  "SYNUSDT": "66724b47ace110a12fa26be298b5ecacb0ba59022e1c6f7e09adc02775a637f4",
+  "SYRUPUSDT": "07e80a94ddb7975f66836b5d7fa9a5d2ce9d77654651af739486d3e422aa847f",
+  "SYSUSDT": "b7c837fbc15f19f39d295014b52892fc17f6afb9df010caf1e80dc2334391378",
+  "TAOUSDT": "86543bec148d1f3f2c2ca4fdb5dbfe640869aaa89fb190daf854443e418ebf4c",
+  "TCTUSDT": "3880eac936c27cbe3ca53fa7ec5fe31f5c7025b93ebe3d6edc9a19b1d6354e12",
+  "TFUELUSDT": "ad0d08f39a3712645cdbc1b191acb36113ad4b22f0119b3d51f34ed1a684d629",
+  "THETAUSDT": "da31f64f95bbcf0200535d501c635dcc8672db625e0bd4870b1656365666fbed",
+  "THEUSDT": "5067a3bf2bdb8952ce34b488a338d652ce595704894011656b2b32bc95276f96",
+  "TIAUSDT": "b8fd8b1610637321e3f2a2efed7474b40adb13756d410dee13aa4c65ff8acad8",
+  "TKOUSDT": "bd4e5827c3d17eecd19a2b1c2aec82680dd5cc5b2606492d4a82d89aa58793a7",
+  "TLMUSDT": "4e842ed3b7146dc159be4ee86a65ce3acc427f6bb63c10c5964dfb9088d7066e",
+  "TNSRUSDT": "c515907cf06e571b229bde97858b28cdafb3da388ec2d5390f8c11715519901d",
+  "TOMOUSDT": "fdbad5192d53860ce914dc1f4b81c8404be4435aea308fce1fc3b5ff0bf8658f",
+  "TONUSDT": "1357f793f45b537c9cedb55d7516d95b1a9035454ad492ffa6e757e8751e3bb8",
+  "TORNUSDT": "13379918448d4ed1cb8d9f23f9799d347b2ae5116a8935883e2415ec4447df2d",
+  "TOWNSUSDT": "a4e6da95109df4900b1fecf64abb84264917cce23448f26580592bd57ac23111",
+  "TQQQBUSDT": "1fd09e4fd214cdaa2b58c4ae2b9a82af7b8c21d0c04011c4fd84f0cc6fe9734b",
+  "TRBUSDT": "df6836a120583cb739ea0498bb3606adda1ab83bd64c33221343ef50d68f4e28",
+  "TREEUSDT": "af400aafe124956598776540397a1d31f105756bb00bacc96714593bf52ff988",
+  "TRIBEUSDT": "8dda1532b14d242ff846a958cad8e32ad6a4549a3d544055258c45b753826f59",
+  "TROYUSDT": "487485ece52a086e2bf69652258ac9bb556dacd5ea9d02cac5ee4e1e175f2e41",
+  "TRUMPUSDT": "c63e788dedfe538aa3483866fce8d2710512e60cdabe01e38b01d9aee59a9408",
+  "TRUUSDT": "3ace57b46569f57b841ff388c9d1fb4befbe50509c1177681d7235f3517cc619",
+  "TRXUSDT": "97ccea46e600d145f117275db2119107dd93834831a98db3356961765430043d",
+  "TSLABUSDT": "31c58141012d3e0841cfcd0e78f9eb92f1f76710ffe550d0bfbe3ab8af2b35dc",
+  "TSMBUSDT": "fbc6f2206daad6d9e90c9f40c783c3b2ac7bc40982ee122cdcff695abcaa06c6",
+  "TSTUSDT": "22a22c0ee81c6b19e5d8060a1820aebe140e1058ee07c9ded7c341386b987a25",
+  "TURBOUSDT": "232364e1dca17f7bf7b67b377df75659fc03085e615e65dc3f625f1231789d1d",
+  "TURTLEUSDT": "2a1eb023455c874ee701761c7c451f7dcd681a3278de3469fe377e4ce178df66",
+  "TUSDT": "a81c271be1406cb618105b7310a37984a554838718ce3c39d386f24c9b8d2ae2",
+  "TUSDUSDT": "aa0f65175405ce0542142aa9e49a564055e9174cda8831815f72776090df4bc0",
+  "TUTUSDT": "0c614a993040adee72da510659aad0a21ac20aa17d84a60843c24a4e6b8957af",
+  "TVKUSDT": "ef1bc727bc9c458ef480bf52ce2cb21f4884a5ec5356b80a4e5bea8e417d9ea0",
+  "TWTUSDT": "2128dc113d1ac717f712fb6c7413a8f00cd770dae1bd9acaff693438698174e1",
+  "UFTUSDT": "77336ee0c0b9728fa7063fa05d86d236a060401d742210ef65d0f3e402423be1",
+  "UMAUSDT": "1be97f2139a5e0c825c73d759d8dabc72dae356860516affcc362caa6376fb72",
+  "UNFIUSDT": "6ba6e0812ab4fe38f259f841f3394411b243ad3a4912819460a79c2eb6b7f0c9",
+  "UNIUSDT": "40666b147e7e57177ae658484be5936d4511ac17c8420fc67626843d36f04f43",
+  "USARBUSDT": "c493c1b7bdd699356cd3effde4d981197021cb8857cf9ac19a41027ddfe5cb36",
+  "USD1USDT": "c3a9dd29ddab33515a1a4f163e695fae80e119b4f28d6989351dd5d38c1d5bd4",
+  "USDCUSDT": "0b0f002850ecc4abfc3c1c7931c3a123ab722ab65d053452e7130d6cc9236b6c",
+  "USDEBUSDT": "88c0d2cba20263cb8040683907ff3537b63e99358d174103d9b1e8a4877131cc",
+  "USDEUSDT": "78e8907205ad40610052730bd0f2856af8d172a52f357eb39c949b0e495f18e5",
+  "USDPUSDT": "42ba8dccd30ae05c38eca3a99f25e2431d01dfa16fa7e41aab4a0d622cea6511",
+  "USDSBUSDT": "105e968642dbfe178018ffa72481c8ec1b704bc873602d2c760ecaf178b2dd3b",
+  "USDSOLDUSDT": "c55bc25196c343ba023c600bb1f118f0a9dbe79e1278c80ad0a93915b74b804d",
+  "USDSUSDT": "d1268aa31c2ec67737f2c659d02d21c5c4cbcb5bdb30f61f6cd6a0064783d2b3",
+  "USTCUSDT": "1df2334ccb21d8d6974696cad1942f37b87033c72b015c78169889c81ddffc4e",
+  "USTUSDT": "ccdb67d0d7c8e15a9feadb186a8ab1546f957af2b43effa489d2d91d788d99fe",
+  "USUALUSDT": "574724a71268eeb9efa2f41e3e82e0c0e998150c624e450f1b2e65179119d340",
+  "UTKUSDT": "c1006f57fa4788ca763973f3dd7c5bbf3d41b328b8eab00ea8e4f09789c30414",
+  "UUSDT": "d43e6732197dd78dc5f3d06e866ec9b4d498cc027d9b983d412f50013032dd35",
+  "VANAUSDT": "1bd579aaed289b1ec9d829f3317d995ac7863f5b05e74b956cc56095738f23c3",
+  "VANRYUSDT": "5d6f9af949fce4353e31208ff1ce49a313741791221657173266abbf034ecf1d",
+  "VELODROMEUSDT": "f9fd002adad18d638e91f4c875efcd9b078fb2480ceca58afdf60df1c2e97045",
+  "VENUSDT": "6d0cdfce4157569e77a7923671f97cf59bc089a2f57b6539ce007c837e1975ca",
+  "VETUSDT": "17adc6eca005bf8015edcdd9d8c18be8f45b0633baba051afc3836dae3b93e0d",
+  "VGXUSDT": "a546b425985c5d3e6deac3f8c62e615c72eefaf23abcccd0c6b2c51f0355c49d",
+  "VIBUSDT": "1fc272a26de2c44ce84ca89135b34b5aa119e0852b25dbc28d3d6f39d6231a47",
+  "VICUSDT": "a453c5a0c1ad985441f564c570c7b1051dc601ddb7b9e952b1f99ec9d0cae553",
+  "VIDTUSDT": "38a4b35d2b1ba784ada3ec83d91c4629be9a5cb317ea4ab1904ac176af0e3406",
+  "VIRTUALUSDT": "3c67e46b04e7362b056fcc12fc7e608344b45be1a1d2fdeafca894a950e53b57",
+  "VITEUSDT": "c5beac415aa1827add097c0235c807e6d116e490c645c3bef90710820ea40c49",
+  "VOXELUSDT": "be02479fee51ffdb9016d05fbe97ec007e6df692d3aa6ee2eedfc65ce50462ad",
+  "VTHOUSDT": "f7b33c43f8355a7dfc1db333bba60a47abde9e46956c75062126e8f613b02598",
+  "WALUSDT": "f888182dfc56d53fc108abcfc405e67bd3b7359316aba1ec5f5a4c9658636372",
+  "WANUSDT": "598ddc3e3a496b7e5bea7c5cd24890b032755b0c6eb112ce41d888a07952f656",
+  "WAVESUSDT": "e6fa65e9fdcb20566248f73c0bdcd1d5f3c42a1f1d18e140b3a0b120e3ad0976",
+  "WAXPUSDT": "ae8c144e1f8452b6cfa637d872d5660276bac5e6fbc46756920e4cef079fe633",
+  "WBETHUSDT": "44e2bb2473321fe9b3068410ea5f8da8cbb0ec25df776f4fcc7406e7db03bebc",
+  "WBTCUSDT": "e23c03ebf834daf0a6f88a391fdfa264deab8b497c701650e8a9c5610ec6a0d9",
+  "WCTUSDT": "8aa78905cd05417561e2425c431af32e45f5e455e3dbed6e0f532fc0b8ae1cda",
+  "WDCBUSDT": "0c32fb198a49b0cf4f47e43d46e2e8d3676cd4e7e06d10118de741d092043cc4",
+  "WENBUSDT": "b4bbda96617142a0011324ee3addd4d8230512a986af3a928dc76ab116312560",
+  "WIFUSDT": "2a8a4bfa4f25cd4ace845786acd361096733645696320b653d6995a697a59023",
+  "WINGUSDT": "34e723b1f44f907e665528fade861426f1704ffb6d4e65a1aafcbc98a3e12b34",
+  "WINUSDT": "e40a0ee407e9940553006780e29d8c37e8cadd04bd23b4f643d4401bbb9e61f4",
+  "WLDUSDT": "de7788f0a150e13cde5db60f24416f1baee0db583b01be6465f6b4a23a7ec8fd",
+  "WLFIUSDT": "9c98a2de72c668a266341b45e9da19ff7543e465a5245996af9ce92b9c9bd06e",
+  "WNXMUSDT": "86f1ed5eff1e5f98d7ecdb2bfa625098d6b6a4a45abb98456fabf86ff93ee2a7",
+  "WOOUSDT": "3418cb8344f0b886a261d48055d86346ad3289e585b62fdbbcbda513937dfc37",
+  "WRXUSDT": "85b93a1c44c4078f2ac847c06ee05241ba91f46e6a06fab571939328291045b3",
+  "WTCUSDT": "e52e62f9f3a0d6b1b6ff32f495e98e0e64ac2a8db009a3d2e187c2486b3b7bcb",
+  "WUSDT": "7fe48b0c1fc0e7141a2094fc05b71d1ab335f3cdca809a059bd2b3c57b83b239",
+  "XAIUSDT": "2485d7e6b63df4c9bfeb9265e3c798c4656ca2755cf1b0c0d744676f0f4836b9",
+  "XAUTUSDT": "4c52efd2cef5ea369a78b7f006965bbe9d0b2cb12a264ba1506996171a0624df",
+  "XECUSDT": "4e777f1575bc4154edb79182e1145ac649c3936de04986c0da89fae2aee961a1",
+  "XEMUSDT": "8f2e91f408ecfc44098a77c8117e71b90f94c64a67b62348c8973aa69e3867ea",
+  "XLMUSDT": "b2eb8ec30d8e5a269b28fc5ff64b7f1760a96f08a534cbc2388cac8b78583b0e",
+  "XMRUSDT": "b7a3c20e15d4fed559f38cc0f949e4a7b7ca29ee3132ce37d4a487c0c29ac346",
+  "XNOUSDT": "90d6993f4b1b5bee96c7f54f9a8f3bf3661a77677d8265680e715078c4174008",
+  "XPLUSDT": "6d7bd01a9b4abd7c848aba78ce5f4076b9c2cf093bd9078a42e1afce0f04e847",
+  "XRPUSDT": "58ac320ede0f6b56e883ebe2fc0fd48e9760b467c9c66d2894f0b306dfb5e011",
+  "XTZUSDT": "4e01f8e6e3015473f842a64e61d67a0d9c7c9c2b0e8b781289849d1b04c88343",
+  "XUSDUSDT": "6d4e210e8aa845e0fb90f64393b44676a9529f084b961a85f8c1910d0f84cdc7",
+  "XVGUSDT": "2db7b60f9e8ed3fc1b60397e968b301e3cdc6c31c9c0c2071d03b58c02d2c97f",
+  "XVSUSDT": "12d4b1e054fdc2f18a302f40c0501f11d33195e16043f7f821d06044bb2ce780",
+  "XZCUSDT": "93a17e207177c8fe2fc181f0fd2b55a2b309d409cf6f7fb7b1765dd77856858b",
+  "YBUSDT": "37f7351a58c0d99102287b65d70f09342260b36162087c10eb9bff5a2b8465ca",
+  "YFIIUSDT": "e0f0d34f81577c14d514dfb2cb90ee91ada6550ee208d7ccd0cee72f3c6019b0",
+  "YFIUSDT": "5fed62e6a79008212ab20ccc1efda17f2f3298ef5fee3151ba32c4bbf2b39948",
+  "YGGUSDT": "a65f205e56d1544c0c08939eb43e4dc46bbbfd082c116059f960a1c7971123f9",
+  "ZAMAUSDT": "301cb20798e9421b46244a91066f84da9e5e5b24e37def21d017a4e36d67a49b",
+  "ZBTUSDT": "04a2589399e9c645c11f3555b366cb59cf4039975aea2d5a01313d8f72ad6c89",
+  "ZECUSDT": "2d40e7edae3d975e8566af426baebeb4bd46f3cf695934f5884b14ce33823129",
+  "ZENUSDT": "9abf987b8f2db7a5c4c5d4974be1c825b4a6707d987f49f7ad1a0cbb1a852b34",
+  "ZILUSDT": "238ad2a9c25b1c37aaa74f9eedf66e01c7a3b5089b69dc600763e64bad64ebe6",
+  "ZKCUSDT": "6a9c38dad8d6be5b986530a99cffeaf10a3d79714838abaa5ab110ae437ebc57",
+  "ZKPUSDT": "cccd5047d778fdc8968dde4fd9701c22622b23a45c4c76f277602fa94015c026",
+  "ZKUSDT": "beb6fdde3b0ede629cde1ba67515dd4fde78c0108961c0e621ca9549919b7635",
+  "ZMBUSDT": "ba89e5156abb8a1f5bc001e7cf762bf96ba694d4088b6fb5c72794563953c7da",
+  "ZROUSDT": "4799a07b0b7a9d1b47475b107ad20ab486da9c82659bd4b87f03e6dfc7cc0766",
+  "ZRXUSDT": "5f9f79e6ec893bb03e1544656d1403a5c3e0b771e42abc568543cac1dfe50ad1",
+  "币安人生USDT": "5300f3cd55097da561eaebb2c9387025e3c146756437bc1ee129d7a404813d4a",
+  "牛来USDT": "0522994d07b71a601ca09ae6a5caf582cea0462c488d4136887fb5cd180b5552"
+ }
+}
