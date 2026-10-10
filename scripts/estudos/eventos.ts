@@ -21,7 +21,10 @@ export interface Ev {k:number;entryBar:number;exitBar:number;side:1|-1;fraction:
  /** Perna de hedge: mesma quantia em valor, lado oposto, na moeda `hedgeK`; fecha junto com a perna principal (inclusive no stop). */
  hedgeK?:number;id?:number}
 export interface EvResult {k:number;entryBar:number;exitBar:number;side:1|-1;ret:number;pnl:number;reason:'time'|'stop'|'end';funding:number;id?:number;notional:number;hedge:boolean}
-export interface EvSim {results:EvResult[];skipped:number;equity:{timestamp:number;equity:number}[];finalEquity:number;maxDrawdown:number;minEquity:number}
+export interface OpenLeg {id?:number;k:number;hedge:boolean;side:1|-1;entryBar:number;exitBar:number;notional:number;unrealized:number}
+export interface EvSim {results:EvResult[];skipped:number;equity:{timestamp:number;equity:number}[];finalEquity:number;maxDrawdown:number;minEquity:number;
+ /** Pernas ainda abertas no fim da simulação, marcadas pelo último fechamento (resultado não realizado, depois da taxa de entrada). */
+ open:OpenLeg[]}
 export interface EvOptions {fee:number;slippageBps:number;initial:number;startBar:number;endBar:number;grossCap:number;
  /** Slippage da perna de hedge (padrão: o mesmo da principal). */
  hedgeSlippageBps?:number;
@@ -80,7 +83,10 @@ export function simulateEvents(L:Pick<Loaded,'lean'|'last'>,evs:Ev[],o:EvOptions
   equitySeries.push({timestamp:t,equity});peak=Math.max(peak,equity);maxDD=Math.max(maxDD,peak>0?1-equity/peak:1);minEq=Math.min(minEq,equity);
   if(equity<=0)break;
  }
- return {results,skipped,equity:equitySeries,finalEquity:equity,maxDrawdown:maxDD,minEquity:minEq};
+ const lastBar=Math.min(o.endBar,equitySeries.length?o.startBar+equitySeries.length-1:o.startBar);
+ const stillOpen=open.map(p=>({id:p.e.id,k:p.e.k,hedge:p.hedge,side:p.e.side,entryBar:p.e.entryBar,exitBar:p.e.exitBar,notional:p.qty*p.entry,
+  unrealized:p.e.side*p.qty*(px0(d.close,p.e.k,lastBar)-p.entry)-o.fee*p.qty*p.entry+p.fund}));
+ return {results,skipped,equity:equitySeries,finalEquity:equity,maxDrawdown:maxDD,minEquity:minEq,open:stillOpen};
 }/** Média, erro-padrão agrupado por mês (CR0) e estatística t. */
 export function clusteredT(rets:number[],clusters:string[]){
  const n=rets.length,m=rets.reduce((a,b)=>a+b,0)/n,by=new Map<string,number>();
