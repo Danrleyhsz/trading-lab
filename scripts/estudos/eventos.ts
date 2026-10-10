@@ -74,10 +74,12 @@ export function simulateEvents(L:Pick<Loaded,'lean'|'last'>,evs:Ev[],o:EvOptions
    else{const adverse=p.e.side===-1?c/p.raw-1:1-c/p.raw;if(adverse>=p.e.stop)hit=true;}
    if(hit){close(p,price,'stop',i);open.splice(n,1);if(p.e.id!==undefined)stopped.add(p.e.id);}
   }
+  // Série que acaba nesta vela fecha a posição e também a perna de hedge do mesmo evento.
+  const ended=new Set<number>();for(const p of open)if(p.e.id!==undefined&&i===L.last[p.e.k])ended.add(p.e.id);
   for(let n=open.length-1;n>=0;n--){
    const p=open[n],c=px0(d.close,p.e.k,i);
    if(p.e.id!==undefined&&stopped.has(p.e.id)){close(p,c,'stop',i);open.splice(n,1);}
-   else if(i===L.last[p.e.k]){close(p,c,'end',i);open.splice(n,1);}
+   else if(i===L.last[p.e.k]||(p.e.id!==undefined&&ended.has(p.e.id))){close(p,c,'end',i);open.splice(n,1);}
   }
   equity=cash;for(const p of open)equity+=p.e.side*p.qty*(px0(d.close,p.e.k,i)-p.entry);
   equitySeries.push({timestamp:t,equity});peak=Math.max(peak,equity);maxDD=Math.max(maxDD,peak>0?1-equity/peak:1);minEq=Math.min(minEq,equity);
