@@ -14,8 +14,8 @@ export const FORWARD_PROTOCOL=Object.freeze({version:'XSMOM_FORWARD_V1',declared
  feeRate:0.00055,slippageBps:2,initialCapital:10000,weeks:12,stopDrawdown:0.15});
 export interface ForwardSnapshot {
  scope:'FORWARD_PAPER_TRACKING_ONLY';protocol:typeof FORWARD_PROTOCOL;observedAt:string;
- status:'WAITING_START'|'RUNNING'|'STOPPED_BY_DRAWDOWN'|'COMPLETED'|'DATA_UNAVAILABLE';
- verdict:'IN_PROGRESS'|'APPROVED'|'REJECTED';
+ status:'WAITING_START'|'RUNNING'|'STOPPED_BY_DRAWDOWN'|'COMPLETED'|'DATA_UNAVAILABLE'|'DISABLED';
+ verdict:'IN_PROGRESS'|'APPROVED'|'REJECTED'|'CLOSED_BY_OWNER';
  startedAt:string;endsAt:string;nextDecisionAt:string|null;weeksElapsed:number;lastCandle:string|null;
  equity:number|null;netPnl:number|null;returnPct:number|null;maxDrawdown:number|null;feesPaid:number|null;fundingCashDelta:number|null;
  portfolio:{decidedAt:string;long:string[];short:string[]}|null;rebalances:number;
@@ -53,17 +53,24 @@ function emptySnapshot(now:number):ForwardSnapshot{
   nextDecisionAt:new Date(P.firstDecisionBar+HOUR).toISOString(),weeksElapsed:0,lastCandle:null,equity:null,netPnl:null,returnPct:null,maxDrawdown:null,feesPaid:null,fundingCashDelta:null,portfolio:null,rebalances:0,curve:[],error:null};
 }
 
+function disabledSnapshot(now:number):ForwardSnapshot{return {...emptySnapshot(now),status:'DISABLED',verdict:'CLOSED_BY_OWNER',nextDecisionAt:null};}
+
 export class ForwardMomentumTracker {
  private latest:ForwardSnapshot;private timer:ReturnType<typeof setTimeout>|null=null;private stopped=true;private busy=false;private pausedUntil=0;
- constructor(private history:History,private now:()=>number=Date.now){this.latest=emptySnapshot(now());}
+ /**
+  * `enabled=false` (padrão em produção desde 10/10/2026, `FORWARD_MOMENTUM_ENABLED`): o acompanhamento foi encerrado pelo dono. Não busca dados,
+  * não agenda nada e o instantâneo diz isso, em vez de fingir que aguarda o início. O último estado real está em
+  * docs/estudos/momentum-ao-vivo-encerrado-2026-10-10.json.
+  */
+ constructor(private history:History,private now:()=>number=Date.now,private enabled=true){this.latest=enabled?emptySnapshot(now()):disabledSnapshot(now());}
  snapshot(){return structuredClone({...this.latest,observedAt:new Date(this.now()).toISOString()});}
  /** Recalcula uma vez por hora, aos 17 minutos (longe das buscas do piloto na virada da hora). */
- start(){if(!this.stopped)return;this.stopped=false;this.schedule(30000);}
+ start(){if(!this.enabled||!this.stopped)return;this.stopped=false;this.schedule(30000);}
  stop(){this.stopped=true;if(this.timer)clearTimeout(this.timer);this.timer=null;}
  private schedule(delay?:number){if(this.stopped)return;const now=this.now(),next=Math.floor(now/HOUR)*HOUR+17*60000;const wait=delay??((next>now?next:next+HOUR)-now);this.timer=setTimeout(()=>{void this.refresh().finally(()=>this.schedule());},wait);}
  async refresh(){
   const P=FORWARD_PROTOCOL,now=this.now();
-  if(this.busy||now<this.pausedUntil)return this.latest;
+  if(!this.enabled||this.busy||now<this.pausedUntil)return this.latest;
   if(now<P.firstDecisionBar+HOUR){this.latest=emptySnapshot(now);return this.latest;}
   if(this.latest.status==='STOPPED_BY_DRAWDOWN'||this.latest.status==='COMPLETED')return this.latest;
   this.busy=true;

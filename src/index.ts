@@ -149,7 +149,7 @@ await persist();const legacyMarket=new BinancePublicMarketData(process.env.MARKE
 // Read-only wall-screen context; never feeds signals, risk or execution.
 void panorama.start().catch(()=>{});
 // Acompanhamento ao vivo do momentum entre moedas (XSMOM_FORWARD_V1): só simulação com dados públicos; nunca envia ordens.
-const forwardMomentum=new ForwardMomentumTracker(new BinancePerpetualHistory());forwardMomentum.start();
+const forwardMomentum=new ForwardMomentumTracker(new BinancePerpetualHistory(),Date.now,process.env.FORWARD_MOMENTUM_ENABLED==='true');forwardMomentum.start(); // encerrado pelo dono em 10/10/2026: só liga com FORWARD_MOMENTUM_ENABLED=true
 app.get('/paper/momentum/forward',async()=>forwardMomentum.snapshot());
 await perpetualMarket.start(async quote=>{if(runtime.isDraining())return;const settlements=quote.markTime>book.cursor()&&book.fundingDue(quote.markTime)?await perpetualMarket.funding(book.cursor()+1,quote.markTime):[];await book.synchronize(quote,settlements,persist);bus.publish(event('PERPETUAL_MARKET_UPDATED',quote));if(!runtime.isDraining())await cycle.onMarket().catch(error=>app.log.warn({error},'autonomous pilot attempt failed; retry deferred'));},error=>{app.log.warn({error},'USD-M reconciliation unavailable');bus.publish(event('MARKET_DATA_FAILED',{instrument:'BINANCE_USDM:BTCUSDT',error:error.message}));});
 app.addHook('preClose',async()=>{runtime.draining();researchJobs.stopAccepting();research.stopAccepting();studies.stopAccepting();});

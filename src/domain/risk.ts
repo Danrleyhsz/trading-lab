@@ -1,6 +1,8 @@
 import type {PaperOrder} from './broker.js';
 import type {PortfolioSnapshot} from './portfolio.js';
 export interface RiskLimits {maxPositionPct:number;maxLossPct:number;maxLeverage:number}
+/** Queda máxima padrão do laboratório desde 10/10/2026 (docs/PADRAO_DE_RISCO.md): vale para os testes e para o motor de risco do paper trading de perpétuos. */
+export const MAX_DRAWDOWN_FRACTION=0.30;
 export interface RiskDecision {approved:boolean;reasons:string[];notional:number}
 export class RiskEngine {
  constructor(private limits:RiskLimits={maxPositionPct:0.2,maxLossPct:0.05,maxLeverage:1}) {}
