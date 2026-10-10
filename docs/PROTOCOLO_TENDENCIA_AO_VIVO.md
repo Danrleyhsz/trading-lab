@@ -42,7 +42,7 @@ Declarado em 10/10/2026, **antes** da primeira rodada. As regras, o universo, a 
 
 - **Livro-razão:** `docs/estudos/tendencia-ao-vivo-registro.json`, encadeado por SHA-256: cada rodada guarda o hash da anterior, e qualquer edição ou remoção quebra a cadeia (o script recusa continuar). Cada rodada registra a decisão (membros, sinais, escala, pesos-alvo), as ordens simuladas com preço do livro e fechamento, o estado das contas e o hash dos dados de entrada.
 - **Resumo:** `docs/estudos/tendencia-ao-vivo.md`, regerado a cada rodada. A história fica no Git.
-- **Como roda:** `npx tsx scripts/estudos/tendencia-ao-vivo.ts` (`--dry` mostra sem gravar). Nenhuma tarefa agendada é criada por este protocolo; se o dono quiser rodar todo dia, é decisão separada.
+- **Como roda:** `npx tsx scripts/estudos/tendencia-ao-vivo.ts` (`--dry` mostra sem gravar). Este documento não cria tarefa agendada; a rodada diária automática é a Emenda 1, no fim.
 
 ## Leitura (sem veredito de retorno)
 
@@ -65,3 +65,14 @@ Declarada antes de rodar, para não se escolher a régua depois:
 - **Rodada manual:** dias sem rodada deslocam o sinal; isso é registrado, não corrigido.
 - **Dados:** velas públicas da Binance (1 000 dias por moeda); a primeira data da série de cada moeda pode ser posterior ao seu início real, o que só afeta o estado inicial do Donchian.
 - **O caixa parado rende zero**, sem imposto, sem custo de transferência.
+
+## Emenda 1: rodada diária por GitHub Actions (10/10/2026, antes da segunda rodada)
+
+Decisão do dono em 10/10/2026: a rodada passa a ser diária e automática, por GitHub Actions. Muda **só o mecanismo de execução**; regra, universo, escala, custos, parada, registro e leitura não mudam.
+
+1. **Quando:** `.github/workflows/tendencia-ao-vivo.yml`, todo dia às 00:10 UTC (o agendamento do GitHub pode atrasar alguns minutos, e o atraso fica registrado na rodada), mais disparo manual. Uma rodada por dia; a segunda no mesmo dia só marca a mercado.
+2. **Dados:** os mesmos dados públicos de mercado, pelo host `data-api.binance.vision` (`BINANCE_SPOT_ORIGIN`), porque `api.binance.com` pode bloquear os servidores do GitHub. Os dois hosts servem os mesmos endpoints; o script só aceita esses dois.
+3. **Onde grava:** o livro-razão e o resumo vão para a branch **`dados/tendencia-ao-vivo`**, uma rodada por commit; **nunca na main**. A cada rodada o fluxo restaura o livro-razão dessa branch antes de decidir, e o script recusa continuar se a cadeia de hashes estiver quebrada. A história entra na main por PR de dados, com CI, quando o dono quiser.
+4. **Fonte única:** a partir daqui a branch de dados é a fonte da verdade. Rodadas manuais locais ficam desaconselhadas, porque criariam um livro-razão divergente.
+5. **Sem segredos:** o fluxo não usa nenhum segredo, conta nem chave, e só tem permissão de escrita no repositório para empurrar a branch de dados.
+6. **Falha:** se a API ou a cadeia falhar, o fluxo falha sem gravar nada, e o dia vira dia perdido na rodada seguinte.
