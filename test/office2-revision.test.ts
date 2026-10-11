@@ -116,3 +116,22 @@ test('celular em pé abre mais perto, centrado no andar; desktop e celular deita
  const landscape=await initialCamera(560,300);
  assert.ok(Math.abs(landscape.camera.s-landscape.fit.s)<1e-9,'celular deitado mantém o andar inteiro');
 });
+
+test('em tela estreita a barra leva "Outros ambientes", luz e o link antigo para a faixa de baixo e os devolve em tela larga',async()=>{
+ const context=runtime(),nodes=new Map<string,any>(),moved:any[]=[],restored:any[]=[];
+ const node=(extra:any={})=>({clientWidth:390,clientHeight:674,style:{},dataset:{},classList:{add(){},toggle(){}},append(){},replaceChildren(){},addEventListener(){},setAttribute(){},getContext(){return {};},...extra});
+ const other=node({id:'otherRooms',nextSibling:'market'}),label=node({id:'luz',nextSibling:'clock'}),link=node({id:'link',nextSibling:null});
+ nodes.set('nav',node({append(n:any){moved.push(n);}}));nodes.set('.status',node({insertBefore(n:any,ref:any){restored.push([n,ref]);}}));
+ nodes.set('#otherRooms',other);nodes.set('#lightingMode',node({closest(){return label;}}));nodes.set('.chip.link',link);
+ const document={hidden:false,querySelector(key:string){if(!nodes.has(key))nodes.set(key,node());return nodes.get(key);},querySelectorAll(){return [];},createElement:node,createTextNode:node,addEventListener(){}};
+ let change:(()=>void)|undefined;const mq={matches:true,addEventListener(_t:string,fn:()=>void){change=fn;}};
+ class Img{onload?:()=>void;set src(_value:string){queueMicrotask(()=>this.onload?.());}}
+ Object.assign(context,{document,Image:Img,localStorage:{getItem(){return 'day';}},matchMedia:()=>mq,requestAnimationFrame(){},setInterval(){},addEventListener(){},performance:{now:()=>0},OfficeSpriteSheets:{},Office2Ring:{ACCOUNT:'evaluation:nova:usdm'},Office2Lab:{},Office2Ops:{},Office2Horizon:{},
+  fetch:async(url:string)=>({ok:url==='/office2/scene-map.json',status:404,json:async()=>map}),
+  Office2Scene:{create(){return {signs:[],renderStatic(_scale:number,_phase:string,height:number){return {worldHeight:height};}};}}});
+ vm.runInContext(readFileSync('public/office2/app.js','utf8'),context);
+ await new Promise(resolve=>setImmediate(resolve));
+ assert.deepEqual(moved,[other,label,link],'em tela estreita os três controles vão para a faixa de zonas');
+ mq.matches=false;change?.();
+ assert.deepEqual(restored,[[other,'market'],[label,'clock'],[link,null]],'em tela larga voltam à posição original');
+});
