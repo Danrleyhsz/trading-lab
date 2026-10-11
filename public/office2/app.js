@@ -365,7 +365,8 @@ function placeZoneLabels(){const c=state.camera;for(const z of zoneLabels){z.nod
  function arrangeTopbar(){
   const mq=globalThis.matchMedia?.('(max-width:900px)'),nav=$('nav'),status=$('.status');if(!mq||!nav||!status)return;
   const tools=[$('#otherRooms'),$('#lightingMode')?.closest?.('label'),$('.chip.link')].filter(Boolean),home=new Map(tools.map(t=>[t,t.nextSibling??null]));
-  const place=()=>{if(mq.matches)for(const t of tools)nav.append(t);else for(const t of tools)status.insertBefore(t,home.get(t)??null);};
+  let inNav=false;
+  const place=()=>{if(mq.matches===inNav)return;inNav=mq.matches;if(inNav)for(const t of tools)nav.append(t);else for(const t of tools)status.insertBefore(t,home.get(t)??null);};
   place();mq.addEventListener?.('change',place);
  }
  async function start(){arrangeTopbar();
