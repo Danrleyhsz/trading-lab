@@ -1,11 +1,6 @@
-import {assertPerpetualContinuation} from '../domain/perpetual-continuation.js';
-import {assertHistoricalStudiesAppendOnly} from './historical-study-guard.js';
-import {assertAiAppendOnly} from '../domain/ai-analysis.js';
-import {isDeepStrictEqual} from 'node:util';
-const equal=(a:unknown,b:unknown)=>isDeepStrictEqual(JSON.parse(JSON.stringify(a)),JSON.parse(JSON.stringify(b)));
 import {Client} from 'pg';
+import {assertAppendOnly,collectEvents} from './append-only.js';
 import type {StateStore,StoredState} from '../domain/storage.js';
-import type {DomainEvent} from '../domain/events.js';
 export class PostgresStateStore implements StateStore {
  private client:Client;private ready=false;private pending:Promise<void>=Promise.resolve();private loaded:StoredState|null=null;
  constructor(connectionString:string,requireTLS=false){if(requireTLS){let url:URL;try{url=new URL(connectionString);}catch{throw Error('invalid PostgreSQL connection configuration');}url.searchParams.set('sslmode','verify-full');connectionString=url.toString();}this.client=new Client({connectionString,connectionTimeoutMillis:10000,statement_timeout:30000});this.client.on('error',()=>{this.ready=false;});}
@@ -15,6 +10,5 @@ export class PostgresStateStore implements StateStore {
  save(state:StoredState){const snapshot=structuredClone(state);const run=async()=>{if(!this.ready)throw Error('database unavailable');assertAppendOnly(this.loaded,snapshot);const oldIds=new Set(this.loaded?collectEvents(this.loaded).map(e=>e.id):[]);const events=collectEvents(snapshot).filter(e=>!oldIds.has(e.id));await this.client.query('BEGIN');try{for(const e of events){await this.client.query('INSERT INTO trading_lab_events(id, occurred_at, event) VALUES ($1,$2,$3::jsonb) ON CONFLICT (id) DO NOTHING',[e.id,e.occurredAt,JSON.stringify(e)]);const original=await this.client.query('SELECT id FROM trading_lab_events WHERE id = $1 AND event IS DISTINCT FROM $2::jsonb',[e.id,JSON.stringify(e)]);if(original.rowCount)throw Error('audit event rewrite rejected');}await this.client.query('INSERT INTO trading_lab_state(id, version, snapshot) VALUES (1,1,$1::jsonb) ON CONFLICT (id) DO UPDATE SET snapshot = EXCLUDED.snapshot, updated_at = now()',[JSON.stringify(snapshot)]);await this.client.query('COMMIT');this.loaded=snapshot;}catch(error){await this.client.query('ROLLBACK');throw error;}};const result=this.pending.then(run);this.pending=result.catch(()=>{});return result;}
  async close(){await this.pending;this.ready=false;await this.client.end();}
 }
-export function collectEvents(state:StoredState):DomainEvent[]{const map=new Map<string,DomainEvent>();for(const e of [...(state.domainEvents??[]),...(state.paperAccounts??[]).flatMap(a=>a.ledger),...(state.perpetualBook?.accounts??[]).flatMap(a=>a.ledger),...(state.researchRuns??[]).flatMap(r=>r.events)]){const previous=map.get(e.id);if(previous&&!equal(previous,e))throw Error('conflicting event IDs');map.set(e.id,e);}return [...map.values()];}
-function prefix(previous:unknown[],next:unknown[]){if(next.length<previous.length||previous.some((item,i)=>!equal(item,next[i])))throw Error('historical record deletion or rewrite rejected');}
-export function assertAppendOnly(previous:StoredState|null,next:StoredState){assertAiAppendOnly(previous?.aiLedger,next.aiLedger);assertHistoricalStudiesAppendOnly(previous?.perpetualStudies,next.perpetualStudies);assertPerpetualContinuation(previous?.perpetualBook,next.perpetualBook);if(!previous)return;prefix(previous.domainEvents??[],next.domainEvents??[]);prefix(previous.memories,next.memories);prefix(previous.agentMessages??[],next.agentMessages??[]);prefix(previous.agentActivity??[],next.agentActivity??[]);for(const account of previous.paperAccounts??[]){const current=next.paperAccounts?.find(a=>a.id===account.id);if(!current||current.initialCash!==account.initialCash)throw Error('account deletion or endowment rewrite rejected');prefix(account.ledger,current.ledger);}for(const run of previous.researchRuns??[]){const current=next.researchRuns?.find(r=>r.id===run.id);if(!current||!equal(current,run))throw Error('research evidence rewrite rejected');}}
+// Reexportadas daqui para quem já importava do store do PostgreSQL (event-audit, restore-drill, testes).
+export {assertAppendOnly,collectEvents};
