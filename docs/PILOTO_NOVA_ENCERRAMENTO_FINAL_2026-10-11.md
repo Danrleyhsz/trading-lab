@@ -9,7 +9,7 @@ Decisão do dono em 11/10/2026, tomada depois de ver o PR #94 e a lista de pend�
 | Piloto da Nova (estudo `d674cb32`, BREAKOUT 480 h, BTCUSDT) | **Encerrado formalmente.** Veredito final: `INSUFFICIENT_EVIDENCE`. |
 | Triagem do piloto 2 (`docs/PROTOCOLO_TRIAGEM_PILOTO_2.md`) | **Não será executada.** Não há segundo piloto. |
 | Vigias `production-monitor` e `pilot-alerts` | **Seguem desligados** até haver um novo piloto. |
-| PR #94 (registro das checagens do ciclo, `CYCLE_CHECKS_V1`) | **Integrado** na `main`, sem deploy. |
+| PR #94 (registro das checagens do ciclo, `CYCLE_CHECKS_V1`) | **Decidido integrar** na `main` depois das 20:00 UTC de 11/10/2026 (quando o estudo perde a elegibilidade), **sem deploy**. A data do merge fica no histórico do PR. |
 
 ## Estado final do piloto
 
