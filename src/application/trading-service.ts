@@ -25,7 +25,3 @@ export class TradingService {
     return { status: 'filled' as const, fill, portfolio: this.portfolio.snapshot() };
   }
 }
-export type TradeResult = Awaited<ReturnType<TradingService['propose']>>;
-export interface PaperExecution {
-  propose(order: PaperOrder): Promise<TradeResult>;
-}
