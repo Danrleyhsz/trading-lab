@@ -65,23 +65,23 @@ room('horizon',[
 room('nexus',[
  ['mesa-reuniao',3,15,7,4,30,{flip:true}],PAREDE('armario-baixo','j0',1,14,2,1,22),PAREDE('armario-baixo','j0',9,14,2,1,22),['planta-alta',0,14,1,1,50],['ficus',11,14,1,1,54],['planta-baixa',1,18,1,1,24],['samambaia',10,18,1,1,32]]);
 room('ring',[
- PAREDE('mesa-curva-operacoes','i0',0,23,5,3,40),PAREDE('mesa-curva-media','i0',0,28,4,3,40),
- PAREDE('poltrona','j0',8,23,2,2,28),['totem-logo',11,23,1,1,56],['jardineira',6,32,4,1,30],['planta-alta',11,29,1,1,50],['ficus',0,32,1,1,54],['espada',6,22,1,1,38],['samambaia',11,31,1,1,32]]);
+ PAREDE('mesa-curva-operacoes','i0',0,24,5,3,40),PAREDE('mesa-curva-media','i0',0,29,4,3,40),
+ PAREDE('poltrona','j0',8,23,2,2,28),['totem-logo',11,23,1,1,56],['jardineira',6,32,4,1,30],['planta-alta',11,29,1,1,50],['ficus',11,32,1,1,54],['espada',6,22,1,1,38],['samambaia',11,31,1,1,32]]);
 room('convivencia',[
  ['tapete',15,11,8,5,2,NB],['jardineira',17,10,4,1,30],PAREDE('sofa','j0',17,11,4,2,28),PAREDE('poltrona','i0',15,12,2,2,28),PAREDE('poltrona','j0',21,11,2,2,28),['mesa-centro',18,13,3,2,12],
  ['luminaria-chao',22,13,1,1,52],['planta-alta',15,10,1,1,50],['planta-baixa',22,10,1,1,24]]);
 room('stress-lab',[
- ['esteira',26,10,2,3,32,{flip:false,wall:'j0',faceWall:true}],['saco-pancada',28,10,1,1,56],PAREDE('rack-halteres','i0',26,13,2,1,28),['bancada-teste',30,15,2,1,30],['espada',32,16,1,1,38],['planta-baixa',26,16,1,1,24]]);
+ ['esteira',26,10,2,3,32,{flip:false,wall:'j0',faceWall:true}],['saco-pancada',28,10,1,1,56],PAREDE('rack-halteres','i0',26,13,2,1,28),['bancada-teste',30,14,3,2,30],['espada',32,12,1,1,38],['planta-baixa',26,16,1,1,24]]);
 room('auditoria',[
  PAREDE('lockers','i0',36,11,3,2,46),PAREDE('armarios-arquivo','i0',36,14,3,2,48),PAREDE('rack-servidor','j0',43,10,1,1,56),['planta-baixa',36,10,1,1,24],['espada',43,16,1,1,38]]);
 room('backtest',[
- PAREDE('estacao-2-monitores','j0',17,22,3,2,36),PAREDE('armario-baixo','j0',21,21,2,1,22),['planta-baixa',15,21,1,1,24],['espada',22,24,1,1,38],['planta-alta',15,24,1,1,50]]);
+ PAREDE('estacao-2-monitores','j0',17,22,3,2,36),PAREDE('armario-baixo','j0',21,21,2,1,22),PAREDE('estante-arquivo','i0',15,22,2,1,50),['planta-baixa',15,21,1,1,24],['espada',22,24,1,1,38],['planta-alta',15,24,1,1,50]]);
 room('risk',[
  PAREDE('estacao-madeira','j0',27,22,4,2,36),PAREDE('estante-arquivo','j0',31,21,2,1,50),['ficus',26,21,1,1,54]]);
 room('diagnostico',[
- ['mesa-reuniao-6',38,22,4,3,30,{flip:true}],['planta-baixa',36,21,1,1,24],['espada',43,21,1,1,38]]);
+ ['mesa-reuniao-6',38,22,4,3,30,{flip:true}],PAREDE('armario-baixo','j0',36,21,2,1,22),PAREDE('estante-arquivo','i0',36,22,2,1,50),['planta-baixa',36,26,1,1,24],['espada',43,21,1,1,38]]);
 room('cafe',[
- PAREDE('sofa-cinza','j0',15,28,3,1,28),['mesa-cafe-4',20,29,3,3,28],['samambaia',15,29,1,1,32],['planta-baixa',15,32,1,1,24]]);
+ PAREDE('sofa-cinza','j0',15,28,3,1,28),['mesa-cafe-4',19,30,3,3,28],PAREDE('aparador','i0',15,30,3,2,24),['samambaia',15,29,1,1,32],['planta-baixa',18,32,1,1,24]]);
 room('cozinha',[
  PAREDE('bancada-cozinha','j0',27,28,4,2,40),['banqueta',27,30,1,1,22],['banqueta',29,30,1,1,22],PAREDE('geladeira','j0',31,28,2,1,52),['planta-baixa',26,32,1,1,24]]);
 room('varanda',[
@@ -91,8 +91,8 @@ for(const [i,j,a] of [[13,6,'planta-alta'],[19,6,'planta-baixa'],[22,6,'planta-a
  props.push({asset:a,tile:{i,j},footprint:{a:1,b:1},h:a==='planta-alta'?50:24});
 
 // ---------- pontos: postos de trabalho, lazer e chegada ----------
-const homes={satoshi:['horizon',2,9],oracle:['horizon',6,9],vega:['horizon',10,9],nova:['ring',3,24],flux:['ring',3,30],atlas:['ring',3,26],euler:['backtest',18,24],sentinel:['risk',28,24]};
-const leisure=[['sofa-1','convivencia',17,13],['sofa-2','convivencia',21,13],['cafe-1','cafe',17,30],['cafe-2','cafe',19,30],['copa-1','cozinha',28,31],['copa-2','cozinha',30,31],['varanda-1','varanda',37,31],['varanda-2','varanda',42,31]];
+const homes={satoshi:['horizon',2,9],oracle:['horizon',6,9],vega:['horizon',10,9],nova:['ring',3,25],flux:['ring',3,31],atlas:['ring',3,27],euler:['backtest',18,24],sentinel:['risk',28,24]};
+const leisure=[['sofa-1','convivencia',17,13],['sofa-2','convivencia',21,13],['cafe-1','cafe',17,30],['cafe-2','cafe',17,32],['copa-1','cozinha',28,31],['copa-2','cozinha',30,31],['varanda-1','varanda',37,31],['varanda-2','varanda',42,31]];
 const points=[
  ...Object.entries(homes).map(([agent,[r,i,j]])=>({id:agent,room:r,tile:{i,j},kind:'WORK',agent,facing:r==='ring'?'NW':'NE'})),
  ...leisure.map(([id,r,i,j])=>({id,room:r,tile:{i,j},kind:'IDLE'})),
@@ -151,6 +151,14 @@ for(const p of props){if(!p.room||p.blocking===false)continue;const t=roomById.g
   if(!p.wall)errors.push(`${p.asset} (${i},${j}) tem frente e não declara a parede em que as costas se apoiam`);
   else{const g=p.wall==='j0'?j-t.j0:i-t.i0;if(g>1)errors.push(`${p.asset} (${i},${j}) longe da parede ${p.wall} (folga ${g})`);
    if(!p.faceWall&&Boolean(p.flip)!==(p.wall==='j0'))errors.push(`${p.asset} (${i},${j}) com a orientação errada para a parede ${p.wall}`);}}}
+// escala da arte: a arte é encolhida para caber no eixo mais apertado da pegada; se a largura final na tela fica abaixo de 45% da largura
+// do losango da pegada, a peça some (ex.: aparador em 3×1 saía a 16% do tamanho e ficava invisível).
+const manifesto=JSON.parse(fs.readFileSync('public/office2/art/manifesto.json','utf8')).props,apoios=JSON.parse(fs.readFileSync('public/office2/art/apoios.json','utf8')).supports;
+for(const p of props){if(p.blocking===false)continue;const info=manifesto[p.asset],ap=apoios[p.asset];if(!info||!ap)continue;
+ const flip=p.flip??((info.axis==='i'&&p.footprint.b>p.footprint.a)||(info.axis==='j'&&p.footprint.a>p.footprint.b));
+ const A=flip?ap.j1-ap.j0:ap.i1-ap.i0,B=flip?ap.i1-ap.i0:ap.j1-ap.j0,s=Math.min((p.footprint.a-.36)/A,(p.footprint.b-.36)/B,(p.h+(p.footprint.a+p.footprint.b)*12)/info.height);
+ const largura=info.width*s,losango=(p.footprint.a+p.footprint.b)*24;
+ if(largura<0.45*losango)errors.push(`${p.asset} (${p.tile.i},${p.tile.j}) pegada ${p.footprint.a}×${p.footprint.b}: a arte sai a ${Math.round(largura)} px, só ${Math.round(100*largura/losango)}% do losango`);}
 // fileiras atrás de parede alta (sombra): nada alto ali
 const tallBehind=[];
 for(const r of map.rooms){const t=r.tiles,e=r.edges;if(e.j0&&/parede/.test(e.j0))tallBehind.push({axis:'j',line:t.j0,from:t.i0,to:t.i1,room:r.id});}

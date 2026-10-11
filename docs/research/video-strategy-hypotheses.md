@@ -451,3 +451,19 @@ After standalone validation, test C01-C03 only if the underlying components show
 # Research Note
 
 The reviewed videos are idea sources only. Their displayed examples may be cherry-picked and do not constitute evidence of an edge. The goal of TradingLab is to convert those ideas into falsifiable hypotheses and let historical/out-of-sample evidence decide whether they survive.
+
+---
+
+# Addendum 2026-10-10 - ICT / Smart Money Concepts video (H07-H11)
+
+Source: Reels "Entenda esses 5 conceitos de ICT" (@trading.de.livro, 2026-10-09), an advertisement for the book *A Mente Institucional*. Idea source only.
+
+Concepts converted into deterministic, falsifiable rules (all thresholds introduced by the protocol, none come from the video):
+
+- H07 Order Block
+- H08 Liquidity Sweep
+- H09 Displacement (momentum and FVG retrace)
+- H10 Inverted Fair Value Gap
+- H11 Internal Range Liquidity
+
+Full rules, grid (23 configurations, 78 cumulative trials) and the added random-entry placebo criterion: `docs/PROTOCOLO_HIPOTESES_ICT.md` (VIDEO_HYPOTHESES_V2_ICT).

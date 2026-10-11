@@ -23,7 +23,7 @@ A durable cursor is saved before execution, so a restart never repeats a candle.
 
 | Rule | Effect |
 |---|---|
-| Nova equity ≤ 97% of the 1 000 endowment (`PILOT_MAX_LOSS`, default 0.03, must stay below the 10% risk limit) | Close the open position through risk, halt new exposure (persisted), emit `AUTONOMOUS_PILOT_STOPPED` / `PILOT_LOSS_LIMIT`. The hourly monitor emails the owner because `halted` is set. |
+| Nova equity ≤ 97% of the 1 000 endowment (`PILOT_MAX_LOSS`, default 0.03, must stay below the risk drawdown limit, 30% since 2026-10-10 (`docs/PADRAO_DE_RISCO.md`)) | Close the open position through risk, halt new exposure (persisted), emit `AUTONOMOUS_PILOT_STOPPED` / `PILOT_LOSS_LIMIT`. The hourly monitor emails the owner because `halted` is set. |
 | Study no longer eligible (the screen's 7-day evidence age expires around 2026-10-11 20:00 UTC, or any check fails) | Close the open position through risk and open nothing new. Emit `STUDY_NOT_ELIGIBLE`. This makes the pilot about one week long. Continuing requires a new reviewed decision. |
 | Deployed commit ≠ `CONTINUOUS_RELEASE_COMMIT` (Render's `RENDER_GIT_COMMIT`) | The cycle stays disabled with reason `RELEASE_NOT_APPROVED`. The service keeps serving; nothing crashes. |
 | A failed attempt (for example source HTTP 418) | Retry only after 5 minutes. Cycle errors no longer mark the market source unavailable. The monitor alerts on `autonomousLastAttemptFailed`. |

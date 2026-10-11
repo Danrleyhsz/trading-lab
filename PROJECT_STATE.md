@@ -1,6 +1,18 @@
 # Trading Lab — Project State
 
-## State on 2026-10-09 (read this first)
+## Estado em 10/10/2026 (leia isto primeiro)
+
+Detalhes e como religar cada item: [docs/ENCERRAMENTO_2026-10-10.md](docs/ENCERRAMENTO_2026-10-10.md).
+
+- **Piloto parado** (`RELEASE_NOT_APPROVED`): sem operação aberta.
+- **`production-monitor` e `pilot-alerts` desligados** (GitHub Actions).
+- **Backup diário mantido** (`production-backup`).
+- **Foco do laboratório:** execução, risco e auditoria.
+- **`/office2` é a entrada padrão** (`/` e `/office` redirecionam para `/office2/`; o 1.0 segue em `/office/index.html`).
+
+## State on 2026-10-09 — HISTÓRICO (era "read this first"; superado pelo estado de 10/10/2026 acima)
+
+> **Histórico.** O bloco abaixo descreve o estado de 09/10/2026 e foi superado pelo bloco "Estado em 10/10/2026". Fica como registro, sem alteração; não use como estado atual.
 
 - **Production** (https://trading-lab-x0yh.onrender.com): commit `08bcfd0`, deployed by the owner's delegate through the Render dashboard on 2026-10-09. Release pins: `CONTINUOUS_RELEASE_COMMIT=08bcfd0…` and `CONTINUOUS_RELEASE_BACKEND` = the backend fingerprint read from `/paper/perpetual/preflight` (`850def3d…`). The service restarts on every deploy; a deploy costs at most one hourly pilot decision.
 - **Office 2.0** (`/office2/`, F6+F7+F8, PRs #100–#102): modular 44×33 plan assembled from separate pieces (see docs/design/OFFICE_2_F8_PLANTA.md). The previous office stays at `/office/`. Making `/office2/` the default entry is an open product decision.

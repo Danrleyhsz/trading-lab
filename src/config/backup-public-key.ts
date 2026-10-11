@@ -1,7 +1,7 @@
 // Public half of the owner's backup key. Not a secret: it can only encrypt.
 // The private key stays with the owner (Documents/TradingLab-Backups/backup-private-key.pem) and never enters Git, Render or CI.
 // Fingerprint (SHA-256 of SPKI DER): a539d19dee549204ae2287a3a3fce503d4596c3a36e24bd24c87c5df1d86bd6c
-export const BACKUP_PUBLIC_KEY_PEM=`-----BEGIN PUBLIC KEY-----
+export const BACKUP_PUBLIC_KEY_PEM = `-----BEGIN PUBLIC KEY-----
 MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAyyX5IrJoLsIh+EguzgwP
 FpGCxbNsi/rq6i90/oHF5a+p5jivcTyzxG9CxMDpk9fZP0BsoJs8F6ma4vv358EH
 Oia/j4QGfz9CDaroFBMjUh6puLZoBeFN7ku3mxtd+foSjkCtVBwPLTxeQ1ZH26+8
@@ -15,4 +15,4 @@ AIv8HC3ty0AwupsE7SuMCCdffmL5pjaoQpl0i/TqDuwrDr9Ju8WQ8c5ilHmpJqKl
 ZilQ7Pk7xzxKgwX2IAr4BdMoIt/dGprv/pMQitEzdTghQLvw/RT/uc8pWhdIboPK
 8ZctiVfQ+XCzCDOSCU54g2ECAwEAAQ==
 -----END PUBLIC KEY-----`;
-export const BACKUP_PUBLIC_KEY_FINGERPRINT='a539d19dee549204ae2287a3a3fce503d4596c3a36e24bd24c87c5df1d86bd6c';
+export const BACKUP_PUBLIC_KEY_FINGERPRINT = 'a539d19dee549204ae2287a3a3fce503d4596c3a36e24bd24c87c5df1d86bd6c';

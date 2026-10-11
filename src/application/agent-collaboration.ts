@@ -1,2 +1,49 @@
-import type{AgentMessageBus}from "../domain/agent-messages.js";import type{AgentCoordinator}from "./agent-coordinator.js";import type{MemoryStore}from "../domain/memory.js";
-export class AgentCollaboration{constructor(private messages:AgentMessageBus,private agents:AgentCoordinator,private memories:MemoryStore){}hypothesis(summary:string,context:Record<string,unknown>={}){this.agents.research(summary);const m=this.messages.send({from:"atlas",to:["euler","sentinel"],kind:"HYPOTHESIS",summary,context});this.memories.add({agentId:"atlas",kind:"OBSERVATION",summary,metadata:{messageId:m.id,...context}});return m}backtestResult(summary:string,context:Record<string,unknown>={}){this.agents.backtest(summary);const m=this.messages.send({from:"euler",to:["atlas","sentinel","nova"],kind:"BACKTEST_RESULT",summary,context});this.memories.add({agentId:"euler",kind:"LESSON",summary,metadata:{messageId:m.id,...context}});return m}riskReview(approved:boolean,summary:string,context:Record<string,unknown>={}){this.agents.risk(summary);const m=this.messages.send({from:"sentinel",to:["nova","atlas"],kind:"RISK_REVIEW",summary,context:{...context,approved}});this.memories.add({agentId:"sentinel",kind:approved?"DECISION":"FAILURE",summary,metadata:{messageId:m.id,approved,...context}});return m}executionPlan(summary:string,context:Record<string,unknown>={}){this.agents.trade(summary);return this.messages.send({from:"nova",to:["sentinel","atlas"],kind:"EXECUTION_PLAN",summary,context})}}
+import type { AgentMessageBus } from '../domain/agent-messages.js';
+import type { AgentCoordinator } from './agent-coordinator.js';
+import type { MemoryStore } from '../domain/memory.js';
+export class AgentCollaboration {
+  constructor(
+    private messages: AgentMessageBus,
+    private agents: AgentCoordinator,
+    private memories: MemoryStore,
+  ) {}
+  hypothesis(summary: string, context: Record<string, unknown> = {}) {
+    this.agents.research(summary);
+    const m = this.messages.send({ from: 'atlas', to: ['euler', 'sentinel'], kind: 'HYPOTHESIS', summary, context });
+    this.memories.add({ agentId: 'atlas', kind: 'OBSERVATION', summary, metadata: { messageId: m.id, ...context } });
+    return m;
+  }
+  backtestResult(summary: string, context: Record<string, unknown> = {}) {
+    this.agents.backtest(summary);
+    const m = this.messages.send({
+      from: 'euler',
+      to: ['atlas', 'sentinel', 'nova'],
+      kind: 'BACKTEST_RESULT',
+      summary,
+      context,
+    });
+    this.memories.add({ agentId: 'euler', kind: 'LESSON', summary, metadata: { messageId: m.id, ...context } });
+    return m;
+  }
+  riskReview(approved: boolean, summary: string, context: Record<string, unknown> = {}) {
+    this.agents.risk(summary);
+    const m = this.messages.send({
+      from: 'sentinel',
+      to: ['nova', 'atlas'],
+      kind: 'RISK_REVIEW',
+      summary,
+      context: { ...context, approved },
+    });
+    this.memories.add({
+      agentId: 'sentinel',
+      kind: approved ? 'DECISION' : 'FAILURE',
+      summary,
+      metadata: { messageId: m.id, approved, ...context },
+    });
+    return m;
+  }
+  executionPlan(summary: string, context: Record<string, unknown> = {}) {
+    this.agents.trade(summary);
+    return this.messages.send({ from: 'nova', to: ['sentinel', 'atlas'], kind: 'EXECUTION_PLAN', summary, context });
+  }
+}

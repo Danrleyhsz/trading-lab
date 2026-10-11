@@ -32,7 +32,15 @@
  const icon=(name,cls='ico')=>{const info=images.icons?.[name];if(!info)return null;const i=el('img',cls);i.src='/office2/art/'+info.file;i.alt='';i.decoding='async';return i;};
  const ZONE_EMBLEM={horizon:'zona-horizon',nexus:'zona-nexus',ring:'zona-ring','stress-lab':'zona-lab',risk:'zona-risk',auditoria:'zona-auditoria',diagnostico:'zona-diagnostico',backtest:'zona-backtest','hall-marca':'zona-marca'};
  // F7: cidade gerada, desenhada como fundo em tela cheia a cada quadro (antes de carregar vale um degradê).
- images.skylines=Object.fromEntries([['day','dia'],['dusk','entardecer'],['night','noite']].map(([phase,name])=>[phase,loadImage('/office2/art/cidade-'+name+'.png')]));images.skyline=images.skylines.night;
+ // Cada cidade pesa cerca de 3,5 MB: só a da fase atual é baixada; a de outra fase só entra quando a fase muda.
+ // `images.skyline` é a última cidade que terminou de carregar: serve de fundo enquanto a da nova fase não chega.
+ const SKYLINE_FILE={day:'dia',dusk:'entardecer',night:'noite'};images.skylines={};
+ function loadSkyline(phase){
+  if(!SKYLINE_FILE[phase]||images.skylines[phase])return;
+  const img=loadImage('/office2/art/cidade-'+SKYLINE_FILE[phase]+'.png',()=>{if(!img.naturalWidth)return;images.skyline=img;if(state.scene&&phase===lightingPhase)state.cache=renderCache(phase);});
+  images.skylines[phase]=img;
+ }
+ loadSkyline(lightingPhase);
  async function get(path){try{const r=await fetch(path,{credentials:'same-origin',headers:{accept:'application/json'}});if(!r.ok)return {ok:false,status:r.status};return {ok:true,body:await r.json()};}catch{return {ok:false,status:0};}}
  const why=res=>res.status===401||res.status===403?'sem acesso (entre pelo escritório atual)':res.status===404?'fonte não disponível':res.status===0?'sem conexão':'indisponível (HTTP '+res.status+')';
 
@@ -221,16 +229,21 @@
 
  // ---------- câmera ----------
  /** Visão geral: enquadra a planta do andar (com as paredes altas e a borda da laje), não o retângulo inteiro da cena; o fundo cobre o resto. */
- function overview(){const iso=state.iso,top=iso.project(0,0,102),left=iso.project(0,iso.H),right=iso.project(iso.W,0),bottom=iso.project(iso.W,iso.H);
+ function floorFit(){const iso=state.iso,top=iso.project(0,0,102),left=iso.project(0,iso.H),right=iso.project(iso.W,0),bottom=iso.project(iso.W,iso.H);
   const bounds={x0:left.x-12,x1:right.x+12,y0:(state.scene?.topY??top.y)-14,y1:bottom.y+24},c=Office2Iso.fit(bounds,viewport.clientWidth,viewport.clientHeight,2,16);
   if(viewport.clientWidth<600)c.y=Math.min(c.y,88-bounds.y0*c.s);return c;}
+ /** Visão inicial. Em celular em pé a planta é limitada pela largura e ficava como uma faixa no topo, com a fachada ocupando o resto da tela:
+  * aí abre mais perto, centrada no andar (as pontas do losango saem da tela e arrastar mostra o resto). Em outras telas é o andar inteiro. */
+ function overview(){const c=floorFit(),vw=viewport.clientWidth,vh=viewport.clientHeight;if(vw>=600||vh<=vw)return c;
+  const iso=state.iso,left=iso.project(0,iso.H),right=iso.project(iso.W,0),bottom=iso.project(iso.W,iso.H),y0=(state.scene?.topY??iso.project(0,0,102).y)-14,y1=bottom.y+24,s=Math.min(3,c.s*1.35);
+  return clampCamera({s,x:vw/2-(left.x+right.x)/2*s,y:Math.max(vh/2-(y0+y1)/2*s,72-y0*s)});}
  function roomCamera(room){const t=room.tiles,pts=[[t.i0,t.j0],[t.i1,t.j0],[t.i1,t.j1],[t.i0,t.j1]].map(([i,j])=>state.iso.project(i,j));
   return Office2Iso.fit({x0:Math.min(...pts.map(p=>p.x))-32,x1:Math.max(...pts.map(p=>p.x))+32,y0:Math.min(...pts.map(p=>p.y))-112,y1:Math.max(...pts.map(p=>p.y))+30},viewport.clientWidth,viewport.clientHeight,2.6,32);}
  function moveCamera(to){if(reduced){state.camera=to;return;}const from={...state.camera},start=performance.now();state.anim={from,to,start};}
  function stepCamera(now){const a=state.anim;if(!a)return;const t=Math.min(1,(now-a.start)/320),e=1-Math.pow(1-t,3);
   state.camera={s:a.from.s+(a.to.s-a.from.s)*e,x:a.from.x+(a.to.x-a.from.x)*e,y:a.from.y+(a.to.y-a.from.y)*e};if(t>=1)state.anim=null;}
  function renderCache(phase=lightingPhase,force=true){
-  const scale=viewport.clientWidth<900?1:2,min=overview().s*.75;
+  const scale=viewport.clientWidth<900?1:2,min=floorFit().s*.75;
   const height=Math.ceil(Math.max(state.map.projection.scene.h+720,viewport.clientHeight/(min*2)+state.iso.project(state.iso.W,state.iso.H).y+180)),key=scale+':'+height+':'+phase;
   if(!force&&state.cacheSpec===key)return state.cache;
   state.cacheSpec=key;return state.scene.renderStatic(scale,phase,height);
@@ -311,7 +324,7 @@ function placeZoneLabels(){const c=state.camera;for(const z of zoneLabels){z.nod
 
  // ---------- barra de cima ----------
  function updateLighting(){
-  const next=A?.phase(lightingMode)??'night';$('#lightingMode').value=lightingMode;
+  const next=A?.phase(lightingMode)??'night';loadSkyline(next);$('#lightingMode').value=lightingMode;
   viewport.dataset.lighting=next;state.lighting={mode:lightingMode,phase:next};
   if(state.scene&&next!==lightingPhase){state.transition=reduced?null:{from:lightingPhase,start:performance.now(),cache:state.cache};lightingPhase=next;state.cache=renderCache(next);}
  }
@@ -351,11 +364,20 @@ function placeZoneLabels(){const c=state.camera;for(const z of zoneLabels){z.nod
   if(ev.type==='pointermove'&&drag.on){const dx=ev.clientX-drag.x,dy=ev.clientY-drag.y;if(!drag.moved&&Math.hypot(dx,dy)<5)return;drag.moved=true;drag.x=ev.clientX;drag.y=ev.clientY;state.anim=null;
    state.camera=clampCamera({...state.camera,x:state.camera.x+dx,y:state.camera.y+dy});canvas.style.cursor='grabbing';return;}
   if(ev.type==='pointerup'||ev.type==='pointercancel'){drag.on=false;canvas.style.cursor='';}}
- function onWheel(ev){ev.preventDefault();const r=canvas.getBoundingClientRect(),c=state.camera,mx=ev.clientX-r.left,my=ev.clientY-r.top,min=overview().s*0.75,s=Math.min(3,Math.max(min,c.s*Math.exp(-ev.deltaY*0.0015)));
+ function onWheel(ev){ev.preventDefault();const r=canvas.getBoundingClientRect(),c=state.camera,mx=ev.clientX-r.left,my=ev.clientY-r.top,min=floorFit().s*0.75,s=Math.min(3,Math.max(min,c.s*Math.exp(-ev.deltaY*0.0015)));
   state.anim=null;state.camera=clampCamera({s,x:mx-(mx-c.x)*s/c.s,y:my-(my-c.y)*s/c.s});}
  function onClick(ev){if(drag.moved){drag.moved=false;return;}const r=canvas.getBoundingClientRect(),c=state.camera,x=(ev.clientX-r.left-c.x)/c.s,y=(ev.clientY-r.top-c.y)/c.s;const t=state.iso.tileAt(x,y);const room=t&&state.iso.roomAt(t.i,t.j);if(room)focusRoom(room);else if(state.focus)focusRoom(null);}
 
- async function start(){
+ /** Em tela estreita a barra fica em duas linhas: logo com mercado e hora em cima; zonas, "Outros ambientes", luz e o link do escritório anterior
+  * na faixa rolável de baixo. Em tela larga os três controles voltam ao lugar de origem (a barra de desktop não muda). */
+ function arrangeTopbar(){
+  const mq=globalThis.matchMedia?.('(max-width:900px)'),nav=$('nav'),status=$('.status');if(!mq||!nav||!status)return;
+  const tools=[$('#otherRooms'),$('#lightingMode')?.closest?.('label'),$('.chip.link')].filter(Boolean),home=new Map(tools.map(t=>[t,t.nextSibling??null]));
+  let inNav=false;
+  const place=()=>{if(mq.matches===inNav)return;inNav=mq.matches;if(inNav)for(const t of tools)nav.append(t);else for(const t of tools)status.insertBefore(t,home.get(t)??null);};
+  place();mq.addEventListener?.('change',place);
+ }
+ async function start(){arrangeTopbar();
   const res=await get('/office2/scene-map.json');if(!res.ok){$('#agentsStatus').hidden=false;$('#agentsStatus').textContent='Mapa da cena indisponível.';return;}
   state.map=res.body;state.iso=Office2Iso.create(state.map);
   // F7: móveis e ícones recortados das folhas do ChatGPT; sem o manifesto, ficam os blocos.
@@ -375,7 +397,7 @@ function placeZoneLabels(){const c=state.camera;for(const z of zoneLabels){z.nod
   buildZoneLabels();resize();
   $('#otherRooms').addEventListener('change',e=>{const room=state.map.rooms.find(r=>r.id===e.target.value);if(room)focusRoom(room);});
   $('#lightingMode').addEventListener('change',e=>{lightingMode=A?.save(preferences,e.target.value)??e.target.value;updateLighting();});
-  for(const b of D.querySelectorAll('[data-zoom]'))b.addEventListener('click',()=>{const c=state.camera,x=viewport.clientWidth/2,y=viewport.clientHeight/2,s=Math.max(overview().s*.75,Math.min(3,c.s*Number(b.dataset.zoom)));moveCamera(clampCamera({s,x:x-(x-c.x)*s/c.s,y:y-(y-c.y)*s/c.s}));});
+  for(const b of D.querySelectorAll('[data-zoom]'))b.addEventListener('click',()=>{const c=state.camera,x=viewport.clientWidth/2,y=viewport.clientHeight/2,s=Math.max(floorFit().s*.75,Math.min(3,c.s*Number(b.dataset.zoom)));moveCamera(clampCamera({s,x:x-(x-c.x)*s/c.s,y:y-(y-c.y)*s/c.s}));});
   $('#fitView').addEventListener('click',()=>moveCamera(state.focus?roomCamera(state.focus):overview()));
   for(const b of D.querySelectorAll('[data-room]'))b.addEventListener('click',()=>{const id=b.dataset.room;focusRoom(id?state.map.rooms.find(r=>r.id===id):null);});
   canvas.addEventListener('click',onClick);

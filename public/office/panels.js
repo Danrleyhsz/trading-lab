@@ -126,12 +126,12 @@
   const grid=el('div',undefined,'hero-grid');grid.append(fund,oiCard,liq,book);
   return [coins,grid,card('24 h · moedas',heat)];
  }
- const forwardStatus={WAITING_START:['Aguardando início','⏳',''],RUNNING:['Ao vivo','●','up'],STOPPED_BY_DRAWDOWN:['Parado: queda de 15%','■','down'],COMPLETED:['12 semanas concluídas','✓',''],DATA_UNAVAILABLE:['Dados indisponíveis','!','down']};
+ const forwardStatus={WAITING_START:['Aguardando início','⏳',''],RUNNING:['Ao vivo','●','up'],STOPPED_BY_DRAWDOWN:['Parado: queda de 15%','■','down'],COMPLETED:['12 semanas concluídas','✓',''],DATA_UNAVAILABLE:['Dados indisponíveis','!','down'],DISABLED:['Encerrado pelo dono','■','']};
  /** Acompanhamento ao vivo do momentum entre moedas (XSMOM_FORWARD_V1): só simulação, dados públicos. */
  function forwardCard(){
   const f=data.forward;if(!f)return null;
   const [label,icon,cls]=forwardStatus[f.status]||[f.status,'•',''],head=el('div',undefined,'forward-head');
-  head.append(el('span',icon+' '+label,'pill '+cls),el('b','Momentum entre moedas · 28 dias · metade do tamanho'),el('small',f.verdict==='APPROVED'?'aprovado':f.verdict==='REJECTED'?'reprovado':'em andamento'));
+  head.append(el('span',icon+' '+label,'pill '+cls),el('b','Momentum entre moedas · 28 dias · metade do tamanho'),el('small',f.verdict==='APPROVED'?'aprovado':f.verdict==='REJECTED'?'reprovado':f.verdict==='CLOSED_BY_OWNER'?'sem veredito':'em andamento'));
   const left=f.portfolio?.long??[],right=f.portfolio?.short??[],chips=(list,c)=>{const box=el('div',undefined,'coin-chips');for(const s of list)box.append(el('span',s.replace('USDT','').replace('1000',''),'coin-chip '+c));return box;};
   const ddLimit=el('div',undefined,'limit-bar'),fill=el('span');fill.style.width=Math.min(100,(f.maxDrawdown||0)/0.15*100)+'%';ddLimit.append(fill);
   const next=f.nextDecisionAt?Math.max(0,Date.parse(f.nextDecisionAt)-Date.now()):null;

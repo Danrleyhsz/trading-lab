@@ -29,3 +29,12 @@ experiments/kronos/vendor/
 experiments/kronos/.cache/
 experiments/kronos/data/
 __pycache__/
+scripts/estudos/out/long-*.json
+scripts/estudos/out/holdout21-*.json
+scripts/estudos/out/outras-*.json
+
+scripts/estudos/out/pool-*.json
+scripts/estudos/out/carry2-*.json
+scripts/estudos/out/listagem-*.json
+scripts/estudos/out/spot1d-*.json
+scripts/estudos/out/antiga-*.json

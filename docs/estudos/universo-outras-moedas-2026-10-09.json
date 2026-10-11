@@ -1,0 +1,425 @@
+{
+ "protocol": "MOM_METADE_V1",
+ "generatedAt": "2026-10-09T20:15:27.819Z",
+ "rule": {
+  "listedUntil": 1638230400000,
+  "count": 45,
+  "groups": 3,
+  "excludedBaseAssets": [
+   "USDC",
+   "TUSD",
+   "FDUSD",
+   "BUSD",
+   "USDP",
+   "DAI",
+   "EUR",
+   "AEUR",
+   "XUSD",
+   "RLUSD",
+   "USD1"
+  ]
+ },
+ "usedSymbols": [
+  "ZECUSDT",
+  "NEARUSDT",
+  "UNIUSDT",
+  "BCHUSDT",
+  "FILUSDT",
+  "AAVEUSDT",
+  "AVAXUSDT",
+  "LINKUSDT",
+  "XRPUSDT",
+  "XLMUSDT",
+  "DOGEUSDT",
+  "SOLUSDT",
+  "LTCUSDT",
+  "ETHUSDT",
+  "BTCUSDT"
+ ],
+ "forwardSymbols": [
+  "ENAUSDT",
+  "ZECUSDT",
+  "WLDUSDT",
+  "NEARUSDT",
+  "UNIUSDT",
+  "ONDOUSDT",
+  "1000PEPEUSDT",
+  "BCHUSDT",
+  "FILUSDT",
+  "AAVEUSDT",
+  "SUIUSDT",
+  "TAOUSDT",
+  "AVAXUSDT",
+  "LINKUSDT",
+  "XRPUSDT",
+  "XLMUSDT",
+  "DOGEUSDT",
+  "SOLUSDT",
+  "LTCUSDT",
+  "ETHUSDT",
+  "BTCUSDT"
+ ],
+ "eligibleCount": 71,
+ "universe": [
+  {
+   "symbol": "RLCUSDT",
+   "baseAsset": "RLC",
+   "onboardDate": "2020-07-31",
+   "quoteVolume24h": 635299332.3759,
+   "rank": 1,
+   "group": 1
+  },
+  {
+   "symbol": "OGNUSDT",
+   "baseAsset": "OGN",
+   "onboardDate": "2021-03-31",
+   "quoteVolume24h": 462980546.59804,
+   "rank": 2,
+   "group": 2
+  },
+  {
+   "symbol": "BNBUSDT",
+   "baseAsset": "BNB",
+   "onboardDate": "2020-02-10",
+   "quoteVolume24h": 266663919.865,
+   "rank": 3,
+   "group": 3
+  },
+  {
+   "symbol": "ADAUSDT",
+   "baseAsset": "ADA",
+   "onboardDate": "2020-01-31",
+   "quoteVolume24h": 185295708.7898,
+   "rank": 4,
+   "group": 1
+  },
+  {
+   "symbol": "SANDUSDT",
+   "baseAsset": "SAND",
+   "onboardDate": "2021-01-18",
+   "quoteVolume24h": 125785280.38045,
+   "rank": 5,
+   "group": 2
+  },
+  {
+   "symbol": "ATOMUSDT",
+   "baseAsset": "ATOM",
+   "onboardDate": "2020-02-07",
+   "quoteVolume24h": 112497889.836,
+   "rank": 6,
+   "group": 3
+  },
+  {
+   "symbol": "DOTUSDT",
+   "baseAsset": "DOT",
+   "onboardDate": "2020-08-22",
+   "quoteVolume24h": 108266426.62637,
+   "rank": 7,
+   "group": 1
+  },
+  {
+   "symbol": "SKLUSDT",
+   "baseAsset": "SKL",
+   "onboardDate": "2020-08-24",
+   "quoteVolume24h": 64013276.183106,
+   "rank": 8,
+   "group": 2
+  },
+  {
+   "symbol": "GTCUSDT",
+   "baseAsset": "GTC",
+   "onboardDate": "2021-03-15",
+   "quoteVolume24h": 62217912.69998,
+   "rank": 9,
+   "group": 3
+  },
+  {
+   "symbol": "CTSIUSDT",
+   "baseAsset": "CTSI",
+   "onboardDate": "2021-10-25",
+   "quoteVolume24h": 59458201.08167,
+   "rank": 10,
+   "group": 1
+  },
+  {
+   "symbol": "BATUSDT",
+   "baseAsset": "BAT",
+   "onboardDate": "2020-02-13",
+   "quoteVolume24h": 55383701.94925,
+   "rank": 11,
+   "group": 2
+  },
+  {
+   "symbol": "CRVUSDT",
+   "baseAsset": "CRV",
+   "onboardDate": "2020-09-01",
+   "quoteVolume24h": 49060911.88444,
+   "rank": 12,
+   "group": 3
+  },
+  {
+   "symbol": "XMRUSDT",
+   "baseAsset": "XMR",
+   "onboardDate": "2020-02-03",
+   "quoteVolume24h": 40081877.44,
+   "rank": 13,
+   "group": 1
+  },
+  {
+   "symbol": "HBARUSDT",
+   "baseAsset": "HBAR",
+   "onboardDate": "2021-03-17",
+   "quoteVolume24h": 36985057.39116,
+   "rank": 14,
+   "group": 2
+  },
+  {
+   "symbol": "ALGOUSDT",
+   "baseAsset": "ALGO",
+   "onboardDate": "2020-06-16",
+   "quoteVolume24h": 30606029.307274,
+   "rank": 15,
+   "group": 3
+  },
+  {
+   "symbol": "ICPUSDT",
+   "baseAsset": "ICP",
+   "onboardDate": "2021-07-30",
+   "quoteVolume24h": 29293706.972,
+   "rank": 16,
+   "group": 1
+  },
+  {
+   "symbol": "TRXUSDT",
+   "baseAsset": "TRX",
+   "onboardDate": "2020-01-15",
+   "quoteVolume24h": 28481763.14584,
+   "rank": 17,
+   "group": 2
+  },
+  {
+   "symbol": "1000SHIBUSDT",
+   "baseAsset": "1000SHIB",
+   "onboardDate": "2021-05-10",
+   "quoteVolume24h": 27601632.122863,
+   "rank": 18,
+   "group": 3
+  },
+  {
+   "symbol": "DASHUSDT",
+   "baseAsset": "DASH",
+   "onboardDate": "2020-02-04",
+   "quoteVolume24h": 24706179.55,
+   "rank": 19,
+   "group": 1
+  },
+  {
+   "symbol": "ETCUSDT",
+   "baseAsset": "ETC",
+   "onboardDate": "2020-01-16",
+   "quoteVolume24h": 22455276.558,
+   "rank": 20,
+   "group": 2
+  },
+  {
+   "symbol": "ONEUSDT",
+   "baseAsset": "ONE",
+   "onboardDate": "2021-03-17",
+   "quoteVolume24h": 13771551.3329154,
+   "rank": 21,
+   "group": 3
+  },
+  {
+   "symbol": "VETUSDT",
+   "baseAsset": "VET",
+   "onboardDate": "2020-02-14",
+   "quoteVolume24h": 12432786.00105,
+   "rank": 22,
+   "group": 1
+  },
+  {
+   "symbol": "GALAUSDT",
+   "baseAsset": "GALA",
+   "onboardDate": "2021-09-17",
+   "quoteVolume24h": 10390165.97491,
+   "rank": 23,
+   "group": 2
+  },
+  {
+   "symbol": "ARUSDT",
+   "baseAsset": "AR",
+   "onboardDate": "2021-09-28",
+   "quoteVolume24h": 9714304.951,
+   "rank": 24,
+   "group": 3
+  },
+  {
+   "symbol": "ONTUSDT",
+   "baseAsset": "ONT",
+   "onboardDate": "2020-02-11",
+   "quoteVolume24h": 8929062.128354,
+   "rank": 25,
+   "group": 1
+  },
+  {
+   "symbol": "LPTUSDT",
+   "baseAsset": "LPT",
+   "onboardDate": "2021-11-10",
+   "quoteVolume24h": 8476090.246,
+   "rank": 26,
+   "group": 2
+  },
+  {
+   "symbol": "AXSUSDT",
+   "baseAsset": "AXS",
+   "onboardDate": "2020-11-20",
+   "quoteVolume24h": 8097335.7792,
+   "rank": 27,
+   "group": 3
+  },
+  {
+   "symbol": "TRBUSDT",
+   "baseAsset": "TRB",
+   "onboardDate": "2020-09-03",
+   "quoteVolume24h": 8012703.758,
+   "rank": 28,
+   "group": 1
+  },
+  {
+   "symbol": "ZENUSDT",
+   "baseAsset": "ZEN",
+   "onboardDate": "2020-11-24",
+   "quoteVolume24h": 7976516.156,
+   "rank": 29,
+   "group": 2
+  },
+  {
+   "symbol": "MANAUSDT",
+   "baseAsset": "MANA",
+   "onboardDate": "2021-03-14",
+   "quoteVolume24h": 7113377.38128,
+   "rank": 30,
+   "group": 3
+  },
+  {
+   "symbol": "COTIUSDT",
+   "baseAsset": "COTI",
+   "onboardDate": "2021-03-09",
+   "quoteVolume24h": 6451297.339983,
+   "rank": 31,
+   "group": 1
+  },
+  {
+   "symbol": "COMPUSDT",
+   "baseAsset": "COMP",
+   "onboardDate": "2020-06-30",
+   "quoteVolume24h": 5947959.39,
+   "rank": 32,
+   "group": 2
+  },
+  {
+   "symbol": "RUNEUSDT",
+   "baseAsset": "RUNE",
+   "onboardDate": "2020-09-04",
+   "quoteVolume24h": 5779633.9154,
+   "rank": 33,
+   "group": 3
+  },
+  {
+   "symbol": "ENJUSDT",
+   "baseAsset": "ENJ",
+   "onboardDate": "2020-09-29",
+   "quoteVolume24h": 5764934.76787,
+   "rank": 34,
+   "group": 1
+  },
+  {
+   "symbol": "DYDXUSDT",
+   "baseAsset": "DYDX",
+   "onboardDate": "2021-09-09",
+   "quoteVolume24h": 5089074.60834,
+   "rank": 35,
+   "group": 2
+  },
+  {
+   "symbol": "CHZUSDT",
+   "baseAsset": "CHZ",
+   "onboardDate": "2021-01-21",
+   "quoteVolume24h": 5078262.43823,
+   "rank": 36,
+   "group": 3
+  },
+  {
+   "symbol": "EGLDUSDT",
+   "baseAsset": "EGLD",
+   "onboardDate": "2020-09-14",
+   "quoteVolume24h": 5008343.975,
+   "rank": 37,
+   "group": 1
+  },
+  {
+   "symbol": "KAVAUSDT",
+   "baseAsset": "KAVA",
+   "onboardDate": "2020-07-28",
+   "quoteVolume24h": 4817937.403917,
+   "rank": 38,
+   "group": 2
+  },
+  {
+   "symbol": "CHRUSDT",
+   "baseAsset": "CHR",
+   "onboardDate": "2021-03-12",
+   "quoteVolume24h": 4718412.00624,
+   "rank": 39,
+   "group": 3
+  },
+  {
+   "symbol": "ENSUSDT",
+   "baseAsset": "ENS",
+   "onboardDate": "2021-11-29",
+   "quoteVolume24h": 4630943.387,
+   "rank": 40,
+   "group": 1
+  },
+  {
+   "symbol": "ALICEUSDT",
+   "baseAsset": "ALICE",
+   "onboardDate": "2021-03-15",
+   "quoteVolume24h": 4556728.14381,
+   "rank": 41,
+   "group": 2
+  },
+  {
+   "symbol": "IOTAUSDT",
+   "baseAsset": "IOTA",
+   "onboardDate": "2020-02-12",
+   "quoteVolume24h": 4430840.237471,
+   "rank": 42,
+   "group": 3
+  },
+  {
+   "symbol": "IOSTUSDT",
+   "baseAsset": "IOST",
+   "onboardDate": "2020-02-21",
+   "quoteVolume24h": 4079620.162669,
+   "rank": 43,
+   "group": 1
+  },
+  {
+   "symbol": "GRTUSDT",
+   "baseAsset": "GRT",
+   "onboardDate": "2020-12-18",
+   "quoteVolume24h": 3853631.96702,
+   "rank": 44,
+   "group": 2
+  },
+  {
+   "symbol": "CELRUSDT",
+   "baseAsset": "CELR",
+   "onboardDate": "2021-03-29",
+   "quoteVolume24h": 3772114.543637,
+   "rank": 45,
+   "group": 3
+  }
+ ]
+}
