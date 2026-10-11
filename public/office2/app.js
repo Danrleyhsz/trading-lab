@@ -32,7 +32,15 @@
  const icon=(name,cls='ico')=>{const info=images.icons?.[name];if(!info)return null;const i=el('img',cls);i.src='/office2/art/'+info.file;i.alt='';i.decoding='async';return i;};
  const ZONE_EMBLEM={horizon:'zona-horizon',nexus:'zona-nexus',ring:'zona-ring','stress-lab':'zona-lab',risk:'zona-risk',auditoria:'zona-auditoria',diagnostico:'zona-diagnostico',backtest:'zona-backtest','hall-marca':'zona-marca'};
  // F7: cidade gerada, desenhada como fundo em tela cheia a cada quadro (antes de carregar vale um degradê).
- images.skylines=Object.fromEntries([['day','dia'],['dusk','entardecer'],['night','noite']].map(([phase,name])=>[phase,loadImage('/office2/art/cidade-'+name+'.png')]));images.skyline=images.skylines.night;
+ // Cada cidade pesa cerca de 3,5 MB: só a da fase atual é baixada; a de outra fase só entra quando a fase muda.
+ // `images.skyline` é a última cidade que terminou de carregar: serve de fundo enquanto a da nova fase não chega.
+ const SKYLINE_FILE={day:'dia',dusk:'entardecer',night:'noite'};images.skylines={};
+ function loadSkyline(phase){
+  if(!SKYLINE_FILE[phase]||images.skylines[phase])return;
+  const img=loadImage('/office2/art/cidade-'+SKYLINE_FILE[phase]+'.png',()=>{if(!img.naturalWidth)return;images.skyline=img;if(state.scene&&phase===lightingPhase)state.cache=renderCache(phase);});
+  images.skylines[phase]=img;
+ }
+ loadSkyline(lightingPhase);
  async function get(path){try{const r=await fetch(path,{credentials:'same-origin',headers:{accept:'application/json'}});if(!r.ok)return {ok:false,status:r.status};return {ok:true,body:await r.json()};}catch{return {ok:false,status:0};}}
  const why=res=>res.status===401||res.status===403?'sem acesso (entre pelo escritório atual)':res.status===404?'fonte não disponível':res.status===0?'sem conexão':'indisponível (HTTP '+res.status+')';
 
@@ -316,7 +324,7 @@ function placeZoneLabels(){const c=state.camera;for(const z of zoneLabels){z.nod
 
  // ---------- barra de cima ----------
  function updateLighting(){
-  const next=A?.phase(lightingMode)??'night';$('#lightingMode').value=lightingMode;
+  const next=A?.phase(lightingMode)??'night';loadSkyline(next);$('#lightingMode').value=lightingMode;
   viewport.dataset.lighting=next;state.lighting={mode:lightingMode,phase:next};
   if(state.scene&&next!==lightingPhase){state.transition=reduced?null:{from:lightingPhase,start:performance.now(),cache:state.cache};lightingPhase=next;state.cache=renderCache(next);}
  }

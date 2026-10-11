@@ -135,3 +135,39 @@ test('em tela estreita a barra leva "Outros ambientes", luz e o link antigo para
  mq.matches=false;change?.();
  assert.deepEqual(restored,[[other,'market'],[label,'clock'],[link,null]],'em tela larga voltam à posição original');
 });
+
+test('a cidade é baixada só da fase atual e a de outra fase só quando a fase muda',async()=>{
+ const context=runtime(),nodes=new Map<string,any>(),requested:string[]=[];let change:((e:unknown)=>void)|undefined;
+ const node=(extra:any={})=>({clientWidth:1200,clientHeight:700,style:{},dataset:{},classList:{add(){},toggle(){}},append(){},replaceChildren(){},addEventListener(){},setAttribute(){},getContext(){return {};},...extra});
+ nodes.set('#lightingMode',node({addEventListener(type:string,fn:(e:unknown)=>void){if(type==='change')change=fn;}}));
+ const document={hidden:false,querySelector(key:string){if(!nodes.has(key))nodes.set(key,node());return nodes.get(key);},querySelectorAll(){return [];},createElement:node,createTextNode:node,addEventListener(){}};
+ class Img{onload?:()=>void;set src(value:string){requested.push(value);queueMicrotask(()=>this.onload?.());}}
+ Object.assign(context,{document,Image:Img,localStorage:{getItem(){return 'day';}},matchMedia:()=>({matches:true}),requestAnimationFrame(){},setInterval(){},addEventListener(){},performance:{now:()=>0},OfficeSpriteSheets:{},Office2Ring:{ACCOUNT:'evaluation:nova:usdm'},Office2Lab:{},Office2Ops:{},Office2Horizon:{},
+  fetch:async(url:string)=>({ok:url==='/office2/scene-map.json',status:404,json:async()=>map}),
+  Office2Scene:{create(){return {signs:[],renderStatic(_scale:number,_phase:string,height:number){return {worldHeight:height};}};}}});
+ vm.runInContext(readFileSync('public/office2/app.js','utf8'),context);
+ await new Promise(resolve=>setImmediate(resolve));
+ const cities=()=>requested.filter(url=>url.includes('/art/cidade-'));
+ assert.deepEqual(cities(),['/office2/art/cidade-dia.png'],'ao abrir, só a cidade da fase atual');
+ assert.equal(typeof change,'function');
+ change!({target:{value:'night'}});
+ assert.deepEqual(cities(),['/office2/art/cidade-dia.png','/office2/art/cidade-noite.png'],'a fase mudou: entra só a cidade da noite');
+ change!({target:{value:'day'}});change!({target:{value:'night'}});
+ assert.equal(cities().length,2,'voltar a uma fase já vista não baixa de novo, e a do entardecer nunca foi pedida');
+});
+
+test('o fundo usa a cidade da fase quando carregou e a última carregada enquanto a da nova fase não chega',()=>{
+ const context=runtime(),scene=context.Office2Scene.create(map,context.Office2Iso.create(map),{});
+ const loaded=(name:string)=>({name,complete:true,naturalWidth:1536,naturalHeight:1024}),pending=(name:string)=>({name,complete:false,naturalWidth:0,naturalHeight:0});
+ const drawn=(images:any,phase:string)=>{
+  const sky=context.Office2Scene.create(map,context.Office2Iso.create(map),images).backdrop,images_:any[]=[];
+  const ctx=new Proxy({},{get:(_t,k)=>k==='drawImage'?(img:any)=>images_.push(img):k==='createLinearGradient'||k==='createRadialGradient'?()=>({addColorStop(){}}):()=>undefined,set:()=>true});
+  sky.draw(ctx,800,600,{x:0,y:0,s:1},0,1,phase);return images_;
+ };
+ assert.ok(scene.backdrop,'a cena expõe o fundo');
+ const day=loaded('dia'),dusk=loaded('entardecer');
+ assert.deepEqual(drawn({skylines:{day,dusk:pending('entardecer')},skyline:day},'day'),[day],'cidade da própria fase');
+ assert.deepEqual(drawn({skylines:{day,dusk:pending('entardecer')},skyline:day},'dusk'),[day],'fase nova ainda carregando: segue a anterior, sem degradê');
+ assert.deepEqual(drawn({skylines:{day,dusk},skyline:dusk},'dusk'),[dusk],'carregou: passa para a da fase');
+ assert.deepEqual(drawn({skylines:{day:pending('dia')}},'day'),[],'nenhuma carregada: só o degradê');
+});

@@ -29,7 +29,9 @@ test('/office2/art serve PNG de nome simples nas pastas de arte e os metadados e
  const app=Fastify();registerOfficeAssets(app);
  try{
   for(const [p,type] of [['/office2/art/manifesto.json','application/json'],['/office2/art/props/sofa.png','image/png'],['/office2/art/icones/estagio-risk.png','image/png'],['/office2/art/cidade-noite.png','image/png'],['/office2/art/texturas/piso-marmore.png','image/png'],['/office2/art/personagens/vega.png','image/png'],['/office2/art/personagens/quadros.json','application/json']]){
-   const r=await app.inject(p);assert.equal(r.statusCode,200,p);assert.match(String(r.headers['content-type']),new RegExp('^'+type));assert.equal(r.headers['x-content-type-options'],'nosniff');}
+   const r=await app.inject(p);assert.equal(r.statusCode,200,p);assert.match(String(r.headers['content-type']),new RegExp('^'+type));assert.equal(r.headers['x-content-type-options'],'nosniff');
+   // Imagem de art/ fica um dia em cache; os JSON da própria pasta art/ continuam revalidando.
+   assert.equal(r.headers['cache-control'],type==='image/png'?'public, max-age=86400':'no-cache',p);}
   for(const p of ['/office2/art/props/nao-existe.png','/office2/art/props/..%2F..%2F..%2F.env','/office2/art/props/%2e%2e%2f%2e%2e%2fapp.js','/office2/art/props/Sofa.png','/office2/art/outros/sofa.png','/office2/art/props/sofa.svg','/office2/art/texturas/..%2F..%2Fscene.js','/office2/art/personagens/outros.json','/office2/art/texturas/quadros.json'])
    assert.equal((await app.inject(p)).statusCode,404,p);
  }finally{await app.close();}

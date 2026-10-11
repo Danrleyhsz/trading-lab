@@ -123,7 +123,7 @@
    const face=(a,b,n,seed,shade)=>{
     const quad=[a,b,{x:b.x,y:b.y+depth},{x:a.x,y:a.y+depth}],rnd=Office2Iso.prng(seed),bays=Math.ceil(n/2);
     poly(ctx,quad,palette.glass);
-    const reflection=images?.skylines?.[phase]??images?.skyline;
+    const reflection=cityFor(images,phase);
     if(reflection?.complete&&reflection.naturalWidth){ctx.save();ctx.clip();ctx.globalAlpha=.16;ctx.drawImage(reflection,Math.min(a.x,b.x),Math.min(a.y,b.y),Math.abs(b.x-a.x),depth+Math.abs(b.y-a.y));ctx.restore();}
     for(let f=0;f*FH<depth;f++){
      const y0=14+f*FH;
@@ -305,6 +305,8 @@
   const topY=Math.min(...wallList.map(w=>P(w.a.i,w.a.j,w.h+HEAD).y));
   return {renderStatic,draw,topY,walls:wallList,posts:postList.map(p=>({i:p.i,j:p.j,h:p.h,door:p.door})),signs:signs.map(s=>s.room),backdrop:createBackdrop(images)};
  }
+ /** Cidade da fase, se já carregou; senão a última que carregou (as cidades são baixadas só quando a fase chega). */
+ function cityFor(images,phase){const own=images?.skylines?.[phase];return own?.complete&&own.naturalWidth?own:images?.skyline;}
  /**
   * Fundo em tela cheia, em coordenadas de tela: a cidade gerada cobre toda a área (sem faixas pretas), com paralaxe leve.
   * "Vida" decorativa por semente e relógio, nunca dado: janelas da própria arte que apagam e acendem devagar, névoa passando
@@ -322,14 +324,15 @@
    return out;
   }
   function draw(ctx,W,H,cam,t,dpr,phase='night',transition){
-   ctx.setTransform(1,0,0,1,0,0);const sky=images?.skylines?.[phase]??images?.skyline;
+   ctx.setTransform(1,0,0,1,0,0);const sky=cityFor(images,phase);
    if(!(sky&&sky.complete&&sky.naturalWidth)){const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,C.sky[0]);g.addColorStop(0.6,C.sky[1]);g.addColorStop(1,C.sky[2]);ctx.fillStyle=g;ctx.fillRect(0,0,W,H);return;}
    // Cobre a tela com 8% de folga; o fundo anda 4% do que a câmera anda (profundidade).
    const s=Math.max(W/sky.naturalWidth,H/sky.naturalHeight)*1.08,dw=sky.naturalWidth*s,dh=sky.naturalHeight*s;
    const px=Math.max(W-dw,Math.min(0,(W-dw)/2+cam.x*dpr*0.04)),py=Math.max(H-dh,Math.min(0,(H-dh)/2+cam.y*dpr*0.04));
    ctx.imageSmoothingEnabled=true;ctx.drawImage(sky,px,py,dw,dh);
    if(transition){const old=images?.skylines?.[transition.from];if(old?.complete&&old.naturalWidth){ctx.globalAlpha=1-transition.progress;ctx.drawImage(old,px,py,dw,dh);ctx.globalAlpha=1;}}
-   if(!lights&&images?.skyline?.complete&&images.skyline.naturalWidth)lights=sample(images.skyline);
+   // As janelas acesas vêm da cidade da noite e só aparecem à noite: a imagem noturna não é pedida antes disso.
+   const night=images?.skylines?.night;if(!lights&&phase==='night'&&night?.complete&&night.naturalWidth)lights=sample(night);
    const win=Math.max(2,4*s);
    for(const L of phase==='night'?(lights??[]):[]){const k=0.5+0.5*Math.sin(t/1000*2*Math.PI/L.period+L.phase),x=px+L.u*dw-win/2,y=py+L.v*dh-win/2;
     if(k<0.22){ctx.fillStyle=`rgba(12,18,32,${((0.22-k)/0.22*0.9).toFixed(3)})`;ctx.fillRect(x,y,win,win*1.3);}
