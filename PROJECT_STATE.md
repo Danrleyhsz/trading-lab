@@ -10,6 +10,8 @@ Detalhes e como religar cada item: [docs/ENCERRAMENTO_2026-10-10.md](docs/ENCERR
 - **Foco do laboratório:** execução, risco e auditoria.
 - **`/office2` é a entrada padrão** (`/` e `/office` redirecionam para `/office2/`; o 1.0 segue em `/office/index.html`).
 
+**Atualização de 11/10/2026:** piloto da Nova **encerrado formalmente** (`INSUFFICIENT_EVIDENCE`, 113 decisões "ficar fora", 0 operações), triagem do piloto 2 **não será executada** e os vigias seguem desligados. Detalhes em [docs/PILOTO_NOVA_ENCERRAMENTO_FINAL_2026-10-11.md](docs/PILOTO_NOVA_ENCERRAMENTO_FINAL_2026-10-11.md).
+
 ## State on 2026-10-09 — HISTÓRICO (era "read this first"; superado pelo estado de 10/10/2026 acima)
 
 > **Histórico.** O bloco abaixo descreve o estado de 09/10/2026 e foi superado pelo bloco "Estado em 10/10/2026". Fica como registro, sem alteração; não use como estado atual.
