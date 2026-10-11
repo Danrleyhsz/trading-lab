@@ -128,7 +128,7 @@
    for(const s of R.stages(r)){const li=el('li','stage');li.dataset.state=s.state;li.dataset.truth=s.truth;const head=el('div','stage-head'),b=el('b','',s.label),ic=icon('estagio-'+s.id);if(ic)b.prepend(ic);head.append(b,truthChip(s.truth));li.append(head,el('span','',s.text));if(s.detail)li.append(el('small','',s.detail));ol.append(li);}
    box.append(ol);
    if(r.team?.length)box.append(el('p','muted','Equipe ('+r.team.length+' mensagens, consultivas): '+r.team.filter(m=>m.kind==='DEBATE').map(m=>m.summary).join(' ').slice(0,220)));
-   box.append(el('p','muted','Ligação decisão → ordem por janela de tempo (lacuna L1); sem impressão digital do backend por decisão (L5).'));
+   box.append(el('p','muted',r.linkage==='DECISION_ID'?'Ordem ligada à decisão pelo ID · release '+(r.provenance?.codeCommit??'n/d').slice(0,7)+' / backend '+(r.provenance?.backendFingerprint??'n/d').slice(0,8):'Decisão anterior ao passo 5: ordem ligada pela janela de tempo e sem release gravada.'));
    const a=el('a','',' ficha completa (JSON)');a.href='/paper/perpetual/pilot/receipts/'+encodeURIComponent(r.decisionEventId);a.target='_blank';a.rel='noopener';box.append(a);
   },
   STRESS_LAB(box){
@@ -189,7 +189,7 @@
    if(vm.readiness){const r=vm.readiness;box.append(el('p','','Serviço: '+(r.ready?'pronto':'não pronto: '+r.reasons.join(', '))+' · armazenamento '+(r.storage??'n/d')+' · mercado perpétuo '+(r.market??'n/d')+(r.lastPersistenceFailureAt?' · última falha de gravação '+O.day(r.lastPersistenceFailureAt):'')));}
    else box.append(el('p','muted','Prontidão: '+why(state.ops.readiness??{status:0})+'.'));
    if(vm.cycle){const c=vm.cycle;box.append(el('p','','Ciclo do piloto agora: '+(c.error?'erro: '+c.error:'sem erro')+(c.lastAttemptFailed?' · última tentativa falhou':'')+(c.stopReason?' · parado: '+c.stopReason:'')));}
-   const h=el('p','muted','Histórico de falhas e novas tentativas: não gravado (lacuna L2); só o estado atual existe.');h.dataset.truth='UNKNOWN';box.append(h);
+   const h=el('p','muted',vm.historyKnown?'Falhas e recuperações do ciclo nesta janela entram na linha do tempo acima (gravadas desde o passo 5).':'Histórico de falhas desta decisão: não gravado (anterior ao passo 5); só o estado atual existe.');h.dataset.truth=vm.historyKnown?'REAL':'UNKNOWN';box.append(h);
   },
   AUDIT_LOGS(box){
    const vm=auditView();

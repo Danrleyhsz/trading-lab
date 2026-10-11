@@ -23,7 +23,11 @@ export interface PilotOptions {
   settleMs?: number;
   /** Team briefing hook; it never affects the decision and its failures are contained. */
   onDecision?: (context: PilotDecisionContext) => void;
+  /** Release que decide (commit e impressão digital do backend), gravado em cada decisão (lacuna L5). */
+  release?: { codeCommit: string | null; backendFingerprint: string | null };
 }
+/** Versão do registro das checagens do ciclo (lacunas L2 e L6): só registra, nunca muda uma condição. */
+export const CYCLE_CHECKS_VERSION = 'CYCLE_CHECKS_V1';
 export class AutonomousPerpetualCycle {
   private busy = false;
   private error: string | null = null;
@@ -35,6 +39,7 @@ export class AutonomousPerpetualCycle {
   private readonly retryDelayMs: number;
   private readonly settleMs: number;
   private readonly onDecision?: (context: PilotDecisionContext) => void;
+  private readonly release: { codeCommit: string | null; backendFingerprint: string | null };
   constructor(
     private enabled: boolean,
     private studyId: string,
@@ -53,6 +58,7 @@ export class AutonomousPerpetualCycle {
     this.maxLossFraction = options.maxLossFraction ?? 0.03;
     this.retryDelayMs = options.retryDelayMs ?? 300000;
     this.settleMs = options.settleMs ?? 0;
+    this.release = options.release ?? { codeCommit: null, backendFingerprint: null };
     if (!(Number.isInteger(this.settleMs) && this.settleMs >= 0 && this.settleMs <= 300000))
       throw Error('settle delay must be an integer from 0 to 300 seconds');
     this.onDecision = options.onDecision;
@@ -138,6 +144,19 @@ export class AutonomousPerpetualCycle {
       const direction = perpetualDirection(data.trade, configuration, current);
       // Persist the decision cursor before execution: restart never duplicates this candle.
       await this.book.checkpoint(last.timestamp, this.save);
+      const checks = [
+        { id: 'STUDY_ELIGIBLE', ok: true },
+        { id: 'PILOT_LOSS_LIMIT', ok: true },
+        { id: 'NOT_HALTED', ok: true },
+        { id: 'SOURCES_READY', ok: true },
+        { id: 'DATASET_VALID', ok: true },
+        {
+          id: 'SIGNAL_FRESH',
+          ok: true,
+          detail: Math.round((this.now() - last.timestamp - 3600000) / 1000) + ' s após o fechamento',
+        },
+        { id: 'CANDLE_NOT_PROCESSED', ok: true },
+      ];
       const decision = event('AUTONOMOUS_DECISION', {
         accountId: account.id,
         studyId: study.id,
@@ -148,6 +167,9 @@ export class AutonomousPerpetualCycle {
         direction,
         currentQuantity: current,
         configuration,
+        checksVersion: CYCLE_CHECKS_VERSION,
+        checks,
+        release: this.release,
       });
       this.bus.publish(decision);
       this.memories.add({
@@ -174,7 +196,14 @@ export class AutonomousPerpetualCycle {
       }
       await this.persist();
       if (current && Math.sign(current) !== direction)
-        await this.book.propose(account.id, current > 0 ? 'SELL' : 'BUY', Math.abs(current), this.save, study.id);
+        await this.book.propose(
+          account.id,
+          current > 0 ? 'SELL' : 'BUY',
+          Math.abs(current),
+          this.save,
+          study.id,
+          decision.id,
+        );
       const fresh = this.book.list().find((a) => a.id === account.id)!;
       // Proteções do estudo (se houver): mesma regra do backtest; só impedem abrir, nunca fechar.
       const closed = (this.book.performance(account.id)?.closedTrades ?? []).map((t) => ({
@@ -223,19 +252,67 @@ export class AutonomousPerpetualCycle {
           (fresh.portfolio.equity * 0.1) / (direction > 0 ? quote.ask : quote.bid),
           this.save,
           study.id,
+          decision.id,
+        );
+      }
+      // L2/L6: quando havia entrada a considerar, grava as checagens dela e o desfecho (as mesmas condições acima).
+      if (!fresh.portfolio.positions.length && direction) {
+        const entryChecks = [
+          { id: 'PRIMARY_DATA', ok: !backupData, detail: data.instrument },
+          { id: 'PROTECTIONS', ok: guard.allowed, detail: guard.reason ?? null },
+          { id: 'EQUITY_POSITIVE', ok: fresh.portfolio.equity > 0 },
+        ];
+        const failed = entryChecks.find((c) => !c.ok);
+        this.bus.publish(
+          event('AUTONOMOUS_ENTRY_CHECKED', {
+            accountId: account.id,
+            studyId: study.id,
+            decisionEventId: decision.id,
+            candleTimestamp: last.timestamp,
+            direction,
+            checksVersion: CYCLE_CHECKS_VERSION,
+            checks: entryChecks,
+            outcome: failed ? 'ENTRY_BLOCKED' : 'ENTRY_SUBMITTED',
+            reason: failed
+              ? failed.id === 'PROTECTIONS'
+                ? (failed.detail ?? 'PROTECTIONS')
+                : failed.id === 'PRIMARY_DATA'
+                  ? 'BACKUP_DATA'
+                  : failed.id
+              : null,
+          }),
         );
       }
       this.succeeded();
     } catch (error) {
-      this.error = error instanceof Error ? error.message : 'autonomous evaluation unavailable';
+      const reason = error instanceof Error ? error.message : 'autonomous evaluation unavailable';
+      const changed = !this.lastAttemptFailed || this.error !== reason;
+      this.error = reason;
       this.lastAttemptFailed = true;
       this.nextAttemptAt = this.now() + this.retryDelayMs;
+      if (changed)
+        this.bus.publish(
+          event('AUTONOMOUS_ATTEMPT_FAILED', {
+            accountId: 'evaluation:nova:usdm',
+            studyId: this.studyId,
+            reason: reason.slice(0, 200),
+            nextAttemptAt: this.nextAttemptAt,
+          }),
+        );
       throw error;
     } finally {
       this.busy = false;
     }
   }
   private succeeded() {
+    if (this.lastAttemptFailed)
+      this.bus.publish(
+        event('AUTONOMOUS_ATTEMPT_RECOVERED', {
+          accountId: 'evaluation:nova:usdm',
+          studyId: this.studyId,
+          previousReason: this.error,
+        }),
+      );
     this.error = null;
     this.lastAttemptFailed = false;
     this.nextAttemptAt = 0;

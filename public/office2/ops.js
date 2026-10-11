@@ -26,6 +26,7 @@
    for(const a of receipt.actions??[]){timeline.push({at:a.proposedAt,label:'proposta '+a.side+' '+a.quantity,kind:'proposal'});if(a.risk)timeline.push({at:a.proposedAt,label:a.risk.approved?'risco aprovou':'risco rejeitou: '+a.risk.reasons.join(', '),kind:a.risk.approved?'ok':'bad'});if(a.fill)timeline.push({at:a.fill.at,label:'fill paper @ '+Number(a.fill.price).toFixed(2),kind:'ok'});}
    for(const b of receipt.blocks??[])timeline.push({at:b.at,label:'bloqueio do ciclo: '+(b.reason??'sem motivo'),kind:'bad'});
    for(const s of receipt.stops??[])timeline.push({at:s.at,label:'piloto parado: '+(s.reason??''),kind:'bad'});
+   for(const a of receipt.attempts??[])timeline.push({at:a.at,label:a.kind==='FAILED'?'tentativa falhou: '+(a.reason??'sem motivo'):'ciclo recuperado (antes: '+(a.reason??'n/d')+')',kind:a.kind==='FAILED'?'bad':'ok'});
    timeline.sort((a,b)=>Date.parse(a.at)-Date.parse(b.at));
   }
   const row=parity?.rows?.find(r=>r.eventId===receipt?.decisionEventId)??null;
@@ -34,7 +35,8 @@
    parity:parity?{passed:parity.passed,summary:parity.summary,row:row?{verdict:row.verdict,execution:row.execution?.verdict,candles:row.candles}:null,latency:parity.decisionLatencySeconds??null}:null,
    readiness:readiness?{ready:!!readiness.ready,reasons:readiness.reasons??[],storage:readiness.storage?.kind??null,lastPersistenceFailureAt:readiness.storage?.lastPersistenceFailureAt??null,market:readiness.market?.perpetual?.status??null,newExposure:readiness.paper?.newExposure??null}:null,
    cycle:auto?{error:auto.error??null,lastAttemptFailed:!!auto.lastAttemptFailed,nextAttemptAt:auto.nextAttemptAt??null,stopReason:auto.stopReason??null,blockedReason:auto.blockedReason??null}:null,
-   historyKnown:false};
+   // Falhas passaram a ser gravadas no passo 5: só fichas com checagens têm histórico conhecido.
+   historyKnown:!!receipt?.checks};
  }
  /** Auditoria: fichas (completas) e eventos gravados recentes. */
  function audit(receiptsBody,events){

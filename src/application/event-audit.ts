@@ -27,6 +27,9 @@ const types = [
   'PAPER_CONTROL_CHANGED',
   'AUTONOMOUS_DECISION',
   'AUTONOMOUS_PILOT_STOPPED',
+  'AUTONOMOUS_ENTRY_CHECKED',
+  'AUTONOMOUS_ATTEMPT_FAILED',
+  'AUTONOMOUS_ATTEMPT_RECOVERED',
 ] as const satisfies readonly DomainEventType[];
 const query = z
   .object({

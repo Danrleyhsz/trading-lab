@@ -9,6 +9,7 @@ export interface PaperOrder {
   agentId?: string;
   strategyId?: string;
   proposalId?: string;
+  /** Decisão autônoma que originou a ordem (AUTONOMOUS_DECISION.id), quando houver. */ decisionEventId?: string;
 }
 export interface PaperFill extends PaperOrder {
   id: string;

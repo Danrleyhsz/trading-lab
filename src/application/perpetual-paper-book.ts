@@ -287,6 +287,7 @@ export class PerpetualPaperBook {
     events: DomainEvent[],
     liquidation = false,
     studyId?: string,
+    decisionEventId?: string,
   ) {
     const p = portfolio(account);
     p.mark('BTCUSDT', quote.markPrice);
@@ -301,6 +302,7 @@ export class PerpetualPaperBook {
       proposalId,
       instrument: PERPETUAL_INSTRUMENT,
       ...(studyId ? { strategyId: studyId } : {}),
+      ...(decisionEventId ? { decisionEventId } : {}),
     };
     const decision = this.risk.evaluate(
       order,
@@ -406,12 +408,14 @@ export class PerpetualPaperBook {
       this.quote = structuredClone(quote);
     });
   }
+  /** `decisionEventId` liga a ordem (e o fill, que copia a ordem) à decisão autônoma que a originou. */
   propose(
     id: string,
     side: 'BUY' | 'SELL',
     quantity: number,
     save: (state: PerpetualBookState) => Promise<void>,
     studyId?: string,
+    decisionEventId?: string,
   ) {
     return this.serial(async () => {
       if (!this.quote || !freshPerpetualQuote(this.quote, this.now())) throw Error('market unavailable');
@@ -421,7 +425,17 @@ export class PerpetualPaperBook {
         account = next.accounts.find((a) => a.id === id);
       if (!account) throw Error('unknown perpetual account');
       const events: DomainEvent[] = [];
-      const result = await this.order(next, account, side, quantity, this.quote, events, false, studyId);
+      const result = await this.order(
+        next,
+        account,
+        side,
+        quantity,
+        this.quote,
+        events,
+        false,
+        studyId,
+        decisionEventId,
+      );
       await this.commit(next, save, events);
       return result;
     });

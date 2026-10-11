@@ -21,6 +21,9 @@ export type DomainEventType =
   | 'PAPER_CONTROL_CHANGED'
   | 'AUTONOMOUS_DECISION'
   | 'AUTONOMOUS_PILOT_STOPPED'
+  | 'AUTONOMOUS_ENTRY_CHECKED'
+  | 'AUTONOMOUS_ATTEMPT_FAILED'
+  | 'AUTONOMOUS_ATTEMPT_RECOVERED'
   | 'RESEARCH_JOB_UPDATED';
 export interface DomainEvent<T = unknown> {
   id: string;

@@ -243,6 +243,10 @@ const cycle = new AutonomousPerpetualCycle(
     blockedReason: autonomousEnabled && production && !releasePinned ? 'RELEASE_NOT_APPROVED' : null,
     maxLossFraction: process.env.PILOT_MAX_LOSS === undefined ? 0.03 : Number(process.env.PILOT_MAX_LOSS),
     settleMs: Number(process.env.CONTINUOUS_SIGNAL_SETTLE_SECONDS ?? 0) * 1000,
+    release: {
+      codeCommit: /^[0-9a-f]{40}$/.test(renderCommit) ? renderCommit : null,
+      backendFingerprint: backend.fingerprint,
+    },
     onDecision: (context) => pilotTeam.brief(context),
   },
 );

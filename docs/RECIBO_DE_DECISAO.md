@@ -1,4 +1,6 @@
-# Recibo de decisão do piloto (DECISION_RECEIPT_V1)
+# Recibo de decisão do piloto (DECISION_RECEIPT_V1, atualizado para V2 no passo 5)
+
+> **V2:** decisões gravadas depois do passo 5 (`docs/PASSO5_REGISTRO_DO_CICLO.md`) ligam a ordem pelo ID, trazem checagens, bloqueios por evento, falhas e release. O texto abaixo descreve a V1, que continua valendo para as decisões antigas.
 
 Passo 1 do mapa ATS-MATRIX (`docs/research/ATSMATRIX_MAPA_DE_LACUNAS.md`, lacunas L3 e L4).
 Só leitura: monta cada recibo a partir de eventos, memórias e mensagens já gravados. Nunca altera o piloto, o livro paper ou as regras.

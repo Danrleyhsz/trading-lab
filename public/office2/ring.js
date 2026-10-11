@@ -15,8 +15,11 @@
    text:'sinal: '+side(r.proposal?.direction)+' · candle '+time(r.candleTimestamp)+' · '+secs(r.latencySeconds?.closeToDecision)+' após o fechamento',
    detail:'posição antes: '+(r.proposal?.positionBefore??'n/d')+(r.proposal?.positionSource==='FILLS'?' (reconstruída pelos fills)':'')+' · estudo '+String(r.provenance?.studyId??'n/d').slice(0,8)};
   const risk=!actions.length?{state:'none',text:'nenhuma ordem proposta'}:rejected.length?{state:'rejected',text:'rejeitada: '+[...new Set(rejected.flatMap(a=>a.risk.reasons))].join(', ')}:actions.every(a=>a.risk?.approved)?{state:'ok',text:actions.length+' ordem(ns) aprovada(s)'}:{state:'unknown',text:'resultado do risco não gravado'};
-  const validator=blocks.length?{state:'blocked',truth:'REAL',text:'bloqueio do ciclo: '+blocks.map(b=>b.reason??'sem motivo').join(', ')}
-   :{state:'unknown',truth:'UNKNOWN',text:'checagens do ciclo não registradas (lacuna L6); não existe validador que vete'};
+  // Desde o passo 5 o ciclo grava as checagens da decisão e da entrada; fichas antigas continuam UNKNOWN.
+  const ck=r.checks,passed=list=>(list??[]).filter(c=>c.ok).length;
+  const validator=blocks.length?{state:'blocked',truth:'REAL',text:'bloqueio do ciclo: '+blocks.map(b=>b.reason??'sem motivo').join(', '),detail:ck?.entry?'entrada: '+ck.entry.map(c=>c.id+(c.ok?' ok':' FALHOU')).join(' · '):undefined}
+   :ck?{state:'ok',truth:'REAL',text:passed(ck.decision)+' de '+ck.decision.length+' checagens do ciclo passaram'+(ck.entry?' · entrada: '+passed(ck.entry)+' de '+ck.entry.length:''),detail:ck.decision.map(c=>c.id).join(' · ')}
+   :{state:'unknown',truth:'UNKNOWN',text:'checagens do ciclo não registradas nesta decisão (gravada antes do passo 5)'};
   const execution=filled.length?{state:'ok',text:filled.length+' fill(s) paper · '+filled.map(a=>a.side+' '+a.quantity+' @ '+Number(a.fill.price).toFixed(2)).join('; ')+' · '+secs(r.latencySeconds?.decisionToFirstFill)+' após a decisão'}
    :actions.length?{state:'none',text:'sem fill (ordem não aprovada)'}:{state:'none',text:'nada a executar'};
   const audit={state:r.complete?'ok':r.outcome==='PENDING'?'pending':'warn',text:(OUTCOME[r.outcome]??r.outcome)+(r.complete?' · ficha completa':' · ficha incompleta')};
