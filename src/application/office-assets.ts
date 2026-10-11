@@ -1,4 +1,6 @@
-import { readFile } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
+import type { IncomingHttpHeaders } from 'node:http';
+import { readFile, stat } from 'node:fs/promises';
 import { join } from 'node:path';
 import type { FastifyInstance } from 'fastify';
 const officeFiles: Record<string, string> = {
@@ -81,6 +83,16 @@ function officeTwoType(name: string) {
           ? 'image/png'
           : null;
 }
+/** ETag forte pelo conteúdo: um arquivo que não mudou continua com o mesmo valor entre deploys. */
+const entityTag = (body: Buffer) => `"${createHash('sha1').update(body).digest('base64url')}"`;
+/** O cliente já tem a cópia atual? If-None-Match tem prioridade sobre If-Modified-Since (RFC 9110, 13.1.3). */
+function notModified(headers: IncomingHttpHeaders, etag: string, modified: Date) {
+  const none = headers['if-none-match'];
+  if (none !== undefined)
+    return none.trim() === '*' || none.split(',').some((tag) => tag.trim().replace(/^W\//, '') === etag);
+  const since = Date.parse(headers['if-modified-since'] ?? '');
+  return Number.isFinite(since) && Math.floor(modified.getTime() / 1000) * 1000 <= since;
+}
 export function registerOfficeAssets(
   app: FastifyInstance,
   directory = join(process.cwd(), 'public', 'office'),
@@ -90,16 +102,24 @@ export function registerOfficeAssets(
     const name = (req.params as { '*': string })['*'] || 'index.html';
     const type = officeTwoType(name);
     if (!type) return reply.code(404).send({ error: 'office asset not found' });
-    let body: Buffer;
+    let body: Buffer, modified: Date;
     try {
-      body = await readFile(join(officeTwo, name));
+      const path = join(officeTwo, name);
+      [body, modified] = [await readFile(path), (await stat(path)).mtime];
     } catch {
       return reply.code(404).send({ error: 'office asset not found' });
     }
     // As imagens de art/ pesam MB e mudam raramente: cache de um dia (uma arte trocada pode levar até 24 h para aparecer).
-    // HTML, JS, CSS e JSON (inclusive os de art/) sempre revalidam.
+    // HTML, JS, CSS e JSON (inclusive os de art/) sempre revalidam, e com ETag a revalidação sai sem corpo (304).
     const cache = name.startsWith('art/') && type.startsWith('image/') ? 'public, max-age=86400' : 'no-cache';
-    reply.type(type).header('X-Content-Type-Options', 'nosniff').header('Cache-Control', cache);
+    const etag = entityTag(body);
+    reply
+      .type(type)
+      .header('X-Content-Type-Options', 'nosniff')
+      .header('Cache-Control', cache)
+      .header('ETag', etag)
+      .header('Last-Modified', modified.toUTCString());
+    if (notModified(req.headers, etag, modified)) return reply.code(304).send();
     return body;
   });
   app.get('/office2', async (_req, reply) => reply.redirect('/office2/'));

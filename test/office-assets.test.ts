@@ -97,3 +97,56 @@ test('office2 caches only the art images for a day; pages, scripts, styles and J
     await app.close();
   }
 });
+test('office2 assets carry ETag and Last-Modified and answer a matching conditional request with an empty 304', async () => {
+  const app = Fastify();
+  registerOfficeAssets(app);
+  try {
+    const seen = new Set<string>();
+    for (const name of [
+      '',
+      'index.html',
+      'app.js',
+      'style.css',
+      'scene-map.json',
+      'art/manifesto.json',
+      'art/props/sofa.png',
+      'art/cidade-noite.png',
+    ]) {
+      const url = '/office2/' + name;
+      const first = await app.inject(url);
+      assert.equal(first.statusCode, 200, name);
+      const etag = String(first.headers.etag),
+        modified = String(first.headers['last-modified']);
+      assert.match(etag, /^"[A-Za-z0-9_-]+"$/, name);
+      assert.match(modified, /GMT$/, name);
+      assert.equal((await app.inject(url)).headers.etag, etag, 'the same bytes give the same ETag');
+      seen.add(etag);
+
+      const cached = await app.inject({ url, headers: { 'if-none-match': etag } });
+      assert.equal(cached.statusCode, 304, name);
+      assert.equal(cached.rawPayload.length, 0, name);
+      assert.equal(cached.headers.etag, etag);
+      assert.equal(cached.headers['cache-control'], first.headers['cache-control'], 'caching policy is kept on a 304');
+      for (const header of [`W/${etag}`, `"other", ${etag}`, '*'])
+        assert.equal((await app.inject({ url, headers: { 'if-none-match': header } })).statusCode, 304, header);
+
+      const stale = await app.inject({ url, headers: { 'if-none-match': '"stale"' } });
+      assert.equal(stale.statusCode, 200, name);
+      assert.equal(stale.rawPayload.length, first.rawPayload.length, 'a different tag gets the whole file');
+
+      assert.equal((await app.inject({ url, headers: { 'if-modified-since': modified } })).statusCode, 304, name);
+      const earlier = new Date(Date.parse(modified) - 3600000).toUTCString();
+      assert.equal((await app.inject({ url, headers: { 'if-modified-since': earlier } })).statusCode, 200, name);
+      assert.equal((await app.inject({ url, headers: { 'if-modified-since': 'not a date' } })).statusCode, 200, name);
+      // If-None-Match decide sozinho: uma etiqueta velha não vira 304 só porque a data bate.
+      const both = await app.inject({ url, headers: { 'if-none-match': '"stale"', 'if-modified-since': modified } });
+      assert.equal(both.statusCode, 200, name);
+    }
+    assert.equal(seen.size, 8 - 1, 'different files have different tags (index.html is served twice)');
+    const missing = await app.inject('/office2/art/props/nao-existe.png');
+    assert.equal(missing.statusCode, 404);
+    assert.equal(missing.headers.etag, undefined);
+  } finally {
+    await app.close();
+  }
+});
