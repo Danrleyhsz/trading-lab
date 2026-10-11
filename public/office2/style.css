@@ -25,6 +25,7 @@ nav select{background:var(--bar)}
 [data-truth="UNKNOWN"].chip{border-color:var(--unknown)}
 .layout{display:flex;flex:1;min-height:0}
 .viewport{position:relative;flex:1;overflow:hidden;background:var(--bg)}
+#scene{touch-action:none}
 #scene{position:absolute;inset:0;display:block;image-rendering:pixelated;cursor:pointer}
 .labels{position:absolute;inset:0;pointer-events:none}
 .labels>*{position:absolute;left:0;top:0;will-change:transform}

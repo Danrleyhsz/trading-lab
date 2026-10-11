@@ -221,16 +221,21 @@
 
  // ---------- câmera ----------
  /** Visão geral: enquadra a planta do andar (com as paredes altas e a borda da laje), não o retângulo inteiro da cena; o fundo cobre o resto. */
- function overview(){const iso=state.iso,top=iso.project(0,0,102),left=iso.project(0,iso.H),right=iso.project(iso.W,0),bottom=iso.project(iso.W,iso.H);
+ function floorFit(){const iso=state.iso,top=iso.project(0,0,102),left=iso.project(0,iso.H),right=iso.project(iso.W,0),bottom=iso.project(iso.W,iso.H);
   const bounds={x0:left.x-12,x1:right.x+12,y0:(state.scene?.topY??top.y)-14,y1:bottom.y+24},c=Office2Iso.fit(bounds,viewport.clientWidth,viewport.clientHeight,2,16);
   if(viewport.clientWidth<600)c.y=Math.min(c.y,88-bounds.y0*c.s);return c;}
+ /** Visão inicial. Em celular em pé a planta é limitada pela largura e ficava como uma faixa no topo, com a fachada ocupando o resto da tela:
+  * aí abre mais perto, centrada no andar (as pontas do losango saem da tela e arrastar mostra o resto). Em outras telas é o andar inteiro. */
+ function overview(){const c=floorFit(),vw=viewport.clientWidth,vh=viewport.clientHeight;if(vw>=600||vh<=vw)return c;
+  const iso=state.iso,left=iso.project(0,iso.H),right=iso.project(iso.W,0),bottom=iso.project(iso.W,iso.H),y0=(state.scene?.topY??iso.project(0,0,102).y)-14,y1=bottom.y+24,s=Math.min(3,c.s*1.35);
+  return clampCamera({s,x:vw/2-(left.x+right.x)/2*s,y:Math.max(vh/2-(y0+y1)/2*s,72-y0*s)});}
  function roomCamera(room){const t=room.tiles,pts=[[t.i0,t.j0],[t.i1,t.j0],[t.i1,t.j1],[t.i0,t.j1]].map(([i,j])=>state.iso.project(i,j));
   return Office2Iso.fit({x0:Math.min(...pts.map(p=>p.x))-32,x1:Math.max(...pts.map(p=>p.x))+32,y0:Math.min(...pts.map(p=>p.y))-112,y1:Math.max(...pts.map(p=>p.y))+30},viewport.clientWidth,viewport.clientHeight,2.6,32);}
  function moveCamera(to){if(reduced){state.camera=to;return;}const from={...state.camera},start=performance.now();state.anim={from,to,start};}
  function stepCamera(now){const a=state.anim;if(!a)return;const t=Math.min(1,(now-a.start)/320),e=1-Math.pow(1-t,3);
   state.camera={s:a.from.s+(a.to.s-a.from.s)*e,x:a.from.x+(a.to.x-a.from.x)*e,y:a.from.y+(a.to.y-a.from.y)*e};if(t>=1)state.anim=null;}
  function renderCache(phase=lightingPhase,force=true){
-  const scale=viewport.clientWidth<900?1:2,min=overview().s*.75;
+  const scale=viewport.clientWidth<900?1:2,min=floorFit().s*.75;
   const height=Math.ceil(Math.max(state.map.projection.scene.h+720,viewport.clientHeight/(min*2)+state.iso.project(state.iso.W,state.iso.H).y+180)),key=scale+':'+height+':'+phase;
   if(!force&&state.cacheSpec===key)return state.cache;
   state.cacheSpec=key;return state.scene.renderStatic(scale,phase,height);
@@ -351,7 +356,7 @@ function placeZoneLabels(){const c=state.camera;for(const z of zoneLabels){z.nod
   if(ev.type==='pointermove'&&drag.on){const dx=ev.clientX-drag.x,dy=ev.clientY-drag.y;if(!drag.moved&&Math.hypot(dx,dy)<5)return;drag.moved=true;drag.x=ev.clientX;drag.y=ev.clientY;state.anim=null;
    state.camera=clampCamera({...state.camera,x:state.camera.x+dx,y:state.camera.y+dy});canvas.style.cursor='grabbing';return;}
   if(ev.type==='pointerup'||ev.type==='pointercancel'){drag.on=false;canvas.style.cursor='';}}
- function onWheel(ev){ev.preventDefault();const r=canvas.getBoundingClientRect(),c=state.camera,mx=ev.clientX-r.left,my=ev.clientY-r.top,min=overview().s*0.75,s=Math.min(3,Math.max(min,c.s*Math.exp(-ev.deltaY*0.0015)));
+ function onWheel(ev){ev.preventDefault();const r=canvas.getBoundingClientRect(),c=state.camera,mx=ev.clientX-r.left,my=ev.clientY-r.top,min=floorFit().s*0.75,s=Math.min(3,Math.max(min,c.s*Math.exp(-ev.deltaY*0.0015)));
   state.anim=null;state.camera=clampCamera({s,x:mx-(mx-c.x)*s/c.s,y:my-(my-c.y)*s/c.s});}
  function onClick(ev){if(drag.moved){drag.moved=false;return;}const r=canvas.getBoundingClientRect(),c=state.camera,x=(ev.clientX-r.left-c.x)/c.s,y=(ev.clientY-r.top-c.y)/c.s;const t=state.iso.tileAt(x,y);const room=t&&state.iso.roomAt(t.i,t.j);if(room)focusRoom(room);else if(state.focus)focusRoom(null);}
 
@@ -375,7 +380,7 @@ function placeZoneLabels(){const c=state.camera;for(const z of zoneLabels){z.nod
   buildZoneLabels();resize();
   $('#otherRooms').addEventListener('change',e=>{const room=state.map.rooms.find(r=>r.id===e.target.value);if(room)focusRoom(room);});
   $('#lightingMode').addEventListener('change',e=>{lightingMode=A?.save(preferences,e.target.value)??e.target.value;updateLighting();});
-  for(const b of D.querySelectorAll('[data-zoom]'))b.addEventListener('click',()=>{const c=state.camera,x=viewport.clientWidth/2,y=viewport.clientHeight/2,s=Math.max(overview().s*.75,Math.min(3,c.s*Number(b.dataset.zoom)));moveCamera(clampCamera({s,x:x-(x-c.x)*s/c.s,y:y-(y-c.y)*s/c.s}));});
+  for(const b of D.querySelectorAll('[data-zoom]'))b.addEventListener('click',()=>{const c=state.camera,x=viewport.clientWidth/2,y=viewport.clientHeight/2,s=Math.max(floorFit().s*.75,Math.min(3,c.s*Number(b.dataset.zoom)));moveCamera(clampCamera({s,x:x-(x-c.x)*s/c.s,y:y-(y-c.y)*s/c.s}));});
   $('#fitView').addEventListener('click',()=>moveCamera(state.focus?roomCamera(state.focus):overview()));
   for(const b of D.querySelectorAll('[data-room]'))b.addEventListener('click',()=>{const id=b.dataset.room;focusRoom(id?state.map.rooms.find(r=>r.id===id):null);});
   canvas.addEventListener('click',onClick);
