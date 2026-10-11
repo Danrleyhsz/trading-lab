@@ -1,2 +1,35 @@
-import type{DerivativesMarketData,MarketSnapshot}from "../domain/market-snapshot.js";
-export class BinanceDerivativesData implements DerivativesMarketData{private valid(s:string){const v=s.toUpperCase();if(!/^[A-Z0-9]{5,20}$/.test(v))throw new Error("invalid symbol");return v}private async json(url:string){const r=await fetch(url,{signal:AbortSignal.timeout(15000)});if(!r.ok)throw new Error("market data unavailable");return r.json() as Promise<any>}async snapshot(symbol:string):Promise<MarketSnapshot>{const s=this.valid(symbol);const [book,premium,oi]=await Promise.all([this.json("https://fapi.binance.com/fapi/v1/ticker/bookTicker?symbol="+s),this.json("https://fapi.binance.com/fapi/v1/premiumIndex?symbol="+s),this.json("https://fapi.binance.com/fapi/v1/openInterest?symbol="+s)]);const bid=Number(book.bidPrice),ask=Number(book.askPrice),price=(bid+ask)/2;return{symbol:s,price,bid,ask,spread:ask-bid,spreadBps:(ask-bid)/price*10000,fundingRate:Number(premium.lastFundingRate),openInterest:Number(oi.openInterest),timestamp:Date.now()}}}
+import type { DerivativesMarketData, MarketSnapshot } from '../domain/market-snapshot.js';
+export class BinanceDerivativesData implements DerivativesMarketData {
+  private valid(s: string) {
+    const v = s.toUpperCase();
+    if (!/^[A-Z0-9]{5,20}$/.test(v)) throw new Error('invalid symbol');
+    return v;
+  }
+  private async json(url: string) {
+    const r = await fetch(url, { signal: AbortSignal.timeout(15000) });
+    if (!r.ok) throw new Error('market data unavailable');
+    return r.json() as Promise<any>;
+  }
+  async snapshot(symbol: string): Promise<MarketSnapshot> {
+    const s = this.valid(symbol);
+    const [book, premium, oi] = await Promise.all([
+      this.json('https://fapi.binance.com/fapi/v1/ticker/bookTicker?symbol=' + s),
+      this.json('https://fapi.binance.com/fapi/v1/premiumIndex?symbol=' + s),
+      this.json('https://fapi.binance.com/fapi/v1/openInterest?symbol=' + s),
+    ]);
+    const bid = Number(book.bidPrice),
+      ask = Number(book.askPrice),
+      price = (bid + ask) / 2;
+    return {
+      symbol: s,
+      price,
+      bid,
+      ask,
+      spread: ask - bid,
+      spreadBps: ((ask - bid) / price) * 10000,
+      fundingRate: Number(premium.lastFundingRate),
+      openInterest: Number(oi.openInterest),
+      timestamp: Date.now(),
+    };
+  }
+}

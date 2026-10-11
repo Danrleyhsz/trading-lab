@@ -1,2 +1,36 @@
-import type{StrategyRegistry}from "../domain/strategy.js";import type{AgentCoordinator}from "./agent-coordinator.js";import type{MemoryStore}from "../domain/memory.js";
-export class StrategyLab{constructor(private strategies:StrategyRegistry,private agents:AgentCoordinator,private memories:MemoryStore){}propose(name:string,symbol:string){this.agents.research("develop strategy: "+name);const s=this.strategies.create(name,symbol);this.memories.add({agentId:"atlas",kind:"OBSERVATION",summary:"strategy proposed: "+name,metadata:{strategyId:s.id,symbol}});return s}startBacktest(id:string){this.agents.backtest("backtest strategy "+id);return this.strategies.setStatus(id,"BACKTESTING")}completeBacktest(id:string,result:{trades:number;netPnl:number;maxDrawdown:number}){const s=this.strategies.recordBacktest(id,result);this.memories.add({agentId:"euler",kind:s.status==="VALIDATED"?"LESSON":"FAILURE",summary:"backtest "+s.status.toLowerCase()+": "+s.name,metadata:{strategyId:id,...result}});this.agents.move("euler","IDLE","Quant Lab","backtest complete");return s}}
+import type { StrategyRegistry } from '../domain/strategy.js';
+import type { AgentCoordinator } from './agent-coordinator.js';
+import type { MemoryStore } from '../domain/memory.js';
+export class StrategyLab {
+  constructor(
+    private strategies: StrategyRegistry,
+    private agents: AgentCoordinator,
+    private memories: MemoryStore,
+  ) {}
+  propose(name: string, symbol: string) {
+    this.agents.research('develop strategy: ' + name);
+    const s = this.strategies.create(name, symbol);
+    this.memories.add({
+      agentId: 'atlas',
+      kind: 'OBSERVATION',
+      summary: 'strategy proposed: ' + name,
+      metadata: { strategyId: s.id, symbol },
+    });
+    return s;
+  }
+  startBacktest(id: string) {
+    this.agents.backtest('backtest strategy ' + id);
+    return this.strategies.setStatus(id, 'BACKTESTING');
+  }
+  completeBacktest(id: string, result: { trades: number; netPnl: number; maxDrawdown: number }) {
+    const s = this.strategies.recordBacktest(id, result);
+    this.memories.add({
+      agentId: 'euler',
+      kind: s.status === 'VALIDATED' ? 'LESSON' : 'FAILURE',
+      summary: 'backtest ' + s.status.toLowerCase() + ': ' + s.name,
+      metadata: { strategyId: id, ...result },
+    });
+    this.agents.move('euler', 'IDLE', 'Quant Lab', 'backtest complete');
+    return s;
+  }
+}

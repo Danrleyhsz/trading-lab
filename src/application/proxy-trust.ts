@@ -10,7 +10,8 @@ export function trustedProxyHops(env: NodeJS.ProcessEnv): number {
   const raw = env.TRUSTED_PROXY_HOPS?.trim();
   if (raw) {
     const hops = Number(raw);
-    if (!Number.isInteger(hops) || hops < 0 || hops > 5) throw Error('TRUSTED_PROXY_HOPS must be an integer from 0 to 5');
+    if (!Number.isInteger(hops) || hops < 0 || hops > 5)
+      throw Error('TRUSTED_PROXY_HOPS must be an integer from 0 to 5');
     return hops;
   }
   return env.RENDER === 'true' ? RENDER_PROXY_HOPS : 0;

@@ -1,14 +1,98 @@
-import {Client} from 'pg';
-import {assertAppendOnly,collectEvents} from './append-only.js';
-import type {StateStore,StoredState} from '../domain/storage.js';
+import { Client } from 'pg';
+import { assertAppendOnly, collectEvents } from './append-only.js';
+import type { StateStore, StoredState } from '../domain/storage.js';
 export class PostgresStateStore implements StateStore {
- private client:Client;private ready=false;private pending:Promise<void>=Promise.resolve();private loaded:StoredState|null=null;
- constructor(connectionString:string,requireTLS=false){if(requireTLS){let url:URL;try{url=new URL(connectionString);}catch{throw Error('invalid PostgreSQL connection configuration');}url.searchParams.set('sslmode','verify-full');connectionString=url.toString();}this.client=new Client({connectionString,connectionTimeoutMillis:10000,statement_timeout:30000});this.client.on('error',()=>{this.ready=false;});}
- async open(){await this.client.connect();const lock=await this.client.query('SELECT pg_try_advisory_lock(746321098) AS acquired');if(!lock.rows[0].acquired){await this.client.end();throw Error('another Trading Lab writer owns this database');}await this.client.query('BEGIN');try{await this.client.query('CREATE TABLE IF NOT EXISTS trading_lab_state (id integer PRIMARY KEY CHECK (id = 1), version integer NOT NULL, snapshot jsonb NOT NULL, updated_at timestamptz NOT NULL DEFAULT now())');await this.client.query('CREATE TABLE IF NOT EXISTS trading_lab_events (id text PRIMARY KEY, occurred_at timestamptz NOT NULL, event jsonb NOT NULL)');await this.client.query('COMMIT');this.ready=true;}catch(error){await this.client.query('ROLLBACK');throw error;}}
- available(){return this.ready;}
- async load(){if(!this.ready)throw Error('database unavailable');const result=await this.client.query('SELECT snapshot FROM trading_lab_state WHERE id = 1');this.loaded=result.rows[0]?.snapshot??null;return this.loaded?structuredClone(this.loaded):null;}
- save(state:StoredState){const snapshot=structuredClone(state);const run=async()=>{if(!this.ready)throw Error('database unavailable');assertAppendOnly(this.loaded,snapshot);const oldIds=new Set(this.loaded?collectEvents(this.loaded).map(e=>e.id):[]);const events=collectEvents(snapshot).filter(e=>!oldIds.has(e.id));await this.client.query('BEGIN');try{for(const e of events){await this.client.query('INSERT INTO trading_lab_events(id, occurred_at, event) VALUES ($1,$2,$3::jsonb) ON CONFLICT (id) DO NOTHING',[e.id,e.occurredAt,JSON.stringify(e)]);const original=await this.client.query('SELECT id FROM trading_lab_events WHERE id = $1 AND event IS DISTINCT FROM $2::jsonb',[e.id,JSON.stringify(e)]);if(original.rowCount)throw Error('audit event rewrite rejected');}await this.client.query('INSERT INTO trading_lab_state(id, version, snapshot) VALUES (1,1,$1::jsonb) ON CONFLICT (id) DO UPDATE SET snapshot = EXCLUDED.snapshot, updated_at = now()',[JSON.stringify(snapshot)]);await this.client.query('COMMIT');this.loaded=snapshot;}catch(error){await this.client.query('ROLLBACK');throw error;}};const result=this.pending.then(run);this.pending=result.catch(()=>{});return result;}
- async close(){await this.pending;this.ready=false;await this.client.end();}
+  private client: Client;
+  private ready = false;
+  private pending: Promise<void> = Promise.resolve();
+  private loaded: StoredState | null = null;
+  constructor(connectionString: string, requireTLS = false) {
+    if (requireTLS) {
+      let url: URL;
+      try {
+        url = new URL(connectionString);
+      } catch {
+        throw Error('invalid PostgreSQL connection configuration');
+      }
+      url.searchParams.set('sslmode', 'verify-full');
+      connectionString = url.toString();
+    }
+    this.client = new Client({ connectionString, connectionTimeoutMillis: 10000, statement_timeout: 30000 });
+    this.client.on('error', () => {
+      this.ready = false;
+    });
+  }
+  async open() {
+    await this.client.connect();
+    const lock = await this.client.query('SELECT pg_try_advisory_lock(746321098) AS acquired');
+    if (!lock.rows[0].acquired) {
+      await this.client.end();
+      throw Error('another Trading Lab writer owns this database');
+    }
+    await this.client.query('BEGIN');
+    try {
+      await this.client.query(
+        'CREATE TABLE IF NOT EXISTS trading_lab_state (id integer PRIMARY KEY CHECK (id = 1), version integer NOT NULL, snapshot jsonb NOT NULL, updated_at timestamptz NOT NULL DEFAULT now())',
+      );
+      await this.client.query(
+        'CREATE TABLE IF NOT EXISTS trading_lab_events (id text PRIMARY KEY, occurred_at timestamptz NOT NULL, event jsonb NOT NULL)',
+      );
+      await this.client.query('COMMIT');
+      this.ready = true;
+    } catch (error) {
+      await this.client.query('ROLLBACK');
+      throw error;
+    }
+  }
+  available() {
+    return this.ready;
+  }
+  async load() {
+    if (!this.ready) throw Error('database unavailable');
+    const result = await this.client.query('SELECT snapshot FROM trading_lab_state WHERE id = 1');
+    this.loaded = result.rows[0]?.snapshot ?? null;
+    return this.loaded ? structuredClone(this.loaded) : null;
+  }
+  save(state: StoredState) {
+    const snapshot = structuredClone(state);
+    const run = async () => {
+      if (!this.ready) throw Error('database unavailable');
+      assertAppendOnly(this.loaded, snapshot);
+      const oldIds = new Set(this.loaded ? collectEvents(this.loaded).map((e) => e.id) : []);
+      const events = collectEvents(snapshot).filter((e) => !oldIds.has(e.id));
+      await this.client.query('BEGIN');
+      try {
+        for (const e of events) {
+          await this.client.query(
+            'INSERT INTO trading_lab_events(id, occurred_at, event) VALUES ($1,$2,$3::jsonb) ON CONFLICT (id) DO NOTHING',
+            [e.id, e.occurredAt, JSON.stringify(e)],
+          );
+          const original = await this.client.query(
+            'SELECT id FROM trading_lab_events WHERE id = $1 AND event IS DISTINCT FROM $2::jsonb',
+            [e.id, JSON.stringify(e)],
+          );
+          if (original.rowCount) throw Error('audit event rewrite rejected');
+        }
+        await this.client.query(
+          'INSERT INTO trading_lab_state(id, version, snapshot) VALUES (1,1,$1::jsonb) ON CONFLICT (id) DO UPDATE SET snapshot = EXCLUDED.snapshot, updated_at = now()',
+          [JSON.stringify(snapshot)],
+        );
+        await this.client.query('COMMIT');
+        this.loaded = snapshot;
+      } catch (error) {
+        await this.client.query('ROLLBACK');
+        throw error;
+      }
+    };
+    const result = this.pending.then(run);
+    this.pending = result.catch(() => {});
+    return result;
+  }
+  async close() {
+    await this.pending;
+    this.ready = false;
+    await this.client.end();
+  }
 }
 // Reexportadas daqui para quem já importava do store do PostgreSQL (event-audit, restore-drill, testes).
-export {assertAppendOnly,collectEvents};
+export { assertAppendOnly, collectEvents };
