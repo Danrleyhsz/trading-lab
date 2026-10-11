@@ -1,2 +1,18 @@
-import test from "node:test";import assert from "node:assert/strict";import{MemoryStore}from "../src/domain/memory.js";
-test("memory v2 filters by agent kind strategy and tag",()=>{const m=new MemoryStore();m.add({agentId:"euler",kind:"LESSON",summary:"momentum worked",strategyId:"s1",tags:["momentum","btc"],confidence:1.5});m.add({agentId:"sentinel",kind:"FAILURE",summary:"drawdown",strategyId:"s2",tags:["risk"]});assert.equal(m.query({strategyId:"s1"}).length,1);assert.equal(m.query({tag:"risk"})[0]?.agentId,"sentinel");assert.equal(m.query({agentId:"euler"})[0]?.confidence,1)});
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { MemoryStore } from '../src/domain/memory.js';
+test('memory v2 filters by agent kind strategy and tag', () => {
+  const m = new MemoryStore();
+  m.add({
+    agentId: 'euler',
+    kind: 'LESSON',
+    summary: 'momentum worked',
+    strategyId: 's1',
+    tags: ['momentum', 'btc'],
+    confidence: 1.5,
+  });
+  m.add({ agentId: 'sentinel', kind: 'FAILURE', summary: 'drawdown', strategyId: 's2', tags: ['risk'] });
+  assert.equal(m.query({ strategyId: 's1' }).length, 1);
+  assert.equal(m.query({ tag: 'risk' })[0]?.agentId, 'sentinel');
+  assert.equal(m.query({ agentId: 'euler' })[0]?.confidence, 1);
+});

@@ -1,5 +1,56 @@
 // PREDICTION e EVALUATION: previsões verificáveis da equipe e o resultado conferido (TEAM_PREDICTIONS_V1).
-export type MemoryKind="DECISION"|"FAILURE"|"OBSERVATION"|"LESSON"|"PREDICTION"|"EVALUATION";
-export interface MemoryRecord{id:string;agentId:string;kind:MemoryKind;summary:string;createdAt:string;metadata?:Record<string,unknown>;tags?:string[];strategyId?:string;sourceEventId?:string;confidence?:number}
-export interface MemoryQuery{agentId?:string;kind?:MemoryKind;strategyId?:string;tag?:string}
-export class MemoryStore{private records:MemoryRecord[]=[];hydrate(records:MemoryRecord[]){this.records=records.map(r=>({...r,tags:r.tags?[...r.tags]:undefined}))}add(input:Omit<MemoryRecord,"id"|"createdAt">){const confidence=input.confidence===undefined?undefined:Math.max(0,Math.min(1,input.confidence));const r:MemoryRecord={...input,confidence,id:crypto.randomUUID(),createdAt:new Date().toISOString(),tags:input.tags?[...input.tags]:undefined};this.records.push(r);return{...r}}list(agentId?:string){return this.query({agentId})}query(q:MemoryQuery={}){return this.records.filter(r=>(!q.agentId||r.agentId===q.agentId)&&(!q.kind||r.kind===q.kind)&&(!q.strategyId||r.strategyId===q.strategyId)&&(!q.tag||r.tags?.includes(q.tag))).map(r=>({...r,tags:r.tags?[...r.tags]:undefined,metadata:r.metadata?{...r.metadata}:undefined}))}}
+export type MemoryKind = 'DECISION' | 'FAILURE' | 'OBSERVATION' | 'LESSON' | 'PREDICTION' | 'EVALUATION';
+export interface MemoryRecord {
+  id: string;
+  agentId: string;
+  kind: MemoryKind;
+  summary: string;
+  createdAt: string;
+  metadata?: Record<string, unknown>;
+  tags?: string[];
+  strategyId?: string;
+  sourceEventId?: string;
+  confidence?: number;
+}
+export interface MemoryQuery {
+  agentId?: string;
+  kind?: MemoryKind;
+  strategyId?: string;
+  tag?: string;
+}
+export class MemoryStore {
+  private records: MemoryRecord[] = [];
+  hydrate(records: MemoryRecord[]) {
+    this.records = records.map((r) => ({ ...r, tags: r.tags ? [...r.tags] : undefined }));
+  }
+  add(input: Omit<MemoryRecord, 'id' | 'createdAt'>) {
+    const confidence = input.confidence === undefined ? undefined : Math.max(0, Math.min(1, input.confidence));
+    const r: MemoryRecord = {
+      ...input,
+      confidence,
+      id: crypto.randomUUID(),
+      createdAt: new Date().toISOString(),
+      tags: input.tags ? [...input.tags] : undefined,
+    };
+    this.records.push(r);
+    return { ...r };
+  }
+  list(agentId?: string) {
+    return this.query({ agentId });
+  }
+  query(q: MemoryQuery = {}) {
+    return this.records
+      .filter(
+        (r) =>
+          (!q.agentId || r.agentId === q.agentId) &&
+          (!q.kind || r.kind === q.kind) &&
+          (!q.strategyId || r.strategyId === q.strategyId) &&
+          (!q.tag || r.tags?.includes(q.tag)),
+      )
+      .map((r) => ({
+        ...r,
+        tags: r.tags ? [...r.tags] : undefined,
+        metadata: r.metadata ? { ...r.metadata } : undefined,
+      }));
+  }
+}

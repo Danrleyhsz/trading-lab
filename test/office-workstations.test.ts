@@ -1,12 +1,101 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
-import {readFileSync} from 'node:fs';
-function env(){const c=vm.createContext({document:{activeElement:null},setTimeout:()=>{throw Error('seated actors must not wander')},clearTimeout(){}});for(const n of ['navigation','workstations','presence','transitions'])vm.runInContext(readFileSync('public/office/'+n+'.js','utf8'),c);return c;}
-const now=Date.parse('2026-10-03T15:00:00Z');
-const state={id:'atlas',room:'Research Lab',status:'IDLE',updatedAt:new Date(now-86400000).toISOString(),lastReason:'Previous research completed'};
-test('eight distinct seats preserve actual room ownership including three Research residents',()=>{const c=env(),a=c.OfficeWorkstations;assert.equal(a.catalog.length,8);assert.equal(a.catalog.filter((s:any)=>s.room==='Research Lab').length,3);assert.equal(new Set(a.catalog.map((s:any)=>s.x+','+s.y)).size,8);for(const s of a.catalog){assert.equal(a.seat({id:s.id,room:s.room}),s);assert.equal(a.seat({id:s.id,room:'Meeting Room'}),null);assert.ok(s.x>0&&s.x<c.OfficeNavigation.scene.width&&s.y>0&&s.y<c.OfficeNavigation.scene.height);}assert.equal(a.seat({id:'__proto__',room:'Research Lab'}),null);});
-test('idle seating never calls a timer, invents typing or changes domain work even when paused',()=>{const c=env(),agent=structuredClone(state),entry:any={station:c.OfficeWorkstations.seat(agent),button:{dataset:{}}};for(const allowed of [true,false]){const d=new c.OfficePresence.Director(()=>allowed);d.update(entry,agent,0,{});assert.equal(entry.button.dataset.pose,'seated');assert.equal(entry.button.dataset.facing,'up');assert.equal(entry.timer,undefined);d.stop(entry);assert.equal(entry.button.dataset.pose,'seated');}assert.deepEqual(agent,state);});
-test('current receipt freshness is independent of old unchanged state and historical reason is not work',()=>{const a=env().OfficeWorkstations,p=a.project(state,{observedAt:now,now,connected:true});assert.equal(p.label,'Sem tarefa');assert.equal(p.active,false);assert.match(p.reasonLabel,/não é tarefa atual/);assert.equal(p.eventId,null);assert.equal(p.updatedAt,state.updatedAt);for(const observedAt of [0,now-15001,now+1]){const stale=a.project({...state,status:'RESEARCHING'},{observedAt,now});assert.equal(stale.label,'Desatualizado');assert.equal(stale.active,false);}assert.equal(a.project({...state,updatedAt:'bad'},{observedAt:now,now}).active,false);});
-test('source links require the exact original state, while disconnect retains an explicitly labeled snapshot',()=>{const a=env().OfficeWorkstations,agent={...state,status:'RESEARCHING'},event={id:'TEST_ONLY_EVENT',type:'AGENT_STATE_CHANGED',payload:agent};const p=a.project(agent,{observedAt:now,now,events:[event]});assert.equal(p.eventId,event.id);assert.match(p.mode,/desconectados/);for(const patch of [{room:'Quant Lab'},{status:'IDLE'},{updatedAt:'different'},{lastReason:'different'},{id:'euler'}])assert.equal(a.project(agent,{observedAt:now,now,events:[{...event,payload:{...agent,...patch}}]}).eventId,null);});
-test('seat access follows the inspected front aisle, preserves footprints, and rejects stale physical origins',()=>{const c=env(),a=c.OfficeTransitions,s=c.OfficeWorkstations.seat(state);const route=a.plan('Research Lab',0,'Quant Lab',0,[],s.point,s);assert.ok(route.length>3);assert.equal(route[0].x,s.point.x);assert.equal(route[0].y,s.point.y);assert.equal(route[1].x,s.point.x);const back=a.plan('Quant Lab',0,'Research Lab',0,[],undefined,undefined,s);assert.equal(back.at(-1).y,s.point.y);assert.equal(back.at(-1).x,s.point.x);assert.equal(a.plan('Research Lab',0,'Quant Lab',0,[s.point],s.point,s).length,0);assert.equal(a.plan('Research Lab',0,'Quant Lab',0,[],{x:10,y:10},s).length,0);});
+import { readFileSync } from 'node:fs';
+function env() {
+  const c = vm.createContext({
+    document: { activeElement: null },
+    setTimeout: () => {
+      throw Error('seated actors must not wander');
+    },
+    clearTimeout() {},
+  });
+  for (const n of ['navigation', 'workstations', 'presence', 'transitions'])
+    vm.runInContext(readFileSync('public/office/' + n + '.js', 'utf8'), c);
+  return c;
+}
+const now = Date.parse('2026-10-03T15:00:00Z');
+const state = {
+  id: 'atlas',
+  room: 'Research Lab',
+  status: 'IDLE',
+  updatedAt: new Date(now - 86400000).toISOString(),
+  lastReason: 'Previous research completed',
+};
+test('eight distinct seats preserve actual room ownership including three Research residents', () => {
+  const c = env(),
+    a = c.OfficeWorkstations;
+  assert.equal(a.catalog.length, 8);
+  assert.equal(a.catalog.filter((s: any) => s.room === 'Research Lab').length, 3);
+  assert.equal(new Set(a.catalog.map((s: any) => s.x + ',' + s.y)).size, 8);
+  for (const s of a.catalog) {
+    assert.equal(a.seat({ id: s.id, room: s.room }), s);
+    assert.equal(a.seat({ id: s.id, room: 'Meeting Room' }), null);
+    assert.ok(s.x > 0 && s.x < c.OfficeNavigation.scene.width && s.y > 0 && s.y < c.OfficeNavigation.scene.height);
+  }
+  assert.equal(a.seat({ id: '__proto__', room: 'Research Lab' }), null);
+});
+test('idle seating never calls a timer, invents typing or changes domain work even when paused', () => {
+  const c = env(),
+    agent = structuredClone(state),
+    entry: any = { station: c.OfficeWorkstations.seat(agent), button: { dataset: {} } };
+  for (const allowed of [true, false]) {
+    const d = new c.OfficePresence.Director(() => allowed);
+    d.update(entry, agent, 0, {});
+    assert.equal(entry.button.dataset.pose, 'seated');
+    assert.equal(entry.button.dataset.facing, 'up');
+    assert.equal(entry.timer, undefined);
+    d.stop(entry);
+    assert.equal(entry.button.dataset.pose, 'seated');
+  }
+  assert.deepEqual(agent, state);
+});
+test('current receipt freshness is independent of old unchanged state and historical reason is not work', () => {
+  const a = env().OfficeWorkstations,
+    p = a.project(state, { observedAt: now, now, connected: true });
+  assert.equal(p.label, 'Sem tarefa');
+  assert.equal(p.active, false);
+  assert.match(p.reasonLabel, /não é tarefa atual/);
+  assert.equal(p.eventId, null);
+  assert.equal(p.updatedAt, state.updatedAt);
+  for (const observedAt of [0, now - 15001, now + 1]) {
+    const stale = a.project({ ...state, status: 'RESEARCHING' }, { observedAt, now });
+    assert.equal(stale.label, 'Desatualizado');
+    assert.equal(stale.active, false);
+  }
+  assert.equal(a.project({ ...state, updatedAt: 'bad' }, { observedAt: now, now }).active, false);
+});
+test('source links require the exact original state, while disconnect retains an explicitly labeled snapshot', () => {
+  const a = env().OfficeWorkstations,
+    agent = { ...state, status: 'RESEARCHING' },
+    event = { id: 'TEST_ONLY_EVENT', type: 'AGENT_STATE_CHANGED', payload: agent };
+  const p = a.project(agent, { observedAt: now, now, events: [event] });
+  assert.equal(p.eventId, event.id);
+  assert.match(p.mode, /desconectados/);
+  for (const patch of [
+    { room: 'Quant Lab' },
+    { status: 'IDLE' },
+    { updatedAt: 'different' },
+    { lastReason: 'different' },
+    { id: 'euler' },
+  ])
+    assert.equal(
+      a.project(agent, { observedAt: now, now, events: [{ ...event, payload: { ...agent, ...patch } }] }).eventId,
+      null,
+    );
+});
+test('seat access follows the inspected front aisle, preserves footprints, and rejects stale physical origins', () => {
+  const c = env(),
+    a = c.OfficeTransitions,
+    s = c.OfficeWorkstations.seat(state);
+  const route = a.plan('Research Lab', 0, 'Quant Lab', 0, [], s.point, s);
+  assert.ok(route.length > 3);
+  assert.equal(route[0].x, s.point.x);
+  assert.equal(route[0].y, s.point.y);
+  assert.equal(route[1].x, s.point.x);
+  const back = a.plan('Quant Lab', 0, 'Research Lab', 0, [], undefined, undefined, s);
+  assert.equal(back.at(-1).y, s.point.y);
+  assert.equal(back.at(-1).x, s.point.x);
+  assert.equal(a.plan('Research Lab', 0, 'Quant Lab', 0, [s.point], s.point, s).length, 0);
+  assert.equal(a.plan('Research Lab', 0, 'Quant Lab', 0, [], { x: 10, y: 10 }, s).length, 0);
+});

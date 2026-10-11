@@ -1,1 +1,14 @@
-import test from "node:test";import assert from "node:assert/strict";import{PaperBroker}from "../src/domain/broker.js";test("paper broker applies fee and adverse slippage",async()=>{const b=new PaperBroker(0.001,10);const f=await b.submit({symbol:"BTCUSDT",side:"BUY",quantity:1,referencePrice:100});assert.equal(f.fillPrice,100.1);assert.equal(f.fee,0.1001)});test("paper broker rejects invalid quantity",async()=>{await assert.rejects(()=>new PaperBroker().submit({symbol:"BTCUSDT",side:"BUY",quantity:0,referencePrice:100}))});
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { PaperBroker } from '../src/domain/broker.js';
+test('paper broker applies fee and adverse slippage', async () => {
+  const b = new PaperBroker(0.001, 10);
+  const f = await b.submit({ symbol: 'BTCUSDT', side: 'BUY', quantity: 1, referencePrice: 100 });
+  assert.equal(f.fillPrice, 100.1);
+  assert.equal(f.fee, 0.1001);
+});
+test('paper broker rejects invalid quantity', async () => {
+  await assert.rejects(() =>
+    new PaperBroker().submit({ symbol: 'BTCUSDT', side: 'BUY', quantity: 0, referencePrice: 100 }),
+  );
+});
