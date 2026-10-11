@@ -23,7 +23,10 @@ export function registerOfficeAssets(app:FastifyInstance, directory=join(process
     if (!type) return reply.code(404).send({error:'office asset not found'});
     let body:Buffer;
     try { body=await readFile(join(officeTwo,name)); } catch { return reply.code(404).send({error:'office asset not found'}); }
-    reply.type(type).header('X-Content-Type-Options','nosniff').header('Cache-Control','no-cache');
+    // As imagens de art/ pesam MB e mudam raramente: cache de um dia (uma arte trocada pode levar até 24 h para aparecer).
+    // HTML, JS, CSS e JSON (inclusive os de art/) sempre revalidam.
+    const cache=name.startsWith('art/')&&type.startsWith('image/')?'public, max-age=86400':'no-cache';
+    reply.type(type).header('X-Content-Type-Options','nosniff').header('Cache-Control',cache);
     return body;
   });
   app.get('/office2',async(_req,reply)=>reply.redirect('/office2/'));
