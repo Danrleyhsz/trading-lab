@@ -88,3 +88,31 @@ test('as três cidades são opacas e as novas rotas servem apenas os nomes expl�
  for(const p of ['art/cidade-segredo.png','art/apoios-private.json','art/..%2F..%2F.env'])assert.equal((await app.inject('/office2/'+p)).statusCode,404);
  }finally{await app.close();}
 });
+
+/** Abre o app.js com uma tela de `vw` × `vh` e devolve a câmera inicial e o enquadramento do andar inteiro. */
+async function initialCamera(vw:number,vh:number){
+ const context=runtime(),nodes=new Map<string,any>();
+ const node=()=>({clientWidth:vw,clientHeight:vh,style:{},dataset:{},classList:{add(){},toggle(){}},append(){},replaceChildren(){},addEventListener(){},setAttribute(){},getContext(){return {};}});
+ const document={hidden:false,querySelector(key:string){if(!nodes.has(key))nodes.set(key,node());return nodes.get(key);},querySelectorAll(){return [];},createElement:node,createTextNode:node,addEventListener(){}};
+ class Img{onload?:()=>void;set src(_value:string){queueMicrotask(()=>this.onload?.());}}
+ Object.assign(context,{document,Image:Img,localStorage:{getItem(){return 'day';}},matchMedia:()=>({matches:true}),requestAnimationFrame(){},setInterval(){},addEventListener(){},performance:{now:()=>0},OfficeSpriteSheets:{},Office2Ring:{ACCOUNT:'evaluation:nova:usdm'},Office2Lab:{},Office2Ops:{},Office2Horizon:{},
+  fetch:async(url:string)=>({ok:url==='/office2/scene-map.json',status:404,json:async()=>map}),
+  Office2Scene:{create(){return {signs:[],renderStatic(_scale:number,_phase:string,height:number){return {worldHeight:height};}};}}});
+ vm.runInContext(readFileSync('public/office2/app.js','utf8'),context);
+ await new Promise(resolve=>setImmediate(resolve));
+ const iso=context.Office2Iso.create(map),top=iso.project(0,0,102),left=iso.project(0,iso.H),right=iso.project(iso.W,0),bottom=iso.project(iso.W,iso.H);
+ const bounds={x0:left.x-12,x1:right.x+12,y0:top.y-14,y1:bottom.y+24};
+ return {camera:context.Office2.state.camera as {s:number;x:number;y:number},fit:context.Office2Iso.fit(bounds,vw,vh,2,16),bounds};
+}
+
+test('celular em pé abre mais perto, centrado no andar; desktop e celular deitado seguem com o andar inteiro',async()=>{
+ const phone=await initialCamera(390,674);
+ assert.ok(Math.abs(phone.camera.s-phone.fit.s*1.35)<1e-9,'1,35× o enquadramento do andar inteiro');
+ const centerX=(phone.bounds.x0+phone.bounds.x1)/2*phone.camera.s+phone.camera.x;
+ assert.ok(Math.abs(centerX-390/2)<1,'andar centrado na horizontal');
+ assert.ok(phone.bounds.y0*phone.camera.s+phone.camera.y>=71.99,'o cartão do andar, no topo, não cobre a planta');
+ const desktop=await initialCamera(1200,700);
+ assert.ok(Math.abs(desktop.camera.s-desktop.fit.s)<1e-9,'desktop mantém o andar inteiro');
+ const landscape=await initialCamera(560,300);
+ assert.ok(Math.abs(landscape.camera.s-landscape.fit.s)<1e-9,'celular deitado mantém o andar inteiro');
+});
