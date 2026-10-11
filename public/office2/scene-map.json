@@ -1658,17 +1658,19 @@
    "flip": false
   },
   {
-   "asset": "bancada-teste",
+   "asset": "estacao-madeira",
    "room": "stress-lab",
    "tile": {
-    "i": 30,
-    "j": 14
+    "i": 29,
+    "j": 10
    },
    "footprint": {
-    "a": 3,
+    "a": 4,
     "b": 2
    },
-   "h": 30
+   "h": 36,
+   "wall": "j0",
+   "flip": true
   },
   {
    "asset": "espada",
