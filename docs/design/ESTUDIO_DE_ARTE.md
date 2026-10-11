@@ -1,5 +1,7 @@
 # Estúdio de Arte TradingLab (pedidos para o Gemini)
 
+> **Histórico (11/10/2026).** Este documento registra os pedidos de imagem do Estúdio de Arte (v3, 21 imagens para o Gemini) e **não é mais uma lista do que falta**. A arte do Escritório 2.0 já foi integrada: F6 (07/10: arte do Gemini com cidade, 23 móveis e 35 ícones) e F7 (08/10: 46 recortes, 35 ícones, cidade e texturas das folhas do ChatGPT, e 12 poses normalizadas). O inventário atual está em `public/office2/art/manifesto.json`. Uma reescrita v4 (25 pedidos, PR #99) foi aberta em 07/10 e **fechada sem merge** em 11/10/2026 por ter ficado superada; a branch `docs/estudio-arte-v4` guarda o texto. O conteúdo abaixo fica sem alteração.
+
 Lista completa das **21 imagens** que faltam para o Escritório 2.0 (`/office2`) ficar parecido com a referência aprovada. Os pedidos foram escritos para o **Gemini** e também funcionam no ChatGPT. Cada um traz o texto para gerar (em inglês, porque o gerador segue melhor as regras assim), o nome exato do arquivo e o que anexar.
 
 ## Como produzir
