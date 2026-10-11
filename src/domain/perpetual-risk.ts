@@ -1,4 +1,4 @@
-import { RiskEngine, MAX_DRAWDOWN_FRACTION, type RiskDecision } from './risk.js';
+import { RiskEngine, MAX_DRAWDOWN_FRACTION, isReducing, type RiskDecision } from './risk.js';
 import type { PaperOrder } from './broker.js';
 import type { PortfolioSnapshot } from './portfolio.js';
 import { freshPerpetualQuote, type PerpetualQuote } from './perpetual-market.js';
@@ -14,10 +14,7 @@ export class PerpetualRiskEngine {
     const result = this.base.evaluate(order, portfolio);
     const current = portfolio.positions.find((p) => p.symbol === order.symbol)?.quantity ?? 0;
     const projected = current + (order.side === 'BUY' ? order.quantity : -order.quantity);
-    const reducing =
-      current !== 0 &&
-      Math.abs(projected) < Math.abs(current) &&
-      (projected === 0 || Math.sign(current) === Math.sign(projected));
+    const reducing = isReducing(current, projected);
     const reasons = [...result.reasons];
     if (!freshPerpetualQuote(quote, now)) reasons.push('STALE_MARKET');
     if (order.symbol !== quote.symbol) reasons.push('INSTRUMENT_MISMATCH');

@@ -43,6 +43,7 @@ import { MarketTriggers, readingFrom, TRIGGER_POLICY } from './application/marke
 import { CrossVenueMarket } from './infrastructure/cross-venue-market.js';
 import { registerPerpetualPaperRoutes } from './application/perpetual-paper-routes.js';
 import { registerAccessControl } from './application/access-control.js';
+import { trustedProxyHops, trustProxyOption } from './application/proxy-trust.js';
 import { registerEncryptedBackup } from './application/encrypted-backup.js';
 import { BACKUP_PUBLIC_KEY_PEM } from './config/backup-public-key.js';
 import { BinancePublicMarketData } from './infrastructure/binance-market-data.js';
@@ -59,9 +60,12 @@ import type { MarketTick } from './domain/market.js';
 const production = process.env.NODE_ENV === 'production';
 if (process.env.PAPER_TRADING_ONLY === 'false') throw Error('only paper trading is supported');
 if (production && !process.env.DATABASE_URL) throw Error('PostgreSQL is required in production');
+const proxyHops = trustedProxyHops(process.env);
 const app = Fastify({
   logger: { redact: ['req.headers.authorization', 'req.headers.cookie', 'res.headers.set-cookie'] },
+  trustProxy: trustProxyOption(proxyHops),
 });
+if (proxyHops > 0) app.log.info({ trustedProxyHops: proxyHops }, 'client address taken from the forwarded chain');
 registerAccessControl(
   app,
   process.env.APP_ACCESS_TOKEN ?? '',

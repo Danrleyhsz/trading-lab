@@ -192,3 +192,152 @@ test('perpetual restore refuses a duplicated fill or misleading inner attributio
   }
   assert.deepEqual(new PerpetualPaperBook(new EventBus(), valid, () => start).list(), book.list());
 });
+// Gravação durável: o livro só regrava o estado quando algo durável mudou ou a amostra de equity virou de minuto.
+// `start` cai 20 s depois do início de um minuto, então +39999 ms ainda é o mesmo minuto e +40000 ms é o seguinte.
+const counting = () => {
+  const saved: PerpetualBookState[] = [];
+  return {
+    saved,
+    save: async (s: PerpetualBookState) => {
+      saved.push(structuredClone(s));
+    },
+  };
+};
+test('quotes inside the same minute without new events do not write the state; the minute rollover does', async () => {
+  let now = start;
+  const book = new PerpetualPaperBook(new EventBus(), undefined, () => now),
+    id = book.ensureEvaluation('nova', 1000),
+    { saved, save } = counting();
+  await book.synchronize(quote(now), [], save);
+  assert.equal(saved.length, 1, 'first quote writes (new account sample and funding schedule)');
+  await book.propose(id, 'BUY', 1, save);
+  assert.equal(saved.length, 2, 'a fill is always written');
+  for (const offset of [3000, 6000, 9000, 12000, 15000, 18000, 21000, 24000, 27000, 30000, 33000, 36000, 39000]) {
+    now = start + offset;
+    await book.synchronize(quote(now, 100 + offset / 1000), [], save);
+  }
+  assert.equal(saved.length, 2, 'thirteen quotes in the same minute wrote nothing');
+  assert.equal(book.market()!.markPrice, 139, 'the in-memory quote is still current');
+  assert.equal(book.list()[0].valuationTime, start + 39000);
+  now = start + 40000;
+  await book.synchronize(quote(now, 140), [], save);
+  assert.equal(saved.length, 3, 'the first quote of the next minute writes');
+  now = start + 43000;
+  await book.synchronize(quote(now, 141), [], save);
+  assert.equal(saved.length, 3, 'and the minute after it is quiet again');
+  assert.equal(saved.at(-1)!.accounts[0].samples.length, 2);
+});
+test('funding settlement or liquidation inside the same minute is written immediately, even with no position to charge', async () => {
+  let now = start;
+  const book = new PerpetualPaperBook(new EventBus(), undefined, () => now),
+    id = book.ensureEvaluation('nova', 1000),
+    { saved, save } = counting();
+  await book.synchronize(quote(now), [], save);
+  now = start + 3000;
+  await book.synchronize(
+    quote(now),
+    [{ instrument: PERPETUAL_INSTRUMENT, timestamp: now - 1, rate: 0.01, markPrice: 100 }],
+    save,
+  );
+  assert.equal(saved.length, 2, 'a settlement that charged nobody still moves the funding cursor');
+  assert.equal(saved.at(-1)!.fundingCursor, now - 1);
+  assert.equal(saved.at(-1)!.accounts[0].ledger.filter((e) => e.type === 'FUNDING_SETTLED').length, 0);
+  await book.propose(id, 'BUY', 1, save);
+  assert.equal(saved.length, 3);
+  now = start + 6000;
+  await book.synchronize(
+    quote(now),
+    [{ instrument: PERPETUAL_INSTRUMENT, timestamp: now - 1, rate: 0.01, markPrice: 100 }],
+    save,
+  );
+  assert.equal(saved.length, 4, 'a settlement that charges a position is written');
+  assert.equal(saved.at(-1)!.accounts[0].ledger.filter((e) => e.type === 'FUNDING_SETTLED').length, 1);
+});
+test('a liquidation inside the same minute is written immediately', async () => {
+  let now = start;
+  const book = new PerpetualPaperBook(new EventBus(), undefined, () => now),
+    id = book.ensureEvaluation('nova', 1000),
+    { saved, save } = counting();
+  await book.synchronize(quote(now), [], save);
+  await book.propose(id, 'SELL', 1, save);
+  const before = saved.length;
+  now = start + 3000;
+  await book.synchronize(quote(now, 2000), [], save);
+  assert.equal(saved.length, before + 1);
+  assert.equal(saved.at(-1)!.accounts[0].ledger.filter((e) => e.type === 'PAPER_LIQUIDATION').length, 1);
+});
+test('peak equity, drawdown and samples stay exact in memory while writes are skipped', async () => {
+  let now = start;
+  const book = new PerpetualPaperBook(new EventBus(), undefined, () => now),
+    id = book.ensureEvaluation('nova', 1000),
+    { saved, save } = counting();
+  await book.synchronize(quote(now), [], save);
+  await book.propose(id, 'BUY', 1, save);
+  let peak = 1000,
+    drawdown = 0;
+  const equityAfter = () => book.list()[0].portfolio.equity;
+  for (const [offset, price] of [
+    [3000, 104],
+    [6000, 111],
+    [9000, 96],
+    [12000, 99],
+    [15000, 121],
+    [18000, 90],
+    [21000, 95],
+  ] as const) {
+    now = start + offset;
+    await book.synchronize(quote(now, price), [], save);
+    const equity = equityAfter();
+    peak = Math.max(peak, equity);
+    drawdown = Math.max(drawdown, (peak - equity) / peak);
+  }
+  assert.equal(saved.length, 2, 'nothing was written during the minute');
+  const state = book.exportState(),
+    account = state.accounts[0];
+  assert.equal(account.peakEquity, peak);
+  assert.ok(drawdown > 0.02);
+  assert.equal(account.maxDrawdown, drawdown);
+  assert.equal(account.samples.length, 1, 'samples of one minute collapse into the latest one');
+  assert.deepEqual(account.samples[0], { timestamp: start + 21000, equity: equityAfter() });
+  assert.equal(book.list()[0].maxDrawdown, drawdown);
+  now = start + 40000;
+  await book.synchronize(quote(now, 95), [], save);
+  const written = saved.at(-1)!.accounts[0];
+  assert.equal(saved.length, 3);
+  assert.equal(written.peakEquity, peak);
+  assert.equal(written.maxDrawdown, drawdown);
+  assert.equal(written.samples.length, 2);
+  assert.deepEqual(
+    new PerpetualPaperBook(new EventBus(), saved.at(-1), () => now).list(),
+    book.list(),
+    'the rollover write restores to exactly the live book',
+  );
+});
+test('persistence stays fail-closed: a failed write blocks orders and is retried on every quote until it succeeds', async () => {
+  let now = start;
+  const book = new PerpetualPaperBook(new EventBus(), undefined, () => now),
+    id = book.ensureEvaluation('nova', 1000),
+    { saved, save } = counting();
+  await book.synchronize(quote(now), [], save);
+  now = start + 39000;
+  await book.synchronize(quote(now), [], save);
+  now = start + 40000;
+  await assert.rejects(
+    book.synchronize(quote(now), [], async () => {
+      throw Error('database offline');
+    }),
+    /database offline/,
+  );
+  assert.equal(book.status().persistenceFailed, true);
+  await assert.rejects(book.propose(id, 'BUY', 1, save), /persistence unavailable/);
+  const before = saved.length;
+  now = start + 43000;
+  await book.synchronize(quote(now), [], save);
+  assert.equal(
+    saved.length,
+    before + 1,
+    'inside the same minute, the retry still writes because the book is in failure state',
+  );
+  assert.equal(book.status().persistenceFailed, false);
+  assert.equal((await book.propose(id, 'BUY', 1, save)).status, 'filled');
+});

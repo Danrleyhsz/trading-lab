@@ -54,3 +54,46 @@ test('office serves binary artwork with correct type and never exposes arbitrary
     await app.close();
   }
 });
+test('office2 caches only the art images for a day; pages, scripts, styles and JSON always revalidate, and the 1.0 office is unchanged', async () => {
+  const app = Fastify();
+  registerOfficeAssets(app);
+  try {
+    for (const name of [
+      'art/cidade-dia.png',
+      'art/cidade-entardecer.png',
+      'art/cidade-noite.png',
+      'art/cidade-noite.jpg',
+      'art/props/sofa.png',
+      'art/icones/estagio-risk.png',
+      'art/texturas/piso-marmore.png',
+      'art/personagens/vega.png',
+    ]) {
+      const reply = await app.inject('/office2/' + name);
+      assert.equal(reply.statusCode, 200, name);
+      assert.equal(reply.headers['cache-control'], 'public, max-age=86400', name);
+    }
+    for (const name of [
+      '',
+      'index.html',
+      'style.css',
+      'app.js',
+      'scene.js',
+      'scene-map.json',
+      'stress-report.json',
+      'art/manifesto.json',
+      'art/apoios.json',
+      'art/personagens/quadros.json',
+    ]) {
+      const reply = await app.inject('/office2/' + name);
+      assert.equal(reply.statusCode, 200, name);
+      assert.equal(reply.headers['cache-control'], 'no-cache', name);
+    }
+    for (const name of ['index.html', 'app.js', 'style.css', 'cidade-faixa-noite.png', 'characters/atlas.png']) {
+      const reply = await app.inject('/office/' + name);
+      assert.equal(reply.statusCode, 200, name);
+      assert.equal(reply.headers['cache-control'], 'no-cache', name);
+    }
+  } finally {
+    await app.close();
+  }
+});

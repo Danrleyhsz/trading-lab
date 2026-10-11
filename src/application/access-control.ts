@@ -63,17 +63,28 @@ export function registerAccessControl(
       return reply.code(403).send({ error: 'origin rejected' });
   });
   app.get('/auth/status', async (req) => ({ required: !!secret, authenticated: authenticated(req.headers) }));
-  let failed = 0,
-    lastFailure = 0;
+  // Falhas de login por IP (req.ip): tentativas erradas de um IP não travam o login do dono em outro. Cada entrada vale 60 s
+  // depois da última falha. O Map segue a ordem da última falha (reinserida a cada falha), então as vencidas ficam na frente
+  // e saem a cada chamada; o tamanho tem teto e, cheio, descarta a mais antiga.
+  const failures = new Map<string, { count: number; last: number }>(),
+    WINDOW_MS = 60000,
+    MAX_FAILURES = 10,
+    MAX_TRACKED_IPS = 1000;
   app.post('/auth/login', async (req, reply) => {
     if (req.headers.origin && origin && req.headers.origin !== origin)
       return reply.code(403).send({ error: 'origin rejected' });
-    if (Date.now() - lastFailure > 60000) failed = 0;
-    if (failed >= 10) return reply.code(429).send({ error: 'try again later' });
+    const now = Date.now();
+    for (const [ip, f] of failures) {
+      if (now - f.last <= WINDOW_MS) break;
+      failures.delete(ip);
+    }
+    const previous = failures.get(req.ip);
+    if ((previous?.count ?? 0) >= MAX_FAILURES) return reply.code(429).send({ error: 'try again later' });
     const token = (req.body as { accessToken?: unknown } | null)?.accessToken;
     if (typeof token !== 'string' || !secret || !equals(token, secret)) {
-      failed++;
-      lastFailure = Date.now();
+      failures.delete(req.ip);
+      failures.set(req.ip, { count: (previous?.count ?? 0) + 1, last: now });
+      if (failures.size > MAX_TRACKED_IPS) failures.delete(failures.keys().next().value!);
       return reply.code(401).send({ error: 'invalid access' });
     }
     const payload = `${Date.now()}.${randomBytes(16).toString('hex')}`;

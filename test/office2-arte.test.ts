@@ -54,6 +54,8 @@ test('/office2/art serve PNG de nome simples nas pastas de arte e os metadados e
       assert.equal(r.statusCode, 200, p);
       assert.match(String(r.headers['content-type']), new RegExp('^' + type));
       assert.equal(r.headers['x-content-type-options'], 'nosniff');
+      // Imagem de art/ fica um dia em cache; os JSON da própria pasta art/ continuam revalidando.
+      assert.equal(r.headers['cache-control'], type === 'image/png' ? 'public, max-age=86400' : 'no-cache', p);
     }
     for (const p of [
       '/office2/art/props/nao-existe.png',

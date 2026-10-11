@@ -375,7 +375,11 @@ export class PerpetualPaperBook {
       }
       if (settlements.length) next.fundingCursor = settlements.at(-1)!.timestamp;
       next.expectedFundingTime = quote.nextFundingTime;
+      const minute = Math.floor(quote.markTime / 60000);
+      let rolled = false;
       for (const account of next.accounts) {
+        const last = account.samples.at(-1);
+        if (!last || Math.floor(last.timestamp / 60000) !== minute) rolled = true;
         this.measure(account, quote);
         const p = portfolio(account).snapshot();
         const position = p.positions[0];
@@ -390,7 +394,15 @@ export class PerpetualPaperBook {
             true,
           );
       }
-      await this.commit(next, save, events);
+      // shortcut: até 1 minuto de amostras de curva pode se perder numa queda; fills e funding sempre são salvos na hora
+      const durable =
+        events.length > 0 ||
+        next.fundingCursor !== this.state.fundingCursor ||
+        next.expectedFundingTime !== this.state.expectedFundingTime ||
+        rolled ||
+        this.persistenceFailed;
+      if (durable) await this.commit(next, save, events);
+      else this.state = next;
       this.quote = structuredClone(quote);
     });
   }

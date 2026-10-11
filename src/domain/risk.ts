@@ -12,6 +12,14 @@ export interface RiskDecision {
   reasons: string[];
   notional: number;
 }
+/** A ordem reduz a posição (inclusive zerando) sem inverter o lado? Definição única, usada pelos dois motores de risco. */
+export function isReducing(current: number, projected: number) {
+  return (
+    current !== 0 &&
+    Math.abs(projected) < Math.abs(current) &&
+    (projected === 0 || Math.sign(projected) === Math.sign(current))
+  );
+}
 export class RiskEngine {
   constructor(private limits: RiskLimits = { maxPositionPct: 0.2, maxLossPct: 0.05, maxLeverage: 1 }) {}
   evaluate(order: PaperOrder, portfolio: PortfolioSnapshot): RiskDecision {
@@ -28,10 +36,7 @@ export class RiskEngine {
       reasons.push('INVALID_ORDER');
     const current = portfolio.positions.find((position) => position.symbol === order.symbol);
     const projectedQuantity = (current?.quantity ?? 0) + (order.side === 'BUY' ? order.quantity : -order.quantity);
-    const reducing =
-      !!current &&
-      Math.abs(projectedQuantity) < Math.abs(current.quantity) &&
-      (projectedQuantity === 0 || Math.sign(projectedQuantity) === Math.sign(current.quantity));
+    const reducing = isReducing(current?.quantity ?? 0, projectedQuantity);
     if (!Number.isFinite(portfolio.equity) || (!reducing && portfolio.equity <= 0)) reasons.push('INVALID_EQUITY');
     const projectedNotional = Math.abs(projectedQuantity * order.referencePrice);
     if (!reducing && projectedNotional > portfolio.equity * this.limits.maxPositionPct) reasons.push('POSITION_LIMIT');
