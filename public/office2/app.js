@@ -360,7 +360,16 @@ function placeZoneLabels(){const c=state.camera;for(const z of zoneLabels){z.nod
   state.anim=null;state.camera=clampCamera({s,x:mx-(mx-c.x)*s/c.s,y:my-(my-c.y)*s/c.s});}
  function onClick(ev){if(drag.moved){drag.moved=false;return;}const r=canvas.getBoundingClientRect(),c=state.camera,x=(ev.clientX-r.left-c.x)/c.s,y=(ev.clientY-r.top-c.y)/c.s;const t=state.iso.tileAt(x,y);const room=t&&state.iso.roomAt(t.i,t.j);if(room)focusRoom(room);else if(state.focus)focusRoom(null);}
 
- async function start(){
+ /** Em tela estreita a barra fica em duas linhas: logo com mercado e hora em cima; zonas, "Outros ambientes", luz e o link do escritório anterior
+  * na faixa rolável de baixo. Em tela larga os três controles voltam ao lugar de origem (a barra de desktop não muda). */
+ function arrangeTopbar(){
+  const mq=globalThis.matchMedia?.('(max-width:900px)'),nav=$('nav'),status=$('.status');if(!mq||!nav||!status)return;
+  const tools=[$('#otherRooms'),$('#lightingMode')?.closest?.('label'),$('.chip.link')].filter(Boolean),home=new Map(tools.map(t=>[t,t.nextSibling??null]));
+  let inNav=false;
+  const place=()=>{if(mq.matches===inNav)return;inNav=mq.matches;if(inNav)for(const t of tools)nav.append(t);else for(const t of tools)status.insertBefore(t,home.get(t)??null);};
+  place();mq.addEventListener?.('change',place);
+ }
+ async function start(){arrangeTopbar();
   const res=await get('/office2/scene-map.json');if(!res.ok){$('#agentsStatus').hidden=false;$('#agentsStatus').textContent='Mapa da cena indisponível.';return;}
   state.map=res.body;state.iso=Office2Iso.create(state.map);
   // F7: móveis e ícones recortados das folhas do ChatGPT; sem o manifesto, ficam os blocos.
