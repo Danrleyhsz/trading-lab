@@ -1,14 +1,14 @@
 # Tendência nas maiores, execução simulada · TENDENCIA_MAIORES_AO_VIVO_V1
 
-Última rodada: **12** em 2026-10-20T04:40:32.930Z (dia decidido 2026-10-19, negociou, atraso de 4.7 h). Protocolo: `docs/PROTOCOLO_TENDENCIA_AO_VIVO.md`. Simulação com dados públicos; não há ordem real nem conta. Sem veredito de retorno: o objetivo é medir fill, custo e atraso.
+Última rodada: **13** em 2026-10-21T04:34:54.981Z (dia decidido 2026-10-20, negociou, atraso de 4.6 h). Protocolo: `docs/PROTOCOLO_TENDENCIA_AO_VIVO.md`. Simulação com dados públicos; não há ordem real nem conta. Sem veredito de retorno: o objetivo é medir fill, custo e atraso.
 
 Membros do universo (5 maiores por volume): BTCUSDT, ETHUSDT, SOLUSDT, XRPUSDT, ZECUSDT.
 
 | Conta | Patrimônio (USDT) | Retorno | Queda atual | Escala | Posições |
 |---|---|---|---|---|---|
-| SMA100 | 9862.82 | -1.37% | -2.26% | 0.32 | BTCUSDT 0.0075942, ETHUSDT 0.25878, SOLUSDT 5.9507, XRPUSDT 477.96, ZECUSDT 0.54633 |
-| DONCHIAN_55_20 | 9924.29 | -0.76% | -1.19% | 0.40 | BTCUSDT 0.0096966, ETHUSDT 0.32901, SOLUSDT 7.5023 |
-| BENCH_5_MAIORES | 9869.75 | -1.30% | -2.14% | 0.32 | BTCUSDT 0.0076476, ETHUSDT 0.26020, SOLUSDT 5.9667, XRPUSDT 480.64, ZECUSDT 0.54672 |
+| SMA100 | 9954.46 | -0.46% | -1.35% | 0.37 | BTCUSDT 0.0087791, ETHUSDT 0.29741, SOLUSDT 6.8690, XRPUSDT 545.72, ZECUSDT 0.57691 |
+| DONCHIAN_55_20 | 9947.06 | -0.53% | -0.96% | 0.43 | BTCUSDT 0.010261, ETHUSDT 0.34760, SOLUSDT 8.0281 |
+| BENCH_5_MAIORES | 9961.61 | -0.38% | -1.23% | 0.37 | BTCUSDT 0.0087854, ETHUSDT 0.29763, SOLUSDT 6.8739, XRPUSDT 546.11, ZECUSDT 0.57732 |
 
 ## Custo e atraso medidos (todas as ordens simuladas)
 
@@ -16,8 +16,8 @@ Referência da pesquisa: 15 bps por lado (taxa e slippage), com decisão e preç
 
 | Conta | Ordens | Taxa (bps) | Slippage do livro (bps) | Atraso até a execução (bps) | Total vs fechamento (bps) | Ordens não preenchidas por inteiro |
 |---|---|---|---|---|---|---|
-| SMA100 | 22 | 10.0 | 0.2 | -20.2 | -10.0 | 0 |
-| DONCHIAN_55_20 | 13 | 10.0 | 0.2 | -20.6 | -10.4 | 0 |
-| BENCH_5_MAIORES | 26 | 10.0 | 0.2 | -17.7 | -7.5 | 0 |
+| SMA100 | 27 | 10.0 | 0.2 | -20.1 | -9.9 | 0 |
+| DONCHIAN_55_20 | 16 | 10.0 | 0.2 | -23.1 | -12.9 | 0 |
+| BENCH_5_MAIORES | 31 | 10.0 | 0.2 | -18.0 | -7.8 | 0 |
 
-Dias decididos: 11; dias perdidos por falta de rodada: 0; rodadas: 12.
+Dias decididos: 12; dias perdidos por falta de rodada: 0; rodadas: 13.
