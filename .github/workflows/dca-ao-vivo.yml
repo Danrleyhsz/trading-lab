@@ -1,0 +1,58 @@
+# Rodada diária da execução simulada DCA_BTC_ETH_AO_VIVO_V1 (docs/PROTOCOLO_DCA_AO_VIVO.md).
+# Só dados públicos de mercado; não usa segredos, contas nem ordens, e não toca no servidor. O livro-razão é gravado na
+# branch de dados `dados/dca-ao-vivo`, nunca na main.
+name: DCA ao vivo (execução simulada)
+on:
+  schedule:
+    - cron: '20 0 * * *'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: dca-ao-vivo
+  cancel-in-progress: false
+jobs:
+  round:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      BINANCE_SPOT_ORIGIN: https://data-api.binance.vision
+      DATA_BRANCH: dados/dca-ao-vivo
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Restore the ledger from the data branch
+        run: |
+          set -euo pipefail
+          if git ls-remote --exit-code --heads origin "$DATA_BRANCH" >/dev/null; then
+            git fetch origin "$DATA_BRANCH"
+            for f in docs/estudos/dca-ao-vivo-registro.json docs/estudos/dca-ao-vivo.md; do
+              git show "origin/$DATA_BRANCH:$f" > "$f"
+            done
+          fi
+      - name: Run the round
+        run: npx tsx scripts/estudos/dca-ao-vivo.ts
+      - name: Commit the ledger to the data branch
+        run: |
+          set -euo pipefail
+          git config user.name "dca-ao-vivo[bot]"
+          git config user.email "actions@users.noreply.github.com"
+          if git ls-remote --exit-code --heads origin "$DATA_BRANCH" >/dev/null; then
+            git worktree add --detach ../data "origin/$DATA_BRANCH"
+          else
+            git worktree add -b "$DATA_BRANCH" ../data origin/main
+          fi
+          cp docs/estudos/dca-ao-vivo-registro.json docs/estudos/dca-ao-vivo.md ../data/docs/estudos/
+          cd ../data
+          git add docs/estudos/dca-ao-vivo-registro.json docs/estudos/dca-ao-vivo.md
+          if git diff --cached --quiet; then echo "sem mudança no livro-razão"; exit 0; fi
+          git commit -m "dados: rodada da compra mensal ao vivo ($(date -u +%F))"
+          git push origin "HEAD:refs/heads/$DATA_BRANCH"
+          echo "$(sed -n '1,8p' docs/estudos/dca-ao-vivo.md)" >> "$GITHUB_STEP_SUMMARY"

@@ -122,7 +122,7 @@ export interface RunRecord {n:number;runAt:string;decisionDay:string;decided:boo
  accounts:Record<AccountId,AccountRun>;prevHash:string;hash:string}
 export interface Ledger {protocol:string;initialCapital:number;runs:RunRecord[]}
 export const GENESIS='0'.repeat(64);
-const canonical=(x:unknown):string=>x===null||typeof x!=='object'?JSON.stringify(x):Array.isArray(x)?'['+x.map(canonical).join(',')+']'
+export const canonical=(x:unknown):string=>x===null||typeof x!=='object'?JSON.stringify(x):Array.isArray(x)?'['+x.map(canonical).join(',')+']'
  :'{'+Object.keys(x as object).sort().map(k=>JSON.stringify(k)+':'+canonical((x as Record<string,unknown>)[k])).join(',')+'}';
 export const recordHash=(rec:Omit<RunRecord,'hash'>)=>createHash('sha256').update(canonical(rec)).digest('hex');
 /** Cada registro guarda o hash do anterior; qualquer edição ou remoção de uma rodada passada quebra a cadeia. */
