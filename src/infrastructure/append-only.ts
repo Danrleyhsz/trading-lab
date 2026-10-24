@@ -35,6 +35,7 @@ export function assertAppendOnly(previous: StoredState | null, next: StoredState
   prefix(previous.memories, next.memories);
   prefix(previous.agentMessages ?? [], next.agentMessages ?? []);
   prefix(previous.agentActivity ?? [], next.agentActivity ?? []);
+  prefix(previous.signalFollower ?? [], next.signalFollower ?? []);
   for (const account of previous.paperAccounts ?? []) {
     const current = next.paperAccounts?.find((a) => a.id === account.id);
     if (!current || current.initialCash !== account.initialCash)

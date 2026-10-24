@@ -264,3 +264,10 @@ Saídas ajustadas: alvo 2 = 0,0711425; alvo 3 = 0,0737295.
 | T15 | Entrada nova com RR 0,56 | `SKIPPED_LOW_RR` |
 | T16 | Runner sem Segunda Fase em 48h | fecha no `open` seguinte, `RUNNER_CLOSED_NO_PHASE2` |
 | T17 | Segunda Fase com suporte abaixo do stop atual do runner | stop do runner não muda |
+
+## 13. Integração no Lab (implementada)
+
+- Flag: `SIGNAL_FOLLOWER_ENABLED=true` (padrão desligado). Capital virtual total: `SIGNAL_FOLLOWER_CAPITAL` (padrão 10.000; 75% spot, 25% futuros).
+- `POST /paper/signals` com `{ "message": "<texto colado do canal>" }`: grava a mensagem (entrada, Segunda Fase ou inválida com motivo). Segunda Fase é ligada à última entrada do mesmo símbolo.
+- `GET /paper/signals`: refaz cada sinal com velas públicas de 1 min da Binance (spot e USD-M) e devolve o resultado por carteira (spot/futuros) e variante (sem runner / runner 20%), com o limite de 3 sinais abertos por carteira (`RISK_MAX_OPEN`) e `DATA_MISSING` quando a Binance não tem os dados.
+- Só as mensagens são gravadas no estado (`signalFollower`), sob a regra append-only. O resultado não é gravado: é reproduzível pelos mesmos dados públicos, como o acompanhamento de momentum. Nenhuma ordem é enviada.
