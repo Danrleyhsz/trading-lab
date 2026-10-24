@@ -11,9 +11,9 @@ import {ACCOUNTS,GENESIS,TREND_LIVE,decide,initialState,mark,rebalance,recordHas
  type AccountId,type AccountRun,type Ledger,type Level,type Quote,type RunRecord} from './tendencia-ao-vivo-lib.js';
 
 // Os dois hosts servem os mesmos dados públicos de mercado; o segundo não é bloqueado nos servidores do GitHub Actions.
-const ORIGINS=['https://api.binance.com','https://data-api.binance.vision'],ORIGIN_API=process.env.BINANCE_SPOT_ORIGIN??ORIGINS[0],DIR='docs/estudos',LEDGER=`${DIR}/tendencia-ao-vivo-registro.json`,REPORT=`${DIR}/tendencia-ao-vivo.md`;
+export const ORIGINS=['https://api.binance.com','https://data-api.binance.vision'],ORIGIN_API=process.env.BINANCE_SPOT_ORIGIN??ORIGINS[0],DIR='docs/estudos',LEDGER=`${DIR}/tendencia-ao-vivo-registro.json`,REPORT=`${DIR}/tendencia-ao-vivo.md`;
 const sleep=(ms:number)=>new Promise(r=>setTimeout(r,ms));
-async function getJson(path:string,params:Record<string,string|number>={}){
+export async function getJson(path:string,params:Record<string,string|number>={}){
  const url=ORIGIN_API+path+'?'+new URLSearchParams(Object.entries(params).map(([k,v])=>[k,String(v)]));
  for(let attempt=0;attempt<4;attempt++){
   const r=await fetch(url);
