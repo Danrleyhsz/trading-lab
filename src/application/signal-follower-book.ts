@@ -20,6 +20,8 @@ import {
 export interface StoredFollowerMessage {
   id: string;
   receivedAt: string;
+  /** SERVER = hora em que foi colada; OWNER = data informada pelo dono ao registrar um sinal antigo. */
+  receivedAtSource?: 'SERVER' | 'OWNER';
   raw: string;
   kind: 'ENTRY' | 'PHASE2' | 'REJECTED_PARSE';
   reason?: string;
@@ -75,25 +77,34 @@ export class SignalFollowerBook {
   list() {
     return structuredClone(this.messages);
   }
-  add(raw: string): StoredFollowerMessage {
-    if (!this.enabled) throw new Error('signal follower disabled');
-    const receivedAt = new Date(this.now()).toISOString();
-    const base = { id: crypto.randomUUID(), receivedAt, raw };
-    let message: StoredFollowerMessage;
+  /** Lê a mensagem sem gravar: o que o Lab entendeu, para o dono conferir antes de enviar. */
+  preview(raw: string): Pick<StoredFollowerMessage, 'kind' | 'reason' | 'parentId'> & { signal?: EntrySignal | Phase2Signal } {
     if (/SEGUNDA FASE/i.test(raw)) {
       const parsed = parsePhase2Signal(raw);
-      if (!parsed.ok) message = { ...base, kind: 'REJECTED_PARSE', reason: parsed.reason };
-      else {
-        // shortcut: o pai é a última entrada do mesmo símbolo, executada ou não; checar a execução quando houver muitos sinais.
-        const parent = [...this.messages].reverse().find(
-          (m) => m.kind === 'ENTRY' && (parseEntrySignal(m.raw) as { signal?: EntrySignal }).signal?.symbol === parsed.signal.symbol,
-        );
-        message = { ...base, kind: 'PHASE2', parentId: parent?.id };
-      }
-    } else {
-      const parsed = parseEntrySignal(raw);
-      message = parsed.ok ? { ...base, kind: 'ENTRY' } : { ...base, kind: 'REJECTED_PARSE', reason: parsed.reason };
+      if (!parsed.ok) return { kind: 'REJECTED_PARSE', reason: parsed.reason };
+      // shortcut: o pai é a última entrada do mesmo símbolo, executada ou não; checar a execução quando houver muitos sinais.
+      const parent = [...this.messages]
+        .reverse()
+        .find((m) => m.kind === 'ENTRY' && (parseEntrySignal(m.raw) as { signal?: EntrySignal }).signal?.symbol === parsed.signal.symbol);
+      return { kind: 'PHASE2', parentId: parent?.id, signal: parsed.signal };
     }
+    const parsed = parseEntrySignal(raw);
+    return parsed.ok ? { kind: 'ENTRY', signal: parsed.signal } : { kind: 'REJECTED_PARSE', reason: parsed.reason };
+  }
+  /** `receivedAt`: quando o sinal chegou no grupo, para registrar mensagens antigas; sem ele vale a hora atual. */
+  add(raw: string, receivedAt?: string): StoredFollowerMessage {
+    if (!this.enabled) throw new Error('signal follower disabled');
+    const now = this.now();
+    const given = receivedAt === undefined ? now : Date.parse(receivedAt);
+    if (!Number.isFinite(given) || given > now) throw new Error('invalid receivedAt');
+    const { signal: _signal, ...read } = this.preview(raw);
+    const message: StoredFollowerMessage = {
+      id: crypto.randomUUID(),
+      receivedAt: new Date(given).toISOString(),
+      receivedAtSource: receivedAt === undefined ? 'SERVER' : 'OWNER',
+      raw,
+      ...read,
+    };
     this.messages.push(message);
     return structuredClone(message);
   }

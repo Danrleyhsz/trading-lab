@@ -574,8 +574,22 @@ forwardMomentum.start(); // encerrado pelo dono em 10/10/2026: só liga com FORW
 app.get('/paper/momentum/forward', async () => forwardMomentum.snapshot());
 app.get('/paper/signals', async () => signalFollower.report());
 app.post('/paper/signals', async (req, reply) => {
-  const body = z.object({ message: z.string().min(10).max(5000) }).strict().safeParse(req.body);
+  const body = z
+    .object({ message: z.string().min(10).max(5000), receivedAt: z.string().max(40).optional(), dryRun: z.boolean().optional() })
+    .strict()
+    .safeParse(req.body);
   if (!body.success) return reply.code(400).send({ error: 'invalid message' });
+  if (body.data.dryRun) return signalFollower.preview(body.data.message);
+  if (!signalFollower.isEnabled()) return reply.code(403).send({ error: 'signal follower disabled' });
+  let message;
+  try {
+    message = signalFollower.add(body.data.message, body.data.receivedAt);
+  } catch {
+    return reply.code(400).send({ error: 'invalid receivedAt' });
+  }
+  await persist();
+  return message;
+});
   if (!signalFollower.isEnabled()) return reply.code(403).send({ error: 'signal follower disabled' });
   const message = signalFollower.add(body.data.message);
   await persist();
