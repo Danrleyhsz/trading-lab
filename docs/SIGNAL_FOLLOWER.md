@@ -271,3 +271,15 @@ Saídas ajustadas: alvo 2 = 0,0711425; alvo 3 = 0,0737295.
 - `POST /paper/signals` com `{ "message": "<texto colado do canal>" }`: grava a mensagem (entrada, Segunda Fase ou inválida com motivo). Segunda Fase é ligada à última entrada do mesmo símbolo.
 - `GET /paper/signals`: refaz cada sinal com velas públicas de 1 min da Binance (spot e USD-M) e devolve o resultado por carteira (spot/futuros) e variante (sem runner / runner 20%), com o limite de 3 sinais abertos por carteira (`RISK_MAX_OPEN`) e `DATA_MISSING` quando a Binance não tem os dados.
 - Só as mensagens são gravadas no estado (`signalFollower`), sob a regra append-only. O resultado não é gravado: é reproduzível pelos mesmos dados públicos, como o acompanhamento de momentum. Nenhuma ordem é enviada.
+
+### 13.1 Tela `/office2/sinais.html`
+
+Link "Sinais" no topo do Escritório 2.0. Mobile first (testada para ~380 px); entra com o mesmo código de acesso do escritório (`/auth/login`).
+
+1. **Colar** a mensagem inteira do canal (entrada ou Segunda Fase).
+2. **Recebida em**: vem com a data de hoje no fuso de Brasília. Hoje → a hora da colagem vale como recebimento (`receivedAtSource: SERVER`). Outra data → envia `AAAA-MM-DDT23:59:00-03:00` (`OWNER`), e a hora `HH:MM` da mensagem cai naquele dia. Data no futuro é rejeitada (400). Serve para registrar sinais antigos.
+3. **Conferir**: `POST /paper/signals` com `dryRun: true`. Só lê e mostra o que foi entendido (moeda, hora, zona, defesa, parciais, alvos, convicção/volatilidade/risco; na Segunda Fase: suporte, alvos e se achou o sinal pai) ou o motivo da rejeição. Não grava e funciona mesmo com `SIGNAL_FOLLOWER_ENABLED` desligada. "Registrar" só habilita se o tipo não for `REJECTED_PARSE`, e volta a travar se o texto ou a data mudarem.
+4. **Registrar**: grava a mensagem. Com a flag desligada o servidor responde 403 e a tela avisa para ligar `SIGNAL_FOLLOWER_ENABLED`.
+5. **Atualizar resultados**: `GET /paper/signals`, com abas para Spot/Futuros × Sem runner/Runner 20%, resumo (fechados, abertos, acertos, R total, R médio, PnL), lista de sinais (status, alavancagem, R, PnL, fills) e as mensagens registradas, inclusive as rejeitadas com motivo.
+
+As rotas ficam em `src/application/signal-follower-routes.ts`; os helpers puros da tela ficam em `globalThis.SignalsView` (`public/office2/sinais.js`) e são testados via `vm`.

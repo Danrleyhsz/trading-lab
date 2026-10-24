@@ -52,6 +52,7 @@ import { BinanceDerivativesData } from './infrastructure/binance-derivatives.js'
 import { BinancePerpetualHistory } from './infrastructure/binance-perpetual-history.js';
 import { ForwardMomentumTracker } from './application/forward-momentum.js';
 import { SignalFollowerBook } from './application/signal-follower-book.js';
+import { registerSignalRoutes } from './application/signal-follower-routes.js';
 import { BinanceSignalWindow } from './infrastructure/binance-signal-window.js';
 import { BybitPerpetualHistory, ResilientPerpetualHistory } from './infrastructure/bybit-perpetual-history.js';
 import { BinancePerpetualMarket } from './infrastructure/binance-perpetual-market.js';
@@ -572,15 +573,7 @@ const forwardMomentum = new ForwardMomentumTracker(
 );
 forwardMomentum.start(); // encerrado pelo dono em 10/10/2026: só liga com FORWARD_MOMENTUM_ENABLED=true
 app.get('/paper/momentum/forward', async () => forwardMomentum.snapshot());
-app.get('/paper/signals', async () => signalFollower.report());
-app.post('/paper/signals', async (req, reply) => {
-  const body = z.object({ message: z.string().min(10).max(5000) }).strict().safeParse(req.body);
-  if (!body.success) return reply.code(400).send({ error: 'invalid message' });
-  if (!signalFollower.isEnabled()) return reply.code(403).send({ error: 'signal follower disabled' });
-  const message = signalFollower.add(body.data.message);
-  await persist();
-  return message;
-});
+registerSignalRoutes(app, signalFollower, () => persist());
 await perpetualMarket.start(
   async (quote) => {
     if (runtime.isDraining()) return;

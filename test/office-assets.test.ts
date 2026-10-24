@@ -150,3 +150,21 @@ test('office2 assets carry ETag and Last-Modified and answer a matching conditio
     await app.close();
   }
 });
+
+test('office2 serve a tela Sinais (HTML e JS) e o escritório linka para ela', async () => {
+  const app = Fastify();
+  registerOfficeAssets(app);
+  try {
+    const page = await app.inject('/office2/sinais.html');
+    assert.equal(page.statusCode, 200);
+    assert.match(page.headers['content-type']!, /^text\/html/);
+    assert.match(page.body, /\/office2\/sinais\.js/);
+    const script = await app.inject('/office2/sinais.js');
+    assert.equal(script.statusCode, 200);
+    assert.match(script.headers['content-type']!, /javascript/);
+    assert.equal(script.headers['cache-control'], 'no-cache');
+    assert.match((await app.inject('/office2/')).body, /href="\/office2\/sinais\.html"/);
+  } finally {
+    await app.close();
+  }
+});

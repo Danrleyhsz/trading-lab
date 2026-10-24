@@ -126,3 +126,54 @@ test('janela da Binance pagina velas de 1 minuto', async () => {
   assert.ok(urls[0]!.startsWith('https://api.binance.com/api/v3/klines'));
   assert.equal(new URL(urls[1]!).searchParams.get('startTime'), String(1000 * MIN));
 });
+
+test('preview lê a mensagem sem gravar: entrada, Segunda Fase com pai e rejeitada', () => {
+  const book = new SignalFollowerBook(market(winning), [], true, 10000, () => RECEIVED);
+  const first = book.preview(entry());
+  assert.equal(first.kind, 'ENTRY');
+  assert.equal((first.signal as { symbol: string }).symbol, 'AIOTUSDT');
+  const orphan = book.preview(PHASE2);
+  assert.equal(orphan.kind, 'PHASE2');
+  assert.equal(orphan.parentId, undefined);
+  const parent = book.add(entry());
+  assert.equal(book.preview(PHASE2).parentId, parent.id);
+  const bad = book.preview('mensagem qualquer sem formato');
+  assert.equal(bad.kind, 'REJECTED_PARSE');
+  assert.ok(bad.reason);
+  assert.equal(book.list().length, 1);
+});
+
+test('preview funciona com o seguidor desligado e não grava', () => {
+  const book = new SignalFollowerBook(market(winning));
+  assert.equal(book.preview(entry()).kind, 'ENTRY');
+  assert.equal(book.list().length, 0);
+});
+
+test('receivedAt de outra data põe o sinal no dia certo e marca a origem como OWNER', async () => {
+  const starts: number[] = [];
+  const spy: MarketWindow = {
+    async candles(_sleeve, _symbol, start) {
+      starts.push(start);
+      return winning(start);
+    },
+    async funding() {
+      return [];
+    },
+  };
+  const book = new SignalFollowerBook(spy, [], true, 10000, () => RECEIVED + 10 * MIN);
+  const today = book.add(entry());
+  const old = book.add(entry('BBBUSDT'), '2026-10-20T23:59:00-03:00');
+  assert.equal(today.receivedAtSource, 'SERVER');
+  assert.equal(old.receivedAtSource, 'OWNER');
+  assert.equal(old.receivedAt, '2026-10-21T02:59:00.000Z');
+  await book.report();
+  assert.ok(starts.includes(Date.UTC(2026, 9, 24, 12, 51))); // 09:51 de hoje em Brasília
+  assert.ok(starts.includes(Date.UTC(2026, 9, 20, 12, 51))); // 09:51 do dia 20
+});
+
+test('receivedAt no futuro ou inválido é rejeitado e nada é gravado', () => {
+  const book = new SignalFollowerBook(market(winning), [], true, 10000, () => RECEIVED);
+  assert.throws(() => book.add(entry(), '2026-10-25T23:59:00-03:00'), /invalid receivedAt/);
+  assert.throws(() => book.add(entry(), 'ontem'), /invalid receivedAt/);
+  assert.equal(book.list().length, 0);
+});
