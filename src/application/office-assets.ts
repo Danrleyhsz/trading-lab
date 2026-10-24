@@ -65,6 +65,8 @@ const officeTwoFiles: Record<string, string> = {
   'lab.js': 'application/javascript; charset=utf-8',
   'ops.js': 'application/javascript; charset=utf-8',
   'horizon.js': 'application/javascript; charset=utf-8',
+  'sinais.html': 'text/html; charset=utf-8',
+  'sinais.js': 'application/javascript; charset=utf-8',
   'stress-report.json': 'application/json; charset=utf-8',
   'scene-map.json': 'application/json; charset=utf-8',
   'art/cidade-noite.jpg': 'image/jpeg',
