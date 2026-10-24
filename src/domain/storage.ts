@@ -9,6 +9,7 @@ import type { MemoryRecord } from './memory.js';
 import type { AgentState } from './agents.js';
 import type { AgentActivity } from './agent-career.js';
 import type { AgentMessage } from './agent-messages.js';
+import type { StoredFollowerMessage } from '../application/signal-follower-book.js';
 export interface StoredState {
   aiLedger?: AiRecord[];
   domainEvents?: DomainEvent[];
@@ -21,6 +22,7 @@ export interface StoredState {
   strategies?: Strategy[];
   perpetualStudies?: PerpetualStudy[];
   perpetualBook?: PerpetualBookState;
+  signalFollower?: StoredFollowerMessage[];
 }
 export interface StateStore {
   load(): Promise<StoredState | null>;

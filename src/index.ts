@@ -51,6 +51,8 @@ import { BinanceHistoricalData } from './infrastructure/binance-history.js';
 import { BinanceDerivativesData } from './infrastructure/binance-derivatives.js';
 import { BinancePerpetualHistory } from './infrastructure/binance-perpetual-history.js';
 import { ForwardMomentumTracker } from './application/forward-momentum.js';
+import { SignalFollowerBook } from './application/signal-follower-book.js';
+import { BinanceSignalWindow } from './infrastructure/binance-signal-window.js';
 import { BybitPerpetualHistory, ResilientPerpetualHistory } from './infrastructure/bybit-perpetual-history.js';
 import { BinancePerpetualMarket } from './infrastructure/binance-perpetual-market.js';
 import { JsonStateStore } from './infrastructure/json-state-store.js';
@@ -80,6 +82,13 @@ const store = process.env.DATABASE_URL
   : new JsonStateStore();
 if (store instanceof PostgresStateStore) await store.open();
 const restored = await store.load();
+// Seguidor de Sinais (docs/SIGNAL_FOLLOWER.md): só simulação com velas públicas; desligado sem SIGNAL_FOLLOWER_ENABLED=true.
+const signalFollower = new SignalFollowerBook(
+  new BinanceSignalWindow(),
+  restored?.signalFollower ?? [],
+  process.env.SIGNAL_FOLLOWER_ENABLED === 'true',
+  Number(process.env.SIGNAL_FOLLOWER_CAPITAL) > 0 ? Number(process.env.SIGNAL_FOLLOWER_CAPITAL) : 10000,
+);
 const runtime = new RuntimeReadiness({
   production,
   storage: store instanceof PostgresStateStore ? 'POSTGRESQL' : 'JSON_DEVELOPMENT',
@@ -157,6 +166,7 @@ const persist = (override?: PerpetualBookState, aiOverride?: AiRecord[]) => {
         strategies: strategies.list(),
         perpetualStudies: studies.list(),
         perpetualBook: override ?? durableBook,
+        signalFollower: signalFollower.list(),
       };
       await store.save(snapshot);
       durableSnapshot = snapshot;
@@ -562,6 +572,15 @@ const forwardMomentum = new ForwardMomentumTracker(
 );
 forwardMomentum.start(); // encerrado pelo dono em 10/10/2026: só liga com FORWARD_MOMENTUM_ENABLED=true
 app.get('/paper/momentum/forward', async () => forwardMomentum.snapshot());
+app.get('/paper/signals', async () => signalFollower.report());
+app.post('/paper/signals', async (req, reply) => {
+  const body = z.object({ message: z.string().min(10).max(5000) }).strict().safeParse(req.body);
+  if (!body.success) return reply.code(400).send({ error: 'invalid message' });
+  if (!signalFollower.isEnabled()) return reply.code(403).send({ error: 'signal follower disabled' });
+  const message = signalFollower.add(body.data.message);
+  await persist();
+  return message;
+});
 await perpetualMarket.start(
   async (quote) => {
     if (runtime.isDraining()) return;
