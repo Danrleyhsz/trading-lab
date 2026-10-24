@@ -3,7 +3,10 @@ import assert from 'node:assert/strict';
 import type { Candle } from '../src/domain/backtest.js';
 import {
   exitWeights,
+  futuresLeverage,
   parseEntrySignal,
+  parsePhase2Signal,
+  simulatePhase2Entry,
   signalTimestamp,
   simulateSignal,
   type EntrySignal,
@@ -149,4 +152,107 @@ test('sem velas suficientes o sinal fica pendente, não é inventado', () => {
 test('taxas reduzem o resultado', () => {
   const r = simulateSignal(signal, 0, [entryBar, p1Bar, p2Bar, a1Bar], { ...cfg, feeRate: 0.001 });
   assert.ok(r.pnl < 309.94 && r.pnl > 250);
+});
+
+// --- Futuros (T9) ---
+const rule = { min: 5, max: 15, liquidationSafetyFactor: 2, maintenanceMarginRate: 0.005 };
+
+test('alavancagem pela distância do stop', () => {
+  assert.equal(futuresLeverage(0.0245, rule), 15); // daria 18, limitado a 15
+  assert.equal(futuresLeverage(0.05, rule), 9);
+  assert.equal(futuresLeverage(0.12, rule), null);
+});
+
+test('T9: stop a ~12% → futuros pulado, spot segue', () => {
+  const wide = { ...signal, defense: 0.054 };
+  const fut = simulateSignal(wide, 0, [entryBar, p1Bar], { ...cfg, market: 'futures' });
+  assert.equal(fut.status, 'FUTURES_SKIPPED_STOP_TOO_WIDE');
+  assert.equal(fut.fills.length, 0);
+  const spot = simulateSignal(wide, 0, [entryBar, p1Bar], cfg);
+  assert.equal(spot.status, 'OPEN');
+});
+
+test('futuros: mesmo risco do spot, 15x, funding real descontado', () => {
+  const funding = [{ timestamp: 2.5 * MIN, rate: 0.0001, markPrice: 0.063 }];
+  const r = simulateSignal(signal, 0, [entryBar, p1Bar, p2Bar, a1Bar], { ...cfg, market: 'futures' }, { funding });
+  assert.equal(r.leverage, 15);
+  const qty = 100 / 0.0015;
+  near(r.funding, -0.0001 * qty * 0.7 * 0.063);
+  near(r.pnl, 309.94 + r.funding);
+});
+
+test('futuros: abertura abaixo da liquidação registra LIQUIDATED', () => {
+  const r = simulateSignal(signal, 0, [entryBar, bar(2, 0.05, 0.05, 0.049)], { ...cfg, market: 'futures' });
+  assert.equal(r.status, 'LIQUIDATED');
+  assert.equal(r.fills.at(-1)!.reason, 'LIQUIDATION');
+});
+
+// --- Segunda Fase (T12–T17) ---
+const PHASE2 = `🔥 ANÁLISE — SEGUNDA FASE | 08:36 | AIOT
+
+PREÇO DE ENTRADA: 0.0608 ✅
+PREÇO DA LEITURA ATUAL: 0.0678
+
+Suporte atual: 0.0621
+Resistência atual: 0.0687
+Possível alvo 2: 0.0715
+Possível alvo 3: 0.0741
+
+⚠️ Quem estiver chegando somente na Segunda Fase deve considerar que a entrada original ocorreu numa região bem diferente da atual.\u200B\u200C\u200D`;
+const p2parsed = parsePhase2Signal(PHASE2);
+assert.ok(p2parsed.ok);
+const p2 = p2parsed.signal;
+const runnerCfg: FollowerConfig = { ...cfg, runnerFraction: 0.2, runnerMaxWaitHoursForPhase2: 48 };
+const phase2 = { signal: p2, time: 4.5 * MIN };
+const qty = 100 / 0.0015;
+const phase1Runner = (0.063481 - 0.0612) * qty * 0.3 + (0.066466 - 0.0612) * qty * 0.3 + (0.0671625 - 0.0612) * qty * 0.2;
+
+test('T12: parser da Segunda Fase', () => {
+  assert.equal(p2.symbol, 'AIOTUSDT');
+  assert.equal(p2.time, '08:36');
+  assert.equal(p2.originalEntry, 0.0608);
+  assert.equal(p2.priceAtSignal, 0.0678);
+  assert.equal(p2.support, 0.0621);
+  assert.equal(p2.resistance, 0.0687);
+  assert.deepEqual(p2.targets, [0.0715, 0.0741]);
+  assert.equal(parsePhase2Signal(PHASE2.replace('Suporte atual: 0.0621', '')).ok, false);
+});
+
+test('T13: runner pega alvo 2 e alvo 3 → +380,25', () => {
+  const path = [entryBar, p1Bar, p2Bar, a1Bar, bar(5, 0.068, 0.0712, 0.0675), bar(6, 0.0712, 0.074, 0.071)];
+  const r = simulateSignal(signal, 0, path, runnerCfg, { phase2 });
+  assert.equal(r.status, 'CLOSED');
+  near(r.pnl, 380.25);
+});
+
+test('T14: runner volta ao stop da P2 → +300,65; sem runner no mesmo caminho → +309,94', () => {
+  const path = [entryBar, p1Bar, p2Bar, a1Bar, bar(5, 0.067, 0.068, 0.066)];
+  near(simulateSignal(signal, 0, path, runnerCfg, { phase2 }).pnl, 300.65);
+  near(simulateSignal(signal, 0, path, cfg, { phase2 }).pnl, 309.94);
+});
+
+test('T15: entrada nova na Segunda Fase com RR ruim é ignorada', () => {
+  const r = simulatePhase2Entry(p2, 0, [bar(1, 0.0678, 0.068, 0.0675)], cfg);
+  assert.equal(r.status, 'SKIPPED_LOW_RR');
+  near(r.rr!, 0.56);
+});
+
+test('entrada nova na Segunda Fase com RR bom opera 50/50 nos alvos', () => {
+  const r = simulatePhase2Entry(p2, 0, [bar(1, 0.0635, 0.064, 0.063), bar(2, 0.064, 0.075, 0.064)], cfg);
+  assert.equal(r.status, 'CLOSED');
+  assert.ok(r.rr! >= 1.5);
+  assert.equal(r.fills.filter((f) => f.reason === 'EXIT').length, 2);
+});
+
+test('T16: sem Segunda Fase em 48h o runner fecha na abertura seguinte', () => {
+  const late = bar(4 + 48 * 60 + 1, 0.066, 0.0665, 0.0664);
+  const r = simulateSignal(signal, 0, [entryBar, p1Bar, p2Bar, a1Bar, late], runnerCfg);
+  assert.equal(r.runnerClosedNoPhase2, true);
+  near(r.pnl, phase1Runner + (0.066 - 0.0612) * qty * 0.2);
+});
+
+test('T17: suporte da Segunda Fase abaixo do stop do runner não rebaixa o stop', () => {
+  const r = simulateSignal(signal, 0, [entryBar, p1Bar, p2Bar, a1Bar, bar(5, 0.068, 0.0685, 0.0675)], runnerCfg, { phase2 });
+  assert.equal(r.status, 'OPEN');
+  near(r.stop, 0.066466, 1e-9);
 });
