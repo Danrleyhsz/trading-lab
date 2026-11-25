@@ -9516,6 +9516,170 @@
    },
    "prevHash": "11554c29aa665e62440fe70e0b954797f59fc1441bacc7889f45fd67bfb99120",
    "hash": "a088db9b6bbb33e706421ab1c5492322fd86c7dca1f643ca04772370adf42d3c"
+  },
+  {
+   "n": 48,
+   "runAt": "2026-11-25T08:18:49.956Z",
+   "decisionDay": "2026-11-24",
+   "decided": true,
+   "delaySeconds": 29930,
+   "missedDays": 0,
+   "members": [
+    "BTCUSDT",
+    "ETHUSDT",
+    "SOLUSDT",
+    "XRPUSDT",
+    "ZECUSDT"
+   ],
+   "dataSha256": "2a30683923ec02f50d7ecda3fc82d256be7c6914604941616e7edf0ca9945975",
+   "accounts": {
+    "SMA100": {
+     "targetWeights": {
+      "BTCUSDT": 0,
+      "ETHUSDT": 0,
+      "SOLUSDT": 0,
+      "ZECUSDT": 0,
+      "XRPUSDT": 0
+     },
+     "signals": {
+      "BTCUSDT": 0,
+      "ETHUSDT": 0,
+      "SOLUSDT": 0,
+      "ZECUSDT": 0,
+      "XRPUSDT": 0
+     },
+     "scale": 0.5827931723490187,
+     "orders": [],
+     "skipped": [],
+     "cash": 9535.434355325711,
+     "positions": {},
+     "equityBefore": 9535.434355325711,
+     "equity": 9535.434355325711,
+     "peak": 10091.08785360541,
+     "drawdown": 0.055063785623585715,
+     "halted": false
+    },
+    "DONCHIAN_55_20": {
+     "targetWeights": {
+      "BTCUSDT": 0,
+      "ETHUSDT": 0,
+      "SOLUSDT": 0,
+      "ZECUSDT": 0,
+      "XRPUSDT": 0
+     },
+     "signals": {
+      "BTCUSDT": 0,
+      "ETHUSDT": 0,
+      "SOLUSDT": 0,
+      "ZECUSDT": 0,
+      "XRPUSDT": 0
+     },
+     "scale": 1,
+     "orders": [],
+     "skipped": [],
+     "cash": 9765.40860871546,
+     "positions": {},
+     "equityBefore": 9765.40860871546,
+     "equity": 9765.40860871546,
+     "peak": 10043.870090856337,
+     "drawdown": 0.027724520490799764,
+     "halted": false
+    },
+    "BENCH_5_MAIORES": {
+     "targetWeights": {
+      "BTCUSDT": 0.07688642788974202,
+      "ETHUSDT": 0.07688642788974202,
+      "SOLUSDT": 0.07688642788974202,
+      "ZECUSDT": 0.07688642788974202,
+      "XRPUSDT": 0.07688642788974202
+     },
+     "signals": {
+      "BTCUSDT": 1,
+      "ETHUSDT": 1,
+      "SOLUSDT": 1,
+      "ZECUSDT": 1,
+      "XRPUSDT": 1
+     },
+     "scale": 0.3844321394487101,
+     "orders": [
+      {
+       "symbol": "ETHUSDT",
+       "side": "BUY",
+       "requestedNotional": 12.312844154556728,
+       "qty": 0.007494761668405543,
+       "avgPrice": 1642.86,
+       "notional": 12.312844154556728,
+       "fee": 0.012312844154556728,
+       "mid": 1642.855,
+       "close": 1680.11,
+       "slipBps": 0.030434822305570278,
+       "delayBps": -221.74143359660906,
+       "feeBps": 10,
+       "totalBps": -211.71167364041642,
+       "filledAll": true
+      },
+      {
+       "symbol": "SOLUSDT",
+       "side": "BUY",
+       "requestedNotional": 30.90911758087293,
+       "qty": 0.4551482488716379,
+       "avgPrice": 67.91,
+       "notional": 30.90911758087293,
+       "fee": 0.03090911758087293,
+       "mid": 67.905,
+       "close": 69.69,
+       "slipBps": 0.7363228039165677,
+       "delayBps": -256.13430908308175,
+       "feeBps": 10,
+       "totalBps": -245.4168460324295,
+       "filledAll": true
+      },
+      {
+       "symbol": "ZECUSDT",
+       "side": "BUY",
+       "requestedNotional": 10.221565529613258,
+       "qty": 0.014027509372582285,
+       "avgPrice": 728.68,
+       "notional": 10.221565529613258,
+       "fee": 0.010221565529613258,
+       "mid": 728.64,
+       "close": 739.77,
+       "slipBps": 0.5489679402717889,
+       "delayBps": -150.45216756559466,
+       "feeBps": 10,
+       "totalBps": -139.91145896697665,
+       "filledAll": true
+      }
+     ],
+     "skipped": [
+      {
+       "symbol": "BTCUSDT",
+       "reason": "MIN_NOTIONAL",
+       "requestedNotional": 7.2137944912587955
+      },
+      {
+       "symbol": "XRPUSDT",
+       "reason": "MIN_NOTIONAL",
+       "requestedNotional": 8.829516755330815
+      }
+     ],
+     "cash": 5288.516871576709,
+     "positions": {
+      "BTCUSDT": 0.01105106494654157,
+      "ETHUSDT": 0.400860534840764,
+      "SOLUSDT": 9.698159129642695,
+      "XRPUSDT": 708.3415150551112,
+      "ZECUSDT": 0.9038142434388129
+     },
+     "equityBefore": 8565.305861055542,
+     "equity": 8565.249543212849,
+     "peak": 10085.598623173853,
+     "drawdown": 0.1507445553571478,
+     "halted": false
+    }
+   },
+   "prevHash": "a088db9b6bbb33e706421ab1c5492322fd86c7dca1f643ca04772370adf42d3c",
+   "hash": "7a16ddbcf50854dd691fd28e6c97913b82ba9a7252f5dd573fc462e23e40a189"
   }
  ]
 }
